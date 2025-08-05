@@ -1,0 +1,46 @@
+# Workflow for continuous integration tasks triggered on pushes to main
+
+name: CI - Main
+run-name: CI - Main
+on:
+  workflow_dispatch:
+    inputs:
+      skip-tests:
+        description: "Don't run tests before deploying"
+        required: false
+        default: false
+        type: boolean
+  push:
+    branches: ["main"]
+
+jobs:
+  test-all:
+    if: ${{ github.event_name == 'push' || ! github.event.inputs.skip-tests }}
+
+    uses: ./.github/workflows/job-test-main.yml
+    secrets: inherit # pass all secrets for the environment
+
+  container-push:
+    uses: ./.github/workflows/job-container-push.yml
+    needs: [test-all]
+    # When ready to enable this step, remove the following line and uncomment the proper condition below it
+    if: false
+    # Proceed if test-all was successful or skipped
+    # if: always() &&  (needs.test-all.result == 'skipped' || needs.test-all.result == 'success')
+    with:
+      container_tag: ${{ github.sha }}
+  # Deploy to Kubernetes Job
+  # Requires an environment, which must reflect the target environment as defined in the
+  # GitHub repository: https://github.com/PSDI-UK/PROJECT_NAME_HYPHEN/settings/environments
+  # The downstream deploy job leverages on Environment specific secrets, which also must be defined
+  # For the tag, we need something unique for each push, so we use the SHA of the latest commit
+  deploy-stfc-dev-k8s:
+    needs: [container-push]
+    # Proceed if test-all was successful or skipped
+    if: always() && (needs.container-push.result == 'success')
+    uses: ./.github/workflows/job-deploy-k8s.yml # use the callable deploy job
+    secrets: inherit # pass all secrets for the environment
+    with:
+      # container_tag
+      container_tag: ${{ github.sha }}
+      environment: development

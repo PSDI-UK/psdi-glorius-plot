@@ -1,0 +1,26 @@
+"""
+# get.py
+
+This module defines the various webpages (the "GET" methods) provided by the website, connecting them to relevant
+functions to return rendered templates.
+"""
+
+
+from flask import Flask, render_template
+
+from PROJECT_NAME.gui.env import get_env_kwargs
+
+
+def index():
+    """Return the web page along with relevant data
+    """
+    return render_template("index.html",
+                           **get_env_kwargs())
+
+
+def init_get(app: Flask):
+    """Connect the provided Flask app to each of the pages on the site
+    """
+
+    app.route('/')(index)
+    app.route('/index.html')(index)

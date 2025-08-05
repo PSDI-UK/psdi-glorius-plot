@@ -1,0 +1,50 @@
+# Reusable workflow intended to be called as a job by other workflows
+
+# This action does the following:
+#
+# Creates a new release containing the repository source code, and tagging the
+# release with an appropriate version number, and publishing it on the Github project
+# page
+#
+# Notes:
+# - The version number is incremented every release as described in
+#   https://github.com/mathieudutour/github-tag-action. Note that by default semantic
+#   version numbers are used and the patch number is incremented every release.
+#   Moreover, in accordance with Angular conventional commits convention, the minor or
+#   major number is incremented only upon detection of commits in the history with
+#   certain formats. E.g. a commit beginning with 'feat:', signifying a new feature,
+#   would result in the minor number being incremented. For details on the expected
+#   format of commit messages in this regard see
+#   https://github.com/conventional-changelog/conventional-changelog/tree/master/packages/conventional-changelog-angular.
+#
+
+name: Job - Tag
+run-name: Tag
+
+on:
+  workflow_call:
+    outputs:
+      container_tag:
+        description: "Container Tag"
+        value: ${{ jobs.tag.outputs.container_tag }}
+    
+jobs:
+  tag:
+    outputs:
+      container_tag: ${{ steps.tag_version.outputs.new_tag }}
+    runs-on: psdi-uk-runners
+    steps:
+      - uses: actions/checkout@v4
+      - name: Bump version and push tag
+        id: tag_version
+        uses: mathieudutour/github-tag-action@v6.2
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          release_branches: release
+          pre_release_branches: rc-*
+      - name: Create a GitHub release
+        uses: ncipollo/release-action@v1
+        with:
+          tag: ${{ steps.tag_version.outputs.new_tag }}
+          name: Release ${{ steps.tag_version.outputs.new_tag }}
+          body: ${{ steps.tag_version.outputs.changelog }}

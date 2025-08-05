@@ -1,0 +1,50 @@
+# Workflow for continuous integration tasks run periodically
+
+name: CI - Periodic jobs
+run-name: CI - Periodic jobs
+
+on:
+  schedule:
+    # Run once a week
+    - cron: "00 0 1,8,15,22 * *"
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  update-assets:
+    name: Update common assets
+    runs-on: psdi-uk-runners
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Fetch assets
+        run: |
+          ./scripts/fetch-common-style.sh
+
+      - name: Check for changes in staged files
+        id: check-changes
+        run: |
+          # Get the list of modified, added, or deleted files
+          CHANGED_FILES=$(git status --porcelain)
+
+          # Check if there are any changes
+          if [ -z "$CHANGED_FILES" ]; then
+            echo "No assets have been updated"
+            echo "has_changes=0" >> $GITHUB_OUTPUT
+          else
+            echo "Assets have been updated"
+            echo "has_changes=1" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Create Pull Request (if changes detected)
+        if: steps.check-changes.outputs.has_changes == '1'
+        uses: peter-evans/create-pull-request@v7
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          branch: auto-update-assets
+          commit-message: "Automated update of PSDI common assets"
+          title: "Automated update of PSDI common assets"
+          body: "This PR contains automated updates to the PSDI common assets."
+          labels: automated
+          base: main

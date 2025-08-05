@@ -1,0 +1,18 @@
+# Workflow for continuous integration tasks triggered on push to a release candidate branch
+
+name: CI - Release candidate and hotfix branches
+run-name: CI - Release candidate and hotfix branches
+on:
+  workflow_dispatch:
+  push:
+    branches: ["rc**", "hotfix**"]
+
+jobs:
+  open-pull-request:
+    # Open a PR if the branch isn't release itself
+    if: ${{ github.head_ref || github.ref_name }} != 'release'
+    uses: ./.github/workflows/job-open-pull-request.yml
+    with:
+      target: release
+      # Pass an empty string for args, which disables the default -d flag which creates the PR as a draft
+      args: 

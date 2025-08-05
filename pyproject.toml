@@ -1,0 +1,90 @@
+[build-system]
+requires = ["hatchling==1.27.0", "hatch-vcs"]
+build-backend = "hatchling.build"
+
+[project]
+name = "PROJECT_NAME"
+authors = [
+  # Add your name and email here
+  { name = "Bryan Gillis", email = "7204836+brgillis@users.noreply.github.com" },
+]
+description = "TODO: Project Description"
+readme = "README.md"
+# List keywords relevant to your project here. There's no official list, so include ones you think are relevant and will
+# help find your project in searches, e.g. ["chemistry", "PSDI"]
+keywords = ["flask"]
+license = { file = "LICENSE" }
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Framework :: Flask",
+  "Intended Audience :: Science/Research",
+  "License :: OSI Approved :: Apache Software License",
+  "Natural Language :: English",
+  "Operating System :: POSIX :: Linux",
+  "Programming Language :: JavaScript",
+  "Programming Language :: Python :: 3",
+  "Topic :: Scientific/Engineering :: Chemistry",
+]
+dependencies = ["Flask"]
+requires-python = ">= 3.12"
+
+# Version specification - we determine the version through git. If you wish to install this without it being in a git
+# repository, you can do so by uncommenting the next line, then commenting out the block below which specifies how to
+# determine the version from git
+
+# version = "0.0.1"
+
+# If using a fixed version, start commenting out from here
+dynamic = ["version"]
+
+[tool.hatch.version]
+source = "vcs"
+
+[tool.hatch.version.raw-options]
+local_scheme = "no-local-version"
+# If using a fixed version, stop commenting out here
+
+[project.optional-dependencies]
+test = ["pytest", "coverage"]
+gui-test = ["pytest", "coverage", "selenium", "webdriver_manager"]
+deploy = ["gunicorn"]
+doc = ["pdoc3", "gunicorn", "pytest", "selenium"]
+plots = ["matplotlib"]
+
+[project.scripts]
+PROJECT_NAME_HYPHEN-gui = "PROJECT_NAME.main_gui:main"
+
+[project.urls]
+Homepage = "https://PROJECT_NAME_HYPHEN.psdi.ac.uk/"
+Documentation = "https://psdi-uk.github.io/PROJECT_NAME_HYPHEN/"
+Issues = "https://github.com/PSDI-UK/PROJECT_NAME_HYPHEN/issues"
+Changelog = "https://github.com/PSDI-UK/PROJECT_NAME_HYPHEN/blob/main/CHANGELOG.md"
+
+# Repository currently isn't public - when it goes public, uncomment the below
+# Repository = "https://github.com/PSDI-UK/PROJECT_NAME_HYPHEN"
+# Download = "https://github.com/PSDI-UK/PROJECT_NAME_HYPHEN/releases/latest"
+
+[tool.hatch.build]
+exclude = [
+  ".github/**",
+  "deploy/**",
+  "scripts/fetch-common-style.*",
+  "scripts/make-index-html.sh",
+  "Dockerfile",
+]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+
+[tool.coverage.run]
+source_pkgs = ["PROJECT_NAME"]
+branch = true
+# main_gui.py is tested via the Selenium tests, which are indirect enough that the coverage tool doesn't pick up that the
+# lines are being tested, so we exclude it from the coverage % calculation
+omit = ["main_gui.py", "*/gui/get.py", "*/gui/post.py"]
+
+[tool.coverage.paths]
+tests = ["tests/python"]
+
+[tool.coverage.report]
+exclude_lines = ["no cov", "if __name__ == .__main__.:", "if TYPE_CHECKING:"]

@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: PROJECT_NAME_HYPHEN
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: PROJECT_NAME_HYPHEN
+  template:
+    metadata:
+      labels:
+        app: PROJECT_NAME_HYPHEN
+      annotations:
+        elastic.co/dataset: kubernetes.container_logs.PROJECT_NAME
+    spec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                    - key: app
+                      operator: In
+                      values:
+                        - PROJECT_NAME_HYPHEN
+                topologyKey: "kubernetes.io/hostname"
+      containers:
+        - name: PROJECT_NAME_HYPHEN
+          image: PROJECT_NAME_HYPHEN
+          volumeMounts:
+            - mountPath: /tmp
+              name: uploads
+          ports:
+            - containerPort: 8000
+          resources:
+            requests:
+              memory: "512Mi"
+              cpu: "250m"
+            limits:
+              memory: "1Gi" # this value may need to increase if application stability declines
+              cpu: "1000m"
+      imagePullSecrets:
+        - name: github-psdi-registry-credentials
+      volumes:
+        - name: uploads
+          emptyDir:
+            sizeLimit: 1Gi

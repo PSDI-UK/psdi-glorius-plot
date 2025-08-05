@@ -1,0 +1,714 @@
+@import url('https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&family=Oswald:wght@200..700&display=swap');
+
+:root {
+  /* PSDI Common Style Definition                                            */
+  /* ----------------------------                                            */
+  /*                                                                         */
+  /* This file defines the common PSDI style scheme. The variable            */
+  /* definitions here can be modified to alter this scheme, and they will be */
+  /* included and used appropriately by the various builders.                */
+
+
+  /* Font */
+  --ifm-font-size-base      : 1rem;
+  --ifm-line-height-base    : 1.5;
+  --ifm-font-family-base    : Lato, Helvetica, Verdana, Arial, Lucida, sans-serif;
+  --ifm-heading-font-family : Oswald, Helvetica, Verdana, Arial, Lucida, sans-serif;
+  --ifm-font-weight-base    : normal;
+  --psdi-letter-spacing-base: normal;
+
+  /* Background and text colors */
+
+  --psdi-dark-text-color-body    : #000000;
+  --psdi-dark-text-color-heading : #041E42;
+  --psdi-light-text-color-body   : #ffffff;
+  --psdi-light-text-color-heading: #ffffff;
+
+  /* Default color (light mode) */
+  --psdi-text-color-default-body   : var(--psdi-dark-text-color-body);
+  --psdi-text-color-default-heading: var(--psdi-dark-text-color-heading);
+  --psdi-bg-color-default          : #ffffff;
+
+  /* Default color (dark mode) */
+  --psdi-dm-text-color-default-body   : var(--psdi-light-text-color-body);
+  --psdi-dm-text-color-default-heading: var(--psdi-light-text-color-heading);
+  --psdi-dm-bg-color-default          : #000000;
+
+  /* Primary color (light mode) - used for Hero panel and footer */
+  --psdi-bg-color-primary         : #041e42;
+  --psdi-bg-color-primary-dark    : #041b3b;
+  --psdi-bg-color-primary-darker  : #031938;
+  --psdi-bg-color-primary-darkest : #03152e;
+  --psdi-bg-color-primary-light   : #042149;
+  --psdi-bg-color-primary-lighter : #05224c;
+  --psdi-bg-color-primary-lightest: #052756;
+
+  /* Primary color (dark mode) */
+  --psdi-dm-bg-color-primary         : #96caf4;
+  --psdi-dm-bg-color-primary-dark    : #72b8f0;
+  --psdi-dm-bg-color-primary-darker  : #61afee;
+  --psdi-dm-bg-color-primary-darkest : #2b94e9;
+  --psdi-dm-bg-color-primary-light   : #badcf8;
+  --psdi-dm-bg-color-primary-lighter : #cbe5fa;
+  --psdi-dm-bg-color-primary-lightest: #ffffff;
+
+  /* Secondary color (light mode) */
+  --psdi-text-color-secondary-body   : var(--psdi-dark-text-color-body);
+  --psdi-text-color-secondary-heading: var(--psdi-dark-text-color-heading);
+  --psdi-bg-color-secondary          : #e5e1e6;
+  --psdi-bg-color-secondary-dark     : #cfc8d1;
+  --psdi-bg-color-secondary-darker   : #c5bcc7;
+  --psdi-bg-color-secondary-darkest  : #a497a8;
+  --psdi-bg-color-secondary-light    : #f0edf0;
+  --psdi-bg-color-secondary-lighter  : #fbfafb;
+  --psdi-bg-color-secondary-lightest : #ffffff;
+
+  /* Secondary color (dark mode) */
+  --psdi-dm-text-color-secondary-body   : var(--psdi-dark-text-color-body);
+  --psdi-dm-text-color-secondary-heading: var(--psdi-dark-text-color-heading);
+  --psdi-dm-bg-color-secondary          : #bbbbbb;
+  --psdi-dm-bg-color-secondary-dark     : #a8a8a8;
+  --psdi-dm-bg-color-secondary-darker   : #9f9f9f;
+  --psdi-dm-bg-color-secondary-darkest  : #838383;
+  --psdi-dm-bg-color-secondary-light    : #cecece;
+  --psdi-dm-bg-color-secondary-lighter  : #d7d7d7;
+  --psdi-dm-bg-color-secondary-lightest : #f3f3f3;
+
+  /* Success color */
+  --ifm-color-success         : #5aa2ae;
+  --ifm-color-success-dark    : #4e949f;
+  --ifm-color-success-darker  : #4a8c97;
+  --ifm-color-success-darkest : #3d737c;
+  --ifm-color-success-light   : #6cacb7;
+  --ifm-color-success-lighter : #75b1bb;
+  --ifm-color-success-lightest: #8fc0c8;
+
+  /* Info color */
+  --ifm-color-info         : #3d7cc9;
+  --ifm-color-info-dark    : #336fb8;
+  --ifm-color-info-darker  : #3069ae;
+  --ifm-color-info-darkest : #28578f;
+  --ifm-color-info-light   : #518acf;
+  --ifm-color-info-lighter : #5c91d2;
+  --ifm-color-info-lightest: #7aa6da;
+
+  /* Warning color */
+  --ifm-color-warning         : #ff9e18;
+  --ifm-color-warning-dark    : #fb9200;
+  --ifm-color-warning-darker  : #ed8a00;
+  --ifm-color-warning-darkest : #c37100;
+  --ifm-color-warning-light   : #ffaa34;
+  --ifm-color-warning-lighter : #ffb042;
+  --ifm-color-warning-lightest: #ffc16c;
+
+  /* Danger color */
+  --ifm-color-danger         : #993366;
+  --ifm-color-danger-dark    : #8a2e5c;
+  --ifm-color-danger-darker  : #822b57;
+  --ifm-color-danger-darkest : #6b2447;
+  --ifm-color-danger-light   : #a83870;
+  --ifm-color-danger-lighter : #b03b75;
+  --ifm-color-danger-lightest: #c24785;
+
+  /* Footer */
+  --ifm-footer-background-color: var(--ifm-color-primary);
+  --ifn-footer-title-color     : var(--ifm-font-color-base-inverse);
+  --ifm-footer-color           : var(--ifm-font-color-base-inverse);
+  --ifm-footer-link-color      : var(--ifm-font-color-base-inverse);
+  --ifm-footer-link-hover-color: var(--ifm-font-color-base-inverse);
+
+  /* Button color */
+  --ifm-button-background-color     : var(--psdi-bg-color-secondary);
+  --ifm-button-background-color-dark: var(--psdi-bg-color-secondary-dark);
+  --ifm-button-color                : var(--psdi-dark-text-color-heading);
+
+  /* Border colors */
+  --psdi-border-color-light: #f5f6f7;
+  --psdi-border-color-dark : #111111;
+
+  /* Link styling */
+  --ifm-link-color             : inherit;
+  --ifm-link-hover-color       : inherit;
+  --ifm-navbar-link-hover-color: inherit;
+
+  /* Set specific colors to used based on light/dark-mode */
+  /* Define light mode here first, as default */
+  --ifm-background-color: var(--psdi-bg-color-default);
+
+  --ifm-color-primary         : var(--psdi-bg-color-primary);
+  --ifm-color-primary-dark    : var(--psdi-bg-color-primary-dark);
+  --ifm-color-primary-darker  : var(--psdi-bg-color-primary-darker);
+  --ifm-color-primary-darkest : var(--psdi-bg-color-primary-darkest);
+  --ifm-color-primary-light   : var(--psdi-bg-color-primary-light);
+  --ifm-color-primary-lighter : var(--psdi-bg-color-primary-lighter);
+  --ifm-color-primary-lightest: var(--psdi-bg-color-primary-lightest);
+
+  --ifm-color-secondary           : var(--psdi-bg-color-secondary);
+  --ifm-color-secondary-dark      : var(--psdi-bg-color-secondary-dark);
+  --ifm-background-color-secondary: var(--psdi-bg-color-secondary);
+
+  --ifm-font-color-base        : var(--psdi-dark-text-color-body);
+  --ifm-hero-text-color        : var(--psdi-light-text-color-body);
+  --ifm-heading-color          : var(--psdi-dark-text-color-heading);
+  --psdi-heading-color-inverse : var(--psdi-light-text-color-heading);
+  --ifm-font-color-secondary   : var(--psdi-text-color-secondary-body);
+  --ifm-heading-color-secondary: var(--psdi-dark-text-color-heading);
+  --psdi-font-color-faint      : gray;
+
+  --psdi-border-color: var(--psdi-border-color-light);
+
+  --lm-display: inherit;
+  --dm-display: none;
+
+}
+
+[data-theme='dark'] {
+
+  /* Set dark mode colors here */
+  --ifm-background-color: var(--psdi-dm-bg-color-default);
+
+  --ifm-color-primary         : var(--psdi-dm-bg-color-primary);
+  --ifm-color-primary-dark    : var(--psdi-dm-bg-color-primary-dark);
+  --ifm-color-primary-darker  : var(--psdi-dm-bg-color-primary-darker);
+  --ifm-color-primary-darkest : var(--psdi-dm-bg-color-primary-darkest);
+  --ifm-color-primary-light   : var(--psdi-dm-bg-color-primary-light);
+  --ifm-color-primary-lighter : var(--psdi-dm-bg-color-primary-lighter);
+  --ifm-color-primary-lightest: var(--psdi-dm-bg-color-primary-lightest);
+
+  --ifm-color-secondary           : var(--psdi-dm-bg-color-secondary);
+  --ifm-color-secondary-dark      : var(--psdi-dm-bg-color-secondary-dark);
+  --ifm-background-color-secondary: var(--psdi-dm-bg-color-secondary);
+
+  --ifm-font-color-base        : var(--psdi-light-text-color-body);
+  --ifm-hero-text-color        : var(--psdi-dark-text-color-body);
+  --ifm-heading-color          : var(--psdi-light-text-color-heading);
+  --psdi-heading-color-inverse : var(--psdi-dark-text-color-heading);
+  --ifm-font-color-secondary   : var(--psdi-dm-text-color-secondary-body);
+  --ifm-heading-color-secondary: var(--psdi-dark-text-color-heading);
+  --psdi-font-color-faint      : gray;
+
+  --psdi-border-color: var(--psdi-border-color-dark);
+
+  --lm-display: none;
+  --dm-display: inherit;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-font-smoothing  : antialiased;
+  text-rendering          : optimizelegibility;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust        : 100%;
+}
+
+body {
+  min-height      : 100vh;
+  font-family     : var(--ifm-font-family-base);
+  font-size       : var(--ifm-font-size-base);
+  font-weight     : var(--ifm-font-weight-base);
+  background-color: var(--ifm-background-color);
+  color           : var(--ifm-font-color-base);
+  letter-spacing  : var(--psdi-letter-spacing-base);
+  line-height     : var(--ifm-line-height-base);
+  display         : flex;
+  flex-direction  : column;
+  justify-content : space-between;
+  padding         : 0;
+  margin          : 0;
+  word-wrap       : break-word;
+}
+
+#cover {
+  position  : fixed;
+  height    : 100%;
+  width     : 100%;
+  top       : 0;
+  left      : 0;
+  background: var(--ifm-background-color);
+  z-index   : 99999;
+}
+
+select,
+option,
+input {
+  font-family     : var(--ifm-font-family-base);
+  font-size       : var(--ifm-font-size-base);
+  font-weight     : var(--ifm-font-weight-base);
+  background-color: var(--ifm-background-color);
+  color           : var(--ifm-font-color-base);
+  letter-spacing  : var(--psdi-letter-spacing-base);
+  line-height     : var(--ifm-line-height-base);
+}
+
+option:checked {
+  background-color: var(--ifm-color-primary);
+  color           : var(--ifm-hero-text-color);
+}
+
+input::placeholder {
+  color     : var(--psdi-font-color-faint);
+  font-style: italic;
+}
+
+button,
+input.button {
+  font-family     : var(--ifm-font-family-base);
+  font-size       : var(--ifm-font-size-base);
+  font-weight     : var(--ifm-font-weight-base);
+  color           : var(--ifm-hero-text-color);
+  background-color: var(--ifm-color-primary);
+  letter-spacing  : var(--psdi-letter-spacing-base);
+  line-height     : var(--ifm-line-height-base);
+  border-radius   : 0.25rem;
+  margin          : 0.25rem;
+}
+
+*:has(> .max-width-box) {
+  display        : flex;
+  justify-content: center;
+}
+
+body>* {
+  flex-grow: 1;
+  padding  : 0.5rem 0;
+}
+
+#__docusaurus {
+  padding: 0;
+}
+
+.max-width-box {
+  max-width: 1320px;
+}
+
+.lm-only {
+  display: var(--lm-display);
+}
+
+.dm-only {
+  display: var(--dm-display);
+}
+
+.announcementBar_mb4j,
+.header,
+.hero,
+.footer {
+  flex: none;
+}
+
+.announcementBar_mb4j {
+  background-color: #ff89a2;
+  color           : black;
+  display         : flex;
+  flex-direction  : column;
+  align-items     : center;
+  padding         : 0;
+  border-bottom   : 1px solid var(--psdi-border-color);
+  height          : auto;
+}
+
+.announcementBarContent_xLdY {
+  font-size : 0.9rem;
+  padding   : 5px 0;
+  text-align: center;
+}
+
+.header .max-width-box {
+  display        : flex;
+  flex           : auto;
+  justify-content: space-around;
+  align-items    : center;
+}
+
+.header-left {
+  display       : flex;
+  flex          : 1 1 50%;
+  flex-direction: row;
+  align-items   : center;
+}
+
+.navbar__item {
+  padding    : 0.5rem 0.75rem;
+  font-weight: var(--ifm-font-weight-base);
+}
+
+#psdi-header .navbar__items--right {
+  display        : flex;
+  flex           : 1 1 50%;
+  flex-direction : row;
+  flex-wrap      : wrap;
+  justify-content: right;
+  align-items    : center;
+}
+
+/* Applies only to buttons with this class not in the PSDI header, to not break docusaurus sites */
+.clean-btn {
+  margin: 0;
+}
+
+#psdi-header .clean-btn {
+  background     : none;
+  border         : none;
+  color          : inherit;
+  cursor         : pointer;
+  font-family    : inherit;
+  padding        : 0;
+  align-items    : center;
+  border-radius  : 50%;
+  display        : flex;
+  justify-content: center;
+  height         : 2rem;
+  width          : 2rem;
+}
+
+[data-theme='dark'] #psdi-header .clean-btn {
+  background-color: black;
+}
+
+#psdi-header .clean-btn:hover {
+  background: var(--ifm-background-color-secondary);
+}
+
+#psdi-header .clean-btn:active {
+  background: inherit;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  color      : var(--ifm-heading-color);
+  font-family: var(--ifm-heading-font-family);
+  font-weight: bold;
+  margin     : 0 0 1rem 0;
+}
+
+.marginless_header {
+  margin: 0;
+}
+
+h1 {
+  font-size: 3rem;
+}
+
+h2 {
+  font-size: 2.5rem;
+}
+
+h3 {
+  font-size: 2rem;
+}
+
+h4 {
+  font-size: 1.75rem;
+}
+
+h5 {
+  font-size: 1.5rem;
+}
+
+h6 {
+  font-size: 1.25rem;
+}
+
+p {
+  margin        : 0 0 1.25rem 0;
+  padding-bottom: 0;
+}
+
+.text--center {
+  text-align: center;
+}
+
+#psdi-header ul,
+#psdi-footer ul {
+  list-style: none;
+  padding   : 0;
+}
+
+.hero,
+.footer {
+  color: var(--ifm-hero-text-color);
+}
+
+.hero {
+  background-color: var(--ifm-color-primary);
+}
+
+.hero .max-width-box {
+  display       : flex;
+  flex-direction: column;
+  align-items   : center;
+  margin        : 2rem;
+}
+
+.hero__title {
+  font-size: 3rem;
+}
+
+.hero__subtitle {
+  font-size: 1.5rem;
+}
+
+.secondary {
+  background-color: var(--ifm-background-color-secondary);
+}
+
+.hero h1,
+.hero h2,
+.hero h3,
+.hero h4,
+.hero h5,
+.hero h6,
+.footer h1,
+.footer h2,
+.footer h3,
+.footer h4,
+.footer h5,
+.footer h6 {
+  color: var(--psdi-heading-color-inverse);
+}
+
+.secondary {
+  color: var(--ifm-font-color-secondary);
+}
+
+.secondary h1,
+.secondary h2,
+.secondary h3,
+.secondary h4,
+.secondary h5,
+.secondary h6 {
+  color: var(--ifm-heading-color-secondary);
+}
+
+/* Link styling - to match main page, we make links bold and make underline
+   disappear when hovered over, and don't show the extra icon. */
+a {
+  color          : inherit;
+  font-weight    : bold;
+  text-decoration: underline;
+}
+
+.content_knG7 a:hover,
+a:hover {
+  text-decoration: none;
+}
+
+/* For links which contain longer text content, don't underline any text in paragraphs,
+   but do underline (and remove on hover) in the headings */
+a:has(>h1),
+a:has(>h2),
+a:has(>h3),
+a:has(>h4),
+a:has(>h5),
+a:has(>h6) {
+  text-decoration: none;
+}
+
+a h1,
+a h2,
+a h3,
+a h4,
+a h5,
+a h6 {
+  text-decoration: underline;
+}
+
+a:hover h1,
+a:hover h2,
+a:hover h3,
+a:hover h4,
+a:hover h5,
+a:hover h6 {
+  text-decoration: none;
+}
+
+/* Don't display the icons Docusaurus adds to links */
+a svg {
+  display: none;
+}
+
+.navbar {
+  padding: 1rem 0;
+}
+
+.navbar__brand {
+  display       : flex;
+  flex-direction: row;
+  align-items   : center;
+  padding-right : 0 0.75rem;
+}
+
+@media (max-width: 700px) {
+  .navbar__brand {
+    flex-wrap: wrap;
+  }
+}
+
+.navbar__title h5 {
+  display: flex;
+  color  : var(--ifm-heading-color);
+  margin : 0 0 0.5rem 1.5rem;
+}
+
+.navbar__logo img {
+  width    : 100%;
+  min-width: 7.5rem;
+  max-width: 15rem;
+}
+
+#__docusaurus .navbar__logo img {
+  height   : 2rem;
+  min-width: auto;
+  max-width: auto;
+}
+
+.footer {
+  background-color: var(--ifm-color-primary);
+  color           : var(--ifm-hero-text-color);
+  padding         : 0.5rem 2rem 0.5rem 2rem;
+}
+
+.footer .max-width-box {
+  display       : flex;
+  flex-direction: column;
+  align-items   : stretch;
+  text-align    : left;
+}
+
+.footer .container-fluid {
+  padding: 0;
+}
+
+.footer .footer__bottom {
+  margin: 0;
+}
+
+.footer__links {
+  display        : flex;
+  flex-direction : row;
+  justify-content: center;
+  align-items    : flex-start;
+  margin         : 0;
+}
+
+#footer__links__left {
+  min-width            : 20rem;
+  flex                 : 1 1 60%;
+  display              : grid;
+  grid-template-columns: 40% 60%;
+  grid-template-rows   : 3rem 1rem auto 1rem;
+  margin-right         : 0;
+  padding-right        : 0;
+}
+
+#footer__links__right {
+  min-width            : 20rem;
+  flex                 : 1 1 40%;
+  display              : grid;
+  grid-template-columns: 50% 50%;
+  grid-template-rows   : 3rem 1rem auto 1rem;
+  margin-left          : 0;
+  padding-left         : 0;
+}
+
+.footer__title,
+.footer__col,
+.footer__bottom {
+  margin: 0 1rem;
+}
+
+.footer__title {
+  color          : var(--psdi-heading-color-inverse);
+  font-weight    : bold;
+  display        : flex;
+  flex-direction : column;
+  justify-content: flex-end;
+}
+
+.footer__title h6 {
+  padding: 0;
+  margin : 0;
+}
+
+.footer__hline,
+.footer__hline hr {
+  grid-column  : 1 / 6;
+  padding-left : 0;
+  padding-right: 0;
+  margin       : 0;
+}
+
+.footer__hline hr {
+  margin             : 0.5rem 0;
+  height             : 2px;
+  border-top-style   : none;
+  border-bottom-style: inset;
+  border-bottom-width: 1px;
+}
+
+.max-width-box .footer__col {
+  margin : 0 1rem;
+  padding: 0;
+}
+
+.footer__col:has(img) {
+  padding-top: 0rem;
+}
+
+.footer__items li {
+  padding: 0.25rem 0;
+}
+
+.footer img {
+  max-height: 4rem;
+  max-width : 100%;
+}
+
+#footer-icon-list {
+  margin-top     : 0.5rem;
+  display        : flex;
+  flex-direction : row;
+  justify-content: left;
+  height         : 1.5rem;
+  gap            : 1rem;
+  flex-wrap      : wrap;
+}
+
+#footer-icon-list img {
+  height: 1.5rem;
+}
+
+.footer__hline.big-screen-only {
+  display   : block;
+  margin-top: -1rem;
+}
+
+.footer__hline.small-screen-only {
+  display: none;
+}
+
+@media (max-width: 700px) {
+  .footer__links {
+    flex-direction: column;
+    align-items   : stretch;
+  }
+
+  .footer__hline.big-screen-only {
+    display: none;
+  }
+
+  .footer__hline.small-screen-only {
+    display: block;
+  }
+}
+
+.footer__copyright__text {
+  padding: 0;
+}

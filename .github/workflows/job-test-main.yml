@@ -1,0 +1,105 @@
+# Reusable workflow intended to be called as a job by other workflows
+
+# Runs automated tests on the main branch and calculates and reports test coverage
+
+name: Job - Test Main Branch
+run-name: Test Main
+
+on:
+  workflow_call:
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Set up Firefox
+        uses: browser-actions/setup-firefox@v1
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install flake8
+          pip install .[gui-test]
+
+      - name: Test with pytest and report coverage
+        id: total
+        run: |
+          export GH_TOKEN=${{ github.token }}
+          coverage run -m pytest tests
+          # Save coverage report to coverage.json
+          coverage json
+          # Report coverage to the shell
+          coverage report
+
+      - name: "Upload coverage data"
+        uses: actions/upload-artifact@v4
+        with:
+          name: covdata
+          path: coverage.json
+
+      - name: Lint with flake8
+        run: |
+          # stop the build if there are Python syntax errors or undefined names
+          flake8 tests PROJECT_NAME --count --select=E9,F63,F7,F82 --show-source --statistics
+          # exit-zero treats all errors as warnings
+          flake8 tests PROJECT_NAME --count --exit-zero --max-complexity=10 --max-line-length=120 --statistics
+
+      - name: Test building the package
+        run: |
+          pip install build
+          python -m build
+
+  coverage:
+    name: Report Coverage
+    needs: tests
+    continue-on-error: true
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the repo
+        uses: "actions/checkout@v2"
+
+      - name: Set up Python
+        uses: "actions/setup-python@v2"
+        with:
+          python-version: "3.12"
+
+      - name: Download coverage data
+        uses: actions/download-artifact@v4
+        with:
+          name: covdata
+
+      - name: Get total coverage
+        id: total
+        run: |
+          export TOTAL=$(python -c "import json;print(json.load(open('coverage.json'))['totals']['percent_covered_display'])")
+          echo "total=$TOTAL" >> $GITHUB_OUTPUT
+          echo "### Total coverage: ${TOTAL}%" >> $GITHUB_STEP_SUMMARY
+
+      - name: Make coverage badge
+        # Remove the below line once you've created a Gist to store coverage data for this project and added its token
+        # to the repository's secrets. See the tutorial at
+        # https://nedbatchelder.com/blog/202209/making_a_coverage_badge.html, and also uncomment the badge in the README
+        if: false
+        uses: schneegans/dynamic-badges-action@v1.4.0
+        with:
+          auth: ${{ secrets.COVERAGE_GIST_TOKEN }}
+          gistID: dbd938192dc4de9b7779978e515c0e79
+          filename: covbadge.json
+          label: Coverage
+          message: ${{ steps.total.outputs.total }}%
+          minColorRange: 50
+          maxColorRange: 90
+          valColorRange: ${{ steps.total.outputs.total }}

@@ -1,0 +1,29 @@
+.*
+!.gitignore
+!.github
+
+# Compiled files
+*.pyc
+*.pyo
+
+# Compiled documentation
+html/*
+
+# Build files
+build/*
+dist/*
+*.egg-info
+
+# Created error log
+error_log.txt
+
+# Any zone identifiers created by Windows copying
+*:Zone.Identifier
+
+# Scripts created to clean up and purge downloaded assets
+scripts/cleanup-common-style.sh
+scripts/purge-common-style.sh
+
+# Downloaded assets
+psdi-assets.tar.gz
+psdi-common-style-*.*.*

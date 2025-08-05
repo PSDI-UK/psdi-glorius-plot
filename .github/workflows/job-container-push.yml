@@ -1,0 +1,53 @@
+# Reusable workflow intended to be called as a job by other workflows
+
+# This action does the following:
+#
+# Build and push a container image
+
+name: Job - Tag and push container
+run-name: Tag and push container
+
+on:
+  workflow_call:
+    inputs:
+      container_tag: # define our version tag created from the upstream container build job
+        description: "The latest tag for the container"
+        required: true
+        type: string
+
+jobs:
+  container-push:
+    runs-on: psdi-uk-runners
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Setup docker auth
+        run: |
+          mkdir -p ~/.docker
+          cat <<EOF > ~/.docker/config.json
+          {
+            "auths": {
+              "ghcr.io": {
+                "auth": "$(echo -n "$GIT_USERNAME:$GIT_PASSWORD" | base64 -w0)"
+              }
+            }
+          }
+          EOF
+        env: # needed to authenticate to github and download the repo
+          GIT_USERNAME: ${{ github.actor }}
+          GIT_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
+      - name: Docker build API
+        env:
+          IMAGE_NAME: "ghcr.io/psdi-uk/PROJECT_NAME/PROJECT_NAME:${{ inputs.container_tag }}"
+        run: |
+          SHA=`git log -n 1 | head -n 1 | awk '{print($2)}'`
+          TAG=`git tag --sort -version:refname | head -n 1`
+          TAG_SHA=`git show $TAG | head -n 1 | awk '{print($2)}'`
+          echo "Building with TAG=$TAG, TAG_SHA=$TAG_SHA, SHA=$SHA"
+          docker build \
+            --build-arg SHA=$SHA \
+            --build-arg TAG=$TAG \
+            --build-arg TAG_SHA=$TAG_SHA \
+            -t $IMAGE_NAME .
+          docker push $IMAGE_NAME

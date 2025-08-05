@@ -1,0 +1,61 @@
+# Reusable workflow intended to be called as a job by other workflows
+
+# Runs automated tests on the Python backend with pytest and calculates test coverage
+
+name: Job - Test Python
+run-name: Test Python
+
+on:
+  workflow_call:
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  tests:
+    runs-on: ${{ matrix.os }}
+    continue-on-error: ${{ matrix.secondary }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+        secondary: [false]
+        # Temporarily disable MacOS tests due to bug introduced in recent GitHub version update, while we decide how to
+        # address it
+        # include:
+        #   - os: [macos-latest]
+        #     secondary: true
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install flake8
+          pip install .[test]
+
+      - name: Test non-GUI code with pytest
+        run: |
+          pytest tests/python
+          # Save coverage report to coverage.json
+
+      - name: Lint with flake8
+        if: ${{ ! matrix.secondary }}
+        run: |
+          # stop the build if there are Python syntax errors or undefined names
+          flake8 tests PROJECT_NAME --count --select=E9,F63,F7,F82 --show-source --statistics
+          # exit-zero treats all errors as warnings
+          flake8 tests PROJECT_NAME --count --exit-zero --max-complexity=10 --max-line-length=120 --statistics
+
+      - name: Test building the package
+        run: |
+          pip install build
+          python -m build

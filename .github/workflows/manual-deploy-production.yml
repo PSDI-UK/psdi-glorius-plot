@@ -1,0 +1,120 @@
+# Workflow for manually triggering deployment of latest release version to the production environment
+
+# It is intended that this workflow be manually triggered after the 'ci-release.yml' job has been shown
+# to successfully deploy the latest release version to the staging cluster.
+
+# To be more specific, this workflow deploys the container in the GitHub Container Registry namespace for this
+# repo whose tag corresponds to the highest version number, while only considering tags of the form 'v*.*.*',
+# where '*' signify non-negative integers.
+
+name: Manual Trigger - Deploy to production cluster
+run-name: Manual Trigger - Deploy to production cluster
+on:
+  workflow_dispatch:
+
+jobs:
+  check-branch:
+    # Check that this job is being run on the release branch
+    name: Check this is release branch
+    runs-on: psdi-uk-runners
+    steps:
+      - name: Check branch (success)
+        if: github.ref == 'refs/heads/release'
+        run: echo "Success - this is being run on the 'release' branch"
+      - name: Check branch (failure)
+        if: github.ref != 'refs/heads/release'
+        run: |
+          echo "ERROR: This workflow can only be run on the 'release' branch"
+          false # Command that always fails, to signal the job to fail
+
+  get-latest-release-tag:
+    # run on our self hosted github runners enabling access to STFC infrastructure
+    name: Get latest release tag
+    runs-on: psdi-uk-runners
+    needs: check-branch
+    outputs:
+      tag: ${{ steps.get-tag.outputs.TARGET_TAG }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Get latest tag in the relase branch
+        id: get-tag
+        run: |
+          TARGET_TAG=$(git tag --sort -version:refname | head -n 1)
+          echo "TARGET_TAG=$TARGET_TAG" >> "$GITHUB_OUTPUT"
+          echo "Highest version tag found to be = $TARGET_TAG"
+
+  build-python:
+    needs: get-latest-release-tag
+    name: Build distribution 📦
+    runs-on: psdi-uk-runners
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+      - name: Install pypa/build
+        run: >-
+          python3 -m
+          pip install
+          build
+          --user
+      - name: Build a binary wheel and a source tarball
+        run: python3 -m build
+      - name: Store the distribution packages
+        uses: actions/upload-artifact@v4
+        with:
+          name: python-package-distributions
+          path: dist/
+
+  publish-to-pypi:
+    # When ready to enable this step, remove the following line
+    if: false
+    name: >-
+      Publish Python 🐍 distribution 📦 to PyPI
+    needs:
+      - build-python
+    runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/p/PROJECT_NAME
+    permissions:
+      id-token: write # IMPORTANT: mandatory for trusted publishing
+
+    steps:
+      - name: Download all the dists
+        uses: actions/download-artifact@v4
+        with:
+          name: python-package-distributions
+          path: dist/
+      - name: Publish distribution 📦 to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          verbose: true
+
+  # Deploy container with tag to production environment
+  deploy-stfc-production-k8s:
+    # When ready to enable this step, remove the following line
+    if: false
+    name: Deploy to production
+    needs: get-latest-release-tag
+    uses: ./.github/workflows/job-deploy-k8s.yml # use the callable deploy job
+    secrets: inherit # pass all secrets for the environment
+    with:
+      container_tag: ${{ needs.get-latest-release-tag.outputs.tag }}
+      environment: production
+
+  # Run a simple test on prod to ensure nothing is broken
+  test-prod:
+    name: Test deployment was successful
+    needs: deploy-stfc-production-k8s
+    uses: ./.github/workflows/job-test-gui.yml
+    with:
+      simple: true
+      prod: true
