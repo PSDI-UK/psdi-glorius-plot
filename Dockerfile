@@ -1,25 +1,25 @@
 #
-# Dockerfile for image containerising PROJECT_NAME_HUMAN
+# Dockerfile for image containerising PSDI Reaction Sensitivity Radar Plot Generator
 #
 #
 # Building the image
 # ------------------
 #
 # 1. Download the service repo containing the source code
-#    from https://github.com/PSDI-UK/PROJECT_NAME_HYPHEN/tree/main
+#    from https://github.com/PSDI-UK/psdi-reaction-radar/tree/main
 # 2. Copy this file into the main directory of the repo
 # 3. From within the main directory of the repo, use docker to build the image
-#    'PROJECT_NAME_HYPHEN' via the command
-#    ``docker build -t PROJECT_NAME_HYPHEN .``
+#    'psdi-reaction-radar' via the command
+#    ``docker build -t psdi-reaction-radar .``
 #
 # To check that the image has been build run ``docker images``, which should
-# list and image called 'PROJECT_NAME_HYPHEN'.
+# list and image called 'psdi-reaction-radar'.
 #
 #
 # Running the service
 # -------------------
 #
-# The command ``docker run -p 8000:8000 PROJECT_NAME_HYPHEN`` will run the
+# The command ``docker run -p 8000:8000 psdi-reaction-radar`` will run the
 # service on port 8000 of localhost, with logs output to stdout. To access the
 # service visit http://localhost:8000 in your browser.
 #
@@ -33,7 +33,7 @@ RUN apt-get -y install libxrender1 libxext6 git
 RUN pip install --upgrade pip
 
 WORKDIR /app
-COPY PROJECT_NAME /app/PROJECT_NAME
+COPY psdi_reaction_radar /app/psdi_reaction_radar
 COPY CHANGELOG.md CONTRIBUTING.md LICENSE pyproject.toml README.md /app/
 
 ENV SETUPTOOLS_SCM_PRETEND_VERSION="1.0.0"
@@ -57,10 +57,10 @@ ENV SHA=$SHA
 
 EXPOSE 8000
 
-RUN mkdir -p /app/PROJECT_NAME/static/uploads
-RUN mkdir -p /app/PROJECT_NAME/static/downloads
+RUN mkdir -p /app/psdi_reaction_radar/static/uploads
+RUN mkdir -p /app/psdi_reaction_radar/static/downloads
 
 #set web server timout to more than application default (60)
 ENV TIMEOUT=90
 
-CMD ["sh", "-c", "gunicorn -b 0.0.0.0:8000 PROJECT_NAME.app:app --timeout $TIMEOUT"]
+CMD ["sh", "-c", "gunicorn -b 0.0.0.0:8000 psdi_reaction_radar.app:app --timeout $TIMEOUT"]

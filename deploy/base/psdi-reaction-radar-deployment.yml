@@ -1,18 +1,18 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: PROJECT_NAME_HYPHEN
+  name: psdi-reaction-radar
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: PROJECT_NAME_HYPHEN
+      app: psdi-reaction-radar
   template:
     metadata:
       labels:
-        app: PROJECT_NAME_HYPHEN
+        app: psdi-reaction-radar
       annotations:
-        elastic.co/dataset: kubernetes.container_logs.PROJECT_NAME
+        elastic.co/dataset: kubernetes.container_logs.psdi_reaction_radar
     spec:
       affinity:
         podAntiAffinity:
@@ -24,11 +24,11 @@ spec:
                     - key: app
                       operator: In
                       values:
-                        - PROJECT_NAME_HYPHEN
+                        - psdi-reaction-radar
                 topologyKey: "kubernetes.io/hostname"
       containers:
-        - name: PROJECT_NAME_HYPHEN
-          image: PROJECT_NAME_HYPHEN
+        - name: psdi-reaction-radar
+          image: psdi-reaction-radar
           volumeMounts:
             - mountPath: /tmp
               name: uploads

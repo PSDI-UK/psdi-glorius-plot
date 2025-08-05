@@ -8,7 +8,7 @@ functions to return rendered templates.
 
 from flask import Flask, render_template
 
-from PROJECT_NAME.gui.env import get_env_kwargs
+from psdi_reaction_radar.gui.env import get_env_kwargs
 
 
 def index():

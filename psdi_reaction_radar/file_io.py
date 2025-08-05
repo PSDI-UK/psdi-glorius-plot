@@ -1,4 +1,4 @@
-"""@file PROJECT_NAME/file_io.py
+"""@file psdi_reaction_radar/file_io.py
 
 Functions and classes related to general filesystem input/output
 """
@@ -6,12 +6,12 @@ Functions and classes related to general filesystem input/output
 import os
 from functools import lru_cache
 
-from PROJECT_NAME import constants as const
+from psdi_reaction_radar import constants as const
 
 
 @lru_cache(maxsize=1)
 def get_package_path() -> str:
-    """Gets the absolute path to where the `PROJECT_NAME` package is on disk
+    """Gets the absolute path to where the `psdi_reaction_radar` package is on disk
 
     Returns
     -------

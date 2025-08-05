@@ -13,11 +13,11 @@ from typing import Any
 import werkzeug
 from flask import Flask, cli
 
-import PROJECT_NAME
-from PROJECT_NAME import constants as const
-from PROJECT_NAME.gui.env import get_env
-from PROJECT_NAME.gui.get import init_get
-from PROJECT_NAME.gui.post import init_post
+import psdi_reaction_radar
+from psdi_reaction_radar import constants as const
+from psdi_reaction_radar.gui.env import get_env
+from psdi_reaction_radar.gui.get import init_get
+from psdi_reaction_radar.gui.post import init_post
 
 _app: Flask | None = None
 
@@ -71,7 +71,7 @@ def start_app():
     old_cwd = os.getcwd()
 
     try:
-        os.chdir(os.path.join(PROJECT_NAME.__path__[0], ".."))
+        os.chdir(os.path.join(psdi_reaction_radar.__path__[0], ".."))
         get_app().run(debug=get_env().debug_mode)
     finally:
         # Return to the previous directory after running the app

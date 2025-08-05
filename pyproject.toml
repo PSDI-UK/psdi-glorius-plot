@@ -3,7 +3,7 @@ requires = ["hatchling==1.27.0", "hatch-vcs"]
 build-backend = "hatchling.build"
 
 [project]
-name = "PROJECT_NAME"
+name = "psdi_reaction_radar"
 authors = [
   # Add your name and email here
   { name = "Bryan Gillis", email = "7204836+brgillis@users.noreply.github.com" },
@@ -52,17 +52,17 @@ doc = ["pdoc3", "gunicorn", "pytest", "selenium"]
 plots = ["matplotlib"]
 
 [project.scripts]
-PROJECT_NAME_HYPHEN-gui = "PROJECT_NAME.main_gui:main"
+psdi-reaction-radar-gui = "psdi_reaction_radar.main_gui:main"
 
 [project.urls]
-Homepage = "https://PROJECT_NAME_HYPHEN.psdi.ac.uk/"
-Documentation = "https://psdi-uk.github.io/PROJECT_NAME_HYPHEN/"
-Issues = "https://github.com/PSDI-UK/PROJECT_NAME_HYPHEN/issues"
-Changelog = "https://github.com/PSDI-UK/PROJECT_NAME_HYPHEN/blob/main/CHANGELOG.md"
+Homepage = "https://psdi-reaction-radar.psdi.ac.uk/"
+Documentation = "https://psdi-uk.github.io/psdi-reaction-radar/"
+Issues = "https://github.com/PSDI-UK/psdi-reaction-radar/issues"
+Changelog = "https://github.com/PSDI-UK/psdi-reaction-radar/blob/main/CHANGELOG.md"
 
 # Repository currently isn't public - when it goes public, uncomment the below
-# Repository = "https://github.com/PSDI-UK/PROJECT_NAME_HYPHEN"
-# Download = "https://github.com/PSDI-UK/PROJECT_NAME_HYPHEN/releases/latest"
+# Repository = "https://github.com/PSDI-UK/psdi-reaction-radar"
+# Download = "https://github.com/PSDI-UK/psdi-reaction-radar/releases/latest"
 
 [tool.hatch.build]
 exclude = [
@@ -77,7 +77,7 @@ exclude = [
 pythonpath = ["."]
 
 [tool.coverage.run]
-source_pkgs = ["PROJECT_NAME"]
+source_pkgs = ["psdi_reaction_radar"]
 branch = true
 # main_gui.py is tested via the Selenium tests, which are indirect enough that the coverage tool doesn't pick up that the
 # lines are being tested, so we exclude it from the coverage % calculation

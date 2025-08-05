@@ -39,7 +39,7 @@ jobs:
           GIT_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
       - name: Docker build API
         env:
-          IMAGE_NAME: "ghcr.io/psdi-uk/PROJECT_NAME/PROJECT_NAME:${{ inputs.container_tag }}"
+          IMAGE_NAME: "ghcr.io/psdi-uk/psdi_reaction_radar/psdi_reaction_radar:${{ inputs.container_tag }}"
         run: |
           SHA=`git log -n 1 | head -n 1 | awk '{print($2)}'`
           TAG=`git tag --sort -version:refname | head -n 1`

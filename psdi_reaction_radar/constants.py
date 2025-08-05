@@ -1,4 +1,4 @@
-"""@file PROJECT_NAME/constants.py
+"""@file psdi_reaction_radar/constants.py
 
 Miscellaneous constant values used within this project.
 
@@ -31,10 +31,10 @@ import shutil
 # ---------
 
 # The name of the command-line script
-CL_SCRIPT_NAME = "PROJECT_NAME_HYPHEN"
+CL_SCRIPT_NAME = "psdi-reaction-radar"
 
 # The name of the Flask app
-APP_NAME = "PROJECT_NAME"
+APP_NAME = "psdi_reaction_radar"
 
 # Environmental variables
 LOG_MODE_EV = "LOG_MODE"

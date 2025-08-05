@@ -1,4 +1,4 @@
-# Changelog for PROJECT_NAME_HUMAN
+# Changelog for PSDI Reaction Sensitivity Radar Plot Generator
 
 ## v0.1.0
 

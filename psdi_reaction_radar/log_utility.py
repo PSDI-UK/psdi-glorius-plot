@@ -1,4 +1,4 @@
-"""@file PROJECT_NAME/logging.py
+"""@file psdi_reaction_radar/logging.py
 
 Functions and classes related to logging and other messaging for the user
 """

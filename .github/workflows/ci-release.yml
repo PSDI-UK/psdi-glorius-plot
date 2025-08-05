@@ -46,7 +46,7 @@ jobs:
 
   # Deploy to Kubernetes Job
   # Requires an environment, which must reflect the target environment as defined in the
-  # GitHub repository: https://github.com/PSDI-UK/PROJECT_NAME/settings/environments
+  # GitHub repository: https://github.com/PSDI-UK/psdi_reaction_radar/settings/environments
   # The downstream deploy job leverages on Environment specific secrets, which also must be defined
   deploy-stfc-staging-k8s:
     # When ready to enable this step, remove the following line
@@ -98,7 +98,7 @@ jobs:
 
     environment:
       name: testpypi
-      url: https://test.pypi.org/p/PROJECT_NAME
+      url: https://test.pypi.org/p/psdi_reaction_radar
 
     permissions:
       id-token: write # IMPORTANT: mandatory for trusted publishing

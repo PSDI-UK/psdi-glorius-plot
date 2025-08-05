@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-# Selenium test script for PROJECT_NAME_HUMAN Service.
+# Selenium test script for PSDI Reaction Sensitivity Radar Plot Generator Service.
 
 import os
 import time
@@ -8,7 +8,7 @@ from multiprocessing import Process
 
 import pytest
 
-import PROJECT_NAME
+import psdi_reaction_radar
 
 # Skip all tests in this module if required packages for GUI testing aren't installed
 try:
@@ -23,7 +23,7 @@ try:
     from selenium.webdriver.support.ui import WebDriverWait
     from webdriver_manager.firefox import GeckoDriverManager
 
-    from PROJECT_NAME.gui.setup import start_app
+    from psdi_reaction_radar.gui.setup import start_app
 
 except ImportError:
     # We put the importorskip commands here rather than above so that standard imports can be used by static analysis
@@ -56,7 +56,7 @@ def common_setup():
 
     # Change to the root dir of the project for running the tests, in case this was invoked elsewhere
     old_cwd = os.getcwd()
-    os.chdir(os.path.join(PROJECT_NAME.__path__[0], ".."))
+    os.chdir(os.path.join(psdi_reaction_radar.__path__[0], ".."))
 
     yield
 
@@ -128,7 +128,7 @@ def test_initial_frontpage(driver: WebDriver):
     driver.get(f"{origin}/")
     wait_for_cover_hidden(driver)
 
-    # Check that the front page contains the header "PROJECT_NAME_HUMAN".
+    # Check that the front page contains the header "PSDI Reaction Sensitivity Radar Plot Generator".
 
     element = wait_for_element(driver, "//header//h5")
-    assert element.text == "PROJECT_NAME_HUMAN"
+    assert element.text == "PSDI Reaction Sensitivity Radar Plot Generator"

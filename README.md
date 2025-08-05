@@ -1,4 +1,4 @@
-# PROJECT_NAME_HUMAN
+# PSDI Reaction Sensitivity Radar Plot Generator
 
 [![License Badge](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
@@ -34,7 +34,7 @@ This is a template project for a PSDI project which deploys a Flask website, als
     - (Automated workflows for various tasks related to project maintenance)
 - `deploy`
   - (Files used as part of the deployment to STFC infrastructure)
-- `PROJECT_NAME` (Primary source directory)
+- `psdi_reaction_radar` (Primary source directory)
   - `static` (Static code and assets for the web app)
     - `img`
       - (Image assets for the web app)
@@ -133,7 +133,7 @@ In addition to the dependencies listed above, this project uses the assets made 
 
 ## Using the online app
 
-Enter https://PROJECT_NAME.psdi.ac.uk/ in a browser. Guidance on usage is given on each page of the website.
+Enter https://psdi_reaction_radar.psdi.ac.uk/ in a browser. Guidance on usage is given on each page of the website.
 
 ## Running the Python/Flask app locally
 
@@ -142,7 +142,7 @@ Enter https://PROJECT_NAME.psdi.ac.uk/ in a browser. Guidance on usage is given 
 This project is available on PyPI, and so can be installed via pip, including the necessary dependencies for the GUI, with:
 
 ```bash
-pip install PROJECT_NAME_HYPHEN'[gui]'
+pip install psdi-reaction-radar'[gui]'
 ```
 
 If you wish to install the project locally from source, this can be done most easily by cloning the project and then executing:
@@ -157,12 +157,12 @@ If your system does not allow installation in this manner, it may be necessary t
 
 ### Running the App
 
-Once installed, the command-line script `PROJECT_NAME_HYPHEN-gui` will be made available, which can be called to start the server. You can then access the website by going to <http://127.0.0.1:5000> in a browser (this will also be printed in the terminal, and you can CTRL+click it there to open it in your default browser). Guidance for using the app is given on each page of it. When you're finished with the app, key CTRL+C in the terminal where you called the script to shut down the server, or, if the process was backgrounded, kill the appropriate process.
+Once installed, the command-line script `psdi-reaction-radar-gui` will be made available, which can be called to start the server. You can then access the website by going to <http://127.0.0.1:5000> in a browser (this will also be printed in the terminal, and you can CTRL+click it there to open it in your default browser). Guidance for using the app is given on each page of it. When you're finished with the app, key CTRL+C in the terminal where you called the script to shut down the server, or, if the process was backgrounded, kill the appropriate process.
 
 In case of problems when using Chrome, try opening Chrome from the command line:
 open -a "Google Chrome.app" --args --allow-file-access-from-files
 
-The local version has some customisable options for running it, which can can be seen by running `PROJECT_NAME_HYPHEN-gui --help`.
+The local version has some customisable options for running it, which can can be seen by running `psdi-reaction-radar-gui --help`.
 
 ## Testing
 

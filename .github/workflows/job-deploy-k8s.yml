@@ -69,7 +69,7 @@ jobs:
           DEPLOY_ENV="${{ inputs.environment }}"
           cd deploy/$DEPLOY_ENV
           # update image with version passed from upstream build job
-          kustomize edit set image PROJECT_NAME_HYPHEN=ghcr.io/psdi-uk/PROJECT_NAME_HYPHEN/PROJECT_NAME_HYPHEN:$CONTAINER_TAG
+          kustomize edit set image psdi-reaction-radar=ghcr.io/psdi-uk/psdi-reaction-radar/psdi-reaction-radar:$CONTAINER_TAG
           # return to root of repository
           cd -
           # Apply env specific kustomizations

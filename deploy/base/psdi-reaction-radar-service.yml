@@ -1,10 +1,10 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: PROJECT_NAME_HYPHEN
+  name: psdi-reaction-radar
 spec:
   selector:
-    app: PROJECT_NAME_HYPHEN
+    app: psdi-reaction-radar
   ports:
     - port: 8000
       targetPort: 8000
