@@ -4,11 +4,38 @@
 
 {% block head %}
 {{ super() }}
-
+<link rel="stylesheet" href="{{url_for('static', filename='css/index.css')}}">
 {% endblock %}
 
 {% block hero_title %}PSDI Reaction Sensitivity Radar Plot Generator{% endblock %}
 
 {% block inner_content %}
-<p>Main page content goes here</p>
+<table class="data-input">
+  <tr class="header">
+    <th>Label</th>
+    <th>Deviation (%)</th>
+    <td>
+      <button class="remove-column init-disabled fix-size-small" disabled="true">-</button>
+      <button class="add-column fix-size-small">+</button>
+    </td>
+  </tr>
+  <tr class="sens-row">
+    <td><input type="text" class="sens-label" placeholder="Condition (e.g. “High C”)"></td>
+    <td><input type="number" class="sens-value" value="0"> %</td>
+  </tr>
+  <tr class="sens-row">
+    <td><input type="text" class="sens-label" placeholder="Condition (e.g. “High C”)"></td>
+    <td><input type="number" class="sens-value" value="0"> %</td>
+  </tr>
+  <tr class="sens-row">
+    <td><input type="text" class="sens-label" placeholder="Condition (e.g. “High C”)"></td>
+    <td><input type="number" class="sens-value" value="0"> %</td>
+  </tr>
+  <tr>
+    <td>
+      <button class="remove-row init-disabled fix-size-small" disabled="true">-</button>
+      <button class="add-row fix-size-small">+</button>
+    </td>
+  </tr>
+</table>
 {% endblock %}
