@@ -64,8 +64,38 @@ function addRow() {
     disableButton($("button.add-row"));
   }
 
+  // Check if we've passed the minimum number of rows, and enable the button to remove rows if so
+  if (numRows + 1 > MIN_ROWS) {
+    enableButton($("button.remove-row"));
+  }
+
+}
+
+function removeRow() {
+
+  // Check that we don't already have too few
+  const numRows = getNumRows();
+  if (numRows <= MIN_ROWS) {
+    console.error("Attempt to remove row when minimum rows already reached");
+    return;
+  }
+
+  let lastRow = $("table.sens-table tr.sens-row").get(-1);
+  $("table.sens-table tbody")[0].removeChild(lastRow);
+
+  // Check if we've reached the minimum number of rows, and disable the button to remove rows if so
+  if (numRows - 1 <= MIN_ROWS) {
+    disableButton($("button.remove-row"));
+  }
+
+  // Check if we've gotten under the minimum number of rows, and enable the button to add rows if so
+  if (numRows - 1 < MAX_ROWS) {
+    enableButton($("button.add-row"));
+  }
+
 }
 
 $(document).ready(function () {
   $("button.add-row").click(addRow);
+  $("button.remove-row").click(removeRow);
 });
