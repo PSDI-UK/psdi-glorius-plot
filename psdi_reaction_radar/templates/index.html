@@ -5,17 +5,18 @@
 {% block head %}
 {{ super() }}
 <link rel="stylesheet" href="{{url_for('static', filename='css/index.css')}}">
+<script type="module" src="{{url_for('static', filename='js/index.js')}}"></script>
 {% endblock %}
 
 {% block hero_title %}PSDI Reaction Sensitivity Radar Plot Generator{% endblock %}
 
 {% block inner_content %}
-<table class="data-input">
+<table class="sens-table">
   <tr class="header">
-    <th>Label</th>
-    <th>Deviation (%)</th>
+    <th class="label-heading">Label</th>
+    <th class="deviation-heading">Deviation (%)</th>
     <td>
-      <button class="remove-column init-disabled fix-size-small" disabled="true">-</button>
+      <button class="remove-column disabled fix-size-small" disabled="true">-</button>
       <button class="add-column fix-size-small">+</button>
     </td>
   </tr>
@@ -31,9 +32,9 @@
     <td><input type="text" class="sens-label" placeholder="Condition (e.g. “High C”)"></td>
     <td><input type="number" class="sens-value" value="0"> %</td>
   </tr>
-  <tr>
+  <tr class="button-row">
     <td>
-      <button class="remove-row init-disabled fix-size-small" disabled="true">-</button>
+      <button class="remove-row disabled fix-size-small" disabled="true">-</button>
       <button class="add-row fix-size-small">+</button>
     </td>
   </tr>

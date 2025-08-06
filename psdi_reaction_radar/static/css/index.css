@@ -3,8 +3,9 @@ input.sens-value {
 }
 
 /* Buttons that are initially disabled */
-button.init-disabled {
+button:disabled {
   background-color: var(--psdi-bg-color-secondary);
+  border-color    : rgba(118, 118, 118, 0.3);
   color           : gray
 }
 
