@@ -131,4 +131,4 @@ def test_initial_frontpage(driver: WebDriver):
     # Check that the front page contains the header "PSDI Reaction Sensitivity Radar Plot Generator".
 
     element = wait_for_element(driver, "//header//h5")
-    assert element.text == "PSDI Reaction Sensitivity Radar Plot Generator"
+    assert element.text == "Reaction Sensitivity Radar Plot Generator"
