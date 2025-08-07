@@ -6,6 +6,8 @@
  * JavaScript code to handle the special functionality of the index.html page
  */
 
+import { initDirtyForms } from "./common.js";
+
 const MIN_ROWS = 3;
 const MAX_ROWS = 12;
 
@@ -172,4 +174,6 @@ $(document).ready(function () {
   $("button.remove-row").click(removeRow);
   $("button.add-column").click(addColumn);
   $("button.remove-column").click(removeColumn);
+
+  initDirtyForms();
 });
