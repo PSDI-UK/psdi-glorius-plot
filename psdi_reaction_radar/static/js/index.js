@@ -15,7 +15,7 @@ const MAX_COLS = 5;
 // When the script is initially loaded, store a copy of a heading element and cell elements that we'll later use
 // as templates to add new rows
 
-const TEMPLATE_HEADING = $("th.deviation-heading")[0].cloneNode(true);
+const TEMPLATE_HEADING = $("th.output-heading")[0].cloneNode(true);
 const TEMPLATE_LABEL_INPUT = $("td:has(> input.sens-label)")[0].cloneNode(true);
 const TEMPLATE_VALUE_INPUT = $("td:has(> input.sens-value)")[0].cloneNode(true);
 
@@ -24,7 +24,7 @@ function getNumRows() {
 }
 
 function getNumValueCols() {
-  return $("table.sens-table tr.header th.deviation-heading").length;
+  return $("table.sens-table tr.header th.output-heading").length;
 }
 
 function disableButton(button) {
@@ -108,9 +108,13 @@ function addColumn() {
   const lRows = $("table.sens-table tr.sens-row");
 
   // Add a new heading cell
+  let newHeadingCell = TEMPLATE_HEADING.cloneNode(true);
+  newHeadingCell.children[0].value = "";
+
   let headerRow = $("table.sens-table tr.header")[0];
   let headerButtonsCell = $("table.sens-table tr.header td.button-column")[0];
-  headerRow.insertBefore(TEMPLATE_HEADING.cloneNode(true), headerButtonsCell);
+
+  headerRow.insertBefore(newHeadingCell, headerButtonsCell);
 
   // Add a new cell to each row
   for (let i = 0; i < numRows; ++i) {
@@ -143,7 +147,7 @@ function removeColumn() {
 
   // Remove the last heading cell
   let headerRow = $("table.sens-table tr.header");
-  let headerButtonsCell = headerRow.children("th.deviation-heading").get(-1);
+  let headerButtonsCell = headerRow.children("th.output-heading").get(-1);
   headerRow[0].removeChild(headerButtonsCell);
 
   // Remove the last cell from each row
