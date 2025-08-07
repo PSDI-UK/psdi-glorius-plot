@@ -95,7 +95,42 @@ function removeRow() {
 
 }
 
+function addColumn() {
+
+  // Check that we don't already have too many columns
+  const numCols = getNumValueCols();
+  if (numCols >= MAX_COLS) {
+    console.error("Attempt to add column when maximum columns already reached");
+    return;
+  }
+
+  const numRows = getNumRows();
+  const lRows = $("table.sens-table tr.sens-row");
+
+  // Add a new heading cell
+  let headerRow = $("table.sens-table tr.header")[0];
+  let headerButtonsCell = $("table.sens-table tr.header td.button-column")[0];
+  headerRow.insertBefore(TEMPLATE_HEADING.cloneNode(true), headerButtonsCell);
+
+  // Add a new cell to each row
+  for (let i = 0; i < numRows; ++i) {
+    lRows[i].appendChild(TEMPLATE_VALUE_INPUT.cloneNode(true));
+  }
+
+  // Check if we've reached the maximum number of columns, and disable the button to add columns if so
+  if (numCols + 1 >= MAX_COLS) {
+    disableButton($("button.add-column"));
+  }
+
+  // Check if we've passed the minimum number of columns, and enable the button to remove columns if so
+  if (numCols + 1 > MIN_COLS) {
+    enableButton($("button.remove-column"));
+  }
+
+}
+
 $(document).ready(function () {
   $("button.add-row").click(addRow);
   $("button.remove-row").click(removeRow);
+  $("button.add-column").click(addColumn);
 });
