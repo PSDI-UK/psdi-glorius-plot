@@ -129,8 +129,43 @@ function addColumn() {
 
 }
 
+function removeColumn() {
+
+  // Check that we don't already have too few columns
+  const numCols = getNumValueCols();
+  if (numCols <= MIN_COLS) {
+    console.error("Attempt to remove column when minimum columns already reached");
+    return;
+  }
+
+  const numRows = getNumRows();
+  const lRows = $("table.sens-table tr.sens-row");
+
+  // Remove the last heading cell
+  let headerRow = $("table.sens-table tr.header");
+  let headerButtonsCell = headerRow.children("th.deviation-heading").get(-1);
+  headerRow[0].removeChild(headerButtonsCell);
+
+  // Remove the last cell from each row
+  for (let i = 0; i < numRows; ++i) {
+    lRows[i].removeChild(lRows[i].lastChild);
+  }
+
+  // Check if we've reached the minimum number of columns, and disable the button to remove columns if so
+  if (numCols - 1 <= MIN_COLS) {
+    disableButton($("button.remove-column"));
+  }
+
+  // Check if we've gone under the minimum number of columns, and enable the button to add columns if so
+  if (numCols - 1 < MAX_COLS) {
+    enableButton($("button.add-column"));
+  }
+
+}
+
 $(document).ready(function () {
   $("button.add-row").click(addRow);
   $("button.remove-row").click(removeRow);
   $("button.add-column").click(addColumn);
+  $("button.remove-column").click(removeColumn);
 });
