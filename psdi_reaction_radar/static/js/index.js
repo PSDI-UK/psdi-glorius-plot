@@ -169,11 +169,35 @@ function removeColumn() {
 
 }
 
+function generatePlot() {
+
+  // Collect information from the table
+
+  let numRows = getNumRows();
+  let numCols = getNumValueCols();
+
+  // Get the column labels
+  let lColLabels = [];
+  let lColLabelCells = $("table.sens-table tr.header th.output-heading");
+  for (let i = 0; i < numCols; ++i) {
+    lColLabels.push(lColLabelCells[i].children[0].value)
+  }
+
+  // Get the row labels
+  let lRowLabels = [];
+  let lRowLabelCells = $("table.sens-table tr.sens-row td input.sens-label");
+  for (let i = 0; i < numRows; ++i) {
+    lRowLabels.push(lRowLabelCells[i].value)
+  }
+}
+
 $(document).ready(function () {
+  initDirtyForms();
+
   $("button.add-row").click(addRow);
   $("button.remove-row").click(removeRow);
   $("button.add-column").click(addColumn);
   $("button.remove-column").click(removeColumn);
 
-  initDirtyForms();
+  $("button#generate-plot").click(generatePlot);
 });
