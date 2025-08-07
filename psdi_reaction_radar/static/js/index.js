@@ -179,8 +179,8 @@ function generatePlot() {
   // Get the column labels
   let lColLabels = [];
   let lColLabelCells = $("table.sens-table tr.header th.output-heading");
-  for (let i = 0; i < numCols; ++i) {
-    lColLabels.push(lColLabelCells[i].children[0].value)
+  for (let j = 0; j < numCols; ++j) {
+    lColLabels.push(lColLabelCells[j].children[0].value)
   }
 
   // Get the row labels
@@ -188,6 +188,20 @@ function generatePlot() {
   let lRowLabelCells = $("table.sens-table tr.sens-row td input.sens-label");
   for (let i = 0; i < numRows; ++i) {
     lRowLabels.push(lRowLabelCells[i].value)
+  }
+
+  // Get each column of data
+  let llData = [];
+  for (let j = 0; j < numCols; ++j) {
+    llData.push([]);
+  }
+
+  let lSensRows = $("table.sens-table tr.sens-row");
+  for (let i = 0; i < numRows; ++i) {
+    let lCells = lSensRows.eq(i).find("td input.sens-value");
+    for (let j = 0; j < numCols; ++j) {
+      llData[j].push(lCells[j].value)
+    }
   }
 }
 
