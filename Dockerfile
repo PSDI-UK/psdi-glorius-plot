@@ -24,7 +24,7 @@
 # service visit http://localhost:8000 in your browser.
 #
 
-FROM python:3.12-slim-bookworm
+FROM python:3.13-slim-bookworm
 
 RUN apt update
 RUN apt-get -y install libxrender1 libxext6 git
