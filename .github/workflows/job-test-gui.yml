@@ -65,4 +65,4 @@ jobs:
             export ORIGIN=https://psdi-reaction-radar.psdi.ac.uk/
           fi
           export GH_TOKEN=${{ github.token }}
-          pytest 'tests/gui/gui_test.py::test_conversions[Standard Single Test]'
+          pytest 'tests/gui/gui_test.py::test_initial_frontpage'
