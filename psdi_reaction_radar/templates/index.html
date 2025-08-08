@@ -1,14 +1,48 @@
 {% extends "parent/layout.htm" %}
 
-{% block page_title %}Home - PSDI Reaction Sensitivity Radar Plot Generator{% endblock %}
+{% block page_title %}Home - PSDI Glorius Plot Generator{% endblock %}
 
 {% block head %}
 {{ super() }}
-
+<link rel="stylesheet" href="{{url_for('static', filename='css/index.css')}}">
+<script type="module" src="{{url_for('static', filename='js/index.js')}}"></script>
 {% endblock %}
 
-{% block hero_title %}PSDI Reaction Sensitivity Radar Plot Generator{% endblock %}
+{% block hero_title %}PSDI Glorius Plot Generator{% endblock %}
 
 {% block inner_content %}
-<p>Main page content goes here</p>
+<form class="sens-form">
+  <table class="sens-table">
+    <tr class="header">
+      <th class="label-heading">Label</th>
+      <th class="output-heading">
+        <input type="text" class="output-label" placeholder="Output (e.g. “Yield”)" value="Yield">
+      </th>
+      <td class="button-column">
+        <button type="button" class="remove-column disabled fix-size-small" disabled="true">-</button>
+        <button type="button" class="add-column fix-size-small">+</button>
+      </td>
+    </tr>
+    <tr class="sens-row">
+      <td><input type="text" class="sens-label" placeholder="Condition (e.g. “High c”)"></td>
+      <td><input type="number" class="sens-value" value="0"> %</td>
+    </tr>
+    <tr class="sens-row">
+      <td><input type="text" class="sens-label" placeholder="Condition (e.g. “High c”)"></td>
+      <td><input type="number" class="sens-value" value="0"> %</td>
+    </tr>
+    <tr class="sens-row">
+      <td><input type="text" class="sens-label" placeholder="Condition (e.g. “High c”)"></td>
+      <td><input type="number" class="sens-value" value="0"> %</td>
+    </tr>
+    <tr class="button-row">
+      <td>
+        <button type="button" class="remove-row disabled fix-size-small" disabled="true">-</button>
+        <button type="button" class="add-row fix-size-small">+</button>
+      </td>
+    </tr>
+  </table>
+
+  <button type="button" id="generate-plot">Generate</button>
+</form>
 {% endblock %}
