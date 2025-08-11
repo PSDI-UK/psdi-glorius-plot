@@ -19,3 +19,8 @@ button.fix-size-small {
 tr>td:first-child>button:first-child {
   margin-left: 0;
 }
+
+#glorius-plot {
+  width    : 100%;
+  max-width: 700px;
+}

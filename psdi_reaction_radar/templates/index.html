@@ -5,6 +5,7 @@
 {% block head %}
 {{ super() }}
 <link rel="stylesheet" href="{{url_for('static', filename='css/index.css')}}">
+<script type="module" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <script type="module" src="{{url_for('static', filename='js/index.js')}}"></script>
 {% endblock %}
 
@@ -45,4 +46,6 @@
 
   <button type="button" id="generate-plot">Generate</button>
 </form>
+
+<canvas id="glorius-plot"></canvas>
 {% endblock %}

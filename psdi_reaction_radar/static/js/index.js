@@ -14,6 +14,15 @@ const MAX_ROWS = 12;
 const MIN_COLS = 1;
 const MAX_COLS = 5;
 
+// Plot styling
+const L_BORDER_DASHES = [[],
+[6, 6],
+[4, 4],
+[2, 2],
+[1, 1]]
+const BORDER_WIDTH = 2
+let radarChart = null;
+
 // When the script is initially loaded, store a copy of a heading element and cell elements that we'll later use
 // as templates to add new rows
 
@@ -49,7 +58,7 @@ function addRow() {
   const numValueCols = getNumValueCols();
 
   // Construct a new row
-  let newRow = document.createElement('tr');
+  const newRow = document.createElement('tr');
   newRow.classList.add("sens-row");
 
   newRow.appendChild(TEMPLATE_LABEL_INPUT.cloneNode(true));
@@ -110,11 +119,11 @@ function addColumn() {
   const lRows = $("table.sens-table tr.sens-row");
 
   // Add a new heading cell
-  let newHeadingCell = TEMPLATE_HEADING.cloneNode(true);
+  const newHeadingCell = TEMPLATE_HEADING.cloneNode(true);
   newHeadingCell.children[0].value = "";
 
-  let headerRow = $("table.sens-table tr.header")[0];
-  let headerButtonsCell = $("table.sens-table tr.header td.button-column")[0];
+  const headerRow = $("table.sens-table tr.header")[0];
+  const headerButtonsCell = $("table.sens-table tr.header td.button-column")[0];
 
   headerRow.insertBefore(newHeadingCell, headerButtonsCell);
 
@@ -148,8 +157,8 @@ function removeColumn() {
   const lRows = $("table.sens-table tr.sens-row");
 
   // Remove the last heading cell
-  let headerRow = $("table.sens-table tr.header");
-  let headerButtonsCell = headerRow.children("th.output-heading").get(-1);
+  const headerRow = $("table.sens-table tr.header");
+  const headerButtonsCell = headerRow.children("th.output-heading").get(-1);
   headerRow[0].removeChild(headerButtonsCell);
 
   // Remove the last cell from each row
@@ -173,36 +182,78 @@ function generatePlot() {
 
   // Collect information from the table
 
-  let numRows = getNumRows();
-  let numCols = getNumValueCols();
+  const numRows = getNumRows();
+  const numCols = getNumValueCols();
 
   // Get the column labels
-  let lColLabels = [];
-  let lColLabelCells = $("table.sens-table tr.header th.output-heading");
+  const lColLabels = [];
+  const lColLabelCells = $("table.sens-table tr.header th.output-heading");
   for (let j = 0; j < numCols; ++j) {
     lColLabels.push(lColLabelCells[j].children[0].value)
   }
 
   // Get the row labels
-  let lRowLabels = [];
-  let lRowLabelCells = $("table.sens-table tr.sens-row td input.sens-label");
+  const lRowLabels = [];
+  const lRowLabelCells = $("table.sens-table tr.sens-row td input.sens-label");
   for (let i = 0; i < numRows; ++i) {
     lRowLabels.push(lRowLabelCells[i].value)
   }
 
   // Get each column of data
-  let llData = [];
+  const llData = [];
   for (let j = 0; j < numCols; ++j) {
     llData.push([]);
   }
 
-  let lSensRows = $("table.sens-table tr.sens-row");
+  const lSensRows = $("table.sens-table tr.sens-row");
   for (let i = 0; i < numRows; ++i) {
     let lCells = lSensRows.eq(i).find("td input.sens-value");
     for (let j = 0; j < numCols; ++j) {
       llData[j].push(lCells[j].value)
     }
   }
+
+  const lDatasets = [];
+  for (let j = 0; j < numCols; ++j) {
+    lDatasets.push({
+      label: lColLabels[j],
+      data: llData[j],
+      borderColor: "black",
+      borderDash: L_BORDER_DASHES[j],
+      borderWidth: BORDER_WIDTH,
+      pointRadius: 0,
+      fill: false
+    })
+  }
+
+  if (radarChart === null) {
+    radarChart = new Chart("glorius-plot", {
+      type: "radar",
+      data: {
+        labels: lRowLabels,
+        datasets: lDatasets,
+      },
+      options: {
+        scales: {
+          r: {
+            min: -100,
+            max: 50,
+            reverse: true,
+            ticks: {
+              stepSize: 25
+            }
+          }
+        }
+      }
+    })
+  } else {
+    radarChart.data = {
+      labels: lRowLabels,
+      datasets: lDatasets,
+    }
+    radarChart.update();
+  }
+
 }
 
 $(document).ready(function () {
