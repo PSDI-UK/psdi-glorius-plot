@@ -15,12 +15,13 @@ const MIN_COLS = 1;
 const MAX_COLS = 5;
 
 // Plot styling
-const L_BORDER_DASHES = [[],
-[6, 6],
-[4, 4],
-[2, 2],
-[1, 1]]
-const BORDER_WIDTH = 2
+const L_BORDER_DASHES = [[], [], [], [], [], [], [], [],
+[], [6, 6], [4, 4], [2, 2], [1, 1]];
+const BORDER_WIDTH = 2;
+const L_BG_COLORS = ["#FFFFFF", "#70FF70", "#20A020FF", "#FFFFFF", "#FFC0C0", "#FFA0A0", "#FF8080",
+  "#FF4040"];
+const L_BG_COLOR_BOUNDS = [12.5, 37.5, 50, -12.5, -37.5, -62.5, -87.5, -100];
+const NUM_BG_COLORS = L_BG_COLORS.length;
 let radarChart = null;
 
 // When the script is initially loaded, store a copy of a heading element and cell elements that we'll later use
@@ -185,22 +186,41 @@ function generatePlot() {
   const numRows = getNumRows();
   const numCols = getNumValueCols();
 
-  // Get the column labels
   const lColLabels = [];
+  const llData = [];
+  const lBorderColors = [];
+  const lBackgroundColors = [];
+  const lFill = [];
+
+  // Make fake data for each background color
+  for (let k = 0; k < NUM_BG_COLORS; ++k) {
+    lColLabels.push("");
+    let lFakeData = [];
+    for (let i = 0; i < numRows; ++i) {
+      lFakeData.push(L_BG_COLOR_BOUNDS[k]);
+    }
+    llData.push(lFakeData);
+    lBorderColors.push(L_BG_COLORS[k]);
+    lBackgroundColors.push(L_BG_COLORS[k]);
+    lFill.push(true);
+  }
+
+  // Get the column labels
   const lColLabelCells = $("table.sens-table tr.header th.output-heading");
   for (let j = 0; j < numCols; ++j) {
-    lColLabels.push(lColLabelCells[j].children[0].value)
+    lColLabels.push(lColLabelCells[j].children[0].value);
+    lBorderColors.push("black");
+    lFill.push(false);
   }
 
   // Get the row labels
   const lRowLabels = [];
   const lRowLabelCells = $("table.sens-table tr.sens-row td input.sens-label");
   for (let i = 0; i < numRows; ++i) {
-    lRowLabels.push(lRowLabelCells[i].value)
+    lRowLabels.push(lRowLabelCells[i].value);
   }
 
   // Get each column of data
-  const llData = [];
   for (let j = 0; j < numCols; ++j) {
     llData.push([]);
   }
@@ -209,20 +229,21 @@ function generatePlot() {
   for (let i = 0; i < numRows; ++i) {
     let lCells = lSensRows.eq(i).find("td input.sens-value");
     for (let j = 0; j < numCols; ++j) {
-      llData[j].push(lCells[j].value)
+      llData[NUM_BG_COLORS + j].push(lCells[j].value)
     }
   }
 
   const lDatasets = [];
-  for (let j = 0; j < numCols; ++j) {
+  for (let j = 0; j < NUM_BG_COLORS + numCols; ++j) {
     lDatasets.push({
       label: lColLabels[j],
       data: llData[j],
-      borderColor: "black",
+      borderColor: lBorderColors[j],
+      backgroundColor: lBackgroundColors[j],
       borderDash: L_BORDER_DASHES[j],
       borderWidth: BORDER_WIDTH,
       pointRadius: 0,
-      fill: false
+      fill: lFill[j]
     })
   }
 
