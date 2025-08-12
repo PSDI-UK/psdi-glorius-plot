@@ -17,12 +17,13 @@ const MAX_COLS = 5;
 // Plot styling
 const L_BORDER_DASHES = [[], [], [], [], [], [], [], [],
 [], [6, 6], [4, 4], [2, 2], [1, 1]];
-const BORDER_WIDTH = 2;
-const L_BG_COLORS = ["#20A020FF", "#70FF70", "#FFFFFF", "#FFFFFF", "#FFC0C0", "#FFA0A0", "#FF8080",
-  "#FF4040"];
-const L_BG_COLOR_BOUNDS = [50, 37.5, 12.5, -12.5, -37.5, -62.5, -87.5, -100];
-const L_BG_ORDER = [3, 2, 1, 1, 2, 3, 4, 5]
+const BORDER_WIDTH = 4;
+const L_BG_COLORS = ["#20A020FF", "#70FF70", "#FFFFFF", "#FFC0C0", "#FFA0A0", "#FF8080"];
+const L_BG_COLOR_BOUNDS = [50, 25, -25, -50, -75, -100];
+const L_BG_ORDER = [2, 1, 1, 2, 3, 4];
 const NUM_BG_COLORS = L_BG_COLORS.length;
+const GRID_WIDTH = 1;
+const GRID_COLOR = "#00000080";
 let radarChart = null;
 
 // When the script is initially loaded, store a copy of a heading element and cell elements that we'll later use
@@ -191,6 +192,7 @@ function generatePlot() {
   const llData = [];
   const lOrder = [];
   const lBorderColors = [];
+  const lBorderWidths = [];
   const lBackgroundColors = [];
   const lFill = [];
 
@@ -203,7 +205,8 @@ function generatePlot() {
     }
     llData.push(lFakeData);
     lOrder.push(L_BG_ORDER[k]);
-    lBorderColors.push(L_BG_COLORS[k]);
+    lBorderColors.push(GRID_COLOR);
+    lBorderWidths.push(GRID_WIDTH);
     lBackgroundColors.push(L_BG_COLORS[k]);
     lFill.push(true);
   }
@@ -214,6 +217,7 @@ function generatePlot() {
     lColLabels.push(lColLabelCells[j].children[0].value);
     lOrder.push(0);
     lBorderColors.push("black");
+    lBorderWidths.push(BORDER_WIDTH);
     lBackgroundColors.push("#FFFFFF00");
     lFill.push(false);
   }
@@ -245,9 +249,9 @@ function generatePlot() {
       data: llData[j],
       order: lOrder[j],
       borderColor: lBorderColors[j],
+      borderWidth: lBorderWidths[j],
       backgroundColor: lBackgroundColors[j],
       borderDash: L_BORDER_DASHES[j],
-      borderWidth: BORDER_WIDTH,
       pointRadius: 0,
       fill: lFill[j]
     })
@@ -267,8 +271,9 @@ function generatePlot() {
             max: 50,
             reverse: true,
             ticks: {
-              stepSize: 25
-            }
+              stepSize: 25,
+              z: 2
+            },
           }
         },
         plugins: {
