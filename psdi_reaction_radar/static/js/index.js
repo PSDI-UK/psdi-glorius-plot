@@ -276,8 +276,13 @@ function generatePlot() {
             labels: {
               boxHeight: 16,
               boxWidth: 16,
-              borderRadius: 8,
-              useBorderRadius: true,
+              font: {
+                size: 16,
+                weight: "bold"
+              },
+              filter: function (legendLabel, _) {
+                return legendLabel.text != "";
+              }
             }
           }
         },
