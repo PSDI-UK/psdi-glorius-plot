@@ -18,9 +18,10 @@ const MAX_COLS = 5;
 const L_BORDER_DASHES = [[], [], [], [], [], [], [], [],
 [], [6, 6], [4, 4], [2, 2], [1, 1]];
 const BORDER_WIDTH = 2;
-const L_BG_COLORS = ["#FFFFFF", "#70FF70", "#20A020FF", "#FFFFFF", "#FFC0C0", "#FFA0A0", "#FF8080",
+const L_BG_COLORS = ["#20A020FF", "#70FF70", "#FFFFFF", "#FFFFFF", "#FFC0C0", "#FFA0A0", "#FF8080",
   "#FF4040"];
-const L_BG_COLOR_BOUNDS = [12.5, 37.5, 50, -12.5, -37.5, -62.5, -87.5, -100];
+const L_BG_COLOR_BOUNDS = [50, 37.5, 12.5, -12.5, -37.5, -62.5, -87.5, -100];
+const L_BG_ORDER = [3, 2, 1, 1, 2, 3, 4, 5]
 const NUM_BG_COLORS = L_BG_COLORS.length;
 let radarChart = null;
 
@@ -188,6 +189,7 @@ function generatePlot() {
 
   const lColLabels = [];
   const llData = [];
+  const lOrder = [];
   const lBorderColors = [];
   const lBackgroundColors = [];
   const lFill = [];
@@ -200,15 +202,17 @@ function generatePlot() {
       lFakeData.push(L_BG_COLOR_BOUNDS[k]);
     }
     llData.push(lFakeData);
+    lOrder.push(L_BG_ORDER[k]);
     lBorderColors.push(L_BG_COLORS[k]);
     lBackgroundColors.push(L_BG_COLORS[k]);
     lFill.push(true);
   }
 
-  // Get the column labels
+  // Get the column labels, and also set other fixed data for normal datasets
   const lColLabelCells = $("table.sens-table tr.header th.output-heading");
   for (let j = 0; j < numCols; ++j) {
     lColLabels.push(lColLabelCells[j].children[0].value);
+    lOrder.push(0);
     lBorderColors.push("black");
     lFill.push(false);
   }
@@ -238,6 +242,7 @@ function generatePlot() {
     lDatasets.push({
       label: lColLabels[j],
       data: llData[j],
+      order: lOrder[j],
       borderColor: lBorderColors[j],
       backgroundColor: lBackgroundColors[j],
       borderDash: L_BORDER_DASHES[j],
@@ -264,7 +269,8 @@ function generatePlot() {
               stepSize: 25
             }
           }
-        }
+        },
+        animation: false
       }
     })
   } else {
