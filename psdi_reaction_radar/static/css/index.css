@@ -21,6 +21,6 @@ tr>td:first-child>button:first-child {
 }
 
 #glorius-plot {
-  width    : 100%;
+  width    : 100vw;
   max-width: 700px;
 }
