@@ -297,8 +297,13 @@ function generatePlot() {
             reverse: true,
             ticks: {
               stepSize: 25,
-              z: 2
+              z: 2,
             },
+            pointLabels: {
+              font: {
+                size: 16
+              }
+            }
           }
         },
         plugins: {
