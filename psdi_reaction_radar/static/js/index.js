@@ -15,10 +15,12 @@ const MIN_COLS = 1;
 const MAX_COLS = 5;
 
 // Plot styling
-const L_BORDER_DASHES = [[], [], [], [], [], [], [], [],
-[], [6, 6], [4, 4], [2, 2], [1, 1]];
+const PLOT_MIN = -100;
+const PLOT_MAX = 50;
+const L_BORDER_DASHES = [[], [6, 6], [4, 4], [2, 2], [1, 1]];
 const BORDER_WIDTH = 4;
 const L_BG_COLORS = ["#20A020FF", "#70FF70", "#FFFFFF", "#FFC0C0", "#FFA0A0", "#FF8080"];
+const DATA_BG_COLOR = ["#FFFFFF00"]
 const L_BG_COLOR_BOUNDS = [50, 25, -25, -50, -75, -100];
 const L_BG_ORDER = [2, 1, 1, 2, 3, 4];
 const NUM_BG_COLORS = L_BG_COLORS.length;
@@ -195,6 +197,7 @@ function generatePlot() {
   const lBorderWidths = [];
   const lBackgroundColors = [];
   const lFill = [];
+  const lBorderDashes = [];
 
   // Make fake data for each background color
   for (let k = 0; k < NUM_BG_COLORS; ++k) {
@@ -209,6 +212,27 @@ function generatePlot() {
     lBorderWidths.push(GRID_WIDTH);
     lBackgroundColors.push(L_BG_COLORS[k]);
     lFill.push(true);
+    lBorderDashes.push([]);
+  }
+
+  // Make fake data for each axis line we want to draw
+  for (let k = 0; k < numRows; ++k) {
+    lColLabels.push("");
+    let lFakeData = [];
+    for (let i = 0; i < numRows; ++i) {
+      if (i == k) {
+        lFakeData.push(PLOT_MIN)
+      } else {
+        lFakeData.push(PLOT_MAX)
+      }
+    }
+    llData.push(lFakeData);
+    lOrder.push(-1);
+    lBorderColors.push(GRID_COLOR);
+    lBorderWidths.push(GRID_WIDTH);
+    lBackgroundColors.push(DATA_BG_COLOR);
+    lFill.push(false);
+    lBorderDashes.push([]);
   }
 
   // Get the column labels, and also set other fixed data for normal datasets
@@ -218,8 +242,9 @@ function generatePlot() {
     lOrder.push(0);
     lBorderColors.push("black");
     lBorderWidths.push(BORDER_WIDTH);
-    lBackgroundColors.push("#FFFFFF00");
+    lBackgroundColors.push(DATA_BG_COLOR);
     lFill.push(false);
+    lBorderDashes.push(L_BORDER_DASHES[j]);
   }
 
   // Get the row labels
@@ -238,12 +263,12 @@ function generatePlot() {
   for (let i = 0; i < numRows; ++i) {
     let lCells = lSensRows.eq(i).find("td input.sens-value");
     for (let j = 0; j < numCols; ++j) {
-      llData[NUM_BG_COLORS + j].push(lCells[j].value)
+      llData[NUM_BG_COLORS + numRows + j].push(lCells[j].value)
     }
   }
 
   const lDatasets = [];
-  for (let j = 0; j < NUM_BG_COLORS + numCols; ++j) {
+  for (let j = 0; j < NUM_BG_COLORS + numRows + numCols; ++j) {
     lDatasets.push({
       label: lColLabels[j],
       data: llData[j],
@@ -251,7 +276,7 @@ function generatePlot() {
       borderColor: lBorderColors[j],
       borderWidth: lBorderWidths[j],
       backgroundColor: lBackgroundColors[j],
-      borderDash: L_BORDER_DASHES[j],
+      borderDash: lBorderDashes[j],
       pointRadius: 0,
       fill: lFill[j]
     })
@@ -267,8 +292,8 @@ function generatePlot() {
       options: {
         scales: {
           r: {
-            min: -100,
-            max: 50,
+            min: PLOT_MIN,
+            max: PLOT_MAX,
             reverse: true,
             ticks: {
               stepSize: 25,
