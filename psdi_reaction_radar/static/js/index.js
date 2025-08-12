@@ -214,6 +214,7 @@ function generatePlot() {
     lColLabels.push(lColLabelCells[j].children[0].value);
     lOrder.push(0);
     lBorderColors.push("black");
+    lBackgroundColors.push("#FFFFFF00");
     lFill.push(false);
   }
 
@@ -267,6 +268,16 @@ function generatePlot() {
             reverse: true,
             ticks: {
               stepSize: 25
+            }
+          }
+        },
+        plugins: {
+          legend: {
+            labels: {
+              boxHeight: 16,
+              boxWidth: 16,
+              borderRadius: 8,
+              useBorderRadius: true,
             }
           }
         },
