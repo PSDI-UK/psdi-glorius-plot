@@ -6,7 +6,7 @@
  * JavaScript code to handle the special functionality of the index.html page
  */
 
-import { initDirtyForms } from "./common.js";
+import { initDirtyForms, cleanDirtyForms } from "./common.js";
 
 const MIN_ROWS = 3;
 const MAX_ROWS = 12;
@@ -184,6 +184,9 @@ function removeColumn() {
 }
 
 function generatePlot() {
+
+  // Set the form as clean when we generate a plot from it
+  cleanDirtyForms();
 
   // Collect information from the table
 
