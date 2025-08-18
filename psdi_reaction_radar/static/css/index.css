@@ -1,0 +1,26 @@
+input.sens-value {
+  text-align: right;
+}
+
+/* Buttons that are initially disabled */
+button:disabled {
+  background-color: var(--psdi-bg-color-secondary);
+  border-color    : rgba(118, 118, 118, 0.3);
+  color           : gray
+}
+
+/* Button with a fixed small size */
+button.fix-size-small {
+  height : 2rem;
+  width  : 1.5rem;
+  padding: 0;
+}
+
+tr>td:first-child>button:first-child {
+  margin-left: 0;
+}
+
+#glorius-plot {
+  width    : 100vw;
+  max-width: 700px;
+}

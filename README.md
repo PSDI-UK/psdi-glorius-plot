@@ -8,9 +8,9 @@ the badge in the .github/job-test-main.yaml workflow-->
 
 <!-- ![Coverage Badge](https://img.shields.io/endpoint?url=[GIST_URL]/covbadge.json) -->
 
-Release date: 2025-08-04
+Release date: 2025-08-18
 
-This is a template project for a PSDI project which deploys a Flask website, also publishing the project to PyPI so users can download it and run a local version.
+This projects provides the code for a Flask-hosted web app to generate a Glorius-style radar plot of reaction sensitivity for the user.
 
 ## Table of Contents
 
@@ -135,35 +135,6 @@ In addition to the dependencies listed above, this project uses the assets made 
 
 Enter https://psdi_reaction_radar.psdi.ac.uk/ in a browser. Guidance on usage is given on each page of the website.
 
-## Running the Python/Flask app locally
-
-### Installation and Setup
-
-This project is available on PyPI, and so can be installed via pip, including the necessary dependencies for the GUI, with:
-
-```bash
-pip install psdi-reaction-radar'[gui]'
-```
-
-If you wish to install the project locally from source, this can be done most easily by cloning the project and then executing:
-
-```bash
-pip install .'[gui]'
-```
-
-**Note:** This project uses git to determine the version number. If you clone the repository, you won't have to do anything special here, but if you get the source e.g. by extracting a release archive, you'll have to do one additional step before running the command above. If you have git installed, simply run `git init` in the project directory and it will be able to install. Otherwise, edit the project's `pyproject.toml` file to uncomment the line that sets a fixed version, and comment out the lines that set it up to determine the version from git - these are pointed out in the comments there.
-
-If your system does not allow installation in this manner, it may be necessary to set up a virtual environment. See the instructions in the [command-line application installation](#installation) section above for how to do that, and then try to install again once you've set one up and activated it.
-
-### Running the App
-
-Once installed, the command-line script `psdi-reaction-radar-gui` will be made available, which can be called to start the server. You can then access the website by going to <http://127.0.0.1:5000> in a browser (this will also be printed in the terminal, and you can CTRL+click it there to open it in your default browser). Guidance for using the app is given on each page of it. When you're finished with the app, key CTRL+C in the terminal where you called the script to shut down the server, or, if the process was backgrounded, kill the appropriate process.
-
-In case of problems when using Chrome, try opening Chrome from the command line:
-open -a "Google Chrome.app" --args --allow-file-access-from-files
-
-The local version has some customisable options for running it, which can can be seen by running `psdi-reaction-radar-gui --help`.
-
 ## Testing
 
 To test the app, install the optional testing requirements locally (ideally within a virtual environment) and test with pytest by executing the following commands from this project's directory:
@@ -193,8 +164,10 @@ This section presents solutions for commonly-encountered issues.
 
 ## Contributors
 
-- (Add your name here)
 - Bryan Gillis (7204836+brgillis@users.noreply.github.com)
+- Sally Bloodworth
+- Aileen Day
+- Cerys Willoughby
 
 ## Funding
 

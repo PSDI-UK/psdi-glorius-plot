@@ -128,7 +128,7 @@ def test_initial_frontpage(driver: WebDriver):
     driver.get(f"{origin}/")
     wait_for_cover_hidden(driver)
 
-    # Check that the front page contains the header "PSDI Reaction Sensitivity Radar Plot Generator".
+    # Check that the front page contains the header "Glorius Plot Generator".
 
     element = wait_for_element(driver, "//header//h5")
-    assert element.text == "PSDI Reaction Sensitivity Radar Plot Generator"
+    assert element.text == "Glorius Plot Generator"
