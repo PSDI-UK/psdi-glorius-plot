@@ -59,13 +59,18 @@ def main():
     project_dir = os.path.abspath(os.path.join(psdi_reaction_radar.__path__[0], ".."))
 
     # Copy over the static contents directly to the output directory
-    shutil.copytree(os.path.join(project_dir, "static"), output_dir)
+    target_static_dir = os.path.join(output_dir, "static")
+    if os.path.exists(target_static_dir):
+        shutil.rmtree(target_static_dir)
+    shutil.copytree(os.path.join(project_dir, "psdi_reaction_radar/static"),
+                    target_static_dir)
 
     # Render all pages and output them to the output directory
     for path, func in d_pages.items():
         if not path.endswith(".html"):
             continue
-        qualified_path = os.path.join(output_dir, path)
+        stripped_path = path.strip("/")
+        qualified_path = os.path.join(output_dir, stripped_path)
         open(qualified_path, "w").write(func())
 
 
