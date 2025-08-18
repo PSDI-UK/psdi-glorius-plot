@@ -30,6 +30,14 @@
   <!-- Cover to hide element loading and make page transitions seem smoother -->
   <div id="cover"></div>
 
+  {% block announcement %}
+  <div class="announcementBar_mb4j" role="banner">
+    <div class="max-width-box announcementBarContent_xLdY">This page is currently under construction and may not
+      currently be fully-featured
+    </div>
+  </div>
+  {% endblock %}
+
   {% block header %}
   <header class="header" id="psdi-header">
     {% include 'content/psdi-common-header.html' %}
