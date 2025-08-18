@@ -89,7 +89,11 @@ def main():
 
             qualified_path = os.path.join(output_dir, stripped_path)
 
-            open(qualified_path, "w").write(render_template(stripped_path))
+            # Fix any relative links in the page, since the structure here will be a bit different
+            page_content = render_template(stripped_path)
+            page_content = page_content.replace("../", "./")
+
+            open(qualified_path, "w").write(page_content)
 
 
 if __name__ == "__main__":
