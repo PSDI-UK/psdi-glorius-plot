@@ -7,11 +7,15 @@ import os
 import shutil
 from argparse import ArgumentParser
 
+from flask import render_template
+
 import psdi_reaction_radar
 from psdi_reaction_radar.gui.env import update_env
 from psdi_reaction_radar.gui.get import d_pages
+from psdi_reaction_radar.gui.setup import get_app
 
 DEFAULT_TARGET_DIR = "public"
+DEFAULT_SERVER_ROOT = "psdi-uk.github.io/"
 
 
 def main():
@@ -23,6 +27,10 @@ def main():
     parser.add_argument("--output", "-o", type=str, default=DEFAULT_TARGET_DIR,
                         help="The desired directory (absolute or relative to where this script is run from) to render"
                         "the site to")
+
+    parser.add_argument("--server-name", "-s", type=str, default=DEFAULT_SERVER_ROOT + "psdi-reaction-radar",
+                        help="The name of the server this will be deployed to, which will be used in constructing "
+                        "absolute URLs")
 
     parser.add_argument("--use-env-vars", action="store_true",
                         help="If set, all other arguments and defaults for this script are ignored, and environmental "
@@ -65,13 +73,23 @@ def main():
     shutil.copytree(os.path.join(project_dir, "psdi_reaction_radar/static"),
                     target_static_dir)
 
-    # Render all pages and output them to the output directory
-    for path, func in d_pages.items():
-        if not path.endswith(".html"):
-            continue
-        stripped_path = path.strip("/")
-        qualified_path = os.path.join(output_dir, stripped_path)
-        open(qualified_path, "w").write(func())
+    # Start the app so we're able to render pages
+
+    app = get_app()
+    app.config['SERVER_NAME'] = args.server_name
+    app.config['PREFERRED_URL_SCHEME'] = 'https'
+
+    with app.app_context():
+        # Render all pages and output them to the output directory
+        for path in d_pages:
+            if not path.endswith(".html"):
+                continue
+
+            stripped_path = path.strip("/")
+
+            qualified_path = os.path.join(output_dir, stripped_path)
+
+            open(qualified_path, "w").write(render_template(stripped_path))
 
 
 if __name__ == "__main__":
