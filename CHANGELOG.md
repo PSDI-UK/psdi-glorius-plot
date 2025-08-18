@@ -2,9 +2,10 @@
 
 ## v0.1.0
 
-Example notes:
+MVP release. Included features:
 
-Initial public release. Features included:
-
-- Online server functionality
-- Locally-hosted server
+- Generate a radar plot from provided data
+- Ability to input deviation % directly in table
+- Expandable rows and columns in table (columns providing different outputs to be plotted)
+- Colored background rings in plots
+- Plot can be saved by screenshot or by right-clicking and saving the image
