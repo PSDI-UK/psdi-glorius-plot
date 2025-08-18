@@ -1,5 +1,11 @@
 # Changelog for PSDI Reaction Sensitivity Radar Plot Generator
 
+## v0.1.1
+
+### Miscellaneous Changes
+
+- Enabled publication to GitHub Pages
+
 ## v0.1.0
 
 MVP release. Included features:
