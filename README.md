@@ -12,6 +12,8 @@ Release date: 2025-08-18
 
 This projects provides the code for a Flask-hosted web app to generate a Glorius-style radar plot of reaction sensitivity for the user.
 
+For internal testing, the main branch of this project is published to https://psdi-uk.github.io/psdi-reaction-radar
+
 ## Table of Contents
 
 - [Project Structure](#project-structure)

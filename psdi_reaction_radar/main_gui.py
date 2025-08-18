@@ -42,9 +42,9 @@ def main():
         # Overwrite the values from environmental variables with the values from the command-line arguments
         update_env(args)
 
-    print_wrap("Starting the PSDI Reaction Sensitivity Radar Plot Generator GUI. This GUI is run as a webpage, which you can open by "
-               "right-clicking the link below to open it in your default browser, or by copy-and-pasting it into your "
-               "browser of choice.")
+    print_wrap("Starting the PSDI Reaction Sensitivity Radar Plot Generator GUI. This GUI is run as a webpage, which"
+               "you can open by right-clicking the link below to open it in your default browser, or by "
+               "copy-and-pasting it into your browser of choice.")
 
     start_app()
 

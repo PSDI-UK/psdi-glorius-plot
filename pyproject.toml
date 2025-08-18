@@ -53,6 +53,7 @@ plots = ["matplotlib"]
 
 [project.scripts]
 psdi-reaction-radar-gui = "psdi_reaction_radar.main_gui:main"
+psdi-reaction-radar-render = "psdi_reaction_radar.render_static:main"
 
 [project.urls]
 Homepage = "https://psdi-reaction-radar.psdi.ac.uk/"
@@ -79,8 +80,8 @@ pythonpath = ["."]
 [tool.coverage.run]
 source_pkgs = ["psdi_reaction_radar"]
 branch = true
-# main_gui.py is tested via the Selenium tests, which are indirect enough that the coverage tool doesn't pick up that the
-# lines are being tested, so we exclude it from the coverage % calculation
+# main_gui.py is tested via the Selenium tests, which are indirect enough that the coverage tool doesn't pick up that
+# the lines are being tested, so we exclude it from the coverage % calculation
 omit = ["main_gui.py", "*/gui/get.py", "*/gui/post.py"]
 
 [tool.coverage.paths]

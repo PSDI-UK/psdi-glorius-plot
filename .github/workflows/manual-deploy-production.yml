@@ -74,16 +74,16 @@ jobs:
           path: dist/
 
   publish-to-pypi:
-    # When ready to enable this step, remove the following line
+    # When ready to enable this step, remove the following line and uncomment the environment block below
     if: false
     name: >-
       Publish Python 🐍 distribution 📦 to PyPI
     needs:
       - build-python
     runs-on: ubuntu-latest
-    environment:
-      name: pypi
-      url: https://pypi.org/p/psdi_reaction_radar
+    # environment:
+    #   name: pypi
+    #   url: https://pypi.org/p/psdi_reaction_radar
     permissions:
       id-token: write # IMPORTANT: mandatory for trusted publishing
 

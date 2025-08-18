@@ -18,9 +18,13 @@ def index():
                            **get_env_kwargs())
 
 
+d_pages = {"/": index,
+           "/index.html": index}
+
+
 def init_get(app: Flask):
     """Connect the provided Flask app to each of the pages on the site
     """
 
-    app.route('/')(index)
-    app.route('/index.html')(index)
+    for path, func in d_pages.items():
+        app.route(path)(func)

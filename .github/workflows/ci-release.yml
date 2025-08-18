@@ -41,6 +41,8 @@ jobs:
       container_tag: ${{ needs.tag.outputs.container_tag }}
 
   publish-doc:
+    # When ready to enable this step, remove the following line
+    if: false
     needs: [tag]
     uses: ./.github/workflows/job-publish-doc.yml
 
@@ -93,12 +95,12 @@ jobs:
       - build
     runs-on: ubuntu-latest
 
-    # When ready to enable this step, remove the following line
+    # When ready to enable this step, remove the following line and uncomment the environment block below
     if: false
 
-    environment:
-      name: testpypi
-      url: https://test.pypi.org/p/psdi_reaction_radar
+    # environment:
+    #   name: testpypi
+    #   url: https://test.pypi.org/p/psdi_reaction_radar
 
     permissions:
       id-token: write # IMPORTANT: mandatory for trusted publishing
