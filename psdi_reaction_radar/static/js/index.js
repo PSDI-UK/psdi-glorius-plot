@@ -51,7 +51,15 @@ function enableButton(button) {
   button.prop({ disabled: false });
 }
 
-function addRow() {
+function updateRowSelector() {
+  $("select#num-rows").val(getNumRows()).change();
+}
+
+function updateColSelector() {
+  $("select#num-cols").val(getNumValueCols()).change();
+}
+
+function addRow(updateSelector = true) {
 
   // Check that we don't already have too many rows
   const numRows = getNumRows();
@@ -85,9 +93,13 @@ function addRow() {
     enableButton($("button.remove-row"));
   }
 
+  // Update the rows selector if desired
+  if (updateSelector) {
+    updateRowSelector();
+  }
 }
 
-function removeRow() {
+function removeRow(updateSelector = true) {
 
   // Check that we don't already have too few
   const numRows = getNumRows();
@@ -109,9 +121,13 @@ function removeRow() {
     enableButton($("button.add-row"));
   }
 
+  // Update the rows selector if desired
+  if (updateSelector) {
+    updateRowSelector();
+  }
 }
 
-function addColumn() {
+function addColumn(updateSelector = true) {
 
   // Check that we don't already have too many columns
   const numCols = getNumValueCols();
@@ -147,9 +163,13 @@ function addColumn() {
     enableButton($("button.remove-column"));
   }
 
+  // Update the cols selector if desired
+  if (updateSelector) {
+    updateColSelector();
+  }
 }
 
-function removeColumn() {
+function removeColumn(updateSelector = true) {
 
   // Check that we don't already have too few columns
   const numCols = getNumValueCols();
@@ -181,6 +201,36 @@ function removeColumn() {
     enableButton($("button.add-column"));
   }
 
+  // Update the cols selector if desired
+  if (updateSelector) {
+    updateColSelector();
+  }
+}
+
+function setNumRows(targetNumRows) {
+  const numRows = getNumRows();
+  if (numRows < targetNumRows) {
+    for (let i = 0; i < targetNumRows - numRows; ++i) {
+      addRow(false);
+    }
+  } else if (numRows > targetNumRows) {
+    for (let i = 0; i < numRows - targetNumRows; ++i) {
+      removeRow(false);
+    }
+  }
+}
+
+function setNumCols(targetNumValueCols) {
+  const numCols = getNumValueCols();
+  if (numCols < targetNumValueCols) {
+    for (let i = 0; i < targetNumValueCols - numCols; ++i) {
+      addColumn(false);
+    }
+  } else if (numCols > targetNumValueCols) {
+    for (let i = 0; i < numCols - targetNumValueCols; ++i) {
+      removeColumn(false);
+    }
+  }
 }
 
 // Functions to get various options set by the user
@@ -370,10 +420,17 @@ function generatePlot() {
 $(document).ready(function () {
   initDirtyForms();
 
-  $("button.add-row").click(addRow);
-  $("button.remove-row").click(removeRow);
-  $("button.add-column").click(addColumn);
-  $("button.remove-column").click(removeColumn);
+  $("button.add-row").on("click", () => addRow(true));
+  $("button.remove-row").on("click", () => removeRow(true));
+  $("button.add-column").on("click", () => addColumn(true));
+  $("button.remove-column").on("click", () => removeColumn(true));
 
-  $("button#generate-plot").click(generatePlot);
+  $("button#generate-plot").on("click", generatePlot);
+
+  $("select#num-rows").on("change", function (e) {
+    setNumRows($(e.target).val());
+  })
+  $("select#num-cols").on("change", function (e) {
+    setNumCols($(e.target).val());
+  })
 });

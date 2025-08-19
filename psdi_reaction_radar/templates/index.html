@@ -14,11 +14,34 @@
 {% block inner_content %}
 <div id="plot-options">
   <p>
-    <label for="sort-option">Data arrangement:</label>
-    <select name="sorting" id="sort-option">
+    <label for="sort-option">Data arrangement: </label>
+    <select name="sort-option" id="sort-option">
       <option value="1">Ascending</option>
       <option value="-1">Descending</option>
       <option value="0">As entered</option>
+    </select>
+  </p>
+  <p>
+    <label for="num-rows">Test conditions: </label>
+    <select name="num-rows" id="num-rows">
+      <option value="3">3</option>
+      <option value="4">4</option>
+      <option value="5">5</option>
+      <option value="6">6</option>
+      <option value="7">7</option>
+      <option value="8">8</option>
+      <option value="9">9</option>
+      <option value="10">10</option>
+      <option value="11">11</option>
+      <option value="12">12</option>
+    </select>
+    <label for="num-cols"> Output parameters: </label>
+    <select name="num-cols" id="num-cols">
+      <option value="1">1</option>
+      <option value="2">2</option>
+      <option value="3">3</option>
+      <option value="4">4</option>
+      <option value="5">5</option>
     </select>
   </p>
 </div>
