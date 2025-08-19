@@ -14,6 +14,9 @@ const MAX_ROWS = 12;
 const MIN_COLS = 1;
 const MAX_COLS = 5;
 
+// Sort mode: 0 - as entered, 1 - ascending, -1 - descending
+const SORT_MODE = 0;
+
 // Plot styling
 const PLOT_MIN = -100;
 const PLOT_MAX = 50;
@@ -263,10 +266,29 @@ function generatePlot() {
   }
 
   const lSensRows = $("table.sens-table tr.sens-row");
+  const lRowData = [];
   for (let i = 0; i < numRows; ++i) {
     let lCells = lSensRows.eq(i).find("td input.sens-value");
+    let lSingleRowData = [];
     for (let j = 0; j < numCols; ++j) {
-      llData[NUM_BG_COLORS + numRows + j].push(lCells[j].value)
+      lSingleRowData.push(lCells[j].value);
+    }
+    lRowData.push({
+      label: lRowLabels[i],
+      data: lSingleRowData
+    })
+  }
+
+  // Sort the data by the first value, depending on the sort mode
+  lRowData.sort(function (a, b) {
+    return (a.data[0] - b.data[0]) * SORT_MODE;
+  });
+
+  // Add the sorted data to the main data array, and update the row labels
+  for (let i = 0; i < numRows; ++i) {
+    lRowLabels[i] = lRowData[i].label;
+    for (let j = 0; j < numCols; ++j) {
+      llData[NUM_BG_COLORS + numRows + j].push(lRowData[i].data[j]);
     }
   }
 
