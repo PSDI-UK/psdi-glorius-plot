@@ -14,9 +14,6 @@ const MAX_ROWS = 12;
 const MIN_COLS = 1;
 const MAX_COLS = 5;
 
-// Sort mode: 0 - as entered, 1 - ascending, -1 - descending
-const SORT_MODE = 0;
-
 // Plot styling
 const PLOT_MIN = -100;
 const PLOT_MAX = 50;
@@ -186,6 +183,16 @@ function removeColumn() {
 
 }
 
+// Functions to get various options set by the user
+
+/**
+ * Get how the data should be sorted
+ * @returns {int} 1 if ascending, -1 if descending, 0 if as entered
+ */
+function getDataSorting() {
+  return +($("#sort-option").find(":selected").val());
+}
+
 function generatePlot() {
 
   // Set the form as clean when we generate a plot from it
@@ -280,8 +287,9 @@ function generatePlot() {
   }
 
   // Sort the data by the first value, depending on the sort mode
+  let sort_mode = getDataSorting();
   lRowData.sort(function (a, b) {
-    return (a.data[0] - b.data[0]) * SORT_MODE;
+    return (a.data[0] - b.data[0]) * sort_mode;
   });
 
   // Add the sorted data to the main data array, and update the row labels

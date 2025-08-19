@@ -12,6 +12,16 @@
 {% block hero_title %}PSDI Glorius Plot Generator{% endblock %}
 
 {% block inner_content %}
+<div id="plot-options">
+  <p>
+    <label for="sort-option">Data arrangement:</label>
+    <select name="sorting" id="sort-option">
+      <option value="1">Ascending</option>
+      <option value="-1">Descending</option>
+      <option value="0">As entered</option>
+    </select>
+  </p>
+</div>
 <form class="sens-form">
   <table class="sens-table">
     <tr class="header">

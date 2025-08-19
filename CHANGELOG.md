@@ -1,6 +1,10 @@
 # Changelog for PSDI Reaction Sensitivity Radar Plot Generator
 
-## v0.1.1
+## v0.2.0
+
+### New and Changed Functionality
+
+- Added option to select how data should be sorted when displayed on the plot
 
 ### Miscellaneous Changes
 
