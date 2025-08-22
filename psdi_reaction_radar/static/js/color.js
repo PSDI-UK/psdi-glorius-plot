@@ -23,14 +23,15 @@ function rgb2cmyk(r, g, b) {
   let y = 1 - (b / 255);
   let k = Math.min(c, m, y);
 
+  c = (c - k) / (1 - k);
+  m = (m - k) / (1 - k);
+  y = (y - k) / (1 - k);
+
   c = isNaN(c) ? 0 : c;
   m = isNaN(m) ? 0 : m;
   y = isNaN(y) ? 0 : y;
   k = isNaN(k) ? 0 : k;
 
-  c = (c - k) / (1 - k);
-  m = (m - k) / (1 - k);
-  y = (y - k) / (1 - k);
   return [c, m, y, k];
 }
 
@@ -57,13 +58,13 @@ function mix_cmyks(cmyk1, cmyk2, ratio1) {
   return [c, m, y, k];
 }
 
-function mix_hexes(hex1, hex2, ratio1) {
+export function mix_hexes(hex1, hex2, ratio1) {
 
   let rgb1 = hex2dec(hex1);
   let rgb2 = hex2dec(hex2);
 
-  let cmyk1 = rgb2cmyk(rgb1);
-  let cmyk2 = rgb2cmyk(rgb2);
+  let cmyk1 = rgb2cmyk(...rgb1);
+  let cmyk2 = rgb2cmyk(...rgb2);
 
   let cmyk_mix = mix_cmyks(cmyk1, cmyk2, ratio1);
 

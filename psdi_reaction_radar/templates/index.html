@@ -14,6 +14,12 @@
 {% block inner_content %}
 <div id="plot-options">
   <p>
+    <label for="min-color-input">Color at lowest output: </label>
+    <input type="color" value="#FF8080" name="min-color-input" id="min-color-input">
+    <label for="max-color-input"> Color at highest output: </label>
+    <input type="color" value="#20A020" name="max-color-input" id="max-color-input">
+  </p>
+  <p>
     <label for="sort-option">Data arrangement: </label>
     <select name="sort-option" id="sort-option">
       <option value="1">Ascending</option>

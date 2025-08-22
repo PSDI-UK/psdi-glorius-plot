@@ -20,11 +20,14 @@ const PLOT_MIN = -100;
 const PLOT_MAX = 50;
 const L_BORDER_DASHES = [[], [6, 6], [4, 4], [2, 2], [1, 1]];
 const BORDER_WIDTH = 4;
-const L_BG_COLORS = ["#20A020FF", "#70FF70", "#FFFFFF", "#FFFFFF", "#FFC0C0", "#FFA0A0", "#FF8080"];
-const DATA_BG_COLOR = ["#FFFFFF00"]
-const L_BG_COLOR_BOUNDS = [50, 25, 0, -25, -50, -75, -100];
-const L_BG_ORDER = [3, 2, 1, 1, 2, 3, 4];
-const NUM_BG_COLORS = L_BG_COLORS.length;
+const DATA_BG_COLOR = ["#FFFFFF00"];
+const L_BG_COLOR_BOUNDS_HI = [50, 25, 0]
+const L_BG_COLOR_BOUNDS_LOW = [-25, -50, -75, -100];
+const L_BG_ORDER_HI = [3, 2, 1];
+const L_BG_ORDER_LOW = [1, 2, 3, 4];
+const NUM_BG_COLORS_HI = L_BG_COLOR_BOUNDS_HI.length;
+const NUM_BG_COLORS_LOW = L_BG_COLOR_BOUNDS_LOW.length;
+const NUM_BG_COLORS = NUM_BG_COLORS_HI + NUM_BG_COLORS_LOW;
 const GRID_WIDTH = 1;
 const GRID_COLOR = "#00000080";
 let radarChart = null;
@@ -244,6 +247,14 @@ function getDataSorting() {
   return +($("#sort-option").find(":selected").val());
 }
 
+function getMinColor() {
+  return $("#min-color-input").val();
+}
+
+function getMaxColor() {
+  return $("#max-color-input").val();
+}
+
 function generatePlot() {
 
   // Set the form as clean when we generate a plot from it
@@ -264,17 +275,41 @@ function generatePlot() {
   const lBorderDashes = [];
 
   // Make fake data for each background color
-  for (let k = 0; k < NUM_BG_COLORS; ++k) {
+
+  for (let k = 0; k < NUM_BG_COLORS_HI; ++k) {
     lColLabels.push("");
     let lFakeData = [];
     for (let i = 0; i < numRows; ++i) {
-      lFakeData.push(L_BG_COLOR_BOUNDS[k]);
+      lFakeData.push(L_BG_COLOR_BOUNDS_HI[k]);
     }
     llData.push(lFakeData);
-    lOrder.push(L_BG_ORDER[k]);
+    lOrder.push(L_BG_ORDER_HI[k]);
     lBorderColors.push(GRID_COLOR);
     lBorderWidths.push(GRID_WIDTH);
-    lBackgroundColors.push(L_BG_COLORS[k]);
+
+    let colorRatio = 1 - (k / (NUM_BG_COLORS_HI - 1));
+    let backgroundColor = mix_hexes(getMaxColor(), "#FFFFFF", colorRatio);
+    lBackgroundColors.push(backgroundColor);
+
+    lFill.push(true);
+    lBorderDashes.push([]);
+  }
+
+  for (let k = 0; k < NUM_BG_COLORS_LOW; ++k) {
+    lColLabels.push("");
+    let lFakeData = [];
+    for (let i = 0; i < numRows; ++i) {
+      lFakeData.push(L_BG_COLOR_BOUNDS_LOW[k]);
+    }
+    llData.push(lFakeData);
+    lOrder.push(L_BG_ORDER_LOW[k]);
+    lBorderColors.push(GRID_COLOR);
+    lBorderWidths.push(GRID_WIDTH);
+
+    let colorRatio = k / (NUM_BG_COLORS_LOW - 1);
+    let backgroundColor = mix_hexes(getMinColor(), "#FFFFFF", colorRatio);
+    lBackgroundColors.push(backgroundColor);
+
     lFill.push(true);
     lBorderDashes.push([]);
   }
