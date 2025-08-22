@@ -7,6 +7,7 @@
  */
 
 import { initDirtyForms, cleanDirtyForms } from "./common.js";
+import { mix_hexes } from "./color.js"
 
 const MIN_ROWS = 3;
 const MAX_ROWS = 12;
