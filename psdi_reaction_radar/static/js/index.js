@@ -16,8 +16,6 @@ const MIN_COLS = 1;
 const MAX_COLS = 5;
 
 // Plot styling
-const PLOT_MIN = -100;
-const PLOT_MAX = 50;
 const L_BORDER_DASHES = [[], [6, 6], [4, 4], [2, 2], [1, 1]];
 const BORDER_WIDTH = 4;
 const DATA_BG_COLOR = ["#FFFFFF00"];
@@ -239,7 +237,7 @@ function getMinOutput() {
 }
 
 function getMaxOutput() {
-  let maxOutput = $("#min-output-input").val();
+  let maxOutput = $("#max-output-input").val();
   maxOutput = Math.min(Math.max(maxOutput, 1), 1000);
   return maxOutput;
 }
@@ -275,6 +273,9 @@ function generatePlot() {
   cleanDirtyForms();
 
   // Collect info from the settings and determine data based on them
+  const numRows = getNumRows();
+  const numCols = getNumValueCols();
+
   const minOutput = getMinOutput();
   const maxOutput = getMaxOutput();
   const bandWidth = getBandWidth();
@@ -282,22 +283,22 @@ function generatePlot() {
   const numLowBands = Math.ceil(-minOutput / bandWidth);
   const numHiBands = Math.ceil(maxOutput / bandWidth);
 
-  const numBgColorsLow = numLowBands + 1;
-  const numBgColorsHi = numHiBands;
+  const numBgColorsLow = numLowBands;
+  const numBgColorsHi = numHiBands + 1;
   const numBgColors = numBgColorsLow + numBgColorsHi;
 
   const lBgColorBoundsLow = [];
   const lBgOrderLow = [];
   for (let i = 0; i < numBgColorsLow; ++i) {
-    lBgColorBoundsLow.push(Math.max(-bandWidth * i, minOutput));
-    lBgOrderLow.push(numBgColorsLow - i);
+    lBgColorBoundsLow.push(Math.max(-bandWidth * (i + 1), minOutput));
+    lBgOrderLow.push(i);
   }
 
   const lBgColorBoundsHi = [];
   const lBgOrderHi = [];
   for (let i = 0; i < numBgColorsHi; ++i) {
-    lBgColorBoundsHi.push(Math.min(bandWidth * (i + 1), maxOutput));
-    lBgOrderHi.push(numBgColorsLow - i);
+    lBgColorBoundsHi.push(Math.min(bandWidth * i, maxOutput));
+    lBgOrderHi.push(i);
   }
 
   // Create data we'll plot in the chart
@@ -323,7 +324,7 @@ function generatePlot() {
     lBorderColors.push(GRID_COLOR);
     lBorderWidths.push(GRID_WIDTH);
 
-    let colorRatio = 1 - (k / (numBgColorsHi - 1));
+    let colorRatio = k / (numBgColorsHi - 1);
     let backgroundColor = mix_hexes(getMaxColor(), "#FFFFFF", colorRatio);
     lBackgroundColors.push(backgroundColor);
 
@@ -356,9 +357,9 @@ function generatePlot() {
     let lFakeData = [];
     for (let i = 0; i < numRows; ++i) {
       if (i == k) {
-        lFakeData.push(PLOT_MIN)
+        lFakeData.push(minOutput)
       } else {
-        lFakeData.push(PLOT_MAX)
+        lFakeData.push(maxOutput)
       }
     }
     llData.push(lFakeData);
@@ -437,6 +438,21 @@ function generatePlot() {
     })
   }
 
+  const plotR = {
+    min: minOutput,
+    max: maxOutput,
+    reverse: true,
+    ticks: {
+      stepSize: bandWidth,
+      z: 2,
+    },
+    pointLabels: {
+      font: {
+        size: 16
+      }
+    }
+  };
+
   if (radarChart === null) {
     radarChart = new Chart("glorius-plot", {
       type: "radar",
@@ -446,20 +462,7 @@ function generatePlot() {
       },
       options: {
         scales: {
-          r: {
-            min: PLOT_MIN,
-            max: PLOT_MAX,
-            reverse: true,
-            ticks: {
-              stepSize: 25,
-              z: 2,
-            },
-            pointLabels: {
-              font: {
-                size: 16
-              }
-            }
-          }
+          r: plotR
         },
         plugins: {
           legend: {
@@ -484,6 +487,7 @@ function generatePlot() {
       labels: lRowLabels,
       datasets: lDatasets,
     }
+    radarChart.options.scales.r = plotR;
     radarChart.update();
   }
 
