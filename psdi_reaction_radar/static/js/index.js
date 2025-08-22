@@ -291,14 +291,14 @@ function generatePlot() {
   const lBgOrderLow = [];
   for (let i = 0; i < numBgColorsLow; ++i) {
     lBgColorBoundsLow.push(Math.max(-bandWidth * (i + 1), minOutput));
-    lBgOrderLow.push(i);
+    lBgOrderLow.push(i + 1);
   }
 
   const lBgColorBoundsHi = [];
   const lBgOrderHi = [];
   for (let i = 0; i < numBgColorsHi; ++i) {
     lBgColorBoundsHi.push(Math.min(bandWidth * i, maxOutput));
-    lBgOrderHi.push(i);
+    lBgOrderHi.push(i + 1);
   }
 
   // Create data we'll plot in the chart
