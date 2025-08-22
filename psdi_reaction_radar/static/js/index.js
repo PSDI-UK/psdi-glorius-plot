@@ -21,6 +21,9 @@ const BORDER_WIDTH = 4;
 const DATA_BG_COLOR = ["#FFFFFF00"];
 const GRID_WIDTH = 1;
 const GRID_COLOR = "#00000080";
+
+// Globals
+let autoUpdating = false;
 let radarChart = null;
 
 // When the script is initially loaded, store a copy of a heading element and cell elements that we'll later use
@@ -54,7 +57,7 @@ function updateColSelector() {
   $("select#num-cols").val(getNumValueCols()).change();
 }
 
-function addRow(updateSelector = true) {
+function addRow(updateAfter = true) {
 
   // Check that we don't already have too many rows
   const numRows = getNumRows();
@@ -88,13 +91,23 @@ function addRow(updateSelector = true) {
     enableButton($("button.remove-row"));
   }
 
+  // Enable auto updates for new cells if it's turned on
+  if (autoUpdating) {
+    enableAutoUpdates();
+  }
+
   // Update the rows selector if desired
-  if (updateSelector) {
+  if (updateAfter) {
     updateRowSelector();
+  }
+
+  // Update the plot if desired
+  if (updateAfter && autoUpdating) {
+    generatePlot();
   }
 }
 
-function removeRow(updateSelector = true) {
+function removeRow(updateAfter = true) {
 
   // Check that we don't already have too few
   const numRows = getNumRows();
@@ -117,12 +130,17 @@ function removeRow(updateSelector = true) {
   }
 
   // Update the rows selector if desired
-  if (updateSelector) {
+  if (updateAfter) {
     updateRowSelector();
+  }
+
+  // Update the plot if desired
+  if (updateAfter && autoUpdating) {
+    generatePlot();
   }
 }
 
-function addColumn(updateSelector = true) {
+function addColumn(updateAfter = true) {
 
   // Check that we don't already have too many columns
   const numCols = getNumValueCols();
@@ -158,13 +176,23 @@ function addColumn(updateSelector = true) {
     enableButton($("button.remove-column"));
   }
 
+  // Enable auto updates for new cells if it's turned on
+  if (autoUpdating) {
+    enableAutoUpdates();
+  }
+
   // Update the cols selector if desired
-  if (updateSelector) {
+  if (updateAfter) {
     updateColSelector();
+  }
+
+  // Update the plot if desired
+  if (updateAfter && autoUpdating) {
+    generatePlot();
   }
 }
 
-function removeColumn(updateSelector = true) {
+function removeColumn(updateAfter = true) {
 
   // Check that we don't already have too few columns
   const numCols = getNumValueCols();
@@ -197,8 +225,13 @@ function removeColumn(updateSelector = true) {
   }
 
   // Update the cols selector if desired
-  if (updateSelector) {
+  if (updateAfter) {
     updateColSelector();
+  }
+
+  // Update the plot if desired
+  if (updateAfter && autoUpdating) {
+    generatePlot();
   }
 }
 
@@ -213,6 +246,11 @@ function setNumRows(targetNumRows) {
       removeRow(false);
     }
   }
+
+  // Update the plot if desired
+  if (autoUpdating) {
+    generatePlot();
+  }
 }
 
 function setNumCols(targetNumValueCols) {
@@ -225,6 +263,11 @@ function setNumCols(targetNumValueCols) {
     for (let i = 0; i < numCols - targetNumValueCols; ++i) {
       removeColumn(false);
     }
+  }
+
+  // Update the plot if desired
+  if (autoUpdating) {
+    generatePlot();
   }
 }
 
@@ -271,6 +314,9 @@ function generatePlot() {
 
   // Set the form as clean when we generate a plot from it
   cleanDirtyForms();
+
+  // Display the auto-update toggle
+  $("#auto-update").removeClass("hidden");
 
   // Collect info from the settings and determine data based on them
   const numRows = getNumRows();
@@ -454,6 +500,7 @@ function generatePlot() {
   };
 
   if (radarChart === null) {
+    // Generate the plot for the first time
     radarChart = new Chart("glorius-plot", {
       type: "radar",
       data: {
@@ -493,6 +540,16 @@ function generatePlot() {
 
 }
 
+function enableAutoUpdates() {
+  $(".trigger-update").on("change", generatePlot);
+  autoUpdating = true;
+}
+
+function disableAutoUpdates() {
+  $(".trigger-update").off("change");
+  autoUpdating = false;
+}
+
 $(document).ready(function () {
   initDirtyForms();
 
@@ -508,5 +565,13 @@ $(document).ready(function () {
   })
   $("select#num-cols").on("change", function (e) {
     setNumCols($(e.target).val());
+  })
+
+  $("#auto-update-toggle").on("click", function (e) {
+    if ($(e.target).val() == "on") {
+      enableAutoUpdates();
+    } else {
+      disableAutoUpdates();
+    }
   })
 });

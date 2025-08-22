@@ -15,21 +15,21 @@
 <div id="plot-options">
   <p>
     <label for="min-output-input">Minimum output: </label>
-    <input type="number" value="-100" name="min-output-input" id="min-output-input">
+    <input type="number" value="-100" name="min-output-input" id="min-output-input" class="trigger-update">
     <label for="max-output-input"> Maximum output: </label>
-    <input type="number" value="50" name="max-output-input" id="max-output-input">
+    <input type="number" value="50" name="max-output-input" id="max-output-input" class="trigger-update">
     <label for="band-width-input"> Band width: </label>
-    <input type="number" value="25" name="band-width-input" id="band-width-input">
+    <input type="number" value="25" name="band-width-input" id="band-width-input" class="trigger-update">
   </p>
   <p>
     <label for="min-color-input">Color at lowest output: </label>
-    <input type="color" value="#FF8080" name="min-color-input" id="min-color-input">
+    <input type="color" value="#FF8080" name="min-color-input" id="min-color-input" class="trigger-update">
     <label for="max-color-input"> Color at highest output: </label>
-    <input type="color" value="#20A020" name="max-color-input" id="max-color-input">
+    <input type="color" value="#20A020" name="max-color-input" id="max-color-input" class="trigger-update">
   </p>
   <p>
     <label for="sort-option">Data arrangement: </label>
-    <select name="sort-option" id="sort-option">
+    <select name="sort-option" id="sort-option" class="trigger-update">
       <option value="1">Ascending</option>
       <option value="-1">Descending</option>
       <option value="0">As entered</option>
@@ -64,7 +64,8 @@
     <tr class="header">
       <th class="label-heading">Label</th>
       <th class="output-heading">
-        <input type="text" class="output-label" placeholder="Output (e.g. “Yield”)" value="Yield">
+        <input type="text" class="output-label" placeholder="Output (e.g. “Yield”)" value="Yield"
+          class="trigger-update">
       </th>
       <td class="button-column">
         <button type="button" class="remove-column disabled fix-size-small" disabled="true">-</button>
@@ -72,16 +73,16 @@
       </td>
     </tr>
     <tr class="sens-row">
-      <td><input type="text" class="sens-label" placeholder="Condition (e.g. “High c”)"></td>
-      <td><input type="number" class="sens-value" value="0"> %</td>
+      <td><input type="text" class="sens-label trigger-update" placeholder="Condition (e.g. “High c”)"></td>
+      <td><input type="number" class="sens-value trigger-update" value="0"> %</td>
     </tr>
     <tr class="sens-row">
-      <td><input type="text" class="sens-label" placeholder="Condition (e.g. “High c”)"></td>
-      <td><input type="number" class="sens-value" value="0"> %</td>
+      <td><input type="text" class="sens-label trigger-update" placeholder="Condition (e.g. “High c”)"></td>
+      <td><input type="number" class="sens-value trigger-update" value="0"> %</td>
     </tr>
     <tr class="sens-row">
-      <td><input type="text" class="sens-label" placeholder="Condition (e.g. “High c”)"></td>
-      <td><input type="number" class="sens-value" value="0"> %</td>
+      <td><input type="text" class="sens-label trigger-update" placeholder="Condition (e.g. “High c”)"></td>
+      <td><input type="number" class="sens-value trigger-update" value="0"> %</td>
     </tr>
     <tr class="button-row">
       <td>
@@ -92,6 +93,10 @@
   </table>
 
   <button type="button" id="generate-plot">Generate</button>
+  <span id="auto-update" class="hidden">
+    <input type="checkbox" name="auto-update-toggle" id="auto-update-toggle">
+    <label for="auto-update-toggle"> Auto-update</label>
+  </span>
 </form>
 
 <canvas id="glorius-plot"></canvas>

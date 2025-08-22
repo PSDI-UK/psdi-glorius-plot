@@ -24,3 +24,7 @@ tr>td:first-child>button:first-child {
   width    : 100vw;
   max-width: 700px;
 }
+
+.hidden {
+  display: none;
+}
