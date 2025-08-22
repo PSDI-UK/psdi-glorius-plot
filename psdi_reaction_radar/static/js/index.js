@@ -21,13 +21,6 @@ const PLOT_MAX = 50;
 const L_BORDER_DASHES = [[], [6, 6], [4, 4], [2, 2], [1, 1]];
 const BORDER_WIDTH = 4;
 const DATA_BG_COLOR = ["#FFFFFF00"];
-const L_BG_COLOR_BOUNDS_HI = [50, 25, 0]
-const L_BG_COLOR_BOUNDS_LOW = [-25, -50, -75, -100];
-const L_BG_ORDER_HI = [3, 2, 1];
-const L_BG_ORDER_LOW = [1, 2, 3, 4];
-const NUM_BG_COLORS_HI = L_BG_COLOR_BOUNDS_HI.length;
-const NUM_BG_COLORS_LOW = L_BG_COLOR_BOUNDS_LOW.length;
-const NUM_BG_COLORS = NUM_BG_COLORS_HI + NUM_BG_COLORS_LOW;
 const GRID_WIDTH = 1;
 const GRID_COLOR = "#00000080";
 let radarChart = null;
@@ -239,12 +232,22 @@ function setNumCols(targetNumValueCols) {
 
 // Functions to get various options set by the user
 
-/**
- * Get how the data should be sorted
- * @returns {int} 1 if ascending, -1 if descending, 0 if as entered
- */
-function getDataSorting() {
-  return +($("#sort-option").find(":selected").val());
+function getMinOutput() {
+  let minOutput = $("#min-output-input").val();
+  minOutput = Math.min(Math.max(minOutput, -100), -1);
+  return minOutput;
+}
+
+function getMaxOutput() {
+  let maxOutput = $("#min-output-input").val();
+  maxOutput = Math.min(Math.max(maxOutput, 1), 1000);
+  return maxOutput;
+}
+
+function getBandWidth() {
+  let bandWidth = $("#band-width-input").val();
+  bandWidth = Math.min(Math.max(bandWidth, 0.01), 1000);
+  return bandWidth;
 }
 
 function getMinColor() {
@@ -255,16 +258,49 @@ function getMaxColor() {
   return $("#max-color-input").val();
 }
 
+/**
+ * Get how the data should be sorted
+ * @returns {int} 1 if ascending, -1 if descending, 0 if as entered
+ */
+function getDataSorting() {
+  return +($("#sort-option").find(":selected").val());
+}
+
+/**
+ * Generate the plot using all the provided data
+ */
 function generatePlot() {
 
   // Set the form as clean when we generate a plot from it
   cleanDirtyForms();
 
-  // Collect information from the table
+  // Collect info from the settings and determine data based on them
+  const minOutput = getMinOutput();
+  const maxOutput = getMaxOutput();
+  const bandWidth = getBandWidth();
 
-  const numRows = getNumRows();
-  const numCols = getNumValueCols();
+  const numLowBands = Math.ceil(-minOutput / bandWidth);
+  const numHiBands = Math.ceil(maxOutput / bandWidth);
 
+  const numBgColorsLow = numLowBands + 1;
+  const numBgColorsHi = numHiBands;
+  const numBgColors = numBgColorsLow + numBgColorsHi;
+
+  const lBgColorBoundsLow = [];
+  const lBgOrderLow = [];
+  for (let i = 0; i < numBgColorsLow; ++i) {
+    lBgColorBoundsLow.push(Math.max(-bandWidth * i, minOutput));
+    lBgOrderLow.push(numBgColorsLow - i);
+  }
+
+  const lBgColorBoundsHi = [];
+  const lBgOrderHi = [];
+  for (let i = 0; i < numBgColorsHi; ++i) {
+    lBgColorBoundsHi.push(Math.min(bandWidth * (i + 1), maxOutput));
+    lBgOrderHi.push(numBgColorsLow - i);
+  }
+
+  // Create data we'll plot in the chart
   const lColLabels = [];
   const llData = [];
   const lOrder = [];
@@ -276,18 +312,18 @@ function generatePlot() {
 
   // Make fake data for each background color
 
-  for (let k = 0; k < NUM_BG_COLORS_HI; ++k) {
+  for (let k = 0; k < numBgColorsHi; ++k) {
     lColLabels.push("");
     let lFakeData = [];
     for (let i = 0; i < numRows; ++i) {
-      lFakeData.push(L_BG_COLOR_BOUNDS_HI[k]);
+      lFakeData.push(lBgColorBoundsHi[k]);
     }
     llData.push(lFakeData);
-    lOrder.push(L_BG_ORDER_HI[k]);
+    lOrder.push(lBgOrderHi[k]);
     lBorderColors.push(GRID_COLOR);
     lBorderWidths.push(GRID_WIDTH);
 
-    let colorRatio = 1 - (k / (NUM_BG_COLORS_HI - 1));
+    let colorRatio = 1 - (k / (numBgColorsHi - 1));
     let backgroundColor = mix_hexes(getMaxColor(), "#FFFFFF", colorRatio);
     lBackgroundColors.push(backgroundColor);
 
@@ -295,18 +331,18 @@ function generatePlot() {
     lBorderDashes.push([]);
   }
 
-  for (let k = 0; k < NUM_BG_COLORS_LOW; ++k) {
+  for (let k = 0; k < numBgColorsLow; ++k) {
     lColLabels.push("");
     let lFakeData = [];
     for (let i = 0; i < numRows; ++i) {
-      lFakeData.push(L_BG_COLOR_BOUNDS_LOW[k]);
+      lFakeData.push(lBgColorBoundsLow[k]);
     }
     llData.push(lFakeData);
-    lOrder.push(L_BG_ORDER_LOW[k]);
+    lOrder.push(lBgOrderLow[k]);
     lBorderColors.push(GRID_COLOR);
     lBorderWidths.push(GRID_WIDTH);
 
-    let colorRatio = k / (NUM_BG_COLORS_LOW - 1);
+    let colorRatio = k / (numBgColorsLow - 1);
     let backgroundColor = mix_hexes(getMinColor(), "#FFFFFF", colorRatio);
     lBackgroundColors.push(backgroundColor);
 
@@ -382,12 +418,12 @@ function generatePlot() {
   for (let i = 0; i < numRows; ++i) {
     lRowLabels[i] = lRowData[i].label;
     for (let j = 0; j < numCols; ++j) {
-      llData[NUM_BG_COLORS + numRows + j].push(lRowData[i].data[j]);
+      llData[numBgColors + numRows + j].push(lRowData[i].data[j]);
     }
   }
 
   const lDatasets = [];
-  for (let j = 0; j < NUM_BG_COLORS + numRows + numCols; ++j) {
+  for (let j = 0; j < numBgColors + numRows + numCols; ++j) {
     lDatasets.push({
       label: lColLabels[j],
       data: llData[j],
