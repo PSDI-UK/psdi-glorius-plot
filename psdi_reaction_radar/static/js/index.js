@@ -299,6 +299,14 @@ function getMaxColor() {
   return $("#max-color-input").val();
 }
 
+function getShowGridLines() {
+  return $("#grid-line-toggle").is(":checked");
+}
+
+function getShowAxisLines() {
+  return $("#axis-line-toggle").is(":checked");
+}
+
 /**
  * Get how the data should be sorted
  * @returns {int} 1 if ascending, -1 if descending, 0 if as entered
@@ -314,9 +322,6 @@ function generatePlot() {
 
   // Set the form as clean when we generate a plot from it
   cleanDirtyForms();
-
-  // Display the auto-update toggle
-  $("#auto-update").removeClass("hidden");
 
   // Collect info from the settings and determine data based on them
   const numRows = getNumRows();
@@ -347,6 +352,8 @@ function generatePlot() {
     lBgOrderHi.push(i + 1);
   }
 
+  const showGridLines = getShowGridLines();
+
   // Create data we'll plot in the chart
   const lColLabels = [];
   const llData = [];
@@ -367,12 +374,18 @@ function generatePlot() {
     }
     llData.push(lFakeData);
     lOrder.push(lBgOrderHi[k]);
-    lBorderColors.push(GRID_COLOR);
-    lBorderWidths.push(GRID_WIDTH);
 
     let colorRatio = k / (numBgColorsHi - 1);
     let backgroundColor = mix_hexes(getMaxColor(), "#FFFFFF", colorRatio);
     lBackgroundColors.push(backgroundColor);
+
+    if (showGridLines) {
+      lBorderColors.push(GRID_COLOR);
+      lBorderWidths.push(GRID_WIDTH);
+    } else {
+      lBorderColors.push(backgroundColor);
+      lBorderWidths.push(0);
+    }
 
     lFill.push(true);
     lBorderDashes.push([]);
@@ -386,12 +399,18 @@ function generatePlot() {
     }
     llData.push(lFakeData);
     lOrder.push(lBgOrderLow[k]);
-    lBorderColors.push(GRID_COLOR);
-    lBorderWidths.push(GRID_WIDTH);
 
     let colorRatio = k / (numBgColorsLow - 1);
     let backgroundColor = mix_hexes(getMinColor(), "#FFFFFF", colorRatio);
     lBackgroundColors.push(backgroundColor);
+
+    if (showGridLines) {
+      lBorderColors.push(GRID_COLOR);
+      lBorderWidths.push(GRID_WIDTH);
+    } else {
+      lBorderColors.push(backgroundColor);
+      lBorderWidths.push(0);
+    }
 
     lFill.push(true);
     lBorderDashes.push([]);
@@ -568,10 +587,12 @@ $(document).ready(function () {
   })
 
   $("#auto-update-toggle").on("click", function (e) {
-    if ($(e.target).val() == "on") {
+    if ($(e.target).is(":checked")) {
       enableAutoUpdates();
+      generatePlot();
     } else {
       disableAutoUpdates();
     }
   })
+  enableAutoUpdates();
 });
