@@ -353,6 +353,7 @@ function generatePlot() {
   }
 
   const showGridLines = getShowGridLines();
+  const showAxisLines = getShowAxisLines();
 
   // Create data we'll plot in the chart
   const lColLabels = [];
@@ -416,24 +417,28 @@ function generatePlot() {
     lBorderDashes.push([]);
   }
 
-  // Make fake data for each axis line we want to draw
-  for (let k = 0; k < numRows; ++k) {
-    lColLabels.push("");
-    let lFakeData = [];
-    for (let i = 0; i < numRows; ++i) {
-      if (i == k) {
-        lFakeData.push(minOutput)
-      } else {
-        lFakeData.push(maxOutput)
+  // Make fake data for each axis line we want to draw if desired
+  let numAxisLines = 0;
+  if (showAxisLines) {
+    numAxisLines = numRows;
+    for (let k = 0; k < numRows; ++k) {
+      lColLabels.push("");
+      let lFakeData = [];
+      for (let i = 0; i < numRows; ++i) {
+        if (i == k) {
+          lFakeData.push(minOutput)
+        } else {
+          lFakeData.push(maxOutput)
+        }
       }
+      llData.push(lFakeData);
+      lOrder.push(-1);
+      lBorderColors.push(GRID_COLOR);
+      lBorderWidths.push(GRID_WIDTH);
+      lBackgroundColors.push(DATA_BG_COLOR);
+      lFill.push(false);
+      lBorderDashes.push([]);
     }
-    llData.push(lFakeData);
-    lOrder.push(-1);
-    lBorderColors.push(GRID_COLOR);
-    lBorderWidths.push(GRID_WIDTH);
-    lBackgroundColors.push(DATA_BG_COLOR);
-    lFill.push(false);
-    lBorderDashes.push([]);
   }
 
   // Get the column labels, and also set other fixed data for normal datasets
@@ -484,12 +489,12 @@ function generatePlot() {
   for (let i = 0; i < numRows; ++i) {
     lRowLabels[i] = lRowData[i].label;
     for (let j = 0; j < numCols; ++j) {
-      llData[numBgColors + numRows + j].push(lRowData[i].data[j]);
+      llData[numBgColors + numAxisLines + j].push(lRowData[i].data[j]);
     }
   }
 
   const lDatasets = [];
-  for (let j = 0; j < numBgColors + numRows + numCols; ++j) {
+  for (let j = 0; j < numBgColors + numAxisLines + numCols; ++j) {
     lDatasets.push({
       label: lColLabels[j],
       data: llData[j],
@@ -562,6 +567,7 @@ function generatePlot() {
 function enableAutoUpdates() {
   $(".trigger-update").on("change", generatePlot);
   autoUpdating = true;
+  generatePlot();
 }
 
 function disableAutoUpdates() {
@@ -589,7 +595,6 @@ $(document).ready(function () {
   $("#auto-update-toggle").on("click", function (e) {
     if ($(e.target).is(":checked")) {
       enableAutoUpdates();
-      generatePlot();
     } else {
       disableAutoUpdates();
     }
