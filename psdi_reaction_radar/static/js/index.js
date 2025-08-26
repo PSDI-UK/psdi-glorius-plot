@@ -287,7 +287,7 @@ function getMaxOutput() {
 
 function getBandWidth() {
   let bandWidth = $("#band-width-input").val();
-  bandWidth = Math.min(Math.max(bandWidth, 0.01), 1000);
+  bandWidth = Math.min(Math.max(bandWidth, 1), 1000);
   return bandWidth;
 }
 
