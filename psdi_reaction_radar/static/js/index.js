@@ -143,6 +143,30 @@ function removeRow(updateAfter = true) {
   }
 }
 
+/**
+ * Relabel all the output rows after one is added or removed
+ */
+function relableOutputRows() {
+  const numOutputs = getNumOutputs();
+  const lOutputLabelRows = $("tr.output-label-row");
+  for (let j = 0; j < numOutputs; j++) {
+    const outputLabelRow = lOutputLabelRows[j];
+    const rowNumber = (j + 1).toString();
+
+    const outputLabelLabel = outputLabelRow.children[0].children[0];
+    outputLabelLabel.textContent = OUTPUT_LABEL_TEXT.replace("{N}", rowNumber);
+    outputLabelLabel.for = "ol" + rowNumber;
+
+    const outputLabelInput = outputLabelRow.children[1].children[0];
+    outputLabelInput.id = "ol" + rowNumber;
+
+    const outputLabelRemoveButton = outputLabelRow.children[2].children[0];
+    outputLabelRemoveButton.id = "remove-ob" + rowNumber;
+    const outputLabelAddButton = outputLabelRow.children[2].children[1];
+    outputLabelAddButton.id = "add-ob" + rowNumber;
+  }
+}
+
 function addOutput(e, updateAfter = true) {
 
   // Check that we don't already have too many outputs
@@ -166,30 +190,13 @@ function addOutput(e, updateAfter = true) {
     let eId = e.target.id;
     targetRow = +eId.at(-1);
   }
-  if (targetRow == numOutputs) {
-    $("table.output-label-table")[0].appendChild(newOutputLabelRow);
+  if (targetRow >= numOutputs) {
+    $("table.output-label-table tbody")[0].appendChild(newOutputLabelRow);
   } else {
-    $("table.output-label-table")[0].insertBefore(newOutputLabelRow, $("tr.output-label-row")[targetRow]);
+    $("table.output-label-table tbody")[0].insertBefore(newOutputLabelRow, $("tr.output-label-row")[targetRow]);
   }
 
-  // Relabel all the output rows
-  const lOutputLabelRows = $("tr.output-label-row");
-  for (let j = 0; j < numOutputs + 1; j++) {
-    const outputLabelRow = lOutputLabelRows[j];
-    const rowNumber = (j + 1).toString();
-
-    const outputLabelLabel = outputLabelRow.children[0].children[0];
-    outputLabelLabel.textContent = OUTPUT_LABEL_TEXT.replace("{N}", rowNumber);
-    outputLabelLabel.for = "ol" + rowNumber;
-
-    const outputLabelInput = outputLabelRow.children[1].children[0];
-    outputLabelInput.id = "ol" + rowNumber;
-
-    const outputLabelRemoveButton = outputLabelRow.children[2].children[0];
-    outputLabelRemoveButton.id = "remove-ob" + rowNumber;
-    const outputLabelAddButton = outputLabelRow.children[2].children[1];
-    outputLabelAddButton.id = "add-ob" + rowNumber;
-  }
+  relableOutputRows();
 
   // Add a new input line to each value cell
   const lSensValueCells = $("td.sens-value-cell");
@@ -232,7 +239,7 @@ function addOutput(e, updateAfter = true) {
   }
 }
 
-function removeOutput(updateAfter = true) {
+function removeOutput(e, updateAfter = true) {
 
   // Check that we don't already have too few outputs
   const numOutputs = getNumOutputs();
@@ -244,14 +251,26 @@ function removeOutput(updateAfter = true) {
   const numRows = getNumRows();
   const lRows = $("table.sens-table tr.sens-row");
 
-  // Remove the last heading cell
-  const headerRow = $("table.sens-table tr.header");
-  const headerButtonsCell = headerRow.children("th.sample-heading").get(-1);
-  headerRow[0].removeChild(headerButtonsCell);
+  // Determine which row to remove based on which button was clicked
+  let targetRow;
+  if (e === null) {
+    targetRow = numOutputs - 1;
+  } else {
+    let eId = e.target.id;
+    targetRow = +eId.at(-1) - 1;
+  }
 
-  // Remove the last cell from each row
-  for (let i = 0; i < numRows; ++i) {
-    lRows[i].removeChild(lRows[i].lastChild);
+  // Remove the row from the output label table
+  const outputLabelTable = $("table.output-label-table tbody")[0];
+  const lOutputLabelRows = $("tr.output-label-row");
+  outputLabelTable.removeChild(lOutputLabelRows[targetRow]);
+
+  relableOutputRows();
+
+  // Remove the input line from each cell in the sens table
+  const lSensValueCells = $("td.sens-value-cell");
+  for (let i = 0; i < lSensValueCells.length; ++i) {
+    lSensValueCells[i].removeChild(lSensValueCells[i].children[targetRow]);
   }
 
   // Check if we've reached the minimum number of outputs, and disable the button to remove outputs if so
@@ -301,7 +320,7 @@ function setNumOutputs(targetNumOutputs) {
     }
   } else if (numOutputs > targetNumOutputs) {
     for (let i = 0; i < numOutputs - targetNumOutputs; ++i) {
-      removeOutput(false);
+      removeOutput(null, false);
     }
   }
 
@@ -671,7 +690,7 @@ function initNumOutputControls() {
   $("select#num-outputs").off("change");
 
   $("button.add-output").on("click", (e) => addOutput(e, true));
-  $("button.remove-output").on("click", () => removeOutput(true));
+  $("button.remove-output").on("click", (e) => removeOutput(e, true));
   $("select#num-outputs").on("change", function (e) {
     setNumOutputs($(e.target).val());
   });
