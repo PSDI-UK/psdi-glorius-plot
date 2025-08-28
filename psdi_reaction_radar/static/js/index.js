@@ -35,8 +35,6 @@ let radarChart = null;
 // as templates to add new rows
 
 const TEMPLATE_OUTPUT_LABEL_ROW = $("tr.output-label-row")[0].cloneNode(true);
-const TEMPLATE_HEADING = $("th.sample-heading")[0].cloneNode(true);
-const TEMPLATE_LABEL_INPUT = $("td:has(> input.sens-label)")[0].cloneNode(true);
 const TEMPLATE_INPUT_LINE = $(".sens-input-line")[0].cloneNode(true);
 
 function getNumRows() {
@@ -78,15 +76,10 @@ function addRow(updateAfter = true) {
 
   const numOutputs = getNumOutputs();
 
-  // Construct a new row
-  const newRow = document.createElement('tr');
-  newRow.classList.add("sens-row");
-
-  newRow.appendChild(TEMPLATE_LABEL_INPUT.cloneNode(true));
-
-  for (let i = 0; i < numOutputs; ++i) {
-    newRow.appendChild(TEMPLATE_VALUE_INPUT.cloneNode(true));
-  }
+  // Construct a new row by copying the first and clearing its input
+  const newRow = $("tr.sens-row")[0].cloneNode(true);
+  $(newRow).find("input.sens-label").val("");
+  $(newRow).find("input.sens-value").val("0");
 
   // Add the new row to the table
   $("table.sens-table tbody")[0].insertBefore(newRow, $("table.sens-table tr.button-row")[0]);
@@ -211,7 +204,7 @@ function addOutput(e, updateAfter = true) {
   }
 
   // Connect the newly-added buttons to the add/remove functions
-  reinitNumOutputControls();
+  initNumOutputControls();
 
   // Check if we've reached the maximum number of outputs, and disable the button to add outputs if so
   if (numOutputs + 1 >= MAX_OUTPUTS) {
@@ -649,6 +642,7 @@ function fillRandom() {
 }
 
 function enableAutoUpdates() {
+  disableAutoUpdates();
   $(".trigger-update").on("change", generatePlot);
   autoUpdating = true;
   generatePlot();
@@ -660,6 +654,10 @@ function disableAutoUpdates() {
 }
 
 function initNumParamControls() {
+  $("button.add-row").off("click");
+  $("button.remove-row").off("click");
+  $("select#num-rows").off("change");
+
   $("button.add-row").on("click", () => addRow(true));
   $("button.remove-row").on("click", () => removeRow(true));
   $("select#num-rows").on("change", function (e) {
@@ -667,26 +665,16 @@ function initNumParamControls() {
   });
 }
 
-function reinitNumParamControls() {
-  $("button.add-row").off("click");
-  $("button.remove-row").off("click");
-  $("select#num-rows").off("change");
-  initNumParamControls();
-}
-
 function initNumOutputControls() {
+  $("button.add-output").off("click");
+  $("button.remove-output").off("click");
+  $("select#num-outputs").off("change");
+
   $("button.add-output").on("click", (e) => addOutput(e, true));
   $("button.remove-output").on("click", () => removeOutput(true));
   $("select#num-outputs").on("change", function (e) {
     setNumOutputs($(e.target).val());
   });
-}
-
-function reinitNumOutputControls() {
-  $("button.add-output").off("click");
-  $("button.remove-output").off("click");
-  $("select#num-outputs").off("change");
-  initNumOutputControls();
 }
 
 $(document).ready(function () {
