@@ -28,3 +28,41 @@ tr>td:first-child>button:first-child {
 .hidden {
   display: none;
 }
+
+/* Style the sensitivity table */
+.sens-table td {
+  padding-top   : 0.25rem;
+  padding-bottom: 0.25rem;
+}
+
+.sens-value-cell {
+  display       : flex;
+  flex-direction: column;
+}
+
+.sens-input-line {
+  display        : flex;
+  flex-direction : row;
+  justify-content: start;
+  gap            : 0.25rem;
+}
+
+/* Dotted underline to indicate text that will show a tooltip on mouseover */
+.mouseover {
+  text-decoration: underline dotted;
+}
+
+/* Style the popup tooltips */
+.tooltip {
+  --bs-tooltip-opacity: 1;
+}
+
+.tooltip-on-light {
+  --bs-tooltip-bg   : var(--ifm-color-primary);
+  --bs-tooltip-color: var(--psdi-light-text-color-body);
+}
+
+.tooltip-on-dark {
+  --bs-tooltip-bg   : var(--ifm-background-color);
+  --bs-tooltip-color: var(--psdi-dark-text-color-body);
+}

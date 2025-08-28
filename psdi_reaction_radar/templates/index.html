@@ -3,7 +3,6 @@
 {% block head %}
 {{ super() }}
 <link rel="stylesheet" href="{{url_for('static', filename='css/index.css')}}">
-<script type="module" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <script type="module" src="{{url_for('static', filename='js/index.js')}}"></script>
 {% endblock %}
 
@@ -53,8 +52,8 @@
       <option value="11">11</option>
       <option value="12">12</option>
     </select>
-    <label for="num-cols"> Output parameters: </label>
-    <select name="num-cols" id="num-cols">
+    <label for="num-outputs"> Output parameters: </label>
+    <select name="num-outputs" id="num-outputs">
       <option value="1">1</option>
       <option value="2">2</option>
       <option value="3">3</option>
@@ -64,29 +63,53 @@
   </p>
 </div>
 <form class="sens-form">
+  <table class="output-label-table">
+    <tr class="output-label-row">
+      <td class="output-label-label-cell">
+        <label for="ol1" class="output-label-label">Output 1 Label:</label>
+      </td>
+      <td class="output-label-value-cell">
+        <input type="text" id="ol1" class="output-label-input trigger-update" placeholder="Output (e.g. “Yield”)"
+          value="Yield">
+      </td>
+      <td class="output-label-button-cell">
+        <button type="button" id="remove-ob1" class="remove-output disabled fix-size-small" disabled="true">-</button>
+        <button type="button" id="add-ob1" class="add-output fix-size-small">+</button>
+      </td>
+    </tr>
+  </table>
   <table class="sens-table">
     <tr class="header">
       <th class="label-heading">Label</th>
-      <th class="output-heading">
-        <input type="text" class="output-label trigger-update" placeholder="Output (e.g. “Yield”)" value="Yield"
-          class="trigger-update">
+      <th class="sample-heading">
+        <span class="mouseover" data-bs-toggle="tooltip" data-bs-custom-class="tooltip-on-light" data-bs-placement="top"
+          title="Enter the deviation from the baseline as a percentage, i.e. (Result - Baseline)/Baseline * 100%">
+          Deviation (%)</span>
       </th>
-      <td class="button-column">
-        <button type="button" class="remove-column disabled fix-size-small" disabled="true">-</button>
-        <button type="button" class="add-column fix-size-small">+</button>
+    </tr>
+    <tr class="sens-row">
+      <td><input type="text" class="sens-label trigger-update" placeholder="Condition (e.g. “High c”)"></td>
+      <td class="sens-value-cell">
+        <div class="sens-input-line">
+          <input type="number" class="sens-value trigger-update" value="0"> <span>%</span>
+        </div>
       </td>
     </tr>
     <tr class="sens-row">
       <td><input type="text" class="sens-label trigger-update" placeholder="Condition (e.g. “High c”)"></td>
-      <td><input type="number" class="sens-value trigger-update" value="0"> %</td>
+      <td class="sens-value-cell">
+        <div class="sens-input-line">
+          <input type="number" class="sens-value trigger-update" value="0"> <span>%</span>
+        </div>
+      </td>
     </tr>
     <tr class="sens-row">
       <td><input type="text" class="sens-label trigger-update" placeholder="Condition (e.g. “High c”)"></td>
-      <td><input type="number" class="sens-value trigger-update" value="0"> %</td>
-    </tr>
-    <tr class="sens-row">
-      <td><input type="text" class="sens-label trigger-update" placeholder="Condition (e.g. “High c”)"></td>
-      <td><input type="number" class="sens-value trigger-update" value="0"> %</td>
+      <td class="sens-value-cell">
+        <div class="sens-input-line">
+          <input type="number" class="sens-value trigger-update" value="0"> <span>%</span>
+        </div>
+      </td>
     </tr>
     <tr class="button-row">
       <td>
@@ -101,6 +124,8 @@
     <input type="checkbox" name="auto-update-toggle" id="auto-update-toggle" checked>
     <label for="auto-update-toggle"> Auto-update</label>
   </span>
+  <br>
+  <button type="button" id="fill-random">Fill with random data</button>
 </form>
 
 <canvas id="glorius-plot"></canvas>
