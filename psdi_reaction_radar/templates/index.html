@@ -3,7 +3,6 @@
 {% block head %}
 {{ super() }}
 <link rel="stylesheet" href="{{url_for('static', filename='css/index.css')}}">
-<script type="module" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <script type="module" src="{{url_for('static', filename='js/index.js')}}"></script>
 {% endblock %}
 
@@ -82,7 +81,11 @@
   <table class="sens-table">
     <tr class="header">
       <th class="label-heading">Label</th>
-      <th class="sample-heading">Deviation (%)</th>
+      <th class="sample-heading">
+        <span class="mouseover" data-bs-toggle="tooltip" data-bs-custom-class="tooltip-on-light" data-bs-placement="top"
+          title="Enter the deviation from the baseline as a percentage, i.e. (Result - Baseline)/Baseline * 100%">
+          Deviation (%)</span>
+      </th>
     </tr>
     <tr class="sens-row">
       <td><input type="text" class="sens-label trigger-update" placeholder="Condition (e.g. “High c”)"></td>
