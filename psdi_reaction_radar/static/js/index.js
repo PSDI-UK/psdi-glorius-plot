@@ -12,8 +12,8 @@ import { mix_hexes } from "./color.js"
 const MIN_ROWS = 3;
 const MAX_ROWS = 12;
 
-const MIN_COLS = 1;
-const MAX_COLS = 5;
+const MIN_OUTPUTS = 1;
+const MAX_OUTPUTS = 5;
 
 // Plot styling
 const L_BORDER_DASHES = [[], [6, 6], [4, 4], [2, 2], [1, 1]];
@@ -37,7 +37,7 @@ function getNumRows() {
   return $("table.sens-table tr.sens-row").length;
 }
 
-function getNumValueCols() {
+function getNumOutputs() {
   return $("table.sens-table tr.header th.output-heading").length;
 }
 
@@ -53,8 +53,8 @@ function updateRowSelector() {
   $("select#num-rows").val(getNumRows()).change();
 }
 
-function updateColSelector() {
-  $("select#num-cols").val(getNumValueCols()).change();
+function updateOutputSelector() {
+  $("select#num-outputs").val(getNumOutputs()).change();
 }
 
 function addRow(updateAfter = true) {
@@ -66,7 +66,7 @@ function addRow(updateAfter = true) {
     return;
   }
 
-  const numValueCols = getNumValueCols();
+  const numOutputs = getNumOutputs();
 
   // Construct a new row
   const newRow = document.createElement('tr');
@@ -74,7 +74,7 @@ function addRow(updateAfter = true) {
 
   newRow.appendChild(TEMPLATE_LABEL_INPUT.cloneNode(true));
 
-  for (let i = 0; i < numValueCols; ++i) {
+  for (let i = 0; i < numOutputs; ++i) {
     newRow.appendChild(TEMPLATE_VALUE_INPUT.cloneNode(true));
   }
 
@@ -140,12 +140,12 @@ function removeRow(updateAfter = true) {
   }
 }
 
-function addColumn(updateAfter = true) {
+function addOutput(updateAfter = true) {
 
-  // Check that we don't already have too many columns
-  const numCols = getNumValueCols();
-  if (numCols >= MAX_COLS) {
-    console.error("Attempt to add column when maximum columns already reached");
+  // Check that we don't already have too many outputs
+  const numOutputs = getNumOutputs();
+  if (numOutputs >= MAX_OUTPUTS) {
+    console.error("Attempt to add output when maximum outputs already reached");
     return;
   }
 
@@ -166,13 +166,13 @@ function addColumn(updateAfter = true) {
     lRows[i].appendChild(TEMPLATE_VALUE_INPUT.cloneNode(true));
   }
 
-  // Check if we've reached the maximum number of columns, and disable the button to add columns if so
-  if (numCols + 1 >= MAX_COLS) {
+  // Check if we've reached the maximum number of outputs, and disable the button to add outputs if so
+  if (numOutputs + 1 >= MAX_OUTPUTS) {
     disableButton($("button.add-column"));
   }
 
-  // Check if we've passed the minimum number of columns, and enable the button to remove columns if so
-  if (numCols + 1 > MIN_COLS) {
+  // Check if we've passed the minimum number of outputs, and enable the button to remove outputs if so
+  if (numOutputs + 1 > MIN_OUTPUTS) {
     enableButton($("button.remove-column"));
   }
 
@@ -181,9 +181,9 @@ function addColumn(updateAfter = true) {
     enableAutoUpdates();
   }
 
-  // Update the cols selector if desired
+  // Update the output selector if desired
   if (updateAfter) {
-    updateColSelector();
+    updateOutputSelector();
   }
 
   // Update the plot if desired
@@ -192,12 +192,12 @@ function addColumn(updateAfter = true) {
   }
 }
 
-function removeColumn(updateAfter = true) {
+function removeOutput(updateAfter = true) {
 
-  // Check that we don't already have too few columns
-  const numCols = getNumValueCols();
-  if (numCols <= MIN_COLS) {
-    console.error("Attempt to remove column when minimum columns already reached");
+  // Check that we don't already have too few outputs
+  const numOutputs = getNumOutputs();
+  if (numOutputs <= MIN_OUTPUTS) {
+    console.error("Attempt to remove output when minimum outputs already reached");
     return;
   }
 
@@ -214,19 +214,19 @@ function removeColumn(updateAfter = true) {
     lRows[i].removeChild(lRows[i].lastChild);
   }
 
-  // Check if we've reached the minimum number of columns, and disable the button to remove columns if so
-  if (numCols - 1 <= MIN_COLS) {
+  // Check if we've reached the minimum number of outputs, and disable the button to remove outputs if so
+  if (numOutputs - 1 <= MIN_OUTPUTS) {
     disableButton($("button.remove-column"));
   }
 
-  // Check if we've gone under the minimum number of columns, and enable the button to add columns if so
-  if (numCols - 1 < MAX_COLS) {
+  // Check if we've gone under the minimum number of outputs, and enable the button to add outputs if so
+  if (numOutputs - 1 < MAX_OUTPUTS) {
     enableButton($("button.add-column"));
   }
 
-  // Update the cols selector if desired
+  // Update the output selector if desired
   if (updateAfter) {
-    updateColSelector();
+    updateOutputSelector();
   }
 
   // Update the plot if desired
@@ -253,15 +253,15 @@ function setNumRows(targetNumRows) {
   }
 }
 
-function setNumCols(targetNumValueCols) {
-  const numCols = getNumValueCols();
-  if (numCols < targetNumValueCols) {
-    for (let i = 0; i < targetNumValueCols - numCols; ++i) {
-      addColumn(false);
+function setNumOutputs(targetNumOutputs) {
+  const numOutputs = getNumOutputs();
+  if (numOutputs < targetNumOutputs) {
+    for (let i = 0; i < targetNumOutputs - numOutputs; ++i) {
+      addOutput(false);
     }
-  } else if (numCols > targetNumValueCols) {
-    for (let i = 0; i < numCols - targetNumValueCols; ++i) {
-      removeColumn(false);
+  } else if (numOutputs > targetNumOutputs) {
+    for (let i = 0; i < numOutputs - targetNumOutputs; ++i) {
+      removeOutput(false);
     }
   }
 
@@ -325,7 +325,7 @@ function generatePlot() {
 
   // Collect info from the settings and determine data based on them
   const numRows = getNumRows();
-  const numCols = getNumValueCols();
+  const numOutputs = getNumOutputs();
 
   const minOutput = getMinOutput();
   const maxOutput = getMaxOutput();
@@ -443,7 +443,7 @@ function generatePlot() {
 
   // Get the column labels, and also set other fixed data for normal datasets
   const lColLabelCells = $("table.sens-table tr.header th.output-heading");
-  for (let j = 0; j < numCols; ++j) {
+  for (let j = 0; j < numOutputs; ++j) {
     lColLabels.push(lColLabelCells[j].children[0].value);
     lOrder.push(0);
     lBorderColors.push("black");
@@ -461,7 +461,7 @@ function generatePlot() {
   }
 
   // Get each column of data
-  for (let j = 0; j < numCols; ++j) {
+  for (let j = 0; j < numOutputs; ++j) {
     llData.push([]);
   }
 
@@ -470,7 +470,7 @@ function generatePlot() {
   for (let i = 0; i < numRows; ++i) {
     let lCells = lSensRows.eq(i).find("td input.sens-value");
     let lSingleRowData = [];
-    for (let j = 0; j < numCols; ++j) {
+    for (let j = 0; j < numOutputs; ++j) {
       lSingleRowData.push(lCells[j].value);
     }
     lRowData.push({
@@ -488,13 +488,13 @@ function generatePlot() {
   // Add the sorted data to the main data array, and update the row labels
   for (let i = 0; i < numRows; ++i) {
     lRowLabels[i] = lRowData[i].label;
-    for (let j = 0; j < numCols; ++j) {
+    for (let j = 0; j < numOutputs; ++j) {
       llData[numBgColors + numAxisLines + j].push(lRowData[i].data[j]);
     }
   }
 
   const lDatasets = [];
-  for (let j = 0; j < numBgColors + numAxisLines + numCols; ++j) {
+  for (let j = 0; j < numBgColors + numAxisLines + numOutputs; ++j) {
     lDatasets.push({
       label: lColLabels[j],
       data: llData[j],
@@ -580,16 +580,16 @@ $(document).ready(function () {
 
   $("button.add-row").on("click", () => addRow(true));
   $("button.remove-row").on("click", () => removeRow(true));
-  $("button.add-column").on("click", () => addColumn(true));
-  $("button.remove-column").on("click", () => removeColumn(true));
+  $("button.add-column").on("click", () => addOutput(true));
+  $("button.remove-column").on("click", () => removeOutput(true));
 
   $("button#generate-plot").on("click", generatePlot);
 
   $("select#num-rows").on("change", function (e) {
     setNumRows($(e.target).val());
   })
-  $("select#num-cols").on("change", function (e) {
-    setNumCols($(e.target).val());
+  $("select#num-outputs").on("change", function (e) {
+    setNumOutputs($(e.target).val());
   })
 
   $("#auto-update-toggle").on("click", function (e) {
