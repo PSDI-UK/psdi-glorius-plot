@@ -441,10 +441,10 @@ function generatePlot() {
     }
   }
 
-  // Get the column labels, and also set other fixed data for normal datasets
-  const lColLabelCells = $("table.sens-table tr.header th.output-heading");
+  // Get the output labels, and also set other fixed data for normal datasets
+  const lOutputLabelCells = $("table.sens-table tr.header th.output-heading");
   for (let j = 0; j < numOutputs; ++j) {
-    lColLabels.push(lColLabelCells[j].children[0].value);
+    lColLabels.push(lOutputLabelCells[j].children[0].value);
     lOrder.push(0);
     lBorderColors.push("black");
     lBorderWidths.push(BORDER_WIDTH);
@@ -564,6 +564,40 @@ function generatePlot() {
 
 }
 
+/**
+ * Fill the existing cells with random data
+ */
+function fillRandom() {
+  const numRows = getNumRows();
+  const numOutputs = getNumOutputs();
+
+  // Fill the column labels
+  const lOutputLabelCells = $("table.sens-table tr.header th.output-heading");
+  for (let j = 0; j < numOutputs; ++j) {
+    lOutputLabelCells[j].children[0].value = "Yield " + (j + 1).toString();
+  }
+
+  // Fill the row labels
+  const lRowLabelCells = $("table.sens-table tr.sens-row td input.sens-label");
+  for (let i = 0; i < numRows; ++i) {
+    lRowLabelCells[i].value = (i + 1).toString();
+  }
+
+  // Fill each data cell
+  const minOutput = getMinOutput();
+  const maxOutput = getMaxOutput();
+  const lDataCells = $("table.sens-table tr.sens-row td input.sens-value");
+  for (let k = 0; k < lDataCells.length; ++k) {
+    const e = lDataCells[k];
+    e.value = minOutput + Math.random() * (maxOutput - minOutput);
+  }
+
+  if (autoUpdating) {
+    generatePlot();
+  }
+
+}
+
 function enableAutoUpdates() {
   $(".trigger-update").on("change", generatePlot);
   autoUpdating = true;
@@ -583,6 +617,7 @@ $(document).ready(function () {
   $("button.add-column").on("click", () => addOutput(true));
   $("button.remove-column").on("click", () => removeOutput(true));
 
+  $("button#fill-random").on("click", fillRandom);
   $("button#generate-plot").on("click", generatePlot);
 
   $("select#num-rows").on("change", function (e) {
