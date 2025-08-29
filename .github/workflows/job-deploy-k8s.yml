@@ -18,7 +18,7 @@ jobs:
   deploy-k8s:
     environment: ${{ inputs.environment }}
     # run on our self hosted github runners enabling access to STFC infrastructure
-    runs-on: psdi-uk-runners 
+    runs-on: psdi-reaction-radar-runners
     steps:
       - uses: actions/checkout@v5
 
