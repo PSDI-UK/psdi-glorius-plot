@@ -39,8 +39,8 @@
     </select>
   </p>
   <p>
-    <label for="num-rows">Test conditions: </label>
-    <select name="num-rows" id="num-rows">
+    <label for="num-conditions">Test conditions: </label>
+    <select name="num-conditions" id="num-conditions">
       <option value="3">3</option>
       <option value="4">4</option>
       <option value="5">5</option>
@@ -80,59 +80,62 @@
     </tr>
   </table>
 
-  <table class="sens-table">
+  <table class="deviation-table">
 
-    <tr class="header">
+    <tr class="deviation-header">
       <th class="empty-heading"></th>
-      <th class="label-heading">Label</th>
-      <th class="sample-heading">
+      <th class="condition-label-heading">Label</th>
+      <th class="deviation-sample-heading">
         <span class="mouseover" data-bs-toggle="tooltip" data-bs-custom-class="tooltip-on-light" data-bs-placement="top"
           title="Enter the deviation from the baseline as a percentage, i.e. (Result - Baseline)/Baseline * 100%">
           Deviation (%)</span>
       </th>
     </tr>
 
-    <tr class="sens-row">
-      <td class="sens-row-button-cell">
-        <button type="button" id="remove-rb-0" class="remove-row disabled fix-size-small" disabled="true">-</button>
-        <button type="button" id="add-rb-0" class="add-row fix-size-small">+</button>
+    <tr class="condition-row">
+      <td class="condition-button-cell">
+        <button type="button" id="remove-rb-0" class="remove-condition disabled fix-size-small"
+          disabled="true">-</button>
+        <button type="button" id="add-rb-0" class="add-condition fix-size-small">+</button>
       </td>
-      <td class="sens-label-cell">
-        <input type="text" class="sens-label trigger-update" placeholder="Condition (e.g. “High c”)">
+      <td class="condition-label-cell">
+        <input type="text" class="condition-label trigger-update" placeholder="Condition (e.g. “High c”)">
       </td>
-      <td class="sens-value-cell">
-        <div class="sens-input-line">
-          <input type="number" class="sens-value trigger-update" value="0"> <span>%</span>
+      <td class="deviation-value-cell">
+        <div class="deviation-input-line">
+          <input type="number" class="deviation-value trigger-update" value="0"> <span>%</span>
         </div>
       </td>
     </tr>
 
-    <tr class="sens-row">
-      <td class="sens-row-button-cell">
-        <button type="button" id="remove-rb-1" class="remove-row disabled fix-size-small" disabled="true">-</button>
-        <button type="button" id="add-rb-1" class="add-row fix-size-small">+</button>
+    <tr class="condition-row">
+      <td class="condition-button-cell">
+        <button type="button" id="remove-rb-1" class="remove-condition disabled fix-size-small"
+          disabled="true">-</button>
+        <button type="button" id="add-rb-1" class="add-condition fix-size-small">+</button>
       </td>
-      <td class="sens-label-cell">
-        <input type="text" class="sens-label trigger-update" placeholder="Condition (e.g. “High c”)">
+      <td class="condition-label-cell">
+        <input type="text" class="condition-label trigger-update" placeholder="Condition (e.g. “High c”)">
       </td>
-      <td class="sens-value-cell">
-        <div class="sens-input-line">
-          <input type="number" class="sens-value trigger-update" value="0"> <span>%</span>
+      <td class="deviation-value-cell">
+        <div class="deviation-input-line">
+          <input type="number" class="deviation-value trigger-update" value="0"> <span>%</span>
         </div>
       </td>
     </tr>
 
-    <tr class="sens-row">
-      <td class="sens-row-button-cell">
-        <button type="button" id="remove-rb-2" class="remove-row disabled fix-size-small" disabled="true">-</button>
-        <button type="button" id="add-rb-2" class="add-row fix-size-small">+</button>
+    <tr class="condition-row">
+      <td class="condition-button-cell">
+        <button type="button" id="remove-rb-2" class="remove-condition disabled fix-size-small"
+          disabled="true">-</button>
+        <button type="button" id="add-rb-2" class="add-condition fix-size-small">+</button>
       </td>
-      <td class="sens-label-cell">
-        <input type="text" class="sens-label trigger-update" placeholder="Condition (e.g. “High c”)">
+      <td class="condition-label-cell">
+        <input type="text" class="condition-label trigger-update" placeholder="Condition (e.g. “High c”)">
       </td>
-      <td class="sens-value-cell">
-        <div class="sens-input-line">
-          <input type="number" class="sens-value trigger-update" value="0"> <span>%</span>
+      <td class="deviation-value-cell">
+        <div class="deviation-input-line">
+          <input type="number" class="deviation-value trigger-update" value="0"> <span>%</span>
         </div>
       </td>
     </tr>
