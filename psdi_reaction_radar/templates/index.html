@@ -63,6 +63,7 @@
   </p>
 </div>
 <form class="sens-form">
+
   <table class="output-label-table">
     <tr class="output-label-row">
       <td class="output-label-label-cell">
@@ -78,8 +79,11 @@
       </td>
     </tr>
   </table>
+
   <table class="sens-table">
+
     <tr class="header">
+      <th class="empty-heading"></th>
       <th class="label-heading">Label</th>
       <th class="sample-heading">
         <span class="mouseover" data-bs-toggle="tooltip" data-bs-custom-class="tooltip-on-light" data-bs-placement="top"
@@ -87,36 +91,52 @@
           Deviation (%)</span>
       </th>
     </tr>
+
     <tr class="sens-row">
-      <td><input type="text" class="sens-label trigger-update" placeholder="Condition (e.g. “High c”)"></td>
+      <td class="sens-row-button-cell">
+        <button type="button" id="remove-rb0" class="remove-row disabled fix-size-small" disabled="true">-</button>
+        <button type="button" id="add-rb0" class="add-row fix-size-small">+</button>
+      </td>
+      <td class="sens-label-cell">
+        <input type="text" class="sens-label trigger-update" placeholder="Condition (e.g. “High c”)">
+      </td>
       <td class="sens-value-cell">
         <div class="sens-input-line">
           <input type="number" class="sens-value trigger-update" value="0"> <span>%</span>
         </div>
       </td>
     </tr>
+
     <tr class="sens-row">
-      <td><input type="text" class="sens-label trigger-update" placeholder="Condition (e.g. “High c”)"></td>
+      <td class="sens-row-button-cell">
+        <button type="button" id="remove-rb1" class="remove-row disabled fix-size-small" disabled="true">-</button>
+        <button type="button" id="add-rb1" class="add-row fix-size-small">+</button>
+      </td>
+      <td class="sens-label-cell">
+        <input type="text" class="sens-label trigger-update" placeholder="Condition (e.g. “High c”)">
+      </td>
       <td class="sens-value-cell">
         <div class="sens-input-line">
           <input type="number" class="sens-value trigger-update" value="0"> <span>%</span>
         </div>
       </td>
     </tr>
+
     <tr class="sens-row">
-      <td><input type="text" class="sens-label trigger-update" placeholder="Condition (e.g. “High c”)"></td>
+      <td class="sens-row-button-cell">
+        <button type="button" id="remove-rb2" class="remove-row disabled fix-size-small" disabled="true">-</button>
+        <button type="button" id="add-rb2" class="add-row fix-size-small">+</button>
+      </td>
+      <td class="sens-label-cell">
+        <input type="text" class="sens-label trigger-update" placeholder="Condition (e.g. “High c”)">
+      </td>
       <td class="sens-value-cell">
         <div class="sens-input-line">
           <input type="number" class="sens-value trigger-update" value="0"> <span>%</span>
         </div>
       </td>
     </tr>
-    <tr class="button-row">
-      <td>
-        <button type="button" class="remove-row disabled fix-size-small" disabled="true">-</button>
-        <button type="button" class="add-row fix-size-small">+</button>
-      </td>
-    </tr>
+
   </table>
 
   <button type="button" id="generate-plot">Generate</button>

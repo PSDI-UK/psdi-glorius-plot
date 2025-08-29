@@ -16,7 +16,7 @@ button.fix-size-small {
   padding: 0;
 }
 
-tr>td:first-child>button:first-child {
+tr td:first-child button {
   margin-left: 0;
 }
 
@@ -33,11 +33,26 @@ tr>td:first-child>button:first-child {
 .sens-table td {
   padding-top   : 0.25rem;
   padding-bottom: 0.25rem;
+  min-height    : 3rem;
+}
+
+.sens-label-cell,
+.sens-value-cell {
+  padding-right: 0.5rem;
+}
+
+input.sens-label {
+  max-width: 10rem;
 }
 
 .sens-value-cell {
-  display       : flex;
-  flex-direction: column;
+  display        : flex;
+  flex-direction : column;
+  justify-content: center;
+}
+
+input.sens-value {
+  max-width: 5rem;
 }
 
 .sens-input-line {
