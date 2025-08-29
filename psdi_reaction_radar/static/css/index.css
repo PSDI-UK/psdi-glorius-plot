@@ -1,4 +1,4 @@
-input.sens-value {
+input.deviation-value {
   text-align: right;
 }
 
@@ -16,7 +16,7 @@ button.fix-size-small {
   padding: 0;
 }
 
-tr>td:first-child>button:first-child {
+tr td:first-child button {
   margin-left: 0;
 }
 
@@ -29,18 +29,39 @@ tr>td:first-child>button:first-child {
   display: none;
 }
 
+/* Style the output label table */
+.output-label-label {
+  font-weight  : bold;
+  padding-right: 0.5rem;
+}
+
 /* Style the sensitivity table */
-.sens-table td {
+.deviation-table td {
   padding-top   : 0.25rem;
   padding-bottom: 0.25rem;
+  min-height    : 3rem;
 }
 
-.sens-value-cell {
-  display       : flex;
-  flex-direction: column;
+.condition-label-cell,
+.deviation-value-cell {
+  padding-right: 0.5rem;
 }
 
-.sens-input-line {
+input.condition-label {
+  max-width: 10rem;
+}
+
+.deviation-value-cell {
+  display        : flex;
+  flex-direction : column;
+  justify-content: center;
+}
+
+input.deviation-value {
+  max-width: 5rem;
+}
+
+.deviation-input-line {
   display        : flex;
   flex-direction : row;
   justify-content: start;

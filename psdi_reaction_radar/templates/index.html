@@ -39,8 +39,8 @@
     </select>
   </p>
   <p>
-    <label for="num-rows">Test conditions: </label>
-    <select name="num-rows" id="num-rows">
+    <label for="num-conditions">Test conditions: </label>
+    <select name="num-conditions" id="num-conditions">
       <option value="3">3</option>
       <option value="4">4</option>
       <option value="5">5</option>
@@ -63,60 +63,83 @@
   </p>
 </div>
 <form class="sens-form">
+
   <table class="output-label-table">
     <tr class="output-label-row">
       <td class="output-label-label-cell">
-        <label for="ol1" class="output-label-label">Output 1 Label:</label>
+        <label for="ol-0" class="output-label-label">Output 1 Label:</label>
       </td>
       <td class="output-label-value-cell">
-        <input type="text" id="ol1" class="output-label-input trigger-update" placeholder="Output (e.g. “Yield”)"
+        <input type="text" id="ol-0" class="output-label-input trigger-update" placeholder="Output (e.g. “Yield”)"
           value="Yield">
       </td>
       <td class="output-label-button-cell">
-        <button type="button" id="remove-ob1" class="remove-output disabled fix-size-small" disabled="true">-</button>
-        <button type="button" id="add-ob1" class="add-output fix-size-small">+</button>
+        <button type="button" id="remove-ob-0" class="remove-output disabled fix-size-small" disabled="true">-</button>
+        <button type="button" id="add-ob-0" class="add-output fix-size-small">+</button>
       </td>
     </tr>
   </table>
-  <table class="sens-table">
-    <tr class="header">
-      <th class="label-heading">Label</th>
-      <th class="sample-heading">
+
+  <table class="deviation-table">
+
+    <tr class="deviation-header">
+      <th class="empty-heading"></th>
+      <th class="condition-label-heading">Label</th>
+      <th class="deviation-sample-heading">
         <span class="mouseover" data-bs-toggle="tooltip" data-bs-custom-class="tooltip-on-light" data-bs-placement="top"
           title="Enter the deviation from the baseline as a percentage, i.e. (Result - Baseline)/Baseline * 100%">
           Deviation (%)</span>
       </th>
     </tr>
-    <tr class="sens-row">
-      <td><input type="text" class="sens-label trigger-update" placeholder="Condition (e.g. “High c”)"></td>
-      <td class="sens-value-cell">
-        <div class="sens-input-line">
-          <input type="number" class="sens-value trigger-update" value="0"> <span>%</span>
+
+    <tr class="condition-row">
+      <td class="condition-button-cell">
+        <button type="button" id="remove-rb-0" class="remove-condition disabled fix-size-small"
+          disabled="true">-</button>
+        <button type="button" id="add-rb-0" class="add-condition fix-size-small">+</button>
+      </td>
+      <td class="condition-label-cell">
+        <input type="text" class="condition-label trigger-update" placeholder="Condition (e.g. “High c”)">
+      </td>
+      <td class="deviation-value-cell">
+        <div class="deviation-input-line">
+          <input type="number" class="deviation-value trigger-update" value="0"> <span>%</span>
         </div>
       </td>
     </tr>
-    <tr class="sens-row">
-      <td><input type="text" class="sens-label trigger-update" placeholder="Condition (e.g. “High c”)"></td>
-      <td class="sens-value-cell">
-        <div class="sens-input-line">
-          <input type="number" class="sens-value trigger-update" value="0"> <span>%</span>
+
+    <tr class="condition-row">
+      <td class="condition-button-cell">
+        <button type="button" id="remove-rb-1" class="remove-condition disabled fix-size-small"
+          disabled="true">-</button>
+        <button type="button" id="add-rb-1" class="add-condition fix-size-small">+</button>
+      </td>
+      <td class="condition-label-cell">
+        <input type="text" class="condition-label trigger-update" placeholder="Condition (e.g. “High c”)">
+      </td>
+      <td class="deviation-value-cell">
+        <div class="deviation-input-line">
+          <input type="number" class="deviation-value trigger-update" value="0"> <span>%</span>
         </div>
       </td>
     </tr>
-    <tr class="sens-row">
-      <td><input type="text" class="sens-label trigger-update" placeholder="Condition (e.g. “High c”)"></td>
-      <td class="sens-value-cell">
-        <div class="sens-input-line">
-          <input type="number" class="sens-value trigger-update" value="0"> <span>%</span>
+
+    <tr class="condition-row">
+      <td class="condition-button-cell">
+        <button type="button" id="remove-rb-2" class="remove-condition disabled fix-size-small"
+          disabled="true">-</button>
+        <button type="button" id="add-rb-2" class="add-condition fix-size-small">+</button>
+      </td>
+      <td class="condition-label-cell">
+        <input type="text" class="condition-label trigger-update" placeholder="Condition (e.g. “High c”)">
+      </td>
+      <td class="deviation-value-cell">
+        <div class="deviation-input-line">
+          <input type="number" class="deviation-value trigger-update" value="0"> <span>%</span>
         </div>
       </td>
     </tr>
-    <tr class="button-row">
-      <td>
-        <button type="button" class="remove-row disabled fix-size-small" disabled="true">-</button>
-        <button type="button" class="add-row fix-size-small">+</button>
-      </td>
-    </tr>
+
   </table>
 
   <button type="button" id="generate-plot">Generate</button>
