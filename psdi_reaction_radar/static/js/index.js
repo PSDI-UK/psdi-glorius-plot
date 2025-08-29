@@ -64,22 +64,29 @@ function updateOutputSelector() {
 }
 
 /**
- * Relabel all the value rows after one is added or removed
+ * Get the index value stored at the end of an event's target's ID
+ */
+function getIndexFromEvent(e) {
+  let eId = e.target.id;
+  return +(eId.split("-").at(-1));
+}
+
+/**
+ * Relabel all the value rows after one is added or removed, fixing their behind-the-scenes values of which index
+ * they're at
  */
 function relableValueRows() {
+
   const numRows = getNumRows();
   const lRows = $(".sens-row");
+
   for (let j = 0; j < numRows; j++) {
-    const row = lRows[j];
+    const row = $(lRows[j]);
     const rowNumber = j.toString();
 
-    const rowRemoveButton = $(row).find("button.remove-row");
-    rowRemoveButton.attr("id", "remove-rb" + rowNumber);
-    const rowAddButton = $(row).find("button.add-row");
-    rowAddButton.attr("id", "add-rb" + rowNumber);
-
-    const rowLabelInput = $(row).find("input.sens-label");
-    rowLabelInput.attr("id", "rl" + rowNumber);
+    // Fix the IDs of the buttons
+    row.find(".remove-row").attr("id", "remove-rb-" + rowNumber);
+    row.find(".add-row").attr("id", "add-rb-" + rowNumber);
   }
 }
 
@@ -92,8 +99,6 @@ function addRow(e, updateAfter = true) {
     return;
   }
 
-  const numOutputs = getNumOutputs();
-
   // Construct a new row by copying the first and clearing its input
   const newRow = $(".sens-row")[0].cloneNode(true);
   $(newRow).find(".sens-label").val("");
@@ -104,8 +109,7 @@ function addRow(e, updateAfter = true) {
   if (e === null) {
     targetRow = numRows - 1;
   } else {
-    let eId = e.target.id;
-    targetRow = +eId.at(-1);
+    targetRow = getIndexFromEvent(e);
   }
   if (targetRow >= numRows - 1) {
     $(".sens-table tbody")[0].appendChild(newRow);
@@ -156,8 +160,7 @@ function removeRow(e, updateAfter = true) {
   if (e === null) {
     targetRow = numRows - 1;
   } else {
-    let eId = e.target.id;
-    targetRow = +eId.at(-1);
+    targetRow = getIndexFromEvent(e);
   }
 
   const sensTable = $(".sens-table tbody")[0];
@@ -188,26 +191,29 @@ function removeRow(e, updateAfter = true) {
 }
 
 /**
- * Relabel all the output rows after one is added or removed
+ * Relabel all the output rows after one is added or removed, fixing their behind-the-scenes values of which index
+ * they're at
  */
-function relableOutputRows() {
+function relableOutputLabelRows() {
+
   const numOutputs = getNumOutputs();
   const lOutputLabelRows = $(".output-label-row");
+
   for (let j = 0; j < numOutputs; j++) {
-    const outputLabelRow = lOutputLabelRows[j];
-    const rowNumber = j.toString();
+    const outputLabelRow = $(lOutputLabelRows[j]);
+    const rowNumberString = j.toString();
 
-    const outputLabelLabel = outputLabelRow.children[0].children[0];
-    outputLabelLabel.textContent = OUTPUT_LABEL_TEXT.replace("{N}", (+rowNumber + 1).toString());
-    outputLabelLabel.for = "ol" + rowNumber;
+    // Fix the IDs of the add/remove buttons
+    outputLabelRow.find(".remove-output").attr("id", "remove-ob-" + rowNumberString);
+    outputLabelRow.find(".add-output").attr("id", "add-ob-" + rowNumberString);
 
-    const outputLabelInput = outputLabelRow.children[1].children[0];
-    outputLabelInput.id = "ol" + rowNumber;
+    // Fix the text and "for" attribute of the label
+    const outputLabelLabel = outputLabelRow.find(".output-label-label");
+    outputLabelLabel.text(OUTPUT_LABEL_TEXT.replace("{N}", (j + 1).toString()));
+    outputLabelLabel.attr("for", "ol-" + rowNumberString);
 
-    const outputLabelRemoveButton = outputLabelRow.children[2].children[0];
-    outputLabelRemoveButton.id = "remove-ob" + rowNumber;
-    const outputLabelAddButton = outputLabelRow.children[2].children[1];
-    outputLabelAddButton.id = "add-ob" + rowNumber;
+    // Fix the ID of the input
+    outputLabelRow.find(".output-label-input").attr("id", "ol-" + rowNumberString);
   }
 }
 
@@ -229,8 +235,7 @@ function addOutput(e, updateAfter = true) {
   if (e === null) {
     targetRow = numOutputs - 1;
   } else {
-    let eId = e.target.id;
-    targetRow = +eId.at(-1);
+    targetRow = getIndexFromEvent(e);
   }
   if (targetRow >= numOutputs - 1) {
     $(".output-label-table tbody")[0].appendChild(newOutputLabelRow);
@@ -268,7 +273,7 @@ function addOutput(e, updateAfter = true) {
   // Update affected properties if desired at this point
   if (updateAfter) {
     updateOutputSelector();
-    relableOutputRows();
+    relableOutputLabelRows();
     initNumOutputControls();
   }
 
@@ -292,8 +297,7 @@ function removeOutput(e, updateAfter = true) {
   if (e === null) {
     targetRow = numOutputs - 1;
   } else {
-    let eId = e.target.id;
-    targetRow = +eId.at(-1);
+    targetRow = getIndexFromEvent(e);
   }
 
   // Remove the row from the output label table
@@ -320,7 +324,7 @@ function removeOutput(e, updateAfter = true) {
   // Update affected properties if desired at this point
   if (updateAfter) {
     updateOutputSelector();
-    relableOutputRows();
+    relableOutputLabelRows();
   }
 
   // Update the plot if desired
@@ -339,6 +343,8 @@ function setNumRows(targetNumRows) {
     for (let i = 0; i < numRows - targetNumRows; ++i) {
       removeRow(null, false);
     }
+  } else {
+    return;
   }
 
   relableValueRows();
@@ -360,9 +366,11 @@ function setNumOutputs(targetNumOutputs) {
     for (let i = 0; i < numOutputs - targetNumOutputs; ++i) {
       removeOutput(null, false);
     }
+  } else {
+    return;
   }
 
-  relableOutputRows();
+  relableOutputLabelRows();
   initNumOutputControls();
 
   // Update the plot if desired
