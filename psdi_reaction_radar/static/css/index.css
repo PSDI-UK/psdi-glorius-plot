@@ -29,6 +29,12 @@ tr td:first-child button {
   display: none;
 }
 
+/* Style the output label table */
+.output-label-label {
+  font-weight  : bold;
+  padding-right: 0.5rem;
+}
+
 /* Style the sensitivity table */
 .sens-table td {
   padding-top   : 0.25rem;

@@ -17,8 +17,6 @@ const MAX_OUTPUTS = 5;
 
 // Table values and placeholders
 const OUTPUT_LABEL_TEXT = "Output {N} Label:";
-const OUTPUT_1_DEFAULT_VALUE = "Yield";
-const OUTPUT_N_DEFAULT_VALUE = "";
 
 // Plot styling
 const L_BORDER_DASHES = [[], [6, 6], [4, 4], [2, 2], [1, 1]];
@@ -65,7 +63,27 @@ function updateOutputSelector() {
   $("select#num-outputs").val(getNumOutputs()).change();
 }
 
-function addRow(updateAfter = true) {
+/**
+ * Relabel all the value rows after one is added or removed
+ */
+function relableValueRows() {
+  const numRows = getNumRows();
+  const lRows = $(".sens-row");
+  for (let j = 0; j < numRows; j++) {
+    const row = lRows[j];
+    const rowNumber = j.toString();
+
+    const rowRemoveButton = $(row).find("button.remove-row");
+    rowRemoveButton.attr("id", "remove-rb" + rowNumber);
+    const rowAddButton = $(row).find("button.add-row");
+    rowAddButton.attr("id", "add-rb" + rowNumber);
+
+    const rowLabelInput = $(row).find("input.sens-label");
+    rowLabelInput.attr("id", "rl" + rowNumber);
+  }
+}
+
+function addRow(e, updateAfter = true) {
 
   // Check that we don't already have too many rows
   const numRows = getNumRows();
@@ -81,8 +99,20 @@ function addRow(updateAfter = true) {
   $(newRow).find(".sens-label").val("");
   $(newRow).find(".sens-value").val("0");
 
-  // Add the new row to the table
-  $(".sens-table tbody")[0].insertBefore(newRow, $(".button-row")[0]);
+  // Determine where to add the row based on which button was clicked
+  let targetRow;
+  if (e === null) {
+    targetRow = numRows - 1;
+  } else {
+    let eId = e.target.id;
+    targetRow = +eId.at(-1);
+  }
+  if (targetRow >= numRows - 1) {
+    $(".sens-table tbody")[0].appendChild(newRow);
+  } else {
+    $(".sens-table tbody")[0].insertBefore(newRow, $(".sens-row")[targetRow + 1]);
+  }
+
 
   // Check if we've reached the maximum number of rows, and disable the button to add rows if so
   if (numRows + 1 >= MAX_ROWS) {
@@ -99,9 +129,11 @@ function addRow(updateAfter = true) {
     enableAutoUpdates();
   }
 
-  // Update the rows selector if desired
+  // Update affected properties if desired at this point
   if (updateAfter) {
     updateRowSelector();
+    relableValueRows();
+    initNumParamControls();
   }
 
   // Update the plot if desired
@@ -110,31 +142,43 @@ function addRow(updateAfter = true) {
   }
 }
 
-function removeRow(updateAfter = true) {
+function removeRow(e, updateAfter = true) {
 
-  // Check that we don't already have too few
+  // Check that we don't already have too few rows
   const numRows = getNumRows();
   if (numRows <= MIN_ROWS) {
     console.error("Attempt to remove row when minimum rows already reached");
     return;
   }
 
-  let lastRow = $(".sens-row").get(-1);
-  $(".sens-table tbody")[0].removeChild(lastRow);
+  // Determine which row to remove based on which button was clicked
+  let targetRow;
+  if (e === null) {
+    targetRow = numRows - 1;
+  } else {
+    let eId = e.target.id;
+    targetRow = +eId.at(-1);
+  }
 
-  // Check if we've reached the minimum number of rows, and disable the button to remove rows if so
+  const sensTable = $(".sens-table tbody")[0];
+  const lSensRows = $(".sens-row");
+  sensTable.removeChild(lSensRows[targetRow]);
+
+  // Check if we've reached the minimum number of rows, and disable the buttons to remove rows if so
   if (numRows - 1 <= MIN_ROWS) {
     disableButton($("button.remove-row"));
   }
 
-  // Check if we've gotten under the minimum number of rows, and enable the button to add rows if so
+  // Check if we've gotten under the minimum number of rows, and enable the buttons to add rows if so
   if (numRows - 1 < MAX_ROWS) {
     enableButton($("button.add-row"));
   }
 
-  // Update the rows selector if desired
+  // Update affected properties if desired at this point
   if (updateAfter) {
     updateRowSelector();
+    relableValueRows();
+    initNumParamControls();
   }
 
   // Update the plot if desired
@@ -151,10 +195,10 @@ function relableOutputRows() {
   const lOutputLabelRows = $(".output-label-row");
   for (let j = 0; j < numOutputs; j++) {
     const outputLabelRow = lOutputLabelRows[j];
-    const rowNumber = (j + 1).toString();
+    const rowNumber = j.toString();
 
     const outputLabelLabel = outputLabelRow.children[0].children[0];
-    outputLabelLabel.textContent = OUTPUT_LABEL_TEXT.replace("{N}", rowNumber);
+    outputLabelLabel.textContent = OUTPUT_LABEL_TEXT.replace("{N}", (+rowNumber + 1).toString());
     outputLabelLabel.for = "ol" + rowNumber;
 
     const outputLabelInput = outputLabelRow.children[1].children[0];
@@ -176,8 +220,6 @@ function addOutput(e, updateAfter = true) {
     return;
   }
 
-  const newOutputNumber = (numOutputs + 1).toString();
-
   // Set up the new output label row
   const newOutputLabelRow = TEMPLATE_OUTPUT_LABEL_ROW.cloneNode(true);
   newOutputLabelRow.children[1].children[0].value = "";
@@ -185,33 +227,28 @@ function addOutput(e, updateAfter = true) {
   // Determine where to add the row based on which button was clicked
   let targetRow;
   if (e === null) {
-    targetRow = numOutputs;
+    targetRow = numOutputs - 1;
   } else {
     let eId = e.target.id;
     targetRow = +eId.at(-1);
   }
-  if (targetRow >= numOutputs) {
+  if (targetRow >= numOutputs - 1) {
     $(".output-label-table tbody")[0].appendChild(newOutputLabelRow);
   } else {
-    $(".output-label-table tbody")[0].insertBefore(newOutputLabelRow, $(".output-label-row")[targetRow]);
+    $(".output-label-table tbody")[0].insertBefore(newOutputLabelRow, $(".output-label-row")[targetRow + 1]);
   }
-
-  relableOutputRows();
 
   // Add a new input line to each value cell
   const lSensValueCells = $(".sens-value-cell");
   for (let i = 0; i < lSensValueCells.length; ++i) {
     const newSensInputLine = TEMPLATE_INPUT_LINE.cloneNode(true);
 
-    if (targetRow == numOutputs) {
+    if (targetRow >= numOutputs - 1) {
       lSensValueCells[i].appendChild(newSensInputLine);
     } else {
-      lSensValueCells[i].insertBefore(newSensInputLine, lSensValueCells[i].children[targetRow]);
+      lSensValueCells[i].insertBefore(newSensInputLine, lSensValueCells[i].children[targetRow + 1]);
     }
   }
-
-  // Connect the newly-added buttons to the add/remove functions
-  initNumOutputControls();
 
   // Check if we've reached the maximum number of outputs, and disable the button to add outputs if so
   if (numOutputs + 1 >= MAX_OUTPUTS) {
@@ -228,9 +265,11 @@ function addOutput(e, updateAfter = true) {
     enableAutoUpdates();
   }
 
-  // Update the output selector if desired
+  // Update affected properties if desired at this point
   if (updateAfter) {
     updateOutputSelector();
+    relableOutputRows();
+    initNumOutputControls();
   }
 
   // Update the plot if desired
@@ -248,24 +287,19 @@ function removeOutput(e, updateAfter = true) {
     return;
   }
 
-  const numRows = getNumRows();
-  const lRows = $(".sens-row");
-
   // Determine which row to remove based on which button was clicked
   let targetRow;
   if (e === null) {
     targetRow = numOutputs - 1;
   } else {
     let eId = e.target.id;
-    targetRow = +eId.at(-1) - 1;
+    targetRow = +eId.at(-1);
   }
 
   // Remove the row from the output label table
   const outputLabelTable = $(".output-label-table tbody")[0];
   const lOutputLabelRows = $(".output-label-row");
   outputLabelTable.removeChild(lOutputLabelRows[targetRow]);
-
-  relableOutputRows();
 
   // Remove the input line from each cell in the sens table
   const lSensValueCells = $(".sens-value-cell");
@@ -283,9 +317,10 @@ function removeOutput(e, updateAfter = true) {
     enableButton($("button.add-output"));
   }
 
-  // Update the output selector if desired
+  // Update affected properties if desired at this point
   if (updateAfter) {
     updateOutputSelector();
+    relableOutputRows();
   }
 
   // Update the plot if desired
@@ -298,13 +333,16 @@ function setNumRows(targetNumRows) {
   const numRows = getNumRows();
   if (numRows < targetNumRows) {
     for (let i = 0; i < targetNumRows - numRows; ++i) {
-      addRow(false);
+      addRow(null, false);
     }
   } else if (numRows > targetNumRows) {
     for (let i = 0; i < numRows - targetNumRows; ++i) {
-      removeRow(false);
+      removeRow(null, false);
     }
   }
+
+  relableValueRows();
+  initNumParamControls();
 
   // Update the plot if desired
   if (autoUpdating) {
@@ -323,6 +361,9 @@ function setNumOutputs(targetNumOutputs) {
       removeOutput(null, false);
     }
   }
+
+  relableOutputRows();
+  initNumOutputControls();
 
   // Update the plot if desired
   if (autoUpdating) {
@@ -636,7 +677,11 @@ function fillRandom() {
   // Fill the column labels
   const lOutputLabelInputs = $("input.output-label-input");
   for (let j = 0; j < numOutputs; ++j) {
-    lOutputLabelInputs[j].value = "Yield " + (j + 1).toString();
+    let value = "Yield"
+    if (numOutputs > 1) {
+      value += " " + (j + 1).toString();
+    }
+    lOutputLabelInputs[j].value = value;
   }
 
   // Fill the row labels
@@ -677,11 +722,9 @@ function initNumParamControls() {
   $("button.remove-row").off("click");
   $("select#num-rows").off("change");
 
-  $("button.add-row").on("click", () => addRow(true));
-  $("button.remove-row").on("click", () => removeRow(true));
-  $("select#num-rows").on("change", function (e) {
-    setNumRows($(e.target).val());
-  });
+  $("button.add-row").on("click", (e) => addRow(e, true));
+  $("button.remove-row").on("click", (e) => removeRow(e, true));
+  $("select#num-rows").on("change", (e) => setNumRows($(e.target).val()));
 }
 
 function initNumOutputControls() {
@@ -691,9 +734,7 @@ function initNumOutputControls() {
 
   $("button.add-output").on("click", (e) => addOutput(e, true));
   $("button.remove-output").on("click", (e) => removeOutput(e, true));
-  $("select#num-outputs").on("change", function (e) {
-    setNumOutputs($(e.target).val());
-  });
+  $("select#num-outputs").on("change", (e) => setNumOutputs($(e.target).val()));
 }
 
 $(document).ready(function () {
