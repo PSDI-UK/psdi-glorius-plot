@@ -39,9 +39,9 @@
   --psdi-bg-color-primary-dark    : #041b3b;
   --psdi-bg-color-primary-darker  : #031938;
   --psdi-bg-color-primary-darkest : #03152e;
-  --psdi-bg-color-primary-light   : #042149;
-  --psdi-bg-color-primary-lighter : #05224c;
-  --psdi-bg-color-primary-lightest: #052756;
+  --psdi-bg-color-primary-light   : #052756;
+  --psdi-bg-color-primary-lighter : #06326a;
+  --psdi-bg-color-primary-lightest: #07477f;
 
   /* Primary color (dark mode) */
   --psdi-dm-bg-color-primary         : #96caf4;
@@ -264,6 +264,12 @@ input.button {
   line-height     : var(--ifm-line-height-base);
   border-radius   : 0.25rem;
   margin          : 0.25rem;
+}
+
+button:hover,
+input.button:hover {
+  cursor          : pointer;
+  background-color: var(--ifm-color-primary-lighter);
 }
 
 *:has(> .max-width-box) {
