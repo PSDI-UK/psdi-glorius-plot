@@ -717,13 +717,13 @@ function fillRandom() {
 
 function enableAutoUpdates() {
   disableAutoUpdates();
-  $(".trigger-update").on("change", generatePlot);
+  $(".trigger-chart-update").on("change", generatePlot);
   autoUpdating = true;
   generatePlot();
 }
 
 function disableAutoUpdates() {
-  $(".trigger-update").off("change");
+  $(".trigger-chart-update").off("change");
   autoUpdating = false;
 }
 

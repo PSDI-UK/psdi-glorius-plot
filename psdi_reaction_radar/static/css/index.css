@@ -1,24 +1,46 @@
 /* Control for elements that display only in either direct or calc mode */
 :root {
   --calc-mode-display  : inherit;
+  --calc-mode-row      : table-row;
+  --calc-mode-cell     : table-cell;
   --direct-mode-display: none;
+  --direct-mode-row    : none;
+  --direct-mode-cell   : none;
 }
 
 [input-mode='direct'] {
   --calc-mode-display  : none;
-  --direct-mode-display: inherit;
+  --calc-mode-row      : none;
+  --calc-mode-cell     : none;
+  --direct-mode-display: block;
+  --direct-mode-row    : table-row;
+  --direct-mode-cell   : table-cell;
 }
 
 .calc-mode-only {
   display: var(--calc-mode-display) !important;
 }
 
+td.calc-mode-only,
+th.calc-mode-only {
+  display: var(--calc-mode-cell) !important;
+}
+
+tr.calc-mode-only {
+  display: var(--calc-mode-row) !important;
+}
+
 .direct-mode-only {
   display: var(--direct-mode-display) !important;
 }
 
-.baseline-label {
-  font-weight: bold;
+td.direct-mode-only,
+th.direct-mode-only {
+  display: var(--direct-mode-cell) !important;
+}
+
+tr.direct-mode-only {
+  display: var(--direct-mode-row) !important;
 }
 
 /* Customisation of input boxes */

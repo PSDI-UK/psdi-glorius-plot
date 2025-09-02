@@ -12,27 +12,27 @@
 <div id="plot-options">
   <p>
     <label for="min-output-input">Minimum output: </label>
-    <input type="number" value="-100" name="min-output-input" id="min-output-input" class="trigger-update">
+    <input type="number" value="-100" name="min-output-input" id="min-output-input" class="trigger-chart-update">
     <label for="max-output-input"> Maximum output: </label>
-    <input type="number" value="50" name="max-output-input" id="max-output-input" class="trigger-update">
+    <input type="number" value="50" name="max-output-input" id="max-output-input" class="trigger-chart-update">
     <label for="band-width-input"> Band width: </label>
-    <input type="number" value="25" name="band-width-input" id="band-width-input" class="trigger-update">
+    <input type="number" value="25" name="band-width-input" id="band-width-input" class="trigger-chart-update">
   </p>
   <p>
-    <input type="checkbox" name="grid-line-toggle" id="grid-line-toggle" class="trigger-update" checked>
+    <input type="checkbox" name="grid-line-toggle" id="grid-line-toggle" class="trigger-chart-update" checked>
     <label for="grid-line-toggle"> Show grid lines</label>
-    <input type="checkbox" name="axis-line-toggle" id="axis-line-toggle" class="trigger-update" checked>
+    <input type="checkbox" name="axis-line-toggle" id="axis-line-toggle" class="trigger-chart-update" checked>
     <label for="axis-line-toggle"> Show axis lines</label>
   </p>
   <p>
     <label for="min-color-input">Color at lowest output: </label>
-    <input type="color" value="#FF8080" name="min-color-input" id="min-color-input" class="trigger-update">
+    <input type="color" value="#FF8080" name="min-color-input" id="min-color-input" class="trigger-chart-update">
     <label for="max-color-input"> Color at highest output: </label>
-    <input type="color" value="#20A020" name="max-color-input" id="max-color-input" class="trigger-update">
+    <input type="color" value="#20A020" name="max-color-input" id="max-color-input" class="trigger-chart-update">
   </p>
   <p>
     <label for="sort-option">Data arrangement: </label>
-    <select name="sort-option" id="sort-option" class="trigger-update">
+    <select name="sort-option" id="sort-option" class="trigger-chart-update">
       <option value="1">Ascending</option>
       <option value="-1">Descending</option>
       <option value="0">As entered</option>
@@ -74,7 +74,7 @@
         <label for="ol-0" class="output-label-label">Output 1 Label:</label>
       </td>
       <td class="output-label-value-cell">
-        <input type="text" id="ol-0" class="output-label-input trigger-update" placeholder="Output (e.g. “Yield”)"
+        <input type="text" id="ol-0" class="output-label-input trigger-chart-update" placeholder="Output (e.g. “Yield”)"
           value="Yield">
       </td>
     </tr>
@@ -104,13 +104,13 @@
 
     </tr>
 
-    <tr class="baseline-row" class="calc-mode-only">
+    <tr class="baseline-row calc-mode-only">
       <td class="empty-cell"></td>
-      <td class="baseline-label">Baseline</td>
-      <td class="baseline-value-cell">
+      <td class="baseline-label calc-mode-only">Baseline</td>
+      <td class="baseline-value-cell calc-mode-only">
         <div class="baseline-line-container">
           <div class="baseline-input-line">
-            <input type="number" class="baseline-value trigger-update">
+            <input type="number" class="baseline-value trigger-chart-update">
           </div>
         </div>
       </td>
@@ -124,19 +124,20 @@
         <button type="button" id="add-rb-0" class="add-condition fix-size-small">+</button>
       </td>
       <td class="condition-label-cell">
-        <input type="text" class="condition-label trigger-update" placeholder="Condition (e.g. “High c”)">
+        <input type="text" class="condition-label trigger-chart-update" placeholder="Condition (e.g. “High c”)">
       </td>
-      <td class="sample-value-cell">
+      <td class="sample-value-cell calc-mode-only">
         <div class="sample-line-container">
           <div class="sample-input-line">
-            <input type="number" class="sample-value trigger-update">
+            <input type="number" class="sample-value trigger-deviation-update">
           </div>
         </div>
       </td>
       <td class="deviation-value-cell">
         <div class="deviation-line-container">
           <div class="deviation-input-line">
-            <input type="number" class="deviation-value trigger-update" value="0" disabled> <span>%</span>
+            <input type="number" class="calc-mode-disabled deviation-value trigger-chart-update" value="0" disabled>
+            <span>%</span>
           </div>
         </div>
       </td>
@@ -149,19 +150,20 @@
         <button type="button" id="add-rb-1" class="add-condition fix-size-small">+</button>
       </td>
       <td class="condition-label-cell">
-        <input type="text" class="condition-label trigger-update" placeholder="Condition (e.g. “High c”)">
+        <input type="text" class="condition-label trigger-chart-update" placeholder="Condition (e.g. “High c”)">
       </td>
-      <td class="sample-value-cell">
+      <td class="sample-value-cell calc-mode-only">
         <div class="sample-line-container">
           <div class="sample-input-line">
-            <input type="number" class="sample-value trigger-update">
+            <input type="number" class="sample-value trigger-deviation-update">
           </div>
         </div>
       </td>
       <td class="deviation-value-cell">
         <div class="deviation-line-container">
           <div class="deviation-input-line">
-            <input type="number" class="deviation-value trigger-update" value="0" disabled> <span>%</span>
+            <input type="number" class="calc-mode-disabled deviation-value trigger-chart-update" value="0" disabled>
+            <span>%</span>
           </div>
         </div>
       </td>
@@ -174,19 +176,20 @@
         <button type="button" id="add-rb-2" class="add-condition fix-size-small">+</button>
       </td>
       <td class="condition-label-cell">
-        <input type="text" class="condition-label trigger-update" placeholder="Condition (e.g. “High c”)">
+        <input type="text" class="condition-label trigger-chart-update" placeholder="Condition (e.g. “High c”)">
       </td>
-      <td class="sample-value-cell">
+      <td class="sample-value-cell calc-mode-only">
         <div class="sample-line-container">
           <div class="sample-input-line">
-            <input type="number" class="sample-value trigger-update">
+            <input type="number" class="sample-value trigger-deviation-update">
           </div>
         </div>
       </td>
       <td class="deviation-value-cell">
         <div class="deviation-line-container">
           <div class="deviation-input-line">
-            <input type="number" class="deviation-value trigger-update" value="0" disabled> <span>%</span>
+            <input type="number" class="calc-mode-disabled deviation-value trigger-chart-update" value="0" disabled>
+            <span>%</span>
           </div>
         </div>
       </td>
