@@ -321,7 +321,7 @@ function removeOutput(e, updateAfter = true) {
   outputLabelTable.removeChild(lOutputLabelRows[targetRow]);
 
   // Remove the input line from each cell in the sens table
-  const lSensValueCells = $(".deviation-value-cell");
+  const lSensValueCells = $(".baseline-value-cell, .sample-value-cell, .deviation-value-cell");;
   for (let i = 0; i < lSensValueCells.length; ++i) {
     lSensValueCells[i].removeChild(lSensValueCells[i].children[targetRow]);
   }
