@@ -1,5 +1,37 @@
+/* Control for elements that display only in either direct or calc mode */
+:root {
+  --calc-mode-display  : inherit;
+  --direct-mode-display: none;
+}
+
+[input-mode='direct'] {
+  --calc-mode-display  : none;
+  --direct-mode-display: inherit;
+}
+
+.calc-mode-only {
+  display: var(--calc-mode-display) !important;
+}
+
+.direct-mode-only {
+  display: var(--direct-mode-display) !important;
+}
+
+.baseline-label {
+  font-weight: bold;
+}
+
+/* Customisation of input boxes */
 input.deviation-value {
   text-align: right;
+}
+
+input:disabled {
+  background-color: var(--psdi-bg-color-secondary);
+}
+
+[data-theme='dark'] input:disabled {
+  background-color: var(--psdi-dm-bg-color-secondary-dark);
 }
 
 /* Buttons that are initially disabled */
@@ -36,13 +68,15 @@ tr td:first-child button {
 }
 
 /* Style the sensitivity table */
-.deviation-table td {
+.sensitivity-table td {
   padding-top   : 0.25rem;
   padding-bottom: 0.25rem;
   min-height    : 3rem;
 }
 
 .condition-label-cell,
+.baseline-value-cell,
+.sample-value-cell,
 .deviation-value-cell {
   padding-right: 0.5rem;
 }
@@ -51,16 +85,22 @@ input.condition-label {
   max-width: 10rem;
 }
 
-.deviation-value-cell {
+.baseline-line-container,
+.sample-line-container,
+.deviation-line-container {
   display        : flex;
   flex-direction : column;
   justify-content: center;
 }
 
+input.baseline-value,
+input.sample-value,
 input.deviation-value {
   max-width: 5rem;
 }
 
+.baseline-input-line,
+.sample-input-line,
 .deviation-input-line {
   display        : flex;
   flex-direction : row;
@@ -86,4 +126,9 @@ input.deviation-value {
 .tooltip-on-dark {
   --bs-tooltip-bg   : var(--ifm-background-color);
   --bs-tooltip-color: var(--psdi-dark-text-color-body);
+}
+
+/* Canvas styling */
+.white-bg {
+  background-color: white;
 }

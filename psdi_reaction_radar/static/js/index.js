@@ -44,7 +44,7 @@ function getNumOutputs() {
 }
 
 function getNumSamples() {
-  return $(".deviation-header").length - 2;
+  return $(".sensitivity-header").length - 2;
 }
 
 function disableButton(button) {
@@ -112,9 +112,9 @@ function addConditionRow(e, updateAfter = true) {
     targetRow = getIndexFromEvent(e);
   }
   if (targetRow >= numConditions - 1) {
-    $(".deviation-table tbody")[0].appendChild(newRow);
+    $(".sensitivity-table tbody")[0].appendChild(newRow);
   } else {
-    $(".deviation-table tbody")[0].insertBefore(newRow, $(".condition-row")[targetRow + 1]);
+    $(".sensitivity-table tbody")[0].insertBefore(newRow, $(".condition-row")[targetRow + 1]);
   }
 
 
@@ -163,7 +163,7 @@ function removeConditionRow(e, updateAfter = true) {
     targetRow = getIndexFromEvent(e);
   }
 
-  const sensTable = $(".deviation-table tbody")[0];
+  const sensTable = $(".sensitivity-table tbody")[0];
   const lRows = $(".condition-row");
   sensTable.removeChild(lRows[targetRow]);
 

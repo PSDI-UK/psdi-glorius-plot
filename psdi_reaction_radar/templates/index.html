@@ -80,16 +80,41 @@
     </tr>
   </table>
 
-  <table class="deviation-table">
+  <table class="sensitivity-table">
 
-    <tr class="deviation-header">
+    <tr class="sensitivity-header">
+
       <th class="empty-heading"></th>
-      <th class="condition-label-heading">Label</th>
-      <th class="deviation-sample-heading">
-        <span class="mouseover" data-bs-toggle="tooltip" data-bs-custom-class="tooltip-on-light" data-bs-placement="top"
+
+      <th class="condition-label-heading">
+        Label
+      </th>
+
+      <th class="value-heading calc-mode-only" id="vh-0">Value</th>
+
+      <th class="deviation-heading">
+        <span class="mouseover calc-mode-only" data-bs-toggle="tooltip" data-bs-custom-class="tooltip-on-light"
+          data-bs-placement="top" title="Deviation is calculated as (Result - Baseline)/Baseline * 100%">
+          Deviation (%)</span>
+        <span class="mouseover direct-mode-only" data-bs-toggle="tooltip" data-bs-custom-class="tooltip-on-light"
+          data-bs-placement="top"
           title="Enter the deviation from the baseline as a percentage, i.e. (Result - Baseline)/Baseline * 100%">
           Deviation (%)</span>
       </th>
+
+    </tr>
+
+    <tr class="baseline-row" class="calc-mode-only">
+      <td class="empty-cell"></td>
+      <td class="baseline-label">Baseline</td>
+      <td class="baseline-value-cell">
+        <div class="baseline-line-container">
+          <div class="baseline-input-line">
+            <input type="number" class="baseline-value trigger-update">
+          </div>
+        </div>
+      </td>
+      <td class="empty-cell"></td>
     </tr>
 
     <tr class="condition-row">
@@ -101,9 +126,18 @@
       <td class="condition-label-cell">
         <input type="text" class="condition-label trigger-update" placeholder="Condition (e.g. “High c”)">
       </td>
+      <td class="sample-value-cell">
+        <div class="sample-line-container">
+          <div class="sample-input-line">
+            <input type="number" class="sample-value trigger-update">
+          </div>
+        </div>
+      </td>
       <td class="deviation-value-cell">
-        <div class="deviation-input-line">
-          <input type="number" class="deviation-value trigger-update" value="0"> <span>%</span>
+        <div class="deviation-line-container">
+          <div class="deviation-input-line">
+            <input type="number" class="deviation-value trigger-update" value="0" disabled> <span>%</span>
+          </div>
         </div>
       </td>
     </tr>
@@ -117,9 +151,18 @@
       <td class="condition-label-cell">
         <input type="text" class="condition-label trigger-update" placeholder="Condition (e.g. “High c”)">
       </td>
+      <td class="sample-value-cell">
+        <div class="sample-line-container">
+          <div class="sample-input-line">
+            <input type="number" class="sample-value trigger-update">
+          </div>
+        </div>
+      </td>
       <td class="deviation-value-cell">
-        <div class="deviation-input-line">
-          <input type="number" class="deviation-value trigger-update" value="0"> <span>%</span>
+        <div class="deviation-line-container">
+          <div class="deviation-input-line">
+            <input type="number" class="deviation-value trigger-update" value="0" disabled> <span>%</span>
+          </div>
         </div>
       </td>
     </tr>
@@ -133,9 +176,18 @@
       <td class="condition-label-cell">
         <input type="text" class="condition-label trigger-update" placeholder="Condition (e.g. “High c”)">
       </td>
+      <td class="sample-value-cell">
+        <div class="sample-line-container">
+          <div class="sample-input-line">
+            <input type="number" class="sample-value trigger-update">
+          </div>
+        </div>
+      </td>
       <td class="deviation-value-cell">
-        <div class="deviation-input-line">
-          <input type="number" class="deviation-value trigger-update" value="0"> <span>%</span>
+        <div class="deviation-line-container">
+          <div class="deviation-input-line">
+            <input type="number" class="deviation-value trigger-update" value="0" disabled> <span>%</span>
+          </div>
         </div>
       </td>
     </tr>
@@ -151,5 +203,5 @@
   <button type="button" id="fill-random">Fill with random data</button>
 </form>
 
-<canvas id="glorius-plot"></canvas>
+<canvas id="glorius-plot" class="white-bg"></canvas>
 {% endblock %}
