@@ -15,7 +15,7 @@ const MAX_CONDITIONS = 12;
 const MIN_OUTPUTS = 1;
 const MAX_OUTPUTS = 5;
 
-const DEFAULT_BASELINE_MEAN = 100;
+const DEFAULT_VALUE_MEAN = 100;
 
 // Table values and placeholders
 const OUTPUT_LABEL_TEXT = "Output {N} Label:";
@@ -472,11 +472,57 @@ function calcDeviation() {
     if (lBaselineSamples.length > 0) {
       lBaselineMeans.push(lBaselineSamples.reduce((a, b) => a + b) / lBaselineSamples.length);
     } else {
-      lBaselineMeans.push(DEFAULT_BASELINE_MEAN);
+      lBaselineMeans.push(DEFAULT_VALUE_MEAN);
     }
   }
 
-  console.log("Baseline means: " + lBaselineMeans)
+  // Now calculate the mean for each output of each condition, and use it and the baseline mean to calculate and fill in
+  // the deviation
+
+  const lConditionRows = $(".condition-row");
+
+  for (let i = 0; i < numConditions; i++) {
+
+    const conditionRow = lConditionRows.eq(i);
+    const lConditionCells = conditionRow.find(".sample-value-cell");
+
+    const llConditionSamples = [];
+    for (let j = 0; j < numOutputs; j++) {
+      llConditionSamples.push([]);
+    }
+
+    for (let k = 0; k < numSamples; k++) {
+
+      const conditionSampleCell = lConditionCells.eq(k);
+
+      for (let j = 0; j < numOutputs; j++) {
+        const conditionSampleVal = conditionSampleCell.find(".sample-value").eq(j).val();
+        if (conditionSampleVal != "") {
+          llConditionSamples[j].push(conditionSampleVal);
+        }
+      }
+    }
+
+    const lDeviationInputs = conditionRow.find(".deviation-input-line");
+    for (let j = 0; j < numOutputs; j++) {
+
+      const baselineMean = lBaselineMeans[j];
+      const lConditionSamples = llConditionSamples[j];
+
+      let condtionMean;
+      if (lConditionSamples.length > 0) {
+        condtionMean = lConditionSamples.reduce((a, b) => a + b) / lConditionSamples.length;
+      } else {
+        condtionMean = baselineMean;
+      }
+
+      const deviation = (condtionMean - baselineMean) / baselineMean * 100;
+
+      const deviationInput = lDeviationInputs.eq(j).find(".deviation-value");
+      deviationInput.val(deviation);
+    }
+
+  }
 }
 
 /**
