@@ -29,6 +29,7 @@ const GRID_COLOR = "#00000080";
 
 // Globals
 let autoUpdating = false;
+let directInput = false;
 let radarChart = null;
 
 // When the script is initially loaded, store a copy of a heading element and cell elements that we'll later use
@@ -533,8 +534,10 @@ function generatePlot() {
   // Set the form as clean when we generate a plot from it
   cleanDirtyForms();
 
-  // Ensure deviation is calculated first
-  calcDeviation();
+  // Ensure deviation is calculated first if we aren't in directInput mode
+  if (!directInput) {
+    calcDeviation();
+  }
 
   // Collect info from the settings and determine data based on them
   const numConditions = getNumConditions();
@@ -851,6 +854,23 @@ function disableAutoUpdates() {
   enableDeviationCalc();
 }
 
+function toggleInputMode(e) {
+  if ($(e.target).is(":checked")) {
+
+    directInput = true;
+    document.documentElement.setAttribute("input-mode", "direct");
+    $(".calc-mode-disabled").attr("disabled", false);
+
+  } else {
+
+    directInput = false;
+    document.documentElement.setAttribute("input-mode", "calc");
+    $(".calc-mode-disabled").attr("disabled", true);
+    generatePlot();
+
+  }
+}
+
 function initNumParamControls() {
   $("button.add-condition").off("click");
   $("button.remove-condition").off("click");
@@ -871,12 +891,22 @@ function initNumOutputControls() {
   $("select#num-outputs").on("change", (e) => setNumOutputs($(e.target).val()));
 }
 
+function toggleAutoUpdates(e) {
+  if ($(e.target).is(":checked")) {
+    enableAutoUpdates();
+  } else {
+    disableAutoUpdates();
+  }
+}
+
 $(document).ready(function () {
   // Enable all tooltips on the page
   const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
   const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
 
   initDirtyForms();
+
+  $("#input-mode-toggle").on("click", toggleInputMode)
 
   initNumParamControls();
   initNumOutputControls();
@@ -886,12 +916,6 @@ $(document).ready(function () {
   $("button#fill-random").on("click", fillRandom);
   $("button#generate-plot").on("click", generatePlot);
 
-  $("#auto-update-toggle").on("click", function (e) {
-    if ($(e.target).is(":checked")) {
-      enableAutoUpdates();
-    } else {
-      disableAutoUpdates();
-    }
-  })
+  $("#auto-update-toggle").on("click", toggleAutoUpdates)
   enableAutoUpdates();
 });
