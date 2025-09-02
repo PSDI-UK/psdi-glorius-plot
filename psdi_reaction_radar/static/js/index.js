@@ -15,6 +15,8 @@ const MAX_CONDITIONS = 12;
 const MIN_OUTPUTS = 1;
 const MAX_OUTPUTS = 5;
 
+const DEFAULT_VALUE_MEAN = 100;
+
 // Table values and placeholders
 const OUTPUT_LABEL_TEXT = "Output {N} Label:";
 
@@ -27,13 +29,16 @@ const GRID_COLOR = "#00000080";
 
 // Globals
 let autoUpdating = false;
+let directInput = false;
 let radarChart = null;
 
 // When the script is initially loaded, store a copy of a heading element and cell elements that we'll later use
 // as templates to add new rows
 
 const TEMPLATE_OUTPUT_LABEL_ROW = $(".output-label-row")[0].cloneNode(true);
-const TEMPLATE_INPUT_LINE = $(".deviation-input-line")[0].cloneNode(true);
+const TEMPLATE_BASELINE_INPUT_LINE = $(".baseline-input-line")[0].cloneNode(true);
+const TEMPLATE_SAMPLE_INPUT_LINE = $(".sample-input-line")[0].cloneNode(true);
+const TEMPLATE_DEVIATION_INPUT_LINE = $(".deviation-input-line")[0].cloneNode(true);
 
 function getNumConditions() {
   return $(".condition-row").length;
@@ -44,7 +49,7 @@ function getNumOutputs() {
 }
 
 function getNumSamples() {
-  return $(".deviation-header").length - 2;
+  return $(".sensitivity-header").children().length - 3;
 }
 
 function disableButton(button) {
@@ -112,9 +117,9 @@ function addConditionRow(e, updateAfter = true) {
     targetRow = getIndexFromEvent(e);
   }
   if (targetRow >= numConditions - 1) {
-    $(".deviation-table tbody")[0].appendChild(newRow);
+    $(".sensitivity-table tbody")[0].appendChild(newRow);
   } else {
-    $(".deviation-table tbody")[0].insertBefore(newRow, $(".condition-row")[targetRow + 1]);
+    $(".sensitivity-table tbody")[0].insertBefore(newRow, $(".condition-row")[targetRow + 1]);
   }
 
 
@@ -163,7 +168,7 @@ function removeConditionRow(e, updateAfter = true) {
     targetRow = getIndexFromEvent(e);
   }
 
-  const sensTable = $(".deviation-table tbody")[0];
+  const sensTable = $(".sensitivity-table tbody")[0];
   const lRows = $(".condition-row");
   sensTable.removeChild(lRows[targetRow]);
 
@@ -244,14 +249,25 @@ function addOutput(e, updateAfter = true) {
   }
 
   // Add a new input line to each value cell
-  const lSensValueCells = $(".deviation-value-cell");
+  const lSensValueCells = $(".baseline-value-cell, .sample-value-cell, .deviation-value-cell");
   for (let i = 0; i < lSensValueCells.length; ++i) {
-    const newSensInputLine = TEMPLATE_INPUT_LINE.cloneNode(true);
+
+    // Clone a new node from the proper template
+    const sensValueCell = lSensValueCells[i];
+    let templateLine;
+    if (sensValueCell.classList.contains("sample-value-cell")) {
+      templateLine = TEMPLATE_SAMPLE_INPUT_LINE;
+    } else if (sensValueCell.classList.contains("baseline-value-cell")) {
+      templateLine = TEMPLATE_BASELINE_INPUT_LINE;
+    } else {
+      templateLine = TEMPLATE_DEVIATION_INPUT_LINE;
+    }
+    const newSensInputLine = templateLine.cloneNode(true);
 
     if (targetRow >= numOutputs - 1) {
-      lSensValueCells[i].appendChild(newSensInputLine);
+      sensValueCell.appendChild(newSensInputLine);
     } else {
-      lSensValueCells[i].insertBefore(newSensInputLine, lSensValueCells[i].children[targetRow + 1]);
+      sensValueCell.insertBefore(newSensInputLine, lSensValueCells[i].children[targetRow + 1]);
     }
   }
 
@@ -306,7 +322,7 @@ function removeOutput(e, updateAfter = true) {
   outputLabelTable.removeChild(lOutputLabelRows[targetRow]);
 
   // Remove the input line from each cell in the sens table
-  const lSensValueCells = $(".deviation-value-cell");
+  const lSensValueCells = $(".baseline-value-cell, .sample-value-cell, .deviation-value-cell");;
   for (let i = 0; i < lSensValueCells.length; ++i) {
     lSensValueCells[i].removeChild(lSensValueCells[i].children[targetRow]);
   }
@@ -424,6 +440,93 @@ function getDataSorting() {
 }
 
 /**
+ * Calculate the deviation for each condition
+ */
+function calcDeviation() {
+  const numConditions = getNumConditions();
+  const numOutputs = getNumOutputs();
+  const numSamples = getNumSamples();
+
+  const lBaselineCells = $(".baseline-value-cell");
+
+  // Start by calculating the mean baseline for each output
+  const lBaselineMeans = [];
+  const llBaselineSamples = [];
+  for (let j = 0; j < numOutputs; j++) {
+    llBaselineSamples.push([]);
+  }
+
+  for (let k = 0; k < numSamples; k++) {
+
+    const baselineSampleCell = lBaselineCells.eq(k);
+
+    for (let j = 0; j < numOutputs; j++) {
+      const baselineSampleVal = baselineSampleCell.find(".baseline-value").eq(j).val();
+      if (baselineSampleVal != "") {
+        llBaselineSamples[j].push(baselineSampleVal);
+      }
+    }
+  }
+
+  for (let j = 0; j < numOutputs; j++) {
+    const lBaselineSamples = llBaselineSamples[j];
+    if (lBaselineSamples.length > 0) {
+      lBaselineMeans.push(lBaselineSamples.reduce((a, b) => a + b) / lBaselineSamples.length);
+    } else {
+      lBaselineMeans.push(DEFAULT_VALUE_MEAN);
+    }
+  }
+
+  // Now calculate the mean for each output of each condition, and use it and the baseline mean to calculate and fill in
+  // the deviation
+
+  const lConditionRows = $(".condition-row");
+
+  for (let i = 0; i < numConditions; i++) {
+
+    const conditionRow = lConditionRows.eq(i);
+    const lConditionCells = conditionRow.find(".sample-value-cell");
+
+    const llConditionSamples = [];
+    for (let j = 0; j < numOutputs; j++) {
+      llConditionSamples.push([]);
+    }
+
+    for (let k = 0; k < numSamples; k++) {
+
+      const conditionSampleCell = lConditionCells.eq(k);
+
+      for (let j = 0; j < numOutputs; j++) {
+        const conditionSampleVal = conditionSampleCell.find(".sample-value").eq(j).val();
+        if (conditionSampleVal != "") {
+          llConditionSamples[j].push(conditionSampleVal);
+        }
+      }
+    }
+
+    const lDeviationInputs = conditionRow.find(".deviation-input-line");
+    for (let j = 0; j < numOutputs; j++) {
+
+      const baselineMean = lBaselineMeans[j];
+      const lConditionSamples = llConditionSamples[j];
+
+      let condtionMean;
+      if (lConditionSamples.length > 0) {
+        condtionMean = lConditionSamples.reduce((a, b) => a + b) / lConditionSamples.length;
+      } else {
+        condtionMean = baselineMean;
+      }
+
+      const deviation = (condtionMean - baselineMean) / baselineMean * 100;
+
+      const deviationInput = lDeviationInputs.eq(j).find(".deviation-value");
+      deviationInput.val(deviation);
+    }
+
+  }
+}
+
+/**
  * Generate the plot using all the provided data
  */
 function generatePlot() {
@@ -431,10 +534,14 @@ function generatePlot() {
   // Set the form as clean when we generate a plot from it
   cleanDirtyForms();
 
+  // Ensure deviation is calculated first if we aren't in directInput mode
+  if (!directInput) {
+    calcDeviation();
+  }
+
   // Collect info from the settings and determine data based on them
   const numConditions = getNumConditions();
   const numOutputs = getNumOutputs();
-  const numSamples = getNumSamples();
 
   const minOutput = getMinOutput();
   const maxOutput = getMaxOutput();
@@ -715,16 +822,53 @@ function fillRandom() {
 
 }
 
+function enableDeviationCalc() {
+  // Clear any update triggers first so we don't inadvertently double-up
+  disableDeviationCalc();
+  $(".trigger-deviation-update").on("change", calcDeviation);
+}
+
+function disableDeviationCalc() {
+  $(".trigger-deviation-update").off("change");
+}
+
 function enableAutoUpdates() {
+
+  // Clear any update triggers first so we don't inadvertently double-up
   disableAutoUpdates();
-  $(".trigger-update").on("change", generatePlot);
+
+  // Disable deviation calculation, since that will be handled by the plot generation now
+  disableDeviationCalc();
+
+  $(".trigger-chart-update").on("change", generatePlot);
+  $(".trigger-deviation-update").on("change", generatePlot);
   autoUpdating = true;
   generatePlot();
 }
 
 function disableAutoUpdates() {
-  $(".trigger-update").off("change");
+  $(".trigger-chart-update").off("change");
   autoUpdating = false;
+
+  // Set to still do deviation calculation automatically
+  enableDeviationCalc();
+}
+
+function toggleInputMode(e) {
+  if ($(e.target).is(":checked")) {
+
+    directInput = true;
+    document.documentElement.setAttribute("input-mode", "direct");
+    $(".calc-mode-disabled").attr("disabled", false);
+
+  } else {
+
+    directInput = false;
+    document.documentElement.setAttribute("input-mode", "calc");
+    $(".calc-mode-disabled").attr("disabled", true);
+    generatePlot();
+
+  }
 }
 
 function initNumParamControls() {
@@ -747,6 +891,14 @@ function initNumOutputControls() {
   $("select#num-outputs").on("change", (e) => setNumOutputs($(e.target).val()));
 }
 
+function toggleAutoUpdates(e) {
+  if ($(e.target).is(":checked")) {
+    enableAutoUpdates();
+  } else {
+    disableAutoUpdates();
+  }
+}
+
 $(document).ready(function () {
   // Enable all tooltips on the page
   const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
@@ -754,18 +906,16 @@ $(document).ready(function () {
 
   initDirtyForms();
 
+  $("#input-mode-toggle").on("click", toggleInputMode)
+
   initNumParamControls();
   initNumOutputControls();
+
+  enableDeviationCalc();
 
   $("button#fill-random").on("click", fillRandom);
   $("button#generate-plot").on("click", generatePlot);
 
-  $("#auto-update-toggle").on("click", function (e) {
-    if ($(e.target).is(":checked")) {
-      enableAutoUpdates();
-    } else {
-      disableAutoUpdates();
-    }
-  })
+  $("#auto-update-toggle").on("click", toggleAutoUpdates)
   enableAutoUpdates();
 });
