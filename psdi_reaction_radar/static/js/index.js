@@ -819,15 +819,26 @@ function fillRandom() {
 
 }
 
-function initDeviationCalc() {
+function enableDeviationCalc() {
   // Clear any update triggers first so we don't inadvertently double-up
-  $(".trigger-deviation-update").off("change");
+  disableDeviationCalc();
   $(".trigger-deviation-update").on("change", calcDeviation);
 }
 
+function disableDeviationCalc() {
+  $(".trigger-deviation-update").off("change");
+}
+
 function enableAutoUpdates() {
+
+  // Clear any update triggers first so we don't inadvertently double-up
   disableAutoUpdates();
+
+  // Disable deviation calculation, since that will be handled by the plot generation now
+  disableDeviationCalc();
+
   $(".trigger-chart-update").on("change", generatePlot);
+  $(".trigger-deviation-update").on("change", generatePlot);
   autoUpdating = true;
   generatePlot();
 }
@@ -835,6 +846,9 @@ function enableAutoUpdates() {
 function disableAutoUpdates() {
   $(".trigger-chart-update").off("change");
   autoUpdating = false;
+
+  // Set to still do deviation calculation automatically
+  enableDeviationCalc();
 }
 
 function initNumParamControls() {
@@ -867,7 +881,7 @@ $(document).ready(function () {
   initNumParamControls();
   initNumOutputControls();
 
-  initDeviationCalc();
+  enableDeviationCalc();
 
   $("button#fill-random").on("click", fillRandom);
   $("button#generate-plot").on("click", generatePlot);
