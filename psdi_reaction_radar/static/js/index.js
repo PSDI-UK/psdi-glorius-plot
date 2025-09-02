@@ -15,6 +15,8 @@ const MAX_CONDITIONS = 12;
 const MIN_OUTPUTS = 1;
 const MAX_OUTPUTS = 5;
 
+const DEFAULT_BASELINE_MEAN = 100;
+
 // Table values and placeholders
 const OUTPUT_LABEL_TEXT = "Output {N} Label:";
 
@@ -44,7 +46,7 @@ function getNumOutputs() {
 }
 
 function getNumSamples() {
-  return $(".sensitivity-header").length - 2;
+  return $(".sensitivity-header").children().length - 3;
 }
 
 function disableButton(button) {
@@ -424,6 +426,47 @@ function getDataSorting() {
 }
 
 /**
+ * Calculate the deviation for each condition
+ */
+function calcDeviation() {
+  const numConditions = getNumConditions();
+  const numOutputs = getNumOutputs();
+  const numSamples = getNumSamples();
+
+  const lBaselineCells = $(".baseline-value-cell");
+
+  // Start by calculating the mean baseline for each output
+  const lBaselineMeans = [];
+  const llBaselineSamples = [];
+  for (let j = 0; j < numOutputs; j++) {
+    llBaselineSamples.push([]);
+  }
+
+  for (let k = 0; k < numSamples; k++) {
+
+    const baselineSampleCell = lBaselineCells.eq(k);
+
+    for (let j = 0; j < numOutputs; j++) {
+      const baselineSampleVal = baselineSampleCell.find(".baseline-value").eq(j).val();
+      if (baselineSampleVal != "") {
+        llBaselineSamples[j].push(baselineSampleVal);
+      }
+    }
+  }
+
+  for (let j = 0; j < numOutputs; j++) {
+    const lBaselineSamples = llBaselineSamples[j];
+    if (lBaselineSamples.length > 0) {
+      lBaselineMeans.push(lBaselineSamples.reduce((a, b) => a + b) / lBaselineSamples.length);
+    } else {
+      lBaselineMeans.push(DEFAULT_BASELINE_MEAN);
+    }
+  }
+
+  console.log("Baseline means: " + lBaselineMeans)
+}
+
+/**
  * Generate the plot using all the provided data
  */
 function generatePlot() {
@@ -431,10 +474,12 @@ function generatePlot() {
   // Set the form as clean when we generate a plot from it
   cleanDirtyForms();
 
+  // Ensure deviation is calculated first
+  calcDeviation();
+
   // Collect info from the settings and determine data based on them
   const numConditions = getNumConditions();
   const numOutputs = getNumOutputs();
-  const numSamples = getNumSamples();
 
   const minOutput = getMinOutput();
   const maxOutput = getMaxOutput();
@@ -715,6 +760,12 @@ function fillRandom() {
 
 }
 
+function initDeviationCalc() {
+  // Clear any update triggers first so we don't inadvertently double-up
+  $(".trigger-deviation-update").off("change");
+  $(".trigger-deviation-update").on("change", calcDeviation);
+}
+
 function enableAutoUpdates() {
   disableAutoUpdates();
   $(".trigger-chart-update").on("change", generatePlot);
@@ -756,6 +807,8 @@ $(document).ready(function () {
 
   initNumParamControls();
   initNumOutputControls();
+
+  initDeviationCalc();
 
   $("button#fill-random").on("click", fillRandom);
   $("button#generate-plot").on("click", generatePlot);
