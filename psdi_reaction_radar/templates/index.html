@@ -12,11 +12,14 @@
 <div id="plot-options">
   <p>
     <label for="min-output-input">Minimum output: </label>
-    <input type="number" value="-100" name="min-output-input" id="min-output-input" class="trigger-chart-update">
+    <input type="number" step="any" value="-100" name="min-output-input" id="min-output-input"
+      class="trigger-chart-update">
     <label for="max-output-input"> Maximum output: </label>
-    <input type="number" value="50" name="max-output-input" id="max-output-input" class="trigger-chart-update">
+    <input type="number" step="any" value="50" name="max-output-input" id="max-output-input"
+      class="trigger-chart-update">
     <label for="band-width-input"> Band width: </label>
-    <input type="number" value="25" name="band-width-input" id="band-width-input" class="trigger-chart-update">
+    <input type="number" step="any" value="25" name="band-width-input" id="band-width-input"
+      class="trigger-chart-update">
   </p>
   <p>
     <input type="checkbox" name="grid-line-toggle" id="grid-line-toggle" class="trigger-chart-update" checked>
@@ -110,7 +113,7 @@
       <td class="baseline-value-cell calc-mode-only">
         <div class="baseline-line-container">
           <div class="baseline-input-line">
-            <input type="number" class="baseline-value trigger-chart-update">
+            <input type="number" step="any" class="baseline-value trigger-chart-update">
           </div>
         </div>
       </td>
@@ -129,14 +132,15 @@
       <td class="sample-value-cell calc-mode-only">
         <div class="sample-line-container">
           <div class="sample-input-line">
-            <input type="number" class="sample-value trigger-deviation-update">
+            <input type="number" step="any" class="sample-value trigger-deviation-update">
           </div>
         </div>
       </td>
       <td class="deviation-value-cell">
         <div class="deviation-line-container">
           <div class="deviation-input-line">
-            <input type="number" class="calc-mode-disabled deviation-value trigger-chart-update" value="0" disabled>
+            <input type="number" step="any" class="calc-mode-disabled deviation-value trigger-chart-update" value="0"
+              disabled>
             <span>%</span>
           </div>
         </div>
@@ -155,14 +159,15 @@
       <td class="sample-value-cell calc-mode-only">
         <div class="sample-line-container">
           <div class="sample-input-line">
-            <input type="number" class="sample-value trigger-deviation-update">
+            <input type="number" step="any" class="sample-value trigger-deviation-update">
           </div>
         </div>
       </td>
       <td class="deviation-value-cell">
         <div class="deviation-line-container">
           <div class="deviation-input-line">
-            <input type="number" class="calc-mode-disabled deviation-value trigger-chart-update" value="0" disabled>
+            <input type="number" step="any" class="calc-mode-disabled deviation-value trigger-chart-update" value="0"
+              disabled>
             <span>%</span>
           </div>
         </div>
@@ -181,14 +186,15 @@
       <td class="sample-value-cell calc-mode-only">
         <div class="sample-line-container">
           <div class="sample-input-line">
-            <input type="number" class="sample-value trigger-deviation-update">
+            <input type="number" step="any" class="sample-value trigger-deviation-update">
           </div>
         </div>
       </td>
       <td class="deviation-value-cell">
         <div class="deviation-line-container">
           <div class="deviation-input-line">
-            <input type="number" class="calc-mode-disabled deviation-value trigger-chart-update" value="0" disabled>
+            <input type="number" step="any" class="calc-mode-disabled deviation-value trigger-chart-update" value="0"
+              disabled>
             <span>%</span>
           </div>
         </div>
