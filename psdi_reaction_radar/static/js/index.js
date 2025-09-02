@@ -35,7 +35,9 @@ let radarChart = null;
 // as templates to add new rows
 
 const TEMPLATE_OUTPUT_LABEL_ROW = $(".output-label-row")[0].cloneNode(true);
-const TEMPLATE_INPUT_LINE = $(".deviation-input-line")[0].cloneNode(true);
+const TEMPLATE_BASELINE_INPUT_LINE = $(".baseline-input-line")[0].cloneNode(true);
+const TEMPLATE_SAMPLE_INPUT_LINE = $(".sample-input-line")[0].cloneNode(true);
+const TEMPLATE_DEVIATION_INPUT_LINE = $(".deviation-input-line")[0].cloneNode(true);
 
 function getNumConditions() {
   return $(".condition-row").length;
@@ -246,14 +248,25 @@ function addOutput(e, updateAfter = true) {
   }
 
   // Add a new input line to each value cell
-  const lSensValueCells = $(".deviation-value-cell");
+  const lSensValueCells = $(".baseline-value-cell, .sample-value-cell, .deviation-value-cell");
   for (let i = 0; i < lSensValueCells.length; ++i) {
-    const newSensInputLine = TEMPLATE_INPUT_LINE.cloneNode(true);
+
+    // Clone a new node from the proper template
+    const sensValueCell = lSensValueCells[i];
+    let templateLine;
+    if (sensValueCell.classList.contains("sample-value-cell")) {
+      templateLine = TEMPLATE_SAMPLE_INPUT_LINE;
+    } else if (sensValueCell.classList.contains("baseline-value-cell")) {
+      templateLine = TEMPLATE_BASELINE_INPUT_LINE;
+    } else {
+      templateLine = TEMPLATE_DEVIATION_INPUT_LINE;
+    }
+    const newSensInputLine = templateLine.cloneNode(true);
 
     if (targetRow >= numOutputs - 1) {
-      lSensValueCells[i].appendChild(newSensInputLine);
+      sensValueCell.appendChild(newSensInputLine);
     } else {
-      lSensValueCells[i].insertBefore(newSensInputLine, lSensValueCells[i].children[targetRow + 1]);
+      sensValueCell.insertBefore(newSensInputLine, lSensValueCells[i].children[targetRow + 1]);
     }
   }
 
