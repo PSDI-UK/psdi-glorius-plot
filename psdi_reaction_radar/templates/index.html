@@ -9,38 +9,7 @@
 {% block hero_title %}PSDI Glorius Plot Generator{% endblock %}
 
 {% block inner_content %}
-<div id="plot-options">
-  <p>
-    <label for="min-output-input">Minimum output: </label>
-    <input type="number" step="any" value="-100" name="min-output-input" id="min-output-input"
-      class="trigger-chart-update">
-    <label for="max-output-input"> Maximum output: </label>
-    <input type="number" step="any" value="50" name="max-output-input" id="max-output-input"
-      class="trigger-chart-update">
-    <label for="band-width-input"> Band width: </label>
-    <input type="number" step="any" value="25" name="band-width-input" id="band-width-input"
-      class="trigger-chart-update">
-  </p>
-  <p>
-    <input type="checkbox" name="grid-line-toggle" id="grid-line-toggle" class="trigger-chart-update" checked>
-    <label for="grid-line-toggle"> Show grid lines</label>
-    <input type="checkbox" name="axis-line-toggle" id="axis-line-toggle" class="trigger-chart-update" checked>
-    <label for="axis-line-toggle"> Show axis lines</label>
-  </p>
-  <p>
-    <label for="min-color-input">Color at lowest output: </label>
-    <input type="color" value="#FF8080" name="min-color-input" id="min-color-input" class="trigger-chart-update">
-    <label for="max-color-input"> Color at highest output: </label>
-    <input type="color" value="#20A020" name="max-color-input" id="max-color-input" class="trigger-chart-update">
-  </p>
-  <p>
-    <label for="sort-option">Data arrangement: </label>
-    <select name="sort-option" id="sort-option" class="trigger-chart-update">
-      <option value="1">Ascending</option>
-      <option value="-1">Descending</option>
-      <option value="0">As entered</option>
-    </select>
-  </p>
+<div id="table-options">
   <p>
     <input type="checkbox" name="input-mode-toggle" id="input-mode-toggle">
     <label for="input-mode-toggle"> Directly input deviations</label>
@@ -69,6 +38,7 @@
     </select>
   </p>
 </div>
+
 <form class="sens-form">
 
   <table class="output-label-table">
@@ -219,4 +189,38 @@
 </form>
 
 <canvas id="glorius-plot" class="white-bg"></canvas>
+
+<div id="plot-options">
+  <p>
+    <label for="min-output-input">Minimum output: </label>
+    <input type="number" step="any" value="-100" name="min-output-input" id="min-output-input"
+      class="trigger-chart-update">
+    <label for="max-output-input"> Maximum output: </label>
+    <input type="number" step="any" value="50" name="max-output-input" id="max-output-input"
+      class="trigger-chart-update">
+    <label for="band-width-input"> Band width: </label>
+    <input type="number" step="any" value="25" name="band-width-input" id="band-width-input"
+      class="trigger-chart-update">
+  </p>
+  <p>
+    <input type="checkbox" name="grid-line-toggle" id="grid-line-toggle" class="trigger-chart-update" checked>
+    <label for="grid-line-toggle"> Show grid lines</label>
+    <input type="checkbox" name="axis-line-toggle" id="axis-line-toggle" class="trigger-chart-update" checked>
+    <label for="axis-line-toggle"> Show axis lines</label>
+  </p>
+  <p>
+    <label for="min-color-input">Color at lowest output: </label>
+    <input type="color" value="#FF8080" name="min-color-input" id="min-color-input" class="trigger-chart-update">
+    <label for="max-color-input"> Color at highest output: </label>
+    <input type="color" value="#20A020" name="max-color-input" id="max-color-input" class="trigger-chart-update">
+  </p>
+  <p>
+    <label for="sort-option">Data arrangement: </label>
+    <select name="sort-option" id="sort-option" class="trigger-chart-update">
+      <option value="1">Ascending</option>
+      <option value="-1">Descending</option>
+      <option value="0">As entered</option>
+    </select>
+  </p>
+</div>
 {% endblock %}
