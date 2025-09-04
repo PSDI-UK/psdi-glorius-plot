@@ -271,14 +271,17 @@ function addSampleCol(e, updateAfter = true) {
     targetCol = getIndexFromEvent(e);
   }
 
-  // Construct and insert a new heading cell and baseline value cell
+  // Construct and insert a new button cell, heading cell, and baseline value cell
+  const newButtonCell = $(".sample-button-cell")[0].cloneNode(true);
   const newHeadingCell = $(".value-heading")[0].cloneNode(true);
   const newBaselineValueCell = $(".baseline-value-cell")[0].cloneNode(true);
 
   if (targetCol >= numSamples - 1) {
+    $(".sensitivity-buttons")[0].insertBefore(newButtonCell, $(".button-deviation-cell")[0]);
     $(".sensitivity-header")[0].insertBefore(newHeadingCell, $(".deviation-heading")[0]);
     $(".baseline-row")[0].insertBefore(newBaselineValueCell, $(".baseline-deviation-cell")[0]);
   } else {
+    $(".sensitivity-buttons")[0].insertBefore(newButtonCell, $(".sample-button-cell")[targetCol + 1]);
     $(".sensitivity-header")[0].insertBefore(newHeadingCell, $(".value-heading")[targetCol + 1]);
     $(".baseline-row")[0].insertBefore(newBaselineValueCell, $(".baseline-value-cell")[targetCol + 1]);
   }
@@ -1058,11 +1061,11 @@ function initNumConditionControls() {
 function initNumSampleControls() {
   $("button.add-sample").off("click");
   $("button.remove-sample").off("click");
-  $("select#num-sample").off("change");
+  $("select#num-samples").off("change");
 
   $("button.add-sample").on("click", (e) => addSampleCol(e, true));
   $("button.remove-sample").on("click", (e) => removeSampleCol(e, true));
-  $("select#num-sample").on("change", (e) => setNumSamples($(e.target).val()));
+  $("select#num-samples").on("change", (e) => setNumSamples($(e.target).val()));
 }
 
 function initNumOutputControls() {
