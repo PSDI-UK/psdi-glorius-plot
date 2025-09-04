@@ -646,7 +646,7 @@ function calcDeviation() {
     for (let j = 0; j < numOutputs; j++) {
       const baselineSampleVal = baselineSampleCell.find(".baseline-value").eq(j).val();
       if (baselineSampleVal != "") {
-        llBaselineSamples[j].push(baselineSampleVal);
+        llBaselineSamples[j].push(+baselineSampleVal);
       }
     }
   }
@@ -682,7 +682,7 @@ function calcDeviation() {
       for (let j = 0; j < numOutputs; j++) {
         const conditionSampleVal = conditionSampleCell.find(".sample-value").eq(j).val();
         if (conditionSampleVal != "") {
-          llConditionSamples[j].push(conditionSampleVal);
+          llConditionSamples[j].push(+conditionSampleVal);
         }
       }
     }
@@ -693,14 +693,14 @@ function calcDeviation() {
       const baselineMean = lBaselineMeans[j];
       const lConditionSamples = llConditionSamples[j];
 
-      let condtionMean;
+      let conditionMean;
       if (lConditionSamples.length > 0) {
-        condtionMean = lConditionSamples.reduce((a, b) => a + b) / lConditionSamples.length;
+        conditionMean = lConditionSamples.reduce((a, b) => a + b) / lConditionSamples.length;
       } else {
-        condtionMean = baselineMean;
+        conditionMean = baselineMean;
       }
 
-      const deviation = (condtionMean - baselineMean) / baselineMean * 100;
+      const deviation = (conditionMean - baselineMean) / baselineMean * 100;
 
       const deviationInput = lDeviationInputs.eq(j).find(".deviation-value");
       deviationInput.val(deviation);
@@ -971,12 +971,11 @@ function generatePlot() {
  * Fill the existing cells with random data
  */
 function fillRandom() {
-  const numConditionRows = getNumConditions();
   const numOutputs = getNumOutputs();
 
   // Fill the column labels
-  const lOutputLabelInputs = $("input.output-label-input");
-  for (let j = 0; j < numOutputs; ++j) {
+  const lOutputLabelInputs = $(".output-label-input");
+  for (let j = 0; j < lOutputLabelInputs.length; ++j) {
     let value = "Yield"
     if (numOutputs > 1) {
       value += " " + (j + 1).toString();
@@ -985,18 +984,24 @@ function fillRandom() {
   }
 
   // Fill the row labels
-  const lRowLabelInputs = $("input.condition-label");
-  for (let i = 0; i < numConditionRows; ++i) {
+  const lRowLabelInputs = $(".condition-label");
+  for (let i = 0; i < lRowLabelInputs.length; ++i) {
     lRowLabelInputs[i].value = (i + 1).toString();
+  }
+
+  // Fill each baseline cell
+  const lBaselineInputs = $(".baseline-value");
+  for (let k = 0; k < lBaselineInputs.length; ++k) {
+    lBaselineInputs[k].value = DEFAULT_VALUE_MEAN;
   }
 
   // Fill each data cell
   const minOutput = getMinOutput();
   const maxOutput = getMaxOutput();
-  const lDataCells = $("input.deviation-value");
+  const lDataCells = $(".sample-value");
   for (let k = 0; k < lDataCells.length; ++k) {
     const e = lDataCells[k];
-    e.value = minOutput + Math.random() * (maxOutput - minOutput);
+    e.value = DEFAULT_VALUE_MEAN + minOutput + Math.random() * (maxOutput - minOutput);
   }
 
   if (autoUpdating) {
