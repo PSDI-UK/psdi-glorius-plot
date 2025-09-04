@@ -8,7 +8,7 @@
   --direct-mode-cell   : none;
 }
 
-[input-mode='direct'] {
+[input-mode="direct"] {
   --calc-mode-display  : none;
   --calc-mode-row      : none;
   --calc-mode-cell     : none;

@@ -12,6 +12,9 @@ import { mix_hexes } from "./color.js"
 const MIN_CONDITIONS = 3;
 const MAX_CONDITIONS = 12;
 
+const MIN_SAMPLES = 1;
+const MAX_SAMPLES = 10;
+
 const MIN_OUTPUTS = 1;
 const MAX_OUTPUTS = 5;
 
@@ -49,7 +52,7 @@ function getNumOutputs() {
 }
 
 function getNumSamples() {
-  return $(".sensitivity-header").children().length - 3;
+  return $(".value-heading").length;
 }
 
 function disableButton(button) {
@@ -62,6 +65,10 @@ function enableButton(button) {
 
 function updateConditionSelector() {
   $("select#num-conditions").val(getNumConditions()).change();
+}
+
+function updateSampleSelector() {
+  $("select#num-samples").val(getNumSamples()).change();
 }
 
 function updateOutputSelector() {
@@ -142,7 +149,7 @@ function addConditionRow(e, updateAfter = true) {
   if (updateAfter) {
     updateConditionSelector();
     relableConditionRows();
-    initNumParamControls();
+    initNumConditionControls();
   }
 
   // Update the plot if desired
@@ -168,9 +175,8 @@ function removeConditionRow(e, updateAfter = true) {
     targetRow = getIndexFromEvent(e);
   }
 
-  const sensTable = $(".sensitivity-table tbody")[0];
-  const lRows = $(".condition-row");
-  sensTable.removeChild(lRows[targetRow]);
+  // Remove the row from the table
+  $(".sensitivity-table tbody")[0].removeChild($(".condition-row")[targetRow]);
 
   // Check if we've reached the minimum number of rows, and disable the buttons to remove rows if so
   if (numConditions - 1 <= MIN_CONDITIONS) {
@@ -186,11 +192,213 @@ function removeConditionRow(e, updateAfter = true) {
   if (updateAfter) {
     updateConditionSelector();
     relableConditionRows();
-    initNumParamControls();
+    initNumConditionControls();
   }
 
   // Update the plot if desired
   if (updateAfter && autoUpdating) {
+    generatePlot();
+  }
+}
+
+function setNumConditions(targetNumConditions) {
+  const numConditionRows = getNumConditions();
+  if (numConditionRows < targetNumConditions) {
+    for (let i = 0; i < targetNumConditions - numConditionRows; ++i) {
+      addConditionRow(null, false);
+    }
+  } else if (numConditionRows > targetNumConditions) {
+    for (let i = 0; i < numConditionRows - targetNumConditions; ++i) {
+      removeConditionRow(null, false);
+    }
+  } else {
+    return;
+  }
+
+  relableConditionRows();
+  initNumConditionControls();
+
+  // Update the plot if desired
+  if (autoUpdating) {
+    generatePlot();
+  }
+}
+
+/**
+ * Relabel all the sample columns after one is added or removed, fixing their behind-the-scenes values of which index
+ * they're at, and the displayed sample number
+ */
+function relableSampleCols() {
+
+  const numSamples = getNumSamples();
+  const lSampleButtonCells = $(".sample-button-cell");
+  const lSampleHeadings = $(".value-heading");
+
+  for (let k = 0; k < numSamples; k++) {
+
+    // Set the heading text
+    let headingText;
+    if (numSamples == 1) {
+      headingText = "Value";
+    } else {
+      headingText = "Sample " + (k + 1).toString();
+    }
+    lSampleHeadings.eq(k).text(headingText);
+
+    // Fix the IDs of the buttons
+    const buttonCell = lSampleButtonCells.eq(k);
+    const sampleNumberString = k.toString();
+    buttonCell.find(".remove-sample").attr("id", "remove-sb-" + sampleNumberString);
+    buttonCell.find(".add-sample").attr("id", "add-sb-" + sampleNumberString);
+  }
+}
+
+function addSampleCol(e, updateAfter = true) {
+
+  // Check that we don't already have too many samples
+  const numSamples = getNumSamples();
+  if (numSamples >= MAX_SAMPLES) {
+    console.error("Attempt to add sample when maximum samples already reached");
+    return;
+  }
+
+  // Determine where to add the column based on which button was clicked
+  let targetCol;
+  if (e === null) {
+    targetCol = numSamples - 1;
+  } else {
+    targetCol = getIndexFromEvent(e);
+  }
+
+  // Construct and insert a new button cell, heading cell, and baseline value cell
+  const newButtonCell = $(".sample-button-cell")[0].cloneNode(true);
+  const newHeadingCell = $(".value-heading")[0].cloneNode(true);
+  const newBaselineValueCell = $(".baseline-value-cell")[0].cloneNode(true);
+
+  if (targetCol >= numSamples - 1) {
+    $(".sensitivity-buttons")[0].insertBefore(newButtonCell, $(".button-deviation-cell")[0]);
+    $(".sensitivity-header")[0].insertBefore(newHeadingCell, $(".deviation-heading")[0]);
+    $(".baseline-row")[0].insertBefore(newBaselineValueCell, $(".baseline-deviation-cell")[0]);
+  } else {
+    $(".sensitivity-buttons")[0].insertBefore(newButtonCell, $(".sample-button-cell")[targetCol + 1]);
+    $(".sensitivity-header")[0].insertBefore(newHeadingCell, $(".value-heading")[targetCol + 1]);
+    $(".baseline-row")[0].insertBefore(newBaselineValueCell, $(".baseline-value-cell")[targetCol + 1]);
+  }
+
+  // For each row of the table, construnct and insert a new value cell
+  const numConditions = getNumConditions();
+  for (let i = 0; i < numConditions; i++) {
+    const conditionRow = $(".condition-row")[i];
+    const lValueCells = $(conditionRow).find(".sample-value-cell");
+    const newValueCell = lValueCells[0].cloneNode(true);
+
+    if (targetCol >= numSamples - 1) {
+      conditionRow.insertBefore(newValueCell, $(conditionRow).find(".deviation-value-cell")[0]);
+    } else {
+      conditionRow.insertBefore(newValueCell, lValueCells[targetCol + 1]);
+    }
+  }
+
+  // Check if we've reached the maximum number of samples, and disable the button to add samples if so
+  if (numSamples + 1 >= MAX_SAMPLES) {
+    disableButton($(".add-sample"));
+  }
+
+  // Check if we've passed the minimum number of samples, and enable the button to remove samples if so
+  if (numSamples + 1 > MIN_SAMPLES) {
+    enableButton($(".remove-sample"));
+  }
+
+  // Enable auto updates for new cells if it's turned on
+  if (autoUpdating) {
+    enableAutoUpdates();
+  }
+
+  // Update affected properties if desired at this point
+  if (updateAfter) {
+    updateSampleSelector();
+    relableSampleCols();
+    initNumSampleControls();
+  }
+
+  // Update the plot if desired
+  if (updateAfter && autoUpdating) {
+    generatePlot();
+  }
+}
+
+function removeSampleCol(e, updateAfter = true) {
+
+  // Check that we don't already have too few samples
+  const numSamples = getNumSamples();
+  if (numSamples <= MIN_SAMPLES) {
+    console.error("Attempt to remove sample when minimum samples already reached");
+    return;
+  }
+
+  // Determine which row to remove based on which button was clicked
+  let targetCol;
+  if (e === null) {
+    targetCol = numSamples - 1;
+  } else {
+    targetCol = getIndexFromEvent(e);
+  }
+
+  // Remove the appropriate button cell, heading cell, and baseline cell
+
+  $(".sensitivity-buttons")[0].removeChild($(".sample-button-cell")[targetCol]);
+  $(".sensitivity-header")[0].removeChild($(".value-heading")[targetCol]);
+  $(".baseline-row")[0].removeChild($(".baseline-value-cell")[targetCol]);
+
+  // For each row of the table, remove the appropriate value cell
+  const numConditions = getNumConditions();
+  for (let i = 0; i < numConditions; i++) {
+    const conditionRow = $(".condition-row")[i];
+    conditionRow.removeChild($(conditionRow).find(".sample-value-cell")[targetCol]);
+  }
+
+  // Check if we've reached the minimum number of rows, and disable the buttons to remove rows if so
+  if (numSamples - 1 <= MIN_SAMPLES) {
+    disableButton($(".remove-sample"));
+  }
+
+  // Check if we've gotten under the minimum number of rows, and enable the buttons to add rows if so
+  if (numSamples - 1 < MAX_SAMPLES) {
+    enableButton($(".add-sample"));
+  }
+
+  // Update affected properties if desired at this point
+  if (updateAfter) {
+    updateSampleSelector();
+    relableSampleCols();
+    initNumSampleControls();
+  }
+
+  // Update the plot if desired
+  if (updateAfter && autoUpdating) {
+    generatePlot();
+  }
+}
+
+function setNumSamples(targetNumSamples) {
+  const numSamples = getNumSamples();
+  if (numSamples < targetNumSamples) {
+    for (let i = 0; i < targetNumSamples - numSamples; ++i) {
+      addSampleCol(null, false);
+    }
+  } else if (numSamples > targetNumSamples) {
+    for (let i = 0; i < numSamples - targetNumSamples; ++i) {
+      removeSampleCol(null, false);
+    }
+  } else {
+    return;
+  }
+
+  relableSampleCols();
+  initNumSampleControls();
+
+  // Update the plot if desired
+  if (autoUpdating) {
     generatePlot();
   }
 }
@@ -233,7 +441,7 @@ function addOutput(e, updateAfter = true) {
 
   // Set up the new output label row
   const newOutputLabelRow = TEMPLATE_OUTPUT_LABEL_ROW.cloneNode(true);
-  newOutputLabelRow.children[1].children[0].value = "";
+  $(newOutputLabelRow).find(".output-label-input").val("");
 
   // Determine where to add the row based on which button was clicked
   let targetRow;
@@ -317,9 +525,7 @@ function removeOutput(e, updateAfter = true) {
   }
 
   // Remove the row from the output label table
-  const outputLabelTable = $(".output-label-table tbody")[0];
-  const lOutputLabelRows = $(".output-label-row");
-  outputLabelTable.removeChild(lOutputLabelRows[targetRow]);
+  $(".output-label-table tbody")[0].removeChild($(".output-label-row")[targetRow]);
 
   // Remove the input line from each cell in the sens table
   const lSensValueCells = $(".baseline-value-cell, .sample-value-cell, .deviation-value-cell");;
@@ -345,29 +551,6 @@ function removeOutput(e, updateAfter = true) {
 
   // Update the plot if desired
   if (updateAfter && autoUpdating) {
-    generatePlot();
-  }
-}
-
-function setNumRows(targetNumRows) {
-  const numConditionRows = getNumConditions();
-  if (numConditionRows < targetNumRows) {
-    for (let i = 0; i < targetNumRows - numConditionRows; ++i) {
-      addConditionRow(null, false);
-    }
-  } else if (numConditionRows > targetNumRows) {
-    for (let i = 0; i < numConditionRows - targetNumRows; ++i) {
-      removeConditionRow(null, false);
-    }
-  } else {
-    return;
-  }
-
-  relableConditionRows();
-  initNumParamControls();
-
-  // Update the plot if desired
-  if (autoUpdating) {
     generatePlot();
   }
 }
@@ -463,7 +646,7 @@ function calcDeviation() {
     for (let j = 0; j < numOutputs; j++) {
       const baselineSampleVal = baselineSampleCell.find(".baseline-value").eq(j).val();
       if (baselineSampleVal != "") {
-        llBaselineSamples[j].push(baselineSampleVal);
+        llBaselineSamples[j].push(+baselineSampleVal);
       }
     }
   }
@@ -499,7 +682,7 @@ function calcDeviation() {
       for (let j = 0; j < numOutputs; j++) {
         const conditionSampleVal = conditionSampleCell.find(".sample-value").eq(j).val();
         if (conditionSampleVal != "") {
-          llConditionSamples[j].push(conditionSampleVal);
+          llConditionSamples[j].push(+conditionSampleVal);
         }
       }
     }
@@ -510,14 +693,14 @@ function calcDeviation() {
       const baselineMean = lBaselineMeans[j];
       const lConditionSamples = llConditionSamples[j];
 
-      let condtionMean;
+      let conditionMean;
       if (lConditionSamples.length > 0) {
-        condtionMean = lConditionSamples.reduce((a, b) => a + b) / lConditionSamples.length;
+        conditionMean = lConditionSamples.reduce((a, b) => a + b) / lConditionSamples.length;
       } else {
-        condtionMean = baselineMean;
+        conditionMean = baselineMean;
       }
 
-      const deviation = (condtionMean - baselineMean) / baselineMean * 100;
+      const deviation = (conditionMean - baselineMean) / baselineMean * 100;
 
       const deviationInput = lDeviationInputs.eq(j).find(".deviation-value");
       deviationInput.val(deviation);
@@ -788,12 +971,11 @@ function generatePlot() {
  * Fill the existing cells with random data
  */
 function fillRandom() {
-  const numConditionRows = getNumConditions();
   const numOutputs = getNumOutputs();
 
   // Fill the column labels
-  const lOutputLabelInputs = $("input.output-label-input");
-  for (let j = 0; j < numOutputs; ++j) {
+  const lOutputLabelInputs = $(".output-label-input");
+  for (let j = 0; j < lOutputLabelInputs.length; ++j) {
     let value = "Yield"
     if (numOutputs > 1) {
       value += " " + (j + 1).toString();
@@ -802,18 +984,30 @@ function fillRandom() {
   }
 
   // Fill the row labels
-  const lRowLabelInputs = $("input.condition-label");
-  for (let i = 0; i < numConditionRows; ++i) {
+  const lRowLabelInputs = $(".condition-label");
+  for (let i = 0; i < lRowLabelInputs.length; ++i) {
     lRowLabelInputs[i].value = (i + 1).toString();
+  }
+
+  // Fill each baseline cell
+  const lBaselineInputs = $(".baseline-value");
+  for (let k = 0; k < lBaselineInputs.length; ++k) {
+    lBaselineInputs[k].value = DEFAULT_VALUE_MEAN;
   }
 
   // Fill each data cell
   const minOutput = getMinOutput();
   const maxOutput = getMaxOutput();
-  const lDataCells = $("input.deviation-value");
+  const lDataCells = $(".sample-value");
   for (let k = 0; k < lDataCells.length; ++k) {
     const e = lDataCells[k];
-    e.value = minOutput + Math.random() * (maxOutput - minOutput);
+    e.value = DEFAULT_VALUE_MEAN + minOutput + Math.random() * (maxOutput - minOutput);
+  }
+
+  // Make sure the deviation is calculated, even in direct input mode (if not in this mode, it will be calculated when
+  // the plot is generated)
+  if (directInput) {
+    calcDeviation();
   }
 
   if (autoUpdating) {
@@ -871,14 +1065,24 @@ function toggleInputMode(e) {
   }
 }
 
-function initNumParamControls() {
+function initNumConditionControls() {
   $("button.add-condition").off("click");
   $("button.remove-condition").off("click");
   $("select#num-conditions").off("change");
 
   $("button.add-condition").on("click", (e) => addConditionRow(e, true));
   $("button.remove-condition").on("click", (e) => removeConditionRow(e, true));
-  $("select#num-conditions").on("change", (e) => setNumRows($(e.target).val()));
+  $("select#num-conditions").on("change", (e) => setNumConditions($(e.target).val()));
+}
+
+function initNumSampleControls() {
+  $("button.add-sample").off("click");
+  $("button.remove-sample").off("click");
+  $("select#num-samples").off("change");
+
+  $("button.add-sample").on("click", (e) => addSampleCol(e, true));
+  $("button.remove-sample").on("click", (e) => removeSampleCol(e, true));
+  $("select#num-samples").on("change", (e) => setNumSamples($(e.target).val()));
 }
 
 function initNumOutputControls() {
@@ -908,7 +1112,8 @@ $(document).ready(function () {
 
   $("#input-mode-toggle").on("click", toggleInputMode)
 
-  initNumParamControls();
+  initNumConditionControls();
+  initNumSampleControls();
   initNumOutputControls();
 
   enableDeviationCalc();
