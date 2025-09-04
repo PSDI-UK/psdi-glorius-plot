@@ -175,9 +175,8 @@ function removeConditionRow(e, updateAfter = true) {
     targetRow = getIndexFromEvent(e);
   }
 
-  const sensTable = $(".sensitivity-table tbody")[0];
-  const lRows = $(".condition-row");
-  sensTable.removeChild(lRows[targetRow]);
+  // Remove the row from the table
+  $(".sensitivity-table tbody")[0].removeChild($(".condition-row")[targetRow]);
 
   // Check if we've reached the minimum number of rows, and disable the buttons to remove rows if so
   if (numConditions - 1 <= MIN_CONDITIONS) {
@@ -302,12 +301,12 @@ function addSampleCol(e, updateAfter = true) {
 
   // Check if we've reached the maximum number of samples, and disable the button to add samples if so
   if (numSamples + 1 >= MAX_SAMPLES) {
-    disableButton($("button.add-sample"));
+    disableButton($(".add-sample"));
   }
 
   // Check if we've passed the minimum number of samples, and enable the button to remove samples if so
   if (numSamples + 1 > MIN_SAMPLES) {
-    enableButton($("button.remove-sample"));
+    enableButton($(".remove-sample"));
   }
 
   // Enable auto updates for new cells if it's turned on
@@ -330,40 +329,49 @@ function addSampleCol(e, updateAfter = true) {
 
 function removeSampleCol(e, updateAfter = true) {
 
-  // Check that we don't already have too few rows
-  const numConditions = getNumConditions();
-  if (numConditions <= MIN_CONDITIONS) {
-    console.error("Attempt to remove row when minimum rows already reached");
+  // Check that we don't already have too few samples
+  const numSamples = getNumSamples();
+  if (numSamples <= MIN_SAMPLES) {
+    console.error("Attempt to remove sample when minimum samples already reached");
     return;
   }
 
   // Determine which row to remove based on which button was clicked
-  let targetRow;
+  let targetCol;
   if (e === null) {
-    targetRow = numConditions - 1;
+    targetCol = numSamples - 1;
   } else {
-    targetRow = getIndexFromEvent(e);
+    targetCol = getIndexFromEvent(e);
   }
 
-  const sensTable = $(".sensitivity-table tbody")[0];
-  const lRows = $(".condition-row");
-  sensTable.removeChild(lRows[targetRow]);
+  // Remove the appropriate button cell, heading cell, and baseline cell
+
+  $(".sensitivity-buttons")[0].removeChild($(".sample-button-cell")[targetCol]);
+  $(".sensitivity-header")[0].removeChild($(".value-heading")[targetCol]);
+  $(".baseline-row")[0].removeChild($(".baseline-value-cell")[targetCol]);
+
+  // For each row of the table, remove the appropriate value cell
+  const numConditions = getNumConditions();
+  for (let i = 0; i < numConditions; i++) {
+    const conditionRow = $(".condition-row")[i];
+    conditionRow.removeChild($(conditionRow).find(".sample-value-cell")[targetCol]);
+  }
 
   // Check if we've reached the minimum number of rows, and disable the buttons to remove rows if so
-  if (numConditions - 1 <= MIN_CONDITIONS) {
-    disableButton($(".remove-condition"));
+  if (numSamples - 1 <= MIN_SAMPLES) {
+    disableButton($(".remove-sample"));
   }
 
   // Check if we've gotten under the minimum number of rows, and enable the buttons to add rows if so
-  if (numConditions - 1 < MAX_CONDITIONS) {
-    enableButton($(".add-condition"));
+  if (numSamples - 1 < MAX_SAMPLES) {
+    enableButton($(".add-sample"));
   }
 
   // Update affected properties if desired at this point
   if (updateAfter) {
-    updateConditionSelector();
-    relableConditionRows();
-    initNumConditionControls();
+    updateSampleSelector();
+    relableSampleCols();
+    initNumSampleControls();
   }
 
   // Update the plot if desired
@@ -517,9 +525,7 @@ function removeOutput(e, updateAfter = true) {
   }
 
   // Remove the row from the output label table
-  const outputLabelTable = $(".output-label-table tbody")[0];
-  const lOutputLabelRows = $(".output-label-row");
-  outputLabelTable.removeChild(lOutputLabelRows[targetRow]);
+  $(".output-label-table tbody")[0].removeChild($(".output-label-row")[targetRow]);
 
   // Remove the input line from each cell in the sens table
   const lSensValueCells = $(".baseline-value-cell, .sample-value-cell, .deviation-value-cell");;
