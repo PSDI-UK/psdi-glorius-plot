@@ -49,7 +49,7 @@ function getNumOutputs() {
 }
 
 function getNumSamples() {
-  return $(".sensitivity-header").children().length - 3;
+  return $(".value-heading").length;
 }
 
 function disableButton(button) {
@@ -142,7 +142,7 @@ function addConditionRow(e, updateAfter = true) {
   if (updateAfter) {
     updateConditionSelector();
     relableConditionRows();
-    initNumParamControls();
+    initNumConditionControls();
   }
 
   // Update the plot if desired
@@ -186,11 +186,86 @@ function removeConditionRow(e, updateAfter = true) {
   if (updateAfter) {
     updateConditionSelector();
     relableConditionRows();
-    initNumParamControls();
+    initNumConditionControls();
   }
 
   // Update the plot if desired
   if (updateAfter && autoUpdating) {
+    generatePlot();
+  }
+}
+
+function setNumConditions(targetNumConditions) {
+  const numConditionRows = getNumConditions();
+  if (numConditionRows < targetNumConditions) {
+    for (let i = 0; i < targetNumConditions - numConditionRows; ++i) {
+      addConditionRow(null, false);
+    }
+  } else if (numConditionRows > targetNumConditions) {
+    for (let i = 0; i < numConditionRows - targetNumConditions; ++i) {
+      removeConditionRow(null, false);
+    }
+  } else {
+    return;
+  }
+
+  relableConditionRows();
+  initNumConditionControls();
+
+  // Update the plot if desired
+  if (autoUpdating) {
+    generatePlot();
+  }
+}
+
+/**
+ * Relabel all the sample columns after one is added or removed, fixing their behind-the-scenes values of which index
+ * they're at, and the displayed sample number
+ */
+function relableSampleCols() {
+
+  const numSamples = getNumSamples();
+  const lSampleButtonCells = $(".sample-button-cell");
+  const lSampleHeadings = $(".value-heading");
+
+  for (let k = 0; k < numSamples; k++) {
+    const sampleNumberString = k.toString();
+
+    // Set the heading text
+    let headingText;
+    if (numSamples == 1) {
+      headingText = "Value";
+    } else {
+      headingText = "Sample " + sampleNumberString;
+    }
+    lSampleHeadings.eq(k).text(headingText);
+
+    // Fix the IDs of the buttons
+    const buttonCell = lSampleButtonCells.eq(k);
+    buttonCell.find(".remove-sample").attr("id", "remove-sb-" + sampleNumberString);
+    buttonCell.find(".add-sample").attr("id", "add-sb-" + sampleNumberString);
+  }
+}
+
+function setNumSamples(targetNumSamples) {
+  const numSamples = getNumSamples();
+  if (numSamples < targetNumSamples) {
+    for (let i = 0; i < targetNumSamples - numSamples; ++i) {
+      addSampleCol(null, false);
+    }
+  } else if (numSamples > targetNumSamples) {
+    for (let i = 0; i < numSamples - targetNumSamples; ++i) {
+      removeSampleCol(null, false);
+    }
+  } else {
+    return;
+  }
+
+  relableSampleCols();
+  initNumSampleControls();
+
+  // Update the plot if desired
+  if (autoUpdating) {
     generatePlot();
   }
 }
@@ -233,7 +308,7 @@ function addOutput(e, updateAfter = true) {
 
   // Set up the new output label row
   const newOutputLabelRow = TEMPLATE_OUTPUT_LABEL_ROW.cloneNode(true);
-  newOutputLabelRow.children[1].children[0].value = "";
+  $(newOutputLabelRow).find(".output-label-input").val("");
 
   // Determine where to add the row based on which button was clicked
   let targetRow;
@@ -345,29 +420,6 @@ function removeOutput(e, updateAfter = true) {
 
   // Update the plot if desired
   if (updateAfter && autoUpdating) {
-    generatePlot();
-  }
-}
-
-function setNumRows(targetNumRows) {
-  const numConditionRows = getNumConditions();
-  if (numConditionRows < targetNumRows) {
-    for (let i = 0; i < targetNumRows - numConditionRows; ++i) {
-      addConditionRow(null, false);
-    }
-  } else if (numConditionRows > targetNumRows) {
-    for (let i = 0; i < numConditionRows - targetNumRows; ++i) {
-      removeConditionRow(null, false);
-    }
-  } else {
-    return;
-  }
-
-  relableConditionRows();
-  initNumParamControls();
-
-  // Update the plot if desired
-  if (autoUpdating) {
     generatePlot();
   }
 }
@@ -871,14 +923,24 @@ function toggleInputMode(e) {
   }
 }
 
-function initNumParamControls() {
+function initNumConditionControls() {
   $("button.add-condition").off("click");
   $("button.remove-condition").off("click");
   $("select#num-conditions").off("change");
 
   $("button.add-condition").on("click", (e) => addConditionRow(e, true));
   $("button.remove-condition").on("click", (e) => removeConditionRow(e, true));
-  $("select#num-conditions").on("change", (e) => setNumRows($(e.target).val()));
+  $("select#num-conditions").on("change", (e) => setNumConditions($(e.target).val()));
+}
+
+function initNumSampleControls() {
+  $("button.add-sample").off("click");
+  $("button.remove-sample").off("click");
+  $("select#num-sample").off("change");
+
+  $("button.add-sample").on("click", (e) => addSample(e, true));
+  $("button.remove-sample").on("click", (e) => removeSample(e, true));
+  $("select#num-sample").on("change", (e) => setNumSamples($(e.target).val()));
 }
 
 function initNumOutputControls() {
@@ -908,7 +970,8 @@ $(document).ready(function () {
 
   $("#input-mode-toggle").on("click", toggleInputMode)
 
-  initNumParamControls();
+  initNumConditionControls();
+  initNumSampleControls();
   initNumOutputControls();
 
   enableDeviationCalc();
