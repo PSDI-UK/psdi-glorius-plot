@@ -1004,6 +1004,12 @@ function fillRandom() {
     e.value = DEFAULT_VALUE_MEAN + minOutput + Math.random() * (maxOutput - minOutput);
   }
 
+  // Make sure the deviation is calculated, even in direct input mode (if not in this mode, it will be calculated when
+  // the plot is generated)
+  if (directInput) {
+    calcDeviation();
+  }
+
   if (autoUpdating) {
     generatePlot();
   }
