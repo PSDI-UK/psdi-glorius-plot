@@ -15,8 +15,8 @@
     <label for="input-mode-toggle"> Directly input deviations</label>
   </p>
   <p>
-    <label for="num-conditions">Test conditions: </label>
-    <select name="num-conditions" id="num-conditions">
+    <label for="num-condition">Test conditions: </label>
+    <select name="num-condition" id="num-condition">
       <option value="3">3</option>
       <option value="4">4</option>
       <option value="5">5</option>
@@ -28,8 +28,8 @@
       <option value="11">11</option>
       <option value="12">12</option>
     </select>
-    <label for="num-samples" class="calc-mode-only">Number of samples: </label>
-    <select name="num-samples" id="num-samples" class="calc-mode-only">
+    <label for="num-sample" class="calc-mode-only">Number of samples: </label>
+    <select name="num-sample" id="num-sample" class="calc-mode-only">
       <option value="1">1</option>
       <option value="2">2</option>
       <option value="3">3</option>
@@ -41,8 +41,8 @@
       <option value="9">9</option>
       <option value="10">10</option>
     </select>
-    <label for="num-outputs"> Output parameters: </label>
-    <select name="num-outputs" id="num-outputs">
+    <label for="num-output"> Output parameters: </label>
+    <select name="num-output" id="num-output">
       <option value="1">1</option>
       <option value="2">2</option>
       <option value="3">3</option>
@@ -56,15 +56,15 @@
 
   <table class="output-label-table">
     <tr class="output-label-row">
-      <td class="output-label-button-cell">
+      <td class="output-button-cell">
         <button type="button" id="remove-ob-0" class="remove-output disabled fix-size-small" disabled="true">-</button>
         <button type="button" id="add-ob-0" class="add-output fix-size-small">+</button>
       </td>
-      <td class="output-label-label-cell">
-        <label for="ol-0" class="output-label-label">Output 1 Label:</label>
+      <td class="output-label-cell">
+        <label for="ol-0" class="output-label">Output 1 Label:</label>
       </td>
       <td class="output-label-value-cell">
-        <input type="text" id="ol-0" class="output-label-input trigger-chart-update" placeholder="Output (e.g. “Yield”)"
+        <input type="text" id="ol-0" class="output-input trigger-chart-update" placeholder="Output (e.g. “Yield”)"
           value="Yield">
       </td>
     </tr>
@@ -94,7 +94,7 @@
         Label
       </th>
 
-      <th class="value-heading calc-mode-only">Value</th>
+      <th class="sample-heading calc-mode-only">Value</th>
 
       <th class="deviation-heading">
         <span class="mouseover calc-mode-only" data-bs-toggle="tooltip" data-bs-custom-class="tooltip-on-light"
