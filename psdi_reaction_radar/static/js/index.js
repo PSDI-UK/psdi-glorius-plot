@@ -168,6 +168,15 @@ function postTableUpdateCleanup(dim, updateAfter) {
   }
 }
 
+function getTargetIndex(e, max) {
+  let targetIndex;
+  if (e === null)
+    targetIndex = max - 1;
+  else
+    targetIndex = getIndexFromEvent(e);
+  return targetIndex
+}
+
 /**
  * Relabel IDs and labels after a dimension is added to the table
  */
@@ -225,16 +234,12 @@ function addConditionRow(e, updateAfter = true) {
   $(newRow).find(".deviation-value").val("0");
 
   // Determine where to add the row based on which button was clicked
-  let targetRow;
-  if (e === null)
-    targetRow = numConditions - 1;
-  else
-    targetRow = getIndexFromEvent(e);
+  const targetRowIndex = getTargetIndex(e, numConditions);
 
-  if (targetRow >= numConditions - 1)
+  if (targetRowIndex >= numConditions - 1)
     $(".sensitivity-table tbody")[0].appendChild(newRow);
   else
-    $(".sensitivity-table tbody")[0].insertBefore(newRow, $(".condition-row")[targetRow + 1]);
+    $(".sensitivity-table tbody")[0].insertBefore(newRow, $(".condition-row")[targetRowIndex + 1]);
 
   postTableUpdateCleanup("condition", updateAfter);
 }
@@ -249,14 +254,10 @@ function removeConditionRow(e, updateAfter = true) {
   }
 
   // Determine which row to remove based on which button was clicked
-  let targetRow;
-  if (e === null)
-    targetRow = numConditions - 1;
-  else
-    targetRow = getIndexFromEvent(e);
+  const targetRowIndex = getTargetIndex(e, numConditions);
 
   // Remove the row from the table
-  $(".sensitivity-table tbody")[0].removeChild($(".condition-row")[targetRow]);
+  $(".sensitivity-table tbody")[0].removeChild($(".condition-row")[targetRowIndex]);
 
   postTableUpdateCleanup("condition", updateAfter);
 }
@@ -271,11 +272,7 @@ function addSampleCol(e, updateAfter = true) {
   }
 
   // Determine where to add the column based on which button was clicked
-  let targetCol;
-  if (e === null)
-    targetCol = numSamples - 1;
-  else
-    targetCol = getIndexFromEvent(e);
+  const targetColIndex = getTargetIndex(e, numSamples);
 
   // Construct and insert a new button cell, heading cell, and baseline value cell
   const newButtonCell = $(".sample-button-cell")[0].cloneNode(true);
@@ -283,14 +280,14 @@ function addSampleCol(e, updateAfter = true) {
   const newBaselineValueCell = $(".baseline-value-cell")[0].cloneNode(true);
   $(newBaselineValueCell).find(".baseline-value").val("");
 
-  if (targetCol >= numSamples - 1) {
+  if (targetColIndex >= numSamples - 1) {
     $(".sensitivity-buttons")[0].insertBefore(newButtonCell, $(".button-deviation-cell")[0]);
     $(".sensitivity-header")[0].insertBefore(newHeadingCell, $(".deviation-heading")[0]);
     $(".baseline-row")[0].insertBefore(newBaselineValueCell, $(".baseline-deviation-cell")[0]);
   } else {
-    $(".sensitivity-buttons")[0].insertBefore(newButtonCell, $(".sample-button-cell")[targetCol + 1]);
-    $(".sensitivity-header")[0].insertBefore(newHeadingCell, $(".sample-heading")[targetCol + 1]);
-    $(".baseline-row")[0].insertBefore(newBaselineValueCell, $(".baseline-value-cell")[targetCol + 1]);
+    $(".sensitivity-buttons")[0].insertBefore(newButtonCell, $(".sample-button-cell")[targetColIndex + 1]);
+    $(".sensitivity-header")[0].insertBefore(newHeadingCell, $(".sample-heading")[targetColIndex + 1]);
+    $(".baseline-row")[0].insertBefore(newBaselineValueCell, $(".baseline-value-cell")[targetColIndex + 1]);
   }
 
   // For each row of the table, construnct and insert a new value cell
@@ -301,10 +298,10 @@ function addSampleCol(e, updateAfter = true) {
     const newValueCell = lValueCells[0].cloneNode(true);
     $(newValueCell).find(".sample-value").val("");
 
-    if (targetCol >= numSamples - 1)
+    if (targetColIndex >= numSamples - 1)
       conditionRow.insertBefore(newValueCell, $(conditionRow).find(".deviation-value-cell")[0]);
     else
-      conditionRow.insertBefore(newValueCell, lValueCells[targetCol + 1]);
+      conditionRow.insertBefore(newValueCell, lValueCells[targetColIndex + 1]);
   }
 
   postTableUpdateCleanup("sample", updateAfter);
@@ -320,23 +317,19 @@ function removeSampleCol(e, updateAfter = true) {
   }
 
   // Determine which row to remove based on which button was clicked
-  let targetCol;
-  if (e === null)
-    targetCol = numSamples - 1;
-  else
-    targetCol = getIndexFromEvent(e);
+  const targetColIndex = getTargetIndex(e, numSamples);
 
   // Remove the appropriate button cell, heading cell, and baseline cell
 
-  $(".sensitivity-buttons")[0].removeChild($(".sample-button-cell")[targetCol]);
-  $(".sensitivity-header")[0].removeChild($(".sample-heading")[targetCol]);
-  $(".baseline-row")[0].removeChild($(".baseline-value-cell")[targetCol]);
+  $(".sensitivity-buttons")[0].removeChild($(".sample-button-cell")[targetColIndex]);
+  $(".sensitivity-header")[0].removeChild($(".sample-heading")[targetColIndex]);
+  $(".baseline-row")[0].removeChild($(".baseline-value-cell")[targetColIndex]);
 
   // For each row of the table, remove the appropriate value cell
   const numConditions = getNumConditions();
   for (let i = 0; i < numConditions; i++) {
     const conditionRow = $(".condition-row")[i];
-    conditionRow.removeChild($(conditionRow).find(".sample-value-cell")[targetCol]);
+    conditionRow.removeChild($(conditionRow).find(".sample-value-cell")[targetColIndex]);
   }
 
   postTableUpdateCleanup("sample", updateAfter);
@@ -356,38 +349,31 @@ function addOutput(e, updateAfter = true) {
   $(newOutputLabelRow).find(".output-input").val("");
 
   // Determine where to add the row based on which button was clicked
-  let targetRow;
-  if (e === null)
-    targetRow = numOutputs - 1;
-  else
-    targetRow = getIndexFromEvent(e);
+  const targetOutputIndex = getTargetIndex(e, numOutputs);
 
-  if (targetRow >= numOutputs - 1)
+  if (targetOutputIndex >= numOutputs - 1)
     $(".output-label-table tbody")[0].appendChild(newOutputLabelRow);
   else
-    $(".output-label-table tbody")[0].insertBefore(newOutputLabelRow, $(".output-label-row")[targetRow + 1]);
+    $(".output-label-table tbody")[0].insertBefore(newOutputLabelRow, $(".output-label-row")[targetOutputIndex + 1]);
 
   // Add a new input line to each value cell
-  const lSensValueCells = $(".baseline-value-cell, .sample-value-cell, .deviation-value-cell");
-  for (let i = 0; i < lSensValueCells.length; ++i) {
-
+  $(".baseline-value-cell, .sample-value-cell, .deviation-value-cell").each(function () {
     // Clone a new node from the proper template
-    const sensValueCell = lSensValueCells[i];
     let templateLine;
-    if (sensValueCell.classList.contains("sample-value-cell"))
+    if (this.classList.contains("sample-value-cell"))
       templateLine = TEMPLATE_SAMPLE_INPUT_LINE;
-    else if (sensValueCell.classList.contains("baseline-value-cell"))
+    else if (this.classList.contains("baseline-value-cell"))
       templateLine = TEMPLATE_BASELINE_INPUT_LINE;
     else
       templateLine = TEMPLATE_DEVIATION_INPUT_LINE;
 
     const newSensInputLine = templateLine.cloneNode(true);
 
-    if (targetRow >= numOutputs - 1)
-      sensValueCell.appendChild(newSensInputLine);
+    if (targetOutputIndex >= numOutputs - 1)
+      this.appendChild(newSensInputLine);
     else
-      sensValueCell.insertBefore(newSensInputLine, lSensValueCells[i].children[targetRow + 1]);
-  }
+      this.insertBefore(newSensInputLine, this.children[targetOutputIndex + 1]);
+  })
 
   postTableUpdateCleanup("output", updateAfter);
 }
@@ -402,20 +388,15 @@ function removeOutput(e, updateAfter = true) {
   }
 
   // Determine which row to remove based on which button was clicked
-  let targetRow;
-  if (e === null)
-    targetRow = numOutputs - 1;
-  else
-    targetRow = getIndexFromEvent(e);
+  const targetOutputIndex = getTargetIndex(e, numOutputs);
 
   // Remove the row from the output label table
-  $(".output-label-table tbody")[0].removeChild($(".output-label-row")[targetRow]);
+  $(".output-label-table tbody")[0].removeChild($(".output-label-row")[targetOutputIndex]);
 
   // Remove the input line from each cell in the sens table
-  const lSensValueCells = $(".baseline-value-cell, .sample-value-cell, .deviation-value-cell");;
-  for (let i = 0; i < lSensValueCells.length; ++i) {
-    lSensValueCells[i].removeChild(lSensValueCells[i].children[targetRow]);
-  }
+  $(".baseline-value-cell, .sample-value-cell, .deviation-value-cell").each(function () {
+    this.removeChild(this.children[targetOutputIndex]);
+  });
 
   postTableUpdateCleanup("output", updateAfter);
 }
