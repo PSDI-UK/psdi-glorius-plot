@@ -55,6 +55,14 @@ const TEMPLATE_BASELINE_INPUT_LINE = $(".baseline-input-line")[0].cloneNode(true
 const TEMPLATE_SAMPLE_INPUT_LINE = $(".sample-input-line")[0].cloneNode(true);
 const TEMPLATE_DEVIATION_INPUT_LINE = $(".deviation-input-line")[0].cloneNode(true);
 
+/**
+ * Get the index value stored at the end of an event's target's ID
+ */
+function getIndexFromEvent(e) {
+  let eId = e.target.id;
+  return +(eId.split("-").at(-1));
+}
+
 function disableButton(button) {
   button.prop({ disabled: true });
 }
@@ -130,16 +138,22 @@ function relabelDim(dim) {
     relabelOutputLabelRows();
 }
 
-/**
- * Get the index value stored at the end of an event's target's ID
- */
-function getIndexFromEvent(e) {
-  let eId = e.target.id;
-  return +(eId.split("-").at(-1));
-}
-
 function updateDimSelector(dim) {
   $("select#num-" + dim).val(getDimSize(dim)).change();
+}
+
+function updateButtonStatus(dim) {
+  const num = getDimSize(dim);
+
+  if (num >= DIM_LIMITS[dim].max)
+    disableButton($("button.add-" + dim));
+  else
+    enableButton($("button.add-" + dim));
+
+  if (num <= DIM_LIMITS[dim].min)
+    disableButton($("button.remove-" + dim));
+  else
+    enableButton($("button.remove-" + dim));
 }
 
 function postTableUpdateCleanup(dim, updateAfter) {
@@ -151,6 +165,7 @@ function postTableUpdateCleanup(dim, updateAfter) {
 
   // Update affected properties if desired at this point
   if (updateAfter) {
+    updateButtonStatus(dim);
     updateDimSelector(dim);
     initNumDimControls(dim);
     relabelDim(dim);
@@ -160,7 +175,6 @@ function postTableUpdateCleanup(dim, updateAfter) {
   if (updateAfter && autoUpdating) {
     generatePlot();
   }
-
 }
 
 /**
@@ -208,17 +222,6 @@ function addConditionRow(e, updateAfter = true) {
   else
     $(".sensitivity-table tbody")[0].insertBefore(newRow, $(".condition-row")[targetRow + 1]);
 
-
-  // Check if we've reached the maximum number of rows, and disable the button to add rows if so
-  if (numConditions + 1 >= DIM_LIMITS.condition.max) {
-    disableButton($("button.add-condition"));
-  }
-
-  // Check if we've passed the minimum number of rows, and enable the button to remove rows if so
-  if (numConditions + 1 > DIM_LIMITS.condition.min) {
-    enableButton($("button.remove-condition"));
-  }
-
   postTableUpdateCleanup("condition", updateAfter);
 }
 
@@ -240,16 +243,6 @@ function removeConditionRow(e, updateAfter = true) {
 
   // Remove the row from the table
   $(".sensitivity-table tbody")[0].removeChild($(".condition-row")[targetRow]);
-
-  // Check if we've reached the minimum number of rows, and disable the buttons to remove rows if so
-  if (numConditions - 1 <= DIM_LIMITS.condition.min) {
-    disableButton($(".remove-condition"));
-  }
-
-  // Check if we've gotten under the minimum number of rows, and enable the buttons to add rows if so
-  if (numConditions - 1 < DIM_LIMITS.condition.max) {
-    enableButton($(".add-condition"));
-  }
 
   postTableUpdateCleanup("condition", updateAfter);
 }
@@ -328,16 +321,6 @@ function addSampleCol(e, updateAfter = true) {
       conditionRow.insertBefore(newValueCell, lValueCells[targetCol + 1]);
   }
 
-  // Check if we've reached the maximum number of samples, and disable the button to add samples if so
-  if (numSamples + 1 >= DIM_LIMITS.sample.max) {
-    disableButton($(".add-sample"));
-  }
-
-  // Check if we've passed the minimum number of samples, and enable the button to remove samples if so
-  if (numSamples + 1 > DIM_LIMITS.sample.min) {
-    enableButton($(".remove-sample"));
-  }
-
   postTableUpdateCleanup("sample", updateAfter);
 }
 
@@ -368,16 +351,6 @@ function removeSampleCol(e, updateAfter = true) {
   for (let i = 0; i < numConditions; i++) {
     const conditionRow = $(".condition-row")[i];
     conditionRow.removeChild($(conditionRow).find(".sample-value-cell")[targetCol]);
-  }
-
-  // Check if we've reached the minimum number of rows, and disable the buttons to remove rows if so
-  if (numSamples - 1 <= DIM_LIMITS.sample.min) {
-    disableButton($(".remove-sample"));
-  }
-
-  // Check if we've gotten under the minimum number of rows, and enable the buttons to add rows if so
-  if (numSamples - 1 < DIM_LIMITS.sample.max) {
-    enableButton($(".add-sample"));
   }
 
   postTableUpdateCleanup("sample", updateAfter);
@@ -457,16 +430,6 @@ function addOutput(e, updateAfter = true) {
       sensValueCell.insertBefore(newSensInputLine, lSensValueCells[i].children[targetRow + 1]);
   }
 
-  // Check if we've reached the maximum number of outputs, and disable the button to add outputs if so
-  if (numOutputs + 1 >= DIM_LIMITS.output.max) {
-    disableButton($("button.add-output"));
-  }
-
-  // Check if we've passed the minimum number of outputs, and enable the button to remove outputs if so
-  if (numOutputs + 1 > DIM_LIMITS.output.min) {
-    enableButton($("button.remove-output"));
-  }
-
   postTableUpdateCleanup("output", updateAfter);
 }
 
@@ -493,11 +456,6 @@ function removeOutput(e, updateAfter = true) {
   const lSensValueCells = $(".baseline-value-cell, .sample-value-cell, .deviation-value-cell");;
   for (let i = 0; i < lSensValueCells.length; ++i) {
     lSensValueCells[i].removeChild(lSensValueCells[i].children[targetRow]);
-  }
-
-  // Check if we've reached the minimum number of outputs, and disable the button to remove outputs if so
-  if (numOutputs - 1 <= DIM_LIMITS.output.min) {
-    disableButton($("button.remove-output"));
   }
 
   postTableUpdateCleanup("output", updateAfter);
