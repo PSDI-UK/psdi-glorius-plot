@@ -83,6 +83,37 @@ function getIndexFromEvent(e) {
   return +(eId.split("-").at(-1));
 }
 
+function postTableUpdateCleanup(type, updateAfter) {
+
+  // Enable auto updates for new cells if it's turned on
+  if (autoUpdating) {
+    enableAutoUpdates();
+  }
+
+  // Update affected properties if desired at this point
+  if (updateAfter) {
+    if (type == "condition") {
+      updateConditionSelector();
+      relableConditionRows();
+      initNumConditionControls();
+    } else if (type == "sample") {
+      updateSampleSelector();
+      relableSampleCols();
+      initNumSampleControls();
+    } else {
+      updateOutputSelector();
+      relableOutputLabelRows();
+      initNumOutputControls();
+    }
+  }
+
+  // Update the plot if desired
+  if (updateAfter && autoUpdating) {
+    generatePlot();
+  }
+
+}
+
 /**
  * Relabel all the condition rows after one is added or removed, fixing their behind-the-scenes values of which index
  * they're at
@@ -140,22 +171,7 @@ function addConditionRow(e, updateAfter = true) {
     enableButton($("button.remove-condition"));
   }
 
-  // Enable auto updates for new cells if it's turned on
-  if (autoUpdating) {
-    enableAutoUpdates();
-  }
-
-  // Update affected properties if desired at this point
-  if (updateAfter) {
-    updateConditionSelector();
-    relableConditionRows();
-    initNumConditionControls();
-  }
-
-  // Update the plot if desired
-  if (updateAfter && autoUpdating) {
-    generatePlot();
-  }
+  postTableUpdateCleanup("condition", updateAfter);
 }
 
 function removeConditionRow(e, updateAfter = true) {
@@ -188,17 +204,7 @@ function removeConditionRow(e, updateAfter = true) {
     enableButton($(".add-condition"));
   }
 
-  // Update affected properties if desired at this point
-  if (updateAfter) {
-    updateConditionSelector();
-    relableConditionRows();
-    initNumConditionControls();
-  }
-
-  // Update the plot if desired
-  if (updateAfter && autoUpdating) {
-    generatePlot();
-  }
+  postTableUpdateCleanup("condition", updateAfter);
 }
 
 function setNumConditions(targetNumConditions) {
@@ -215,13 +221,7 @@ function setNumConditions(targetNumConditions) {
     return;
   }
 
-  relableConditionRows();
-  initNumConditionControls();
-
-  // Update the plot if desired
-  if (autoUpdating) {
-    generatePlot();
-  }
+  postTableUpdateCleanup("condition", true);
 }
 
 /**
@@ -309,22 +309,7 @@ function addSampleCol(e, updateAfter = true) {
     enableButton($(".remove-sample"));
   }
 
-  // Enable auto updates for new cells if it's turned on
-  if (autoUpdating) {
-    enableAutoUpdates();
-  }
-
-  // Update affected properties if desired at this point
-  if (updateAfter) {
-    updateSampleSelector();
-    relableSampleCols();
-    initNumSampleControls();
-  }
-
-  // Update the plot if desired
-  if (updateAfter && autoUpdating) {
-    generatePlot();
-  }
+  postTableUpdateCleanup("sample", updateAfter);
 }
 
 function removeSampleCol(e, updateAfter = true) {
@@ -367,17 +352,7 @@ function removeSampleCol(e, updateAfter = true) {
     enableButton($(".add-sample"));
   }
 
-  // Update affected properties if desired at this point
-  if (updateAfter) {
-    updateSampleSelector();
-    relableSampleCols();
-    initNumSampleControls();
-  }
-
-  // Update the plot if desired
-  if (updateAfter && autoUpdating) {
-    generatePlot();
-  }
+  postTableUpdateCleanup("sample", updateAfter);
 }
 
 function setNumSamples(targetNumSamples) {
@@ -394,13 +369,7 @@ function setNumSamples(targetNumSamples) {
     return;
   }
 
-  relableSampleCols();
-  initNumSampleControls();
-
-  // Update the plot if desired
-  if (autoUpdating) {
-    generatePlot();
-  }
+  postTableUpdateCleanup("sample", true);
 }
 
 /**
@@ -489,22 +458,7 @@ function addOutput(e, updateAfter = true) {
     enableButton($("button.remove-output"));
   }
 
-  // Enable auto updates for new cells if it's turned on
-  if (autoUpdating) {
-    enableAutoUpdates();
-  }
-
-  // Update affected properties if desired at this point
-  if (updateAfter) {
-    updateOutputSelector();
-    relableOutputLabelRows();
-    initNumOutputControls();
-  }
-
-  // Update the plot if desired
-  if (updateAfter && autoUpdating) {
-    generatePlot();
-  }
+  postTableUpdateCleanup("output", updateAfter);
 }
 
 function removeOutput(e, updateAfter = true) {
@@ -538,21 +492,7 @@ function removeOutput(e, updateAfter = true) {
     disableButton($("button.remove-output"));
   }
 
-  // Check if we've gone under the minimum number of outputs, and enable the button to add outputs if so
-  if (numOutputs - 1 < MAX_OUTPUTS) {
-    enableButton($("button.add-output"));
-  }
-
-  // Update affected properties if desired at this point
-  if (updateAfter) {
-    updateOutputSelector();
-    relableOutputLabelRows();
-  }
-
-  // Update the plot if desired
-  if (updateAfter && autoUpdating) {
-    generatePlot();
-  }
+  postTableUpdateCleanup("output", updateAfter);
 }
 
 function setNumOutputs(targetNumOutputs) {
@@ -569,13 +509,7 @@ function setNumOutputs(targetNumOutputs) {
     return;
   }
 
-  relableOutputLabelRows();
-  initNumOutputControls();
-
-  // Update the plot if desired
-  if (autoUpdating) {
-    generatePlot();
-  }
+  postTableUpdateCleanup("output", true);
 }
 
 // Functions to get various options set by the user
