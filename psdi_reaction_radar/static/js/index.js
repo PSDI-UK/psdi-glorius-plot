@@ -89,7 +89,7 @@ function getNumOutputs() {
 }
 
 function getNumSamples() {
-  return $(".value-heading").length;
+  return $(".sample-heading").length;
 }
 
 function addDim(dim, e, updateAfter) {
@@ -127,15 +127,6 @@ function setNumDim(dim, num) {
   }
 
   postTableUpdateCleanup(dim, true);
-}
-
-function relabelDim(dim) {
-  if (dim == CONDITION)
-    relabelConditionRows();
-  else if (dim == SAMPLE)
-    relabelSampleCols();
-  else
-    relabelOutputLabelRows();
 }
 
 function updateDimSelector(dim) {
@@ -178,22 +169,45 @@ function postTableUpdateCleanup(dim, updateAfter) {
 }
 
 /**
- * Relabel all the condition rows after one is added or removed, fixing their behind-the-scenes values of which index
- * they're at
+ * Relabel IDs and labels after a dimension is added to the table
  */
-function relabelConditionRows() {
+function relabelDim(dim) {
 
-  const numRows = getNumConditions();
-  const lRows = $(".condition-row");
+  const d = dim[0];
+  const num = getDimSize(dim);
+  const lButtonCells = $(`.${dim}-button-cell`);
+  const lHeadings = $(`.${dim}-heading`);
+  const lLabels = $(`.${dim}-label`);
+  const lInputs = $(`.${dim}-input`);
 
-  for (let j = 0; j < numRows; j++) {
-    const row = $(lRows[j]);
-    const rowNumberString = j.toString();
+  for (let i = 0; i < num; i++) {
+    const sI = i.toString();
+    const sI1 = (i + 1).toString();
 
     // Fix the IDs of the buttons
-    row.find(".remove-condition").attr("id", "remove-rb-" + rowNumberString);
-    row.find(".add-condition").attr("id", "add-rb-" + rowNumberString);
+    const buttonCell = lButtonCells.eq(i);
+    buttonCell.find(".remove-" + dim).attr("id", `remove-${d}b-${sI}`);
+    buttonCell.find(".add-" + dim).attr("id", `add-${d}b-${sI}`);
+
+    // Set the heading text if we have any heading cells
+    if (lHeadings.length > 0) {
+      let headingText;
+      if (num == 1)
+        headingText = "Value";
+      else
+        headingText = "Sample " + sI1;
+      lHeadings.eq(i).text(headingText);
+    }
+
+    // Set the label and input text if we have any of those cells
+    if (lLabels.length > 0 && lInputs.length > 0) {
+      const label = lLabels.eq(i);
+      label.text(OUTPUT_LABEL_TEXT.replace("{N}", sI1));
+      label.attr("for", `${d}l-${sI}`);
+      lInputs.eq(i).attr("id", `${d}l-${sI}`);
+    }
   }
+
 }
 
 function addConditionRow(e, updateAfter = true) {
@@ -247,34 +261,6 @@ function removeConditionRow(e, updateAfter = true) {
   postTableUpdateCleanup("condition", updateAfter);
 }
 
-/**
- * Relabel all the sample columns after one is added or removed, fixing their behind-the-scenes values of which index
- * they're at, and the displayed sample number
- */
-function relabelSampleCols() {
-
-  const numSamples = getNumSamples();
-  const lSampleButtonCells = $(".sample-button-cell");
-  const lSampleHeadings = $(".value-heading");
-
-  for (let k = 0; k < numSamples; k++) {
-
-    // Set the heading text
-    let headingText;
-    if (numSamples == 1)
-      headingText = "Value";
-    else
-      headingText = "Sample " + (k + 1).toString();
-    lSampleHeadings.eq(k).text(headingText);
-
-    // Fix the IDs of the buttons
-    const buttonCell = lSampleButtonCells.eq(k);
-    const sampleNumberString = k.toString();
-    buttonCell.find(".remove-sample").attr("id", "remove-sb-" + sampleNumberString);
-    buttonCell.find(".add-sample").attr("id", "add-sb-" + sampleNumberString);
-  }
-}
-
 function addSampleCol(e, updateAfter = true) {
 
   // Check that we don't already have too many samples
@@ -293,7 +279,7 @@ function addSampleCol(e, updateAfter = true) {
 
   // Construct and insert a new button cell, heading cell, and baseline value cell
   const newButtonCell = $(".sample-button-cell")[0].cloneNode(true);
-  const newHeadingCell = $(".value-heading")[0].cloneNode(true);
+  const newHeadingCell = $(".sample-heading")[0].cloneNode(true);
   const newBaselineValueCell = $(".baseline-value-cell")[0].cloneNode(true);
   $(newBaselineValueCell).find(".baseline-value").val("");
 
@@ -303,7 +289,7 @@ function addSampleCol(e, updateAfter = true) {
     $(".baseline-row")[0].insertBefore(newBaselineValueCell, $(".baseline-deviation-cell")[0]);
   } else {
     $(".sensitivity-buttons")[0].insertBefore(newButtonCell, $(".sample-button-cell")[targetCol + 1]);
-    $(".sensitivity-header")[0].insertBefore(newHeadingCell, $(".value-heading")[targetCol + 1]);
+    $(".sensitivity-header")[0].insertBefore(newHeadingCell, $(".sample-heading")[targetCol + 1]);
     $(".baseline-row")[0].insertBefore(newBaselineValueCell, $(".baseline-value-cell")[targetCol + 1]);
   }
 
@@ -343,7 +329,7 @@ function removeSampleCol(e, updateAfter = true) {
   // Remove the appropriate button cell, heading cell, and baseline cell
 
   $(".sensitivity-buttons")[0].removeChild($(".sample-button-cell")[targetCol]);
-  $(".sensitivity-header")[0].removeChild($(".value-heading")[targetCol]);
+  $(".sensitivity-header")[0].removeChild($(".sample-heading")[targetCol]);
   $(".baseline-row")[0].removeChild($(".baseline-value-cell")[targetCol]);
 
   // For each row of the table, remove the appropriate value cell
@@ -354,33 +340,6 @@ function removeSampleCol(e, updateAfter = true) {
   }
 
   postTableUpdateCleanup("sample", updateAfter);
-}
-
-/**
- * Relabel all the output rows after one is added or removed, fixing their behind-the-scenes values of which index
- * they're at
- */
-function relabelOutputLabelRows() {
-
-  const numOutputs = getNumOutputs();
-  const lOutputLabelRows = $(".output-label-row");
-
-  for (let j = 0; j < numOutputs; j++) {
-    const outputLabelRow = $(lOutputLabelRows[j]);
-    const rowNumberString = j.toString();
-
-    // Fix the IDs of the add/remove buttons
-    outputLabelRow.find(".remove-output").attr("id", "remove-ob-" + rowNumberString);
-    outputLabelRow.find(".add-output").attr("id", "add-ob-" + rowNumberString);
-
-    // Fix the text and "for" attribute of the label
-    const outputLabelLabel = outputLabelRow.find(".output-label-label");
-    outputLabelLabel.text(OUTPUT_LABEL_TEXT.replace("{N}", (j + 1).toString()));
-    outputLabelLabel.attr("for", "ol-" + rowNumberString);
-
-    // Fix the ID of the input
-    outputLabelRow.find(".output-label-input").attr("id", "ol-" + rowNumberString);
-  }
 }
 
 function addOutput(e, updateAfter = true) {
@@ -394,7 +353,7 @@ function addOutput(e, updateAfter = true) {
 
   // Set up the new output label row
   const newOutputLabelRow = TEMPLATE_OUTPUT_LABEL_ROW.cloneNode(true);
-  $(newOutputLabelRow).find(".output-label-input").val("");
+  $(newOutputLabelRow).find(".output-input").val("");
 
   // Determine where to add the row based on which button was clicked
   let targetRow;
@@ -721,7 +680,7 @@ function generatePlot() {
   }
 
   // Get the output labels, and also set other fixed data for normal datasets
-  const lOutputLabelInputs = $("input.output-label-input");
+  const lOutputLabelInputs = $("input.output-input");
   for (let j = 0; j < numOutputs; ++j) {
     lOutputLabels.push(lOutputLabelInputs[j].value);
     lOrder.push(0);
@@ -854,7 +813,7 @@ function fillRandom() {
   const numOutputs = getNumOutputs();
 
   // Fill the column labels
-  const lOutputLabelInputs = $(".output-label-input");
+  const lOutputLabelInputs = $(".output-input");
   for (let j = 0; j < lOutputLabelInputs.length; ++j) {
     let value = "Yield"
     if (numOutputs > 1) {
