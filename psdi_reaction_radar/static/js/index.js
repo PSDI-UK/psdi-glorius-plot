@@ -705,7 +705,6 @@ function generatePlot() {
   for (let i = 0; i < numConditions; ++i) {
     let lSingleConditionData = [];
     const lCells = lSensRows.eq(i).find(".deviation-value-cell");
-    // TODO: Add loop over cells here
     const lInputs = lCells.eq(0).find("input.deviation-value");
     for (let j = 0; j < numOutputs; ++j) {
       lSingleConditionData.push(lInputs[j].value);
