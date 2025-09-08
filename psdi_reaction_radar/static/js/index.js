@@ -730,7 +730,7 @@ function generatePlot() {
 
   const tipSize = 3;
   const baseSeparation = 3;
-  const barSize = (2 * tipSize + 1 + 2 * baseSeparation + 1);
+  const barSize = 2 * (tipSize + baseSeparation + 1);
   const numAnglePoints = numConditions * barSize;
 
   let lOutputConditionLabels = lConditionLabels;
@@ -750,23 +750,24 @@ function generatePlot() {
       for (let j = 0; j < numOutputs; ++j) {
 
         const lData = llData[numBgColors + numAxisLines + i + j * numConditions];
-        const tipCenter = barSize * i;
+        const tipCenter = barSize * (i + 0.5 * j / numOutputs);
 
         for (let l = 0; l < numAnglePoints; ++l) {
-          if (l == tipCenter)
+          if (j == 0 && l == tipCenter)
             lOutputConditionLabels[l] = conditionData.label;
 
+          // Calculate how far the point in from the tip center, taking into account that it's a circular array
           let tipDistance = Math.abs(l - tipCenter);
           if (tipDistance > numAnglePoints / 2)
             tipDistance = numAnglePoints - tipDistance;
 
-
-          if (tipDistance < tipSize)
-            lData.push(null);
-          else if (tipDistance == tipSize)
+          // Set the point value based on the distance from the tip center
+          if (tipDistance <= tipSize)
             lData.push(conditionData.data[j]);
-          else
+          else if (tipDistance <= tipSize + baseSeparation + 1)
             lData.push(0);
+          else
+            lData.push(null);
         }
       }
     } else {
@@ -781,7 +782,10 @@ function generatePlot() {
   const lOutputLabelInputs = $("input.output-input");
   for (let j = 0; j < numOutputs; ++j) {
     for (let i = 0; i < numDatasetMultiplier; ++i) {
-      lOutputLabels.push(lOutputLabelInputs[j].value);
+      if (i == 0)
+        lOutputLabels.push(lOutputLabelInputs[j].value);
+      else
+        lOutputLabels.push("")
       lOrder.push(0);
       lBorderColors.push("black");
       lBorderWidths.push(BORDER_WIDTH);
@@ -789,7 +793,7 @@ function generatePlot() {
 
       if (fanMode) {
         let color;
-        let val = Math.min(Math.max(llData[j][i], minOutput), maxOutput);
+        let val = Math.min(Math.max(lConditionData[i].data[j], minOutput), maxOutput);
         if (val >= 0) {
           let colorRatio = val / maxOutput;
           color = mix_hexes(maxColor, "#FFFFFF", colorRatio);
@@ -819,8 +823,7 @@ function generatePlot() {
       backgroundColor: lBackgroundColors[j],
       borderDash: lBorderDashes[j],
       pointRadius: 0,
-      fill: lFill[j],
-      spanGaps: true
+      fill: lFill[j]
     })
   }
 
