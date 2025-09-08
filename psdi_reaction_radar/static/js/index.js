@@ -560,6 +560,9 @@ function generatePlot() {
   const showGridLines = getShowGridLines();
   const showAxisLines = getShowAxisLines();
 
+  const minColor = getMinColor();
+  const maxColor = getMaxColor();
+
   // Create data we'll plot in the chart
   const lOutputLabels = [];
   const llData = [];
@@ -570,13 +573,26 @@ function generatePlot() {
   const lFill = [];
   const lBorderDashes = [];
 
+  let numAxisLines;
+
+  let numBgColorsLow;
+  let numBgColorsHi;
+  let numBgColors;
+
+  let numDatasetMultiplier;
+
+
   // If in radar mode, we make some fake data to use as background colors and grid lines
 
-  let numAxisLines = 0;
+  if (fanMode) {
+    numAxisLines = 0;
 
-  let numBgColorsLow = 0;
-  let numBgColorsHi = 0;
-  let numBgColors = 0;
+    numBgColorsLow = 0;
+    numBgColorsHi = 0;
+    numBgColors = 0;
+
+    numDatasetMultiplier = numConditions;
+  }
 
   if (!fanMode) {
 
@@ -588,6 +604,8 @@ function generatePlot() {
     numBgColorsLow = numLowBands;
     numBgColorsHi = numHiBands + 1;
     numBgColors = numBgColorsLow + numBgColorsHi;
+
+    numDatasetMultiplier = 1;
 
     const lBgColorBoundsLow = [];
     const lBgOrderLow = [];
@@ -613,7 +631,7 @@ function generatePlot() {
       lOrder.push(lBgOrderHi[k]);
 
       let colorRatio = k / (numBgColorsHi - 1);
-      let backgroundColor = mix_hexes(getMaxColor(), "#FFFFFF", colorRatio);
+      let backgroundColor = mix_hexes(maxColor, "#FFFFFF", colorRatio);
       lBackgroundColors.push(backgroundColor);
 
       if (showGridLines) {
@@ -638,7 +656,7 @@ function generatePlot() {
       lOrder.push(lBgOrderLow[k]);
 
       let colorRatio = k / (numBgColorsLow - 1);
-      let backgroundColor = mix_hexes(getMinColor(), "#FFFFFF", colorRatio);
+      let backgroundColor = mix_hexes(minColor, "#FFFFFF", colorRatio);
       lBackgroundColors.push(backgroundColor);
 
       if (showGridLines) {
@@ -676,18 +694,6 @@ function generatePlot() {
     }
   }
 
-  // Get the output labels, and also set other fixed data for normal datasets
-  const lOutputLabelInputs = $("input.output-input");
-  for (let j = 0; j < numOutputs; ++j) {
-    lOutputLabels.push(lOutputLabelInputs[j].value);
-    lOrder.push(0);
-    lBorderColors.push("black");
-    lBorderWidths.push(BORDER_WIDTH);
-    lBackgroundColors.push(DATA_BG_COLOR);
-    lFill.push(false);
-    lBorderDashes.push(L_BORDER_DASHES[j]);
-  }
-
   // Get the condition labels
   const lConditionLabels = [];
   const lConditionLabelCells = $(".condition-label");
@@ -696,7 +702,7 @@ function generatePlot() {
   }
 
   // Get data for each output
-  for (let j = 0; j < numOutputs; ++j) {
+  for (let j = 0; j < numOutputs * numDatasetMultiplier; ++j) {
     llData.push([]);
   }
 
@@ -721,17 +727,78 @@ function generatePlot() {
     return (a.data[0] - b.data[0]) * sort_mode;
   });
 
+  const tipSize = 0;
+  const baseSeparation = 0;
+  let lOutputConditionLabels = lConditionLabels;
+  if (fanMode)
+    lOutputConditionLabels = [];
+
   // Add the sorted data to the main data array, and update the row labels
   for (let i = 0; i < numConditions; ++i) {
-    lConditionLabels[i] = lConditionData[i].label;
-    for (let j = 0; j < numOutputs; ++j) {
-      llData[numBgColors + numAxisLines + j].push(lConditionData[i].data[j]);
+    let conditionData = lConditionData[i];
+    // TODO: Fix logic here so tip is aligned with the condition label
+    if (fanMode) {
+      for (let j = 0; j < numOutputs; ++j) {
+        const dataIndex = numBgColors + numAxisLines + i + j * numConditions;
+        for (let l = 0; l < tipSize + 1; ++l) {
+          llData[dataIndex].push(conditionData.data[j]);
+          if (j == 0 && l == 0)
+            lOutputConditionLabels.push(conditionData.label);
+          else
+            lOutputConditionLabels.push("");
+        }
+        for (let m = 0; m < baseSeparation + 1; ++m) {
+          llData[dataIndex].push(0);
+          lOutputConditionLabels.push("");
+        }
+        for (let ii = 0; ii < numConditions; ++ii) {
+          for (let lm = 0; lm < tipSize + baseSeparation + 2; ++lm) {
+            llData[dataIndex].push(0);
+            lOutputConditionLabels.push("");
+          }
+        }
+      }
+    } else {
+      lOutputConditionLabels[i] = conditionData.label;
+      for (let j = 0; j < numOutputs; ++j) {
+        llData[numBgColors + numAxisLines + j].push(conditionData.data[j]);
+      }
+    }
+  }
+
+  // Get the output labels, and also set other fixed data for normal datasets
+  const lOutputLabelInputs = $("input.output-input");
+  for (let j = 0; j < numOutputs; ++j) {
+    for (let i = 0; i < numDatasetMultiplier; ++i) {
+      lOutputLabels.push(lOutputLabelInputs[j].value);
+      lOrder.push(0);
+      lBorderColors.push("black");
+      lBorderWidths.push(BORDER_WIDTH);
+      lBorderDashes.push(L_BORDER_DASHES[j]);
+
+      if (fanMode) {
+        let color;
+        let val = Math.min(Math.max(llData[j][i], minOutput), maxOutput);
+        if (val >= 0) {
+          let colorRatio = val / maxOutput;
+          color = mix_hexes(maxColor, "#FFFFFF", colorRatio);
+        }
+        else {
+          let colorRatio = val / minOutput;
+          color = mix_hexes(minColor, "#FFFFFF", colorRatio);
+        }
+        lBackgroundColors.push(color);
+        lFill.push(true);
+      } else {
+        lBackgroundColors.push(DATA_BG_COLOR);
+        lFill.push(false);
+      }
     }
   }
 
   // Prepare the data as Datasets in the format expected by ChartJS
   const lDatasets = [];
-  for (let j = 0; j < numBgColors + numAxisLines + numOutputs; ++j) {
+  for (let j = 0; j < numBgColors + numAxisLines + numOutputs * numDatasetMultiplier; ++j) {
     lDatasets.push({
       label: lOutputLabels[j],
       data: llData[j],
@@ -769,7 +836,7 @@ function generatePlot() {
     radarChart = new Chart("glorius-plot", {
       type: "radar",
       data: {
-        labels: lConditionLabels,
+        labels: lOutputConditionLabels,
         datasets: lDatasets,
       },
       options: {
@@ -796,7 +863,7 @@ function generatePlot() {
     })
   } else {
     radarChart.data = {
-      labels: lConditionLabels,
+      labels: lOutputConditionLabels,
       datasets: lDatasets,
     }
     radarChart.options.scales.r = plotR;
