@@ -6,6 +6,9 @@
   --direct-mode-display: none;
   --direct-mode-row    : none;
   --direct-mode-cell   : none;
+
+  --radar-mode-display: inherit;
+  --fan-mode-display  : none;
 }
 
 [input-mode="direct"] {
@@ -15,6 +18,11 @@
   --direct-mode-display: block;
   --direct-mode-row    : table-row;
   --direct-mode-cell   : table-cell;
+}
+
+[chart-mode="fan"] {
+  --radar-mode-display: none;
+  --fan-mode-display  : block;
 }
 
 .calc-mode-only {
@@ -41,6 +49,14 @@ th.direct-mode-only {
 
 tr.direct-mode-only {
   display: var(--direct-mode-row) !important;
+}
+
+.radar-mode-only {
+  display: var(--radar-mode-display) !important;
+}
+
+.fan-mode-only {
+  display: var(--fan-mode-display) !important;
 }
 
 /* Customisation of input boxes */

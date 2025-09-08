@@ -993,6 +993,13 @@ function toggleInputMode(e) {
   }
 }
 
+function toggleChartMode(e) {
+  if ($(e.target).is(":checked"))
+    document.documentElement.setAttribute("chart-mode", "fan");
+  else
+    document.documentElement.setAttribute("chart-mode", "radar");
+}
+
 function initNumDimControls(dim) {
   $("button.add-" + dim).off("click");
   $("button.remove-" + dim).off("click");
@@ -1017,7 +1024,8 @@ $(document).ready(function () {
 
   initDirtyForms();
 
-  $("#input-mode-toggle").on("click", toggleInputMode)
+  $("#input-mode-toggle").on("click", toggleInputMode);
+  $("#fan-toggle").on("click", toggleChartMode);
 
   L_DIMS.forEach(dim => initNumDimControls(dim));
 
