@@ -429,6 +429,10 @@ function getMaxColor() {
   return $("#max-color-input").val();
 }
 
+function getFanMode() {
+  return $("#fan-toggle").is(":checked");
+}
+
 function getShowGridLines() {
   return $("#grid-line-toggle").is(":checked");
 }
