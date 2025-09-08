@@ -772,7 +772,9 @@ function generatePlot() {
           // Set the point value based on the distance from the tip center
           if (tipDistance <= tipSize)
             lData.push(conditionData.data[j]);
-          else if (tipDistance <= tipSize + baseSeparation + 1)
+          else if (tipDistance <= tipSize + 1)
+            lData.push(0);
+          else if (j == 0 && tipDistance <= tipSize + baseSeparation + 1)
             lData.push(0);
           else
             lData.push(null);
