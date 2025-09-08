@@ -555,26 +555,7 @@ function generatePlot() {
   const maxOutput = getMaxOutput();
   const bandWidth = getBandWidth();
 
-  const numLowBands = Math.ceil(-minOutput / bandWidth);
-  const numHiBands = Math.ceil(maxOutput / bandWidth);
-
-  const numBgColorsLow = numLowBands;
-  const numBgColorsHi = numHiBands + 1;
-  const numBgColors = numBgColorsLow + numBgColorsHi;
-
-  const lBgColorBoundsLow = [];
-  const lBgOrderLow = [];
-  for (let i = 0; i < numBgColorsLow; ++i) {
-    lBgColorBoundsLow.push(Math.max(-bandWidth * (i + 1), minOutput));
-    lBgOrderLow.push(i + 1);
-  }
-
-  const lBgColorBoundsHi = [];
-  const lBgOrderHi = [];
-  for (let i = 0; i < numBgColorsHi; ++i) {
-    lBgColorBoundsHi.push(Math.min(bandWidth * i, maxOutput));
-    lBgOrderHi.push(i + 1);
-  }
+  const fanMode = getFanMode();
 
   const showGridLines = getShowGridLines();
   const showAxisLines = getShowAxisLines();
@@ -589,78 +570,109 @@ function generatePlot() {
   const lFill = [];
   const lBorderDashes = [];
 
-  // Make fake data for each background color
+  // If in radar mode, we make some fake data to use as background colors and grid lines
 
-  for (let k = 0; k < numBgColorsHi; ++k) {
-    lOutputLabels.push("");
-    let lFakeData = [];
-    for (let i = 0; i < numConditions; ++i) {
-      lFakeData.push(lBgColorBoundsHi[k]);
-    }
-    llData.push(lFakeData);
-    lOrder.push(lBgOrderHi[k]);
-
-    let colorRatio = k / (numBgColorsHi - 1);
-    let backgroundColor = mix_hexes(getMaxColor(), "#FFFFFF", colorRatio);
-    lBackgroundColors.push(backgroundColor);
-
-    if (showGridLines) {
-      lBorderColors.push(GRID_COLOR);
-      lBorderWidths.push(GRID_WIDTH);
-    } else {
-      lBorderColors.push(backgroundColor);
-      lBorderWidths.push(0);
-    }
-
-    lFill.push(true);
-    lBorderDashes.push([]);
-  }
-
-  for (let k = 0; k < numBgColorsLow; ++k) {
-    lOutputLabels.push("");
-    let lFakeData = [];
-    for (let i = 0; i < numConditions; ++i) {
-      lFakeData.push(lBgColorBoundsLow[k]);
-    }
-    llData.push(lFakeData);
-    lOrder.push(lBgOrderLow[k]);
-
-    let colorRatio = k / (numBgColorsLow - 1);
-    let backgroundColor = mix_hexes(getMinColor(), "#FFFFFF", colorRatio);
-    lBackgroundColors.push(backgroundColor);
-
-    if (showGridLines) {
-      lBorderColors.push(GRID_COLOR);
-      lBorderWidths.push(GRID_WIDTH);
-    } else {
-      lBorderColors.push(backgroundColor);
-      lBorderWidths.push(0);
-    }
-
-    lFill.push(true);
-    lBorderDashes.push([]);
-  }
-
-  // Make fake data for each axis line we want to draw if desired
   let numAxisLines = 0;
-  if (showAxisLines) {
-    numAxisLines = numConditions;
-    for (let k = 0; k < numConditions; ++k) {
+
+  let numBgColorsLow = 0;
+  let numBgColorsHi = 0;
+  let numBgColors = 0;
+
+  if (!fanMode) {
+
+    // Make fake data for each background color
+
+    const numLowBands = Math.ceil(-minOutput / bandWidth);
+    const numHiBands = Math.ceil(maxOutput / bandWidth);
+
+    numBgColorsLow = numLowBands;
+    numBgColorsHi = numHiBands + 1;
+    numBgColors = numBgColorsLow + numBgColorsHi;
+
+    const lBgColorBoundsLow = [];
+    const lBgOrderLow = [];
+    for (let i = 0; i < numBgColorsLow; ++i) {
+      lBgColorBoundsLow.push(Math.max(-bandWidth * (i + 1), minOutput));
+      lBgOrderLow.push(i + 1);
+    }
+
+    const lBgColorBoundsHi = [];
+    const lBgOrderHi = [];
+    for (let i = 0; i < numBgColorsHi; ++i) {
+      lBgColorBoundsHi.push(Math.min(bandWidth * i, maxOutput));
+      lBgOrderHi.push(i + 1);
+    }
+
+    for (let k = 0; k < numBgColorsHi; ++k) {
       lOutputLabels.push("");
       let lFakeData = [];
       for (let i = 0; i < numConditions; ++i) {
-        if (i == k)
-          lFakeData.push(minOutput)
-        else
-          lFakeData.push(maxOutput)
+        lFakeData.push(lBgColorBoundsHi[k]);
       }
       llData.push(lFakeData);
-      lOrder.push(-1);
-      lBorderColors.push(GRID_COLOR);
-      lBorderWidths.push(GRID_WIDTH);
-      lBackgroundColors.push(DATA_BG_COLOR);
-      lFill.push(false);
+      lOrder.push(lBgOrderHi[k]);
+
+      let colorRatio = k / (numBgColorsHi - 1);
+      let backgroundColor = mix_hexes(getMaxColor(), "#FFFFFF", colorRatio);
+      lBackgroundColors.push(backgroundColor);
+
+      if (showGridLines) {
+        lBorderColors.push(GRID_COLOR);
+        lBorderWidths.push(GRID_WIDTH);
+      } else {
+        lBorderColors.push(backgroundColor);
+        lBorderWidths.push(0);
+      }
+
+      lFill.push(true);
       lBorderDashes.push([]);
+    }
+
+    for (let k = 0; k < numBgColorsLow; ++k) {
+      lOutputLabels.push("");
+      let lFakeData = [];
+      for (let i = 0; i < numConditions; ++i) {
+        lFakeData.push(lBgColorBoundsLow[k]);
+      }
+      llData.push(lFakeData);
+      lOrder.push(lBgOrderLow[k]);
+
+      let colorRatio = k / (numBgColorsLow - 1);
+      let backgroundColor = mix_hexes(getMinColor(), "#FFFFFF", colorRatio);
+      lBackgroundColors.push(backgroundColor);
+
+      if (showGridLines) {
+        lBorderColors.push(GRID_COLOR);
+        lBorderWidths.push(GRID_WIDTH);
+      } else {
+        lBorderColors.push(backgroundColor);
+        lBorderWidths.push(0);
+      }
+
+      lFill.push(true);
+      lBorderDashes.push([]);
+    }
+
+    // Make fake data for each axis line we want to draw if desired
+    if (showAxisLines) {
+      numAxisLines = numConditions;
+      for (let k = 0; k < numConditions; ++k) {
+        lOutputLabels.push("");
+        let lFakeData = [];
+        for (let i = 0; i < numConditions; ++i) {
+          if (i == k)
+            lFakeData.push(minOutput)
+          else
+            lFakeData.push(maxOutput)
+        }
+        llData.push(lFakeData);
+        lOrder.push(-1);
+        lBorderColors.push(GRID_COLOR);
+        lBorderWidths.push(GRID_WIDTH);
+        lBackgroundColors.push(DATA_BG_COLOR);
+        lFill.push(false);
+        lBorderDashes.push([]);
+      }
     }
   }
 
