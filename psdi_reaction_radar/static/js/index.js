@@ -748,17 +748,20 @@ function generatePlot() {
 
   // Prepare the plot scale options
   const plotR = {
+    grid: {
+      circular: fanMode
+    },
     min: minOutput,
     max: maxOutput,
-    reverse: true,
-    ticks: {
-      stepSize: bandWidth,
-      z: 2,
-    },
     pointLabels: {
       font: {
         size: 16
       }
+    },
+    reverse: true,
+    ticks: {
+      stepSize: bandWidth,
+      z: 2,
     }
   };
 
