@@ -727,35 +727,46 @@ function generatePlot() {
     return (a.data[0] - b.data[0]) * sort_mode;
   });
 
-  const tipSize = 0;
-  const baseSeparation = 0;
+
+  const tipSize = 3;
+  const baseSeparation = 3;
+  const barSize = (2 * tipSize + 1 + 2 * baseSeparation + 1);
+  const numAnglePoints = numConditions * barSize;
+
   let lOutputConditionLabels = lConditionLabels;
-  if (fanMode)
+  if (fanMode) {
     lOutputConditionLabels = [];
+    for (let l = 0; l < numAnglePoints; ++l)
+      lOutputConditionLabels.push("");
+  }
 
   // Add the sorted data to the main data array, and update the row labels
   for (let i = 0; i < numConditions; ++i) {
+
     let conditionData = lConditionData[i];
-    // TODO: Fix logic here so tip is aligned with the condition label
+
     if (fanMode) {
+
       for (let j = 0; j < numOutputs; ++j) {
-        const dataIndex = numBgColors + numAxisLines + i + j * numConditions;
-        for (let l = 0; l < tipSize + 1; ++l) {
-          llData[dataIndex].push(conditionData.data[j]);
-          if (j == 0 && l == 0)
-            lOutputConditionLabels.push(conditionData.label);
+
+        const lData = llData[numBgColors + numAxisLines + i + j * numConditions];
+        const tipCenter = barSize * i;
+
+        for (let l = 0; l < numAnglePoints; ++l) {
+          if (l == tipCenter)
+            lOutputConditionLabels[l] = conditionData.label;
+
+          let tipDistance = Math.abs(l - tipCenter);
+          if (tipDistance > numAnglePoints / 2)
+            tipDistance = numAnglePoints - tipDistance;
+
+
+          if (tipDistance < tipSize)
+            lData.push(null);
+          else if (tipDistance == tipSize)
+            lData.push(conditionData.data[j]);
           else
-            lOutputConditionLabels.push("");
-        }
-        for (let m = 0; m < baseSeparation + 1; ++m) {
-          llData[dataIndex].push(0);
-          lOutputConditionLabels.push("");
-        }
-        for (let ii = 0; ii < numConditions; ++ii) {
-          for (let lm = 0; lm < tipSize + baseSeparation + 2; ++lm) {
-            llData[dataIndex].push(0);
-            lOutputConditionLabels.push("");
-          }
+            lData.push(0);
         }
       }
     } else {
@@ -808,7 +819,8 @@ function generatePlot() {
       backgroundColor: lBackgroundColors[j],
       borderDash: lBorderDashes[j],
       pointRadius: 0,
-      fill: lFill[j]
+      fill: lFill[j],
+      spanGaps: true
     })
   }
 
