@@ -433,6 +433,14 @@ function getFanMode() {
   return $("#fan-toggle").is(":checked");
 }
 
+function getTipSize() {
+  return +$("#fan-tip-size").val();
+}
+
+function getBarSeparation() {
+  return +$("#fan-bar-separation").val();
+}
+
 function getShowGridLines() {
   return $("#grid-line-toggle").is(":checked");
 }
@@ -728,8 +736,8 @@ function generatePlot() {
   });
 
 
-  const tipSize = 3;
-  const baseSeparation = 3;
+  const tipSize = getTipSize();
+  const baseSeparation = getBarSeparation();
   const barSize = 2 * (tipSize + baseSeparation + 1);
   const numAnglePoints = numConditions * barSize;
 
