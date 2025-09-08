@@ -429,6 +429,18 @@ function getMaxColor() {
   return $("#max-color-input").val();
 }
 
+function getFanMode() {
+  return $("#fan-toggle").is(":checked");
+}
+
+function getTipSize() {
+  return +$("#fan-tip-size").val();
+}
+
+function getBarSeparation() {
+  return +$("#fan-bar-separation").val();
+}
+
 function getShowGridLines() {
   return $("#grid-line-toggle").is(":checked");
 }
@@ -551,29 +563,13 @@ function generatePlot() {
   const maxOutput = getMaxOutput();
   const bandWidth = getBandWidth();
 
-  const numLowBands = Math.ceil(-minOutput / bandWidth);
-  const numHiBands = Math.ceil(maxOutput / bandWidth);
-
-  const numBgColorsLow = numLowBands;
-  const numBgColorsHi = numHiBands + 1;
-  const numBgColors = numBgColorsLow + numBgColorsHi;
-
-  const lBgColorBoundsLow = [];
-  const lBgOrderLow = [];
-  for (let i = 0; i < numBgColorsLow; ++i) {
-    lBgColorBoundsLow.push(Math.max(-bandWidth * (i + 1), minOutput));
-    lBgOrderLow.push(i + 1);
-  }
-
-  const lBgColorBoundsHi = [];
-  const lBgOrderHi = [];
-  for (let i = 0; i < numBgColorsHi; ++i) {
-    lBgColorBoundsHi.push(Math.min(bandWidth * i, maxOutput));
-    lBgOrderHi.push(i + 1);
-  }
+  const fanMode = getFanMode();
 
   const showGridLines = getShowGridLines();
   const showAxisLines = getShowAxisLines();
+
+  const minColor = getMinColor();
+  const maxColor = getMaxColor();
 
   // Create data we'll plot in the chart
   const lOutputLabels = [];
@@ -585,91 +581,125 @@ function generatePlot() {
   const lFill = [];
   const lBorderDashes = [];
 
-  // Make fake data for each background color
+  let numAxisLines;
 
-  for (let k = 0; k < numBgColorsHi; ++k) {
-    lOutputLabels.push("");
-    let lFakeData = [];
-    for (let i = 0; i < numConditions; ++i) {
-      lFakeData.push(lBgColorBoundsHi[k]);
-    }
-    llData.push(lFakeData);
-    lOrder.push(lBgOrderHi[k]);
+  let numBgColorsLow;
+  let numBgColorsHi;
+  let numBgColors;
 
-    let colorRatio = k / (numBgColorsHi - 1);
-    let backgroundColor = mix_hexes(getMaxColor(), "#FFFFFF", colorRatio);
-    lBackgroundColors.push(backgroundColor);
+  let numDatasetMultiplier;
 
-    if (showGridLines) {
-      lBorderColors.push(GRID_COLOR);
-      lBorderWidths.push(GRID_WIDTH);
-    } else {
-      lBorderColors.push(backgroundColor);
-      lBorderWidths.push(0);
-    }
 
-    lFill.push(true);
-    lBorderDashes.push([]);
+  // If in radar mode, we make some fake data to use as background colors and grid lines
+
+  if (fanMode) {
+    numAxisLines = 0;
+
+    numBgColorsLow = 0;
+    numBgColorsHi = 0;
+    numBgColors = 0;
+
+    numDatasetMultiplier = numConditions;
   }
 
-  for (let k = 0; k < numBgColorsLow; ++k) {
-    lOutputLabels.push("");
-    let lFakeData = [];
-    for (let i = 0; i < numConditions; ++i) {
-      lFakeData.push(lBgColorBoundsLow[k]);
+  if (!fanMode) {
+
+    // Make fake data for each background color
+
+    const numLowBands = Math.ceil(-minOutput / bandWidth);
+    const numHiBands = Math.ceil(maxOutput / bandWidth);
+
+    numBgColorsLow = numLowBands;
+    numBgColorsHi = numHiBands + 1;
+    numBgColors = numBgColorsLow + numBgColorsHi;
+
+    numDatasetMultiplier = 1;
+
+    const lBgColorBoundsLow = [];
+    const lBgOrderLow = [];
+    for (let i = 0; i < numBgColorsLow; ++i) {
+      lBgColorBoundsLow.push(Math.max(-bandWidth * (i + 1), minOutput));
+      lBgOrderLow.push(i + 1);
     }
-    llData.push(lFakeData);
-    lOrder.push(lBgOrderLow[k]);
 
-    let colorRatio = k / (numBgColorsLow - 1);
-    let backgroundColor = mix_hexes(getMinColor(), "#FFFFFF", colorRatio);
-    lBackgroundColors.push(backgroundColor);
-
-    if (showGridLines) {
-      lBorderColors.push(GRID_COLOR);
-      lBorderWidths.push(GRID_WIDTH);
-    } else {
-      lBorderColors.push(backgroundColor);
-      lBorderWidths.push(0);
+    const lBgColorBoundsHi = [];
+    const lBgOrderHi = [];
+    for (let i = 0; i < numBgColorsHi; ++i) {
+      lBgColorBoundsHi.push(Math.min(bandWidth * i, maxOutput));
+      lBgOrderHi.push(i + 1);
     }
 
-    lFill.push(true);
-    lBorderDashes.push([]);
-  }
-
-  // Make fake data for each axis line we want to draw if desired
-  let numAxisLines = 0;
-  if (showAxisLines) {
-    numAxisLines = numConditions;
-    for (let k = 0; k < numConditions; ++k) {
+    for (let k = 0; k < numBgColorsHi; ++k) {
       lOutputLabels.push("");
       let lFakeData = [];
       for (let i = 0; i < numConditions; ++i) {
-        if (i == k)
-          lFakeData.push(minOutput)
-        else
-          lFakeData.push(maxOutput)
+        lFakeData.push(lBgColorBoundsHi[k]);
       }
       llData.push(lFakeData);
-      lOrder.push(-1);
-      lBorderColors.push(GRID_COLOR);
-      lBorderWidths.push(GRID_WIDTH);
-      lBackgroundColors.push(DATA_BG_COLOR);
-      lFill.push(false);
+      lOrder.push(lBgOrderHi[k]);
+
+      let colorRatio = k / (numBgColorsHi - 1);
+      let backgroundColor = mix_hexes(maxColor, "#FFFFFF", colorRatio);
+      lBackgroundColors.push(backgroundColor);
+
+      if (showGridLines) {
+        lBorderColors.push(GRID_COLOR);
+        lBorderWidths.push(GRID_WIDTH);
+      } else {
+        lBorderColors.push(backgroundColor);
+        lBorderWidths.push(0);
+      }
+
+      lFill.push(true);
       lBorderDashes.push([]);
     }
-  }
 
-  // Get the output labels, and also set other fixed data for normal datasets
-  const lOutputLabelInputs = $("input.output-input");
-  for (let j = 0; j < numOutputs; ++j) {
-    lOutputLabels.push(lOutputLabelInputs[j].value);
-    lOrder.push(0);
-    lBorderColors.push("black");
-    lBorderWidths.push(BORDER_WIDTH);
-    lBackgroundColors.push(DATA_BG_COLOR);
-    lFill.push(false);
-    lBorderDashes.push(L_BORDER_DASHES[j]);
+    for (let k = 0; k < numBgColorsLow; ++k) {
+      lOutputLabels.push("");
+      let lFakeData = [];
+      for (let i = 0; i < numConditions; ++i) {
+        lFakeData.push(lBgColorBoundsLow[k]);
+      }
+      llData.push(lFakeData);
+      lOrder.push(lBgOrderLow[k]);
+
+      let colorRatio = k / (numBgColorsLow - 1);
+      let backgroundColor = mix_hexes(minColor, "#FFFFFF", colorRatio);
+      lBackgroundColors.push(backgroundColor);
+
+      if (showGridLines) {
+        lBorderColors.push(GRID_COLOR);
+        lBorderWidths.push(GRID_WIDTH);
+      } else {
+        lBorderColors.push(backgroundColor);
+        lBorderWidths.push(0);
+      }
+
+      lFill.push(true);
+      lBorderDashes.push([]);
+    }
+
+    // Make fake data for each axis line we want to draw if desired
+    if (showAxisLines) {
+      numAxisLines = numConditions;
+      for (let k = 0; k < numConditions; ++k) {
+        lOutputLabels.push("");
+        let lFakeData = [];
+        for (let i = 0; i < numConditions; ++i) {
+          if (i == k)
+            lFakeData.push(minOutput)
+          else
+            lFakeData.push(maxOutput)
+        }
+        llData.push(lFakeData);
+        lOrder.push(-1);
+        lBorderColors.push(GRID_COLOR);
+        lBorderWidths.push(GRID_WIDTH);
+        lBackgroundColors.push(DATA_BG_COLOR);
+        lFill.push(false);
+        lBorderDashes.push([]);
+      }
+    }
   }
 
   // Get the condition labels
@@ -680,7 +710,7 @@ function generatePlot() {
   }
 
   // Get data for each output
-  for (let j = 0; j < numOutputs; ++j) {
+  for (let j = 0; j < numOutputs * numDatasetMultiplier; ++j) {
     llData.push([]);
   }
 
@@ -689,7 +719,6 @@ function generatePlot() {
   for (let i = 0; i < numConditions; ++i) {
     let lSingleConditionData = [];
     const lCells = lSensRows.eq(i).find(".deviation-value-cell");
-    // TODO: Add loop over cells here
     const lInputs = lCells.eq(0).find("input.deviation-value");
     for (let j = 0; j < numOutputs; ++j) {
       lSingleConditionData.push(lInputs[j].value);
@@ -706,17 +735,93 @@ function generatePlot() {
     return (a.data[0] - b.data[0]) * sort_mode;
   });
 
+
+  const tipSize = getTipSize();
+  const baseSeparation = getBarSeparation();
+  const barSize = 2 * (tipSize + baseSeparation + 1);
+  const numAnglePoints = numConditions * barSize;
+
+  let lOutputConditionLabels = lConditionLabels;
+  if (fanMode) {
+    lOutputConditionLabels = [];
+    for (let l = 0; l < numAnglePoints; ++l)
+      lOutputConditionLabels.push("");
+  }
+
   // Add the sorted data to the main data array, and update the row labels
   for (let i = 0; i < numConditions; ++i) {
-    lConditionLabels[i] = lConditionData[i].label;
-    for (let j = 0; j < numOutputs; ++j) {
-      llData[numBgColors + numAxisLines + j].push(lConditionData[i].data[j]);
+
+    let conditionData = lConditionData[i];
+
+    if (fanMode) {
+
+      for (let j = 0; j < numOutputs; ++j) {
+
+        const lData = llData[numBgColors + numAxisLines + i + j * numConditions];
+        const tipCenter = barSize * (i + 0.5 * j / numOutputs);
+
+        for (let l = 0; l < numAnglePoints; ++l) {
+          if (j == 0 && l == tipCenter)
+            lOutputConditionLabels[l] = conditionData.label;
+
+          // Calculate how far the point in from the tip center, taking into account that it's a circular array
+          let tipDistance = Math.abs(l - tipCenter);
+          if (tipDistance > numAnglePoints / 2)
+            tipDistance = numAnglePoints - tipDistance;
+
+          // Set the point value based on the distance from the tip center
+          if (tipDistance <= tipSize)
+            lData.push(conditionData.data[j]);
+          else if (tipDistance <= tipSize + baseSeparation + 1)
+            lData.push(0);
+          else
+            lData.push(null);
+        }
+      }
+    } else {
+      lOutputConditionLabels[i] = conditionData.label;
+      for (let j = 0; j < numOutputs; ++j) {
+        llData[numBgColors + numAxisLines + j].push(conditionData.data[j]);
+      }
+    }
+  }
+
+  // Get the output labels, and also set other fixed data for normal datasets
+  const lOutputLabelInputs = $("input.output-input");
+  for (let j = 0; j < numOutputs; ++j) {
+    for (let i = 0; i < numDatasetMultiplier; ++i) {
+      if (i == 0)
+        lOutputLabels.push(lOutputLabelInputs[j].value);
+      else
+        lOutputLabels.push("")
+      lOrder.push(0);
+      lBorderColors.push("black");
+      lBorderWidths.push(BORDER_WIDTH);
+      lBorderDashes.push(L_BORDER_DASHES[j]);
+
+      if (fanMode) {
+        let color;
+        let val = Math.min(Math.max(lConditionData[i].data[j], minOutput), maxOutput);
+        if (val >= 0) {
+          let colorRatio = val / maxOutput;
+          color = mix_hexes(maxColor, "#FFFFFF", colorRatio);
+        }
+        else {
+          let colorRatio = val / minOutput;
+          color = mix_hexes(minColor, "#FFFFFF", colorRatio);
+        }
+        lBackgroundColors.push(color);
+        lFill.push(true);
+      } else {
+        lBackgroundColors.push(DATA_BG_COLOR);
+        lFill.push(false);
+      }
     }
   }
 
   // Prepare the data as Datasets in the format expected by ChartJS
   const lDatasets = [];
-  for (let j = 0; j < numBgColors + numAxisLines + numOutputs; ++j) {
+  for (let j = 0; j < numBgColors + numAxisLines + numOutputs * numDatasetMultiplier; ++j) {
     lDatasets.push({
       label: lOutputLabels[j],
       data: llData[j],
@@ -732,17 +837,20 @@ function generatePlot() {
 
   // Prepare the plot scale options
   const plotR = {
+    grid: {
+      circular: fanMode
+    },
     min: minOutput,
     max: maxOutput,
-    reverse: true,
-    ticks: {
-      stepSize: bandWidth,
-      z: 2,
-    },
     pointLabels: {
       font: {
         size: 16
       }
+    },
+    reverse: true,
+    ticks: {
+      stepSize: bandWidth,
+      z: 2,
     }
   };
 
@@ -751,7 +859,7 @@ function generatePlot() {
     radarChart = new Chart("glorius-plot", {
       type: "radar",
       data: {
-        labels: lConditionLabels,
+        labels: lOutputConditionLabels,
         datasets: lDatasets,
       },
       options: {
@@ -778,7 +886,7 @@ function generatePlot() {
     })
   } else {
     radarChart.data = {
-      labels: lConditionLabels,
+      labels: lOutputConditionLabels,
       datasets: lDatasets,
     }
     radarChart.options.scales.r = plotR;
@@ -885,6 +993,13 @@ function toggleInputMode(e) {
   }
 }
 
+function toggleChartMode(e) {
+  if ($(e.target).is(":checked"))
+    document.documentElement.setAttribute("chart-mode", "fan");
+  else
+    document.documentElement.setAttribute("chart-mode", "radar");
+}
+
 function initNumDimControls(dim) {
   $("button.add-" + dim).off("click");
   $("button.remove-" + dim).off("click");
@@ -909,7 +1024,8 @@ $(document).ready(function () {
 
   initDirtyForms();
 
-  $("#input-mode-toggle").on("click", toggleInputMode)
+  $("#input-mode-toggle").on("click", toggleInputMode);
+  $("#fan-toggle").on("click", toggleChartMode);
 
   L_DIMS.forEach(dim => initNumDimControls(dim));
 
