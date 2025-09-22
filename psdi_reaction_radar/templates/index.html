@@ -10,11 +10,11 @@
 
 {% block inner_content %}
 <div id="table-options">
-  <p id="input-mode-label-and-toggle" class="hidden">
+  <p id="input-mode-control" class="hidden">
     <input type="checkbox" name="input-mode-toggle" id="input-mode-toggle">
     <label for="input-mode-toggle"> Directly input deviations</label>
   </p>
-  <p id="table-dim-controls">
+  <p id="num-condition-control">
     <label for="num-condition">Test conditions: </label>
     <select name="num-condition" id="num-condition">
       <option value="3">3</option>
@@ -28,6 +28,8 @@
       <option value="11">11</option>
       <option value="12">12</option>
     </select>
+  </p>
+  <p id="num-sample-control">
     <label for="num-sample" class="calc-mode-only"> Number of experiments conducted for each test condition: </label>
     <select name="num-sample" id="num-sample" class="calc-mode-only">
       <option value="1">1</option>
@@ -41,6 +43,8 @@
       <option value="9">9</option>
       <option value="10">10</option>
     </select>
+  </p>
+  <p id="num-output-control" class="hidden">
     <label for="num-output"> Reaction outcomes: </label>
     <select name="num-output" id="num-output">
       <option value="1">1</option>
@@ -53,7 +57,7 @@
 
   <table class="output-label-table">
     <tr class="output-label-row">
-      <td class="output-button-cell">
+      <td class="output-button-cell hidden">
         <button type="button" id="remove-ob-0" class="remove-output disabled fix-size-small" disabled="true">-</button>
         <button type="button" id="add-ob-0" class="add-output fix-size-small">+</button>
       </td>
