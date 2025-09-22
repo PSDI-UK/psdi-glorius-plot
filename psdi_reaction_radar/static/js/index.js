@@ -26,11 +26,13 @@ const DIM_LIMITS = {
   },
   output: {
     min: 1,
-    max: 5
+    max: 2
   }
 }
 
-const DEFAULT_VALUE_MEAN = 100;
+const DEFAULT_VALUE_MEAN = 66.6667;
+const VALUE_MIN = 0.;
+const VALUE_MAX = 100.;
 
 // Table values and placeholders
 const OUTPUT_LABEL_TEXT = "Output {N} Label:";
@@ -231,6 +233,7 @@ function addConditionRow(e, updateAfter = true) {
   // Construct a new row by copying the first and clearing its input
   const newRow = $(".condition-row")[0].cloneNode(true);
   $(newRow).find(".condition-label").val("");
+  $(newRow).find(".sample-value").val("");
   $(newRow).find(".deviation-value").val("0");
 
   // Determine where to add the row based on which button was clicked
@@ -663,7 +666,7 @@ function generatePlot() {
       llData.push(lFakeData);
       lOrder.push(lBgOrderLow[k]);
 
-      let colorRatio = k / (numBgColorsLow - 1);
+      let colorRatio = (k + 1) / numBgColorsLow;
       let backgroundColor = mix_hexes(minColor, "#FFFFFF", colorRatio);
       lBackgroundColors.push(backgroundColor);
 
@@ -926,12 +929,10 @@ function fillRandom() {
   }
 
   // Fill each data cell
-  const minOutput = getMinOutput();
-  const maxOutput = getMaxOutput();
   const lDataCells = $(".sample-value");
   for (let k = 0; k < lDataCells.length; ++k) {
     const e = lDataCells[k];
-    e.value = DEFAULT_VALUE_MEAN + minOutput + Math.random() * (maxOutput - minOutput);
+    e.value = VALUE_MIN + Math.random() * (VALUE_MAX - VALUE_MIN);
   }
 
   // Make sure the deviation is calculated, even in direct input mode (if not in this mode, it will be calculated when
