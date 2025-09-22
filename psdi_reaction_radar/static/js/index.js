@@ -26,7 +26,7 @@ const DIM_LIMITS = {
   },
   output: {
     min: 1,
-    max: 5
+    max: 2
   }
 }
 
