@@ -30,7 +30,9 @@ const DIM_LIMITS = {
   }
 }
 
-const DEFAULT_VALUE_MEAN = 100;
+const DEFAULT_VALUE_MEAN = 66.6667;
+const VALUE_MIN = 0.;
+const VALUE_MAX = 100.;
 
 // Table values and placeholders
 const OUTPUT_LABEL_TEXT = "Output {N} Label:";
