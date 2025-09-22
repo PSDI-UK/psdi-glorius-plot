@@ -666,7 +666,7 @@ function generatePlot() {
       llData.push(lFakeData);
       lOrder.push(lBgOrderLow[k]);
 
-      let colorRatio = k / (numBgColorsLow - 1);
+      let colorRatio = (k + 1) / numBgColorsLow;
       let backgroundColor = mix_hexes(minColor, "#FFFFFF", colorRatio);
       lBackgroundColors.push(backgroundColor);
 
