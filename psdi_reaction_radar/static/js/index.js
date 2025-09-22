@@ -231,6 +231,7 @@ function addConditionRow(e, updateAfter = true) {
   // Construct a new row by copying the first and clearing its input
   const newRow = $(".condition-row")[0].cloneNode(true);
   $(newRow).find(".condition-label").val("");
+  $(newRow).find(".sample-value").val("");
   $(newRow).find(".deviation-value").val("0");
 
   // Determine where to add the row based on which button was clicked
