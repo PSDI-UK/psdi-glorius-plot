@@ -19,7 +19,7 @@
     <select name="num-condition" id="num-condition">
       <option value="3">3</option>
       <option value="4">4</option>
-      <option value="5">5</option>
+      <option value="5" selected>5</option>
       <option value="6">6</option>
       <option value="7">7</option>
       <option value="8">8</option>
@@ -180,6 +180,60 @@
         <button type="button" id="remove-rb-2" class="remove-condition disabled fix-size-small"
           disabled="true">-</button>
         <button type="button" id="add-rb-2" class="add-condition fix-size-small">+</button>
+      </td>
+      <td class="condition-label-cell">
+        <input type="text" class="condition-label trigger-chart-update" placeholder="Condition (e.g. “High c”)">
+      </td>
+      <td class="sample-value-cell calc-mode-only">
+        <div class="sample-line-container">
+          <div class="sample-input-line">
+            <input type="number" step="any" class="sample-value trigger-deviation-update">
+          </div>
+        </div>
+      </td>
+      <td class="deviation-value-cell">
+        <div class="deviation-line-container">
+          <div class="deviation-input-line">
+            <input type="number" step="any" class="calc-mode-disabled deviation-value trigger-chart-update" value="0"
+              disabled>
+            <span>%</span>
+          </div>
+        </div>
+      </td>
+    </tr>
+
+    <tr class="condition-row">
+      <td class="condition-button-cell">
+        <button type="button" id="remove-rb-3" class="remove-condition disabled fix-size-small"
+          disabled="true">-</button>
+        <button type="button" id="add-rb-3" class="add-condition fix-size-small">+</button>
+      </td>
+      <td class="condition-label-cell">
+        <input type="text" class="condition-label trigger-chart-update" placeholder="Condition (e.g. “High c”)">
+      </td>
+      <td class="sample-value-cell calc-mode-only">
+        <div class="sample-line-container">
+          <div class="sample-input-line">
+            <input type="number" step="any" class="sample-value trigger-deviation-update">
+          </div>
+        </div>
+      </td>
+      <td class="deviation-value-cell">
+        <div class="deviation-line-container">
+          <div class="deviation-input-line">
+            <input type="number" step="any" class="calc-mode-disabled deviation-value trigger-chart-update" value="0"
+              disabled>
+            <span>%</span>
+          </div>
+        </div>
+      </td>
+    </tr>
+
+    <tr class="condition-row">
+      <td class="condition-button-cell">
+        <button type="button" id="remove-rb-4" class="remove-condition disabled fix-size-small"
+          disabled="true">-</button>
+        <button type="button" id="add-rb-4" class="add-condition fix-size-small">+</button>
       </td>
       <td class="condition-label-cell">
         <input type="text" class="condition-label trigger-chart-update" placeholder="Condition (e.g. “High c”)">
