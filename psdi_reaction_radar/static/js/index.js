@@ -929,12 +929,10 @@ function fillRandom() {
   }
 
   // Fill each data cell
-  const minOutput = getMinOutput();
-  const maxOutput = getMaxOutput();
   const lDataCells = $(".sample-value");
   for (let k = 0; k < lDataCells.length; ++k) {
     const e = lDataCells[k];
-    e.value = DEFAULT_VALUE_MEAN + minOutput + Math.random() * (maxOutput - minOutput);
+    e.value = VALUE_MIN + Math.random() * (VALUE_MAX - VALUE_MIN);
   }
 
   // Make sure the deviation is calculated, even in direct input mode (if not in this mode, it will be calculated when
