@@ -971,6 +971,58 @@ function fillRandom() {
 
 }
 
+/**
+ * Fill the table with preset example data
+ */
+function fillExample() {
+  setNumDim(CONDITION, 10);
+  setNumDim(SAMPLE, 1);
+  setNumDim(OUTPUT, 1);
+
+  // Set the output label
+  $(".output-label-select").val("Isolated Yield (%)").change();
+
+  // Fill the row labels
+  const lRowLabelInputs = $(".condition-label");
+  lRowLabelInputs.eq(0).val("High concentration");
+  lRowLabelInputs.eq(1).val("Low concentration");
+  lRowLabelInputs.eq(2).val("Low oxygen");
+  lRowLabelInputs.eq(3).val("Longer reaction time");
+  lRowLabelInputs.eq(4).val("Low temperature");
+  lRowLabelInputs.eq(5).val("High temperature");
+  lRowLabelInputs.eq(6).val("High current");
+  lRowLabelInputs.eq(7).val("Low current");
+  lRowLabelInputs.eq(8).val("Small electrode distance");
+  lRowLabelInputs.eq(9).val("Big scale");
+
+  // Fill the baseline value
+  $(".baseline-value").eq(0).val("100");
+
+  // Fill the output values
+  const lDataCells = $(".sample-value");
+  lDataCells.eq(0).val("100");
+  lDataCells.eq(1).val("61");
+  lDataCells.eq(2).val("89");
+  lDataCells.eq(3).val("100");
+  lDataCells.eq(4).val("100");
+  lDataCells.eq(5).val("68");
+  lDataCells.eq(6).val("62");
+  lDataCells.eq(7).val("87");
+  lDataCells.eq(8).val("48");
+  lDataCells.eq(9).val("85");
+
+  // Make sure the deviation is calculated, even in direct input mode (if not in this mode, it will be calculated when
+  // the plot is generated)
+  if (directInput) {
+    calcDeviation();
+  }
+
+  if (autoUpdating) {
+    generatePlot();
+  }
+
+}
+
 function enableDeviationCalc() {
   // Clear any update triggers first so we don't inadvertently double-up
   disableDeviationCalc();
@@ -1114,8 +1166,9 @@ $(document).ready(function () {
 
   enableDeviationCalc();
 
-  $("button#fill-random").on("click", fillRandom);
-  $("button#generate-plot").on("click", generatePlot);
+  $("#fill-random").on("click", fillRandom);
+  $("#fill-example").on("click", fillExample);
+  $("#generate-plot").on("click", generatePlot);
 
   $("#auto-update-toggle").on("click", toggleAutoUpdates)
   enableAutoUpdates();
