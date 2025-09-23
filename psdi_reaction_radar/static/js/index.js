@@ -1013,6 +1013,21 @@ function initNumDimControls(dim) {
   $("select#num-" + dim).on("change", (e) => setNumDim(dim, $(e.target).val()));
 }
 
+function updateOutputLabel(e) {
+  let targetIndex = getTargetIndex(e, DIM_LIMITS.output.max);
+  let newValue = this.value;
+  let lOutcomeValueCells = $(".output-label-value-cell");
+  let outcomeInput = $("#ol-" + targetIndex.toString());
+
+  if (newValue != "Other") {
+    outcomeInput.val(newValue);
+    lOutcomeValueCells.addClass("hidden");
+  } else {
+    outcomeInput.val("");
+    lOutcomeValueCells.removeClass("hidden");
+  }
+}
+
 function toggleAutoUpdates(e) {
   if ($(e.target).is(":checked"))
     enableAutoUpdates();
@@ -1031,6 +1046,8 @@ $(document).ready(function () {
   $("#fan-toggle").on("click", toggleChartMode);
 
   L_DIMS.forEach(dim => initNumDimControls(dim));
+
+  $(".output-label-select").on("change", updateOutputLabel)
 
   enableDeviationCalc();
 
