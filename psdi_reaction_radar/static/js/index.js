@@ -202,11 +202,9 @@ function relabelDim(dim) {
 
     // Set the heading text if we have any heading cells
     if (lHeadings.length > 0) {
-      let headingText;
-      if (num == 1)
-        headingText = "Value";
-      else
-        headingText = "Sample " + sI1;
+      let headingText = $("#ol-0").val();
+      if (num > 1)
+        headingText += " " + sI1;
       lHeadings.eq(i).text(headingText);
     }
 
