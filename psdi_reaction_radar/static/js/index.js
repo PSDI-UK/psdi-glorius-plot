@@ -724,6 +724,8 @@ function generatePlot() {
         lFill.push(false);
         lBorderDashes.push([]);
       }
+    } else {
+      numAxisLines = 0;
     }
   }
 

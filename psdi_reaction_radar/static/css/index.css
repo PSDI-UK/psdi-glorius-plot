@@ -7,7 +7,7 @@
   --direct-mode-row    : none;
   --direct-mode-cell   : none;
 
-  --radar-mode-display: inherit;
+  --radar-mode-display: block;
   --fan-mode-display  : none;
 }
 
