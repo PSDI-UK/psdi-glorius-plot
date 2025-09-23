@@ -30,6 +30,26 @@ const DIM_LIMITS = {
   }
 }
 
+const COLOR_SCHEMES = {
+  classic: {
+    min: "#FF8080",
+    max: "#20A020"
+  },
+  colourblind: {
+    min: "#FF66EB",
+    max: "#009639"
+  },
+  greyscale: {
+    min: "#A0A0A0",
+    max: "#A0A0A0"
+  },
+  custom: {
+    min: null,
+    max: null
+  }
+
+}
+
 const DEFAULT_VALUE_MEAN = 66.6667;
 const VALUE_MIN = 0.;
 const VALUE_MAX = 100.;
@@ -1048,6 +1068,22 @@ function updateOutputLabel(label) {
   }
 }
 
+function updateColourSchemeSelection() {
+  let newValue = this.value;
+  let customColorInput = $(".color-custom");
+
+  if (newValue != "custom") {
+    customColorInput.addClass("hidden");
+    $("#min-color-input").val(COLOR_SCHEMES[newValue].min);
+    $("#max-color-input").val(COLOR_SCHEMES[newValue].max);
+  } else {
+    customColorInput.removeClass("hidden");
+  }
+
+  if (autoUpdating)
+    generatePlot();
+}
+
 function toggleAutoUpdates(e) {
   if ($(e.target).is(":checked"))
     enableAutoUpdates();
@@ -1077,4 +1113,6 @@ $(document).ready(function () {
 
   $("#auto-update-toggle").on("click", toggleAutoUpdates)
   enableAutoUpdates();
+
+  $("#color-select").on("change", updateColourSchemeSelection);
 });

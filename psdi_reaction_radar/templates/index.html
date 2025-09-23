@@ -310,6 +310,15 @@
     <label for="axis-line-toggle"> Show axis lines</label>
   </p>
   <p>
+    <label for="color-select">Colour scheme: </label>
+    <select name="color-select" id="color-select">
+      <option value="classic" selected>Classic</option>
+      <option value="colourblind">Colourblind-friendly</option>
+      <option value="greyscale">Greyscale</option>
+      <option value="custom">Custom</option>
+    </select>
+  </p>
+  <p class="color-custom hidden">
     <label for="min-color-input">Color at lowest output: </label>
     <input type="color" value="#FF8080" name="min-color-input" id="min-color-input" class="trigger-chart-update">
     <label for="max-color-input"> Color at highest output: </label>
