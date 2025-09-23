@@ -422,7 +422,20 @@ function removeOutput(e, updateAfter = true) {
   postTableUpdateCleanup("output", updateAfter);
 }
 
+function updateWidth() {
+  let newWidth = getWidth();
+  let aspectRatio = getAspectRatio();
+  $("#glorius-plot").css({
+    "width": newWidth.toString(),
+    "height": (newWidth / aspectRatio).toString()
+  })
+}
+
 // Functions to get various options set by the user
+
+function getWidth() {
+  return +$("#width-input").val();
+}
 
 function getAspectRatio() {
   return +$("#aspect-ratio-input").val();
@@ -897,6 +910,7 @@ function generatePlot() {
       },
       options: {
         aspectRatio: getAspectRatio(),
+        responsive: false,
         scales: {
           r: plotR
         },
@@ -926,7 +940,7 @@ function generatePlot() {
     radarChart.options.scales.r = plotR;
     radarChart.options.aspectRatio = getAspectRatio();
     radarChart.update();
-    radarChart.resize();
+    radarChart.resize(getWidth(), getWidth() / getAspectRatio());
   }
 
 }
@@ -1018,6 +1032,11 @@ function fillExample() {
   lDataCells.eq(7).val("87");
   lDataCells.eq(8).val("48");
   lDataCells.eq(9).val("85");
+
+  // Set to an appropriate styling
+  $("#width-input").val("800");
+  $("#aspect-ratio-input").val("1.3");
+  $("#font-size-input").val("18");
 
   // Make sure the deviation is calculated, even in direct input mode (if not in this mode, it will be calculated when
   // the plot is generated)
@@ -1176,10 +1195,13 @@ $(document).ready(function () {
 
   $("#fill-random").on("click", fillRandom);
   $("#fill-example").on("click", fillExample);
+
   $("#generate-plot").on("click", generatePlot);
 
   $("#auto-update-toggle").on("click", toggleAutoUpdates)
   enableAutoUpdates();
+
+  $("#width-input").on("change", updateWidth);
 
   $("#color-select").on("change", updateColourSchemeSelection);
 });
