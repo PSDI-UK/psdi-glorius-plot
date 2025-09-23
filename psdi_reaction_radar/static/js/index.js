@@ -478,6 +478,10 @@ function getDataSorting() {
   return +($("#sort-option").find(":selected").val());
 }
 
+function getFontSize() {
+  return +$("#font-size-input").val();
+}
+
 /**
  * Calculate the deviation for each condition
  */
@@ -867,7 +871,7 @@ function generatePlot() {
     max: maxOutput,
     pointLabels: {
       font: {
-        size: 16
+        size: getFontSize()
       }
     },
     reverse: true,
