@@ -424,6 +424,10 @@ function removeOutput(e, updateAfter = true) {
 
 // Functions to get various options set by the user
 
+function getAspectRatio() {
+  return +$("#aspect-ratio-input").val();
+}
+
 function getMinOutput() {
   let minOutput = $("#min-output-input").val();
   minOutput = Math.min(Math.max(minOutput, -100), -1);
@@ -892,6 +896,7 @@ function generatePlot() {
         datasets: lDatasets,
       },
       options: {
+        aspectRatio: getAspectRatio(),
         scales: {
           r: plotR
         },
@@ -919,7 +924,9 @@ function generatePlot() {
       datasets: lDatasets,
     }
     radarChart.options.scales.r = plotR;
+    radarChart.options.aspectRatio = getAspectRatio();
     radarChart.update();
+    radarChart.resize();
   }
 
 }
