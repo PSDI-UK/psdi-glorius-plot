@@ -105,7 +105,16 @@ tr td:first-child button {
   padding-right: 0.5rem;
 }
 
+.output-label-row {
+  height: 2rem;
+}
+
 /* Style the sensitivity table */
+.sensitivity-table th {
+  max-width    : 7rem;
+  padding-right: 0.5rem;
+}
+
 .sensitivity-table td {
   padding-top   : 0.25rem;
   padding-bottom: 0.25rem;

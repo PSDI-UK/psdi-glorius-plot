@@ -62,11 +62,20 @@
         <button type="button" id="add-ob-0" class="add-output fix-size-small">+</button>
       </td>
       <td class="output-label-cell">
-        <label for="ol-0" class="output-label">Outcome:</label>
+        <label for="os-0" class="output-label">Outcome:</label>
       </td>
-      <td class="output-label-value-cell">
+      <td class="output-label-select-cell">
+        <select name="output-label-select" class="output-label-select" id="os-0">
+          <option value="Isolated Yield (%)" selected>Isolated Yield (%)</option>
+          <option value="Spectroscopic Yield (%)">Spectroscopic Yield (%)</option>
+          <option value="ee (%)">ee (%)</option>
+          <option value="de (%)">de (%)</option>
+          <option value="Other">Other</option>
+        </select>
+      </td>
+      <td class="output-label-value-cell hidden">
         <input type="text" id="ol-0" class="output-input trigger-chart-update" placeholder="Outcome (e.g. “Yield”)"
-          value="Yield">
+          value="Isolated Yield (%)">
       </td>
     </tr>
   </table>
@@ -95,7 +104,7 @@
         Label
       </th>
 
-      <th class="sample-heading calc-mode-only">Value</th>
+      <th class="sample-heading calc-mode-only">Isolated Yield (%)</th>
 
       <th class="deviation-heading">
         <span class="mouseover calc-mode-only" data-bs-toggle="tooltip" data-bs-custom-class="tooltip-on-light"
