@@ -953,6 +953,12 @@ function enableDeviationCalc() {
   $(".trigger-deviation-update").on("change", calcDeviation);
 }
 
+function enableOutputLabelUpdate() {
+  let outputLabelInput = $("#ol-0");
+  $("#ol-0").off("change");
+  $("#ol-0").on("change", (e) => updateOutputLabel(e.target.value));
+}
+
 function disableDeviationCalc() {
   $(".trigger-deviation-update").off("change");
 }
@@ -975,7 +981,8 @@ function disableAutoUpdates() {
   $(".trigger-chart-update").off("change");
   autoUpdating = false;
 
-  // Set to still do deviation calculation automatically
+  // Set to still run some tasks on change
+  enableOutputLabelUpdate();
   enableDeviationCalc();
 }
 
@@ -1013,18 +1020,33 @@ function initNumDimControls(dim) {
   $("select#num-" + dim).on("change", (e) => setNumDim(dim, $(e.target).val()));
 }
 
-function updateOutputLabel(e) {
+function updateOutputLabelSelection(e) {
   let targetIndex = getTargetIndex(e, DIM_LIMITS.output.max);
   let newValue = this.value;
   let lOutcomeValueCells = $(".output-label-value-cell");
   let outcomeInput = $("#ol-" + targetIndex.toString());
 
   if (newValue != "Other") {
-    outcomeInput.val(newValue);
     lOutcomeValueCells.addClass("hidden");
   } else {
-    outcomeInput.val("");
+    newValue = "";
     lOutcomeValueCells.removeClass("hidden");
+  }
+  outcomeInput.val(newValue);
+  updateOutputLabel(newValue);
+}
+
+function updateOutputLabel(label) {
+  let lOutputHeadings = $(".sample-heading");
+  let numSamples = getNumSamples();
+
+  // If only one output, don't number it
+  if (numSamples == 1) {
+    lOutputHeadings.text(label);
+  } else {
+    for (let i = 0; i < numSamples; ++i) {
+      lOutputHeadings.eq(i).text(label + " " + (i + 1).toString());
+    }
   }
 }
 
@@ -1047,7 +1069,8 @@ $(document).ready(function () {
 
   L_DIMS.forEach(dim => initNumDimControls(dim));
 
-  $(".output-label-select").on("change", updateOutputLabel)
+  $(".output-label-select").on("change", updateOutputLabelSelection);
+  enableOutputLabelUpdate();
 
   enableDeviationCalc();
 
