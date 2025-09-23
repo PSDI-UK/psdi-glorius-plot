@@ -111,7 +111,7 @@ tr td:first-child button {
 
 /* Style the sensitivity table */
 .sensitivity-table th {
-  max-width    : 8.5rem;
+  max-width    : 7rem;
   padding-right: 0.5rem;
 }
 
