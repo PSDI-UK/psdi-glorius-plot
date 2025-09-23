@@ -972,7 +972,8 @@ function fillRandom() {
 }
 
 /**
- * Fill the table with preset example data
+ * Fill the table with preset example data, from
+ * https://pubs.acs.org/doi/10.1021/acs.orglett.0c02068?goto=supporting-info
  */
 function fillExample() {
   setNumDim(CONDITION, 10);
