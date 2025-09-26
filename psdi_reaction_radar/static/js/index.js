@@ -737,6 +737,11 @@ function generatePlot() {
   const minColor = getMinColor();
   const maxColor = getMaxColor();
 
+  const tipSize = getTipSize();
+  const baseSeparation = getBarSeparation();
+  const barSize = 2 * (tipSize + baseSeparation + 1);
+  const numAnglePoints = numConditions * barSize;
+
   // Create data we'll plot in the chart
   const lOutputLabels = [];
   const llData = [];
@@ -755,20 +760,6 @@ function generatePlot() {
 
   let numDatasetMultiplier;
 
-  // Make a fake dataset at the midpoint value, which we can use as a reference as needed
-  lOutputLabels.push("");
-  let lMidpointData = [];
-  for (let i = 0; i < numConditions; ++i) {
-    lMidpointData.push(outputMidpoint);
-  }
-  llData.push(lMidpointData);
-  lOrder.push(0);
-  lBorderColors.push("black");
-  lBorderWidths.push(BASELINE_WIDTH);
-  lBackgroundColors.push("black");
-  lFill.push(false);
-  lBorderDashes.push([]);
-
 
   // If in radar mode, we make some fake data to use as background colors and grid lines
 
@@ -781,6 +772,30 @@ function generatePlot() {
 
     numDatasetMultiplier = numConditions;
   }
+
+  // Make a fake dataset at the midpoint value, which we can use as a reference as needed
+  lOutputLabels.push("");
+  let lMidpointData = [];
+  let numMidpointPoints = numConditions;
+
+  if (fanMode)
+    numMidpointPoints = numAnglePoints;
+
+  for (let i = 0; i < numMidpointPoints; ++i) {
+    lMidpointData.push(outputMidpoint);
+  }
+
+  llData.push(lMidpointData);
+  lOrder.push(0);
+  lBorderColors.push("black");
+  lBackgroundColors.push("black");
+  lFill.push(false);
+  lBorderDashes.push([]);
+
+  if (fanMode)
+    lBorderWidths.push(0);
+  else
+    lBorderWidths.push(BASELINE_WIDTH);
 
   if (!fanMode) {
 
@@ -919,12 +934,6 @@ function generatePlot() {
     return (a.data[0] - b.data[0]) * sort_mode;
   });
 
-
-  const tipSize = getTipSize();
-  const baseSeparation = getBarSeparation();
-  const barSize = 2 * (tipSize + baseSeparation + 1);
-  const numAnglePoints = numConditions * barSize;
-
   let lOutputConditionLabels = lConditionLabels;
   if (fanMode) {
     lOutputConditionLabels = [];
@@ -948,7 +957,7 @@ function generatePlot() {
           if (j == 0 && l == tipCenter)
             lOutputConditionLabels[l] = conditionData.label;
 
-          // Calculate how far the point in from the tip center, taking into account that it's a circular array
+          // Calculate how far the point is from the tip center, taking into account that it's a circular array
           let tipDistance = Math.abs(l - tipCenter);
           if (tipDistance > numAnglePoints / 2)
             tipDistance = numAnglePoints - tipDistance;
