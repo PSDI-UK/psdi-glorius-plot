@@ -289,9 +289,14 @@
     <label for="height-input">Plot height in pixels: </label>
     <input type="number" step="50" value="600" min="200" max="4000" name="height-input" id="height-input"
       class="trigger-chart-update">
+    <label for="font-size-input">Label font size: </label>
+    <input type="number" name="font-size-input" id="font-size-input" class="trigger-chart-update" min="2" max="64"
+      value="18">
     <br>
     <input type="checkbox" name="lock-aspect-ratio" id="lock-aspect-ratio" checked>
     <label for="lock-aspect-ratio"> Lock aspect ratio</label>
+    <input type="checkbox" name="scale-font-size" id="scale-font-size">
+    <label for="scale-font-size"> Scale font size with plot size</label>
   </p>
   <p>
     <label for="min-output-input">Minimum output: </label>
@@ -343,11 +348,6 @@
       <option value="-1">Descending</option>
       <option value="0">As entered</option>
     </select>
-  </p>
-  <p>
-    <label for="font-size-input">Label font size: </label>
-    <input type="number" name="font-size-input" id="font-size-input" class="trigger-chart-update" min="2" max="64"
-      value="18">
   </p>
 </div>
 {% endblock %}

@@ -430,9 +430,12 @@ function updateCanvasShape() {
 }
 
 let lastAspectRatio;
+let lastFontSizeWidthRatio;
+let lastFontSizeHeightRatio;
 
 /**
- * Called when the width is updated, so that if the aspect ratio is locked, the height can be updated as well
+ * Called when the width is updated, so that if the aspect ratio is locked, the height can be updated as well, and
+ * similarly if font scaling is enabled
  */
 function updateWidth() {
 
@@ -441,11 +444,19 @@ function updateWidth() {
   else
     lastAspectRatio = getAspectRatio();
 
+  if (getFontSizeScaleLock()) {
+    $("#font-size-input").val(getWidth() * lastFontSizeWidthRatio);
+    lastFontSizeHeightRatio = getFontSizeHeightRatio();
+  } else {
+    lastFontSizeWidthRatio = getFontSizeWidthRatio();
+  }
+
   updateCanvasShape();
 }
 
 /**
- * Called when the height is updated, so that if the aspect ratio is locked, the width can be updated as well
+ * Called when the height is updated, so that if the aspect ratio is locked, the width can be updated as well, and
+ * similarly if font scaling is enabled
  */
 function updateHeight() {
 
@@ -454,8 +465,24 @@ function updateHeight() {
   else
     lastAspectRatio = getAspectRatio();
 
+  if (getFontSizeScaleLock()) {
+    $("#font-size-input").val(getHeight() * lastFontSizeHeightRatio);
+    lastFontSizeWidthRatio = getFontSizeWidthRatio();
+  } else {
+    lastFontSizeHeightRatio = getFontSizeHeightRatio();
+  }
+
   updateCanvasShape();
 }
+
+/**
+ * Called when the font size is updated to update the font size scales
+ */
+function updateFontSize() {
+  lastFontSizeWidthRatio = getFontSizeWidthRatio();
+  lastFontSizeHeightRatio = getFontSizeHeightRatio();
+}
+
 
 // Functions to get various options set by the user
 
@@ -467,12 +494,28 @@ function getHeight() {
   return +$("#height-input").val();
 }
 
+function getFontSize() {
+  return +$("#font-size-input").val();
+}
+
 function getAspectRatio() {
   return getWidth() / getHeight();
 }
 
 function getAspectRatioLock() {
   return $("#lock-aspect-ratio").is(":checked");
+}
+
+function getFontSizeWidthRatio() {
+  return getFontSize() / getWidth();
+}
+
+function getFontSizeHeightRatio() {
+  return getFontSize() / getHeight();
+}
+
+function getFontSizeScaleLock() {
+  return $("#scale-font-size").is(":checked");
 }
 
 function getMinOutput() {
@@ -527,10 +570,6 @@ function getShowAxisLines() {
  */
 function getDataSorting() {
   return +($("#sort-option").find(":selected").val());
-}
-
-function getFontSize() {
-  return +$("#font-size-input").val();
 }
 
 /**
@@ -1079,9 +1118,10 @@ function fillExample() {
 
 }
 
-function enableCanvasShapeUpdate() {
+function enableCanvasUpdate() {
   $("#width-input").on("change", updateWidth);
   $("#height-input").on("change", updateHeight);
+  $("#font-size-input").on("change", updateFontSize);
 }
 
 function enableDeviationCalc() {
@@ -1114,14 +1154,33 @@ function enableAutoUpdates() {
   generatePlot();
 }
 
+function enableButtons() {
+  $("#input-mode-toggle").on("click", toggleInputMode);
+  $("#fan-toggle").on("click", toggleChartMode);
+
+  $("#fill-random").on("click", fillRandom);
+  $("#fill-example").on("click", fillExample);
+
+  $("#generate-plot").on("click", generatePlot);
+
+  $("#auto-update-toggle").on("click", toggleAutoUpdates);
+}
+
+function enableOnChangeTriggers() {
+  enableOutputLabelUpdate();
+  enableDeviationCalc();
+  enableCanvasUpdate();
+
+  $(".output-label-select").on("change", updateOutputLabelSelection);
+  $("#color-select").on("change", updateColourSchemeSelection);
+}
+
 function disableAutoUpdates() {
   $(".trigger-chart-update").off("change");
   autoUpdating = false;
 
-  // Set to still run some tasks on change
-  enableOutputLabelUpdate();
-  enableDeviationCalc();
-  enableCanvasShapeUpdate();
+  // Re-enable any on change triggers aside from chart updating
+  enableOnChangeTriggers();
 }
 
 function toggleInputMode(e) {
@@ -1211,34 +1270,39 @@ function toggleAutoUpdates(e) {
     disableAutoUpdates();
 }
 
-$(document).ready(function () {
-  // Enable all tooltips on the page
-  const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
-  const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
-
+/**
+ * Initialize global variables in this script
+ */
+function initGlobals() {
   lastAspectRatio = getAspectRatio();
+  lastFontSizeWidthRatio = getFontSizeWidthRatio();
+  lastFontSizeHeightRatio = getFontSizeHeightRatio();
+}
 
+/**
+ * Enable all tooltips on the page
+ */
+function initTooltips() {
+  const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+  [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
+}
+
+$(document).ready(function () {
+
+  initTooltips();
+  initGlobals();
   initDirtyForms();
-
-  $("#input-mode-toggle").on("click", toggleInputMode);
-  $("#fan-toggle").on("click", toggleChartMode);
 
   L_DIMS.forEach(dim => initNumDimControls(dim));
 
-  $(".output-label-select").on("change", updateOutputLabelSelection);
   enableOutputLabelUpdate();
+
+  enableOnChangeTriggers();
+  enableButtons();
 
   enableDeviationCalc();
 
-  $("#fill-random").on("click", fillRandom);
-  $("#fill-example").on("click", fillExample);
-
-  $("#generate-plot").on("click", generatePlot);
-
-  $("#auto-update-toggle").on("click", toggleAutoUpdates)
   enableAutoUpdates();
 
-  enableCanvasShapeUpdate();
-
-  $("#color-select").on("change", updateColourSchemeSelection);
+  enableCanvasUpdate();
 });
