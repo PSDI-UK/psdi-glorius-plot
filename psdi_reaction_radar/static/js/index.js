@@ -423,11 +423,9 @@ function removeOutput(e, updateAfter = true) {
 }
 
 function updateWidth() {
-  let newWidth = getWidth();
-  let aspectRatio = getAspectRatio();
   $("#glorius-plot").css({
-    "width": newWidth.toString(),
-    "height": (newWidth / aspectRatio).toString()
+    "width": getWidth().toString(),
+    "height": getHeight().toString()
   })
 }
 
@@ -437,8 +435,12 @@ function getWidth() {
   return +$("#width-input").val();
 }
 
+function getHeight() {
+  return +$("#height-input").val();
+}
+
 function getAspectRatio() {
-  return +$("#aspect-ratio-input").val();
+  return getWidth() / getHeight();
 }
 
 function getMinOutput() {
@@ -940,7 +942,7 @@ function generatePlot() {
     radarChart.options.scales.r = plotR;
     radarChart.options.aspectRatio = getAspectRatio();
     radarChart.update();
-    radarChart.resize(getWidth(), getWidth() / getAspectRatio());
+    radarChart.resize(getWidth(), getHeight());
   }
 
 }
@@ -1035,7 +1037,7 @@ function fillExample() {
 
   // Set to an appropriate styling
   $("#width-input").val("800");
-  $("#aspect-ratio-input").val("1.3");
+  $("#height-input").val("600");
   $("#font-size-input").val("18");
 
   // Make sure the deviation is calculated, even in direct input mode (if not in this mode, it will be calculated when
