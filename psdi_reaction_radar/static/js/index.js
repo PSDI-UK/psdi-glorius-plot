@@ -69,6 +69,14 @@ let autoUpdating = false;
 let directInput = false;
 let radarChart = null;
 
+let lastAspectRatio;
+let lastFontSizeWidthRatio;
+let lastFontSizeHeightRatio;
+
+let initWidth;
+let initHeight;
+let initFontSize;
+
 // When the script is initially loaded, store a copy of a heading element and cell elements that we'll later use
 // as templates to add new rows
 
@@ -422,14 +430,80 @@ function removeOutput(e, updateAfter = true) {
   postTableUpdateCleanup("output", updateAfter);
 }
 
-function updateWidth() {
-  let newWidth = getWidth();
-  let aspectRatio = getAspectRatio();
+function updateCanvasShape() {
   $("#glorius-plot").css({
-    "width": newWidth.toString(),
-    "height": (newWidth / aspectRatio).toString()
+    "width": getWidth().toString(),
+    "height": getHeight().toString()
   })
 }
+
+/**
+ * Called when the width is updated, so that if the aspect ratio is locked, the height can be updated as well, and
+ * similarly if font scaling is enabled
+ */
+function updateWidth() {
+
+  if (getAspectRatioLock())
+    $("#height-input").val(getWidth() / lastAspectRatio);
+  else
+    lastAspectRatio = getAspectRatio();
+
+  if (getFontSizeScaleLock()) {
+    $("#font-size-input").val(getWidth() * lastFontSizeWidthRatio);
+    lastFontSizeHeightRatio = getFontSizeHeightRatio();
+  } else {
+    lastFontSizeWidthRatio = getFontSizeWidthRatio();
+  }
+
+  if (autoUpdating)
+    updateCanvasShape();
+}
+
+/**
+ * Called when the height is updated, so that if the aspect ratio is locked, the width can be updated as well, and
+ * similarly if font scaling is enabled
+ */
+function updateHeight() {
+
+  if (getAspectRatioLock())
+    $("#width-input").val(getHeight() * lastAspectRatio);
+  else
+    lastAspectRatio = getAspectRatio();
+
+  if (getFontSizeScaleLock()) {
+    $("#font-size-input").val(getHeight() * lastFontSizeHeightRatio);
+    lastFontSizeWidthRatio = getFontSizeWidthRatio();
+  } else {
+    lastFontSizeHeightRatio = getFontSizeHeightRatio();
+  }
+
+  if (autoUpdating)
+    updateCanvasShape();
+}
+
+/**
+ * Called when the font size is updated to update the font size scales
+ */
+function updateFontSize() {
+  lastFontSizeWidthRatio = getFontSizeWidthRatio();
+  lastFontSizeHeightRatio = getFontSizeHeightRatio();
+}
+
+/**
+ * Reset the width, height, and font size to their initial values, and also update globals tracking the ratios
+ */
+function resetPlotDims() {
+  $("#width-input").val(initWidth);
+  $("#height-input").val(initHeight);
+  $("#font-size-input").val(initFontSize);
+
+  lastAspectRatio = getAspectRatio();
+  updateFontSize();
+
+  if (autoUpdating)
+    generatePlot();
+}
+
 
 // Functions to get various options set by the user
 
@@ -437,8 +511,32 @@ function getWidth() {
   return +$("#width-input").val();
 }
 
+function getHeight() {
+  return +$("#height-input").val();
+}
+
+function getFontSize() {
+  return +$("#font-size-input").val();
+}
+
 function getAspectRatio() {
-  return +$("#aspect-ratio-input").val();
+  return getWidth() / getHeight();
+}
+
+function getAspectRatioLock() {
+  return $("#lock-aspect-ratio").is(":checked");
+}
+
+function getFontSizeWidthRatio() {
+  return getFontSize() / getWidth();
+}
+
+function getFontSizeHeightRatio() {
+  return getFontSize() / getHeight();
+}
+
+function getFontSizeScaleLock() {
+  return $("#scale-font-size").is(":checked");
 }
 
 function getMinOutput() {
@@ -493,10 +591,6 @@ function getShowAxisLines() {
  */
 function getDataSorting() {
   return +($("#sort-option").find(":selected").val());
-}
-
-function getFontSize() {
-  return +$("#font-size-input").val();
 }
 
 /**
@@ -940,7 +1034,7 @@ function generatePlot() {
     radarChart.options.scales.r = plotR;
     radarChart.options.aspectRatio = getAspectRatio();
     radarChart.update();
-    radarChart.resize(getWidth(), getWidth() / getAspectRatio());
+    radarChart.resize(getWidth(), getHeight());
   }
 
 }
@@ -1033,11 +1127,6 @@ function fillExample() {
   lDataCells.eq(8).val("48");
   lDataCells.eq(9).val("85");
 
-  // Set to an appropriate styling
-  $("#width-input").val("800");
-  $("#aspect-ratio-input").val("1.3");
-  $("#font-size-input").val("18");
-
   // Make sure the deviation is calculated, even in direct input mode (if not in this mode, it will be calculated when
   // the plot is generated)
   if (directInput) {
@@ -1048,6 +1137,12 @@ function fillExample() {
     generatePlot();
   }
 
+}
+
+function enableCanvasUpdate() {
+  $("#width-input").on("change", updateWidth);
+  $("#height-input").on("change", updateHeight);
+  $("#font-size-input").on("change", updateFontSize);
 }
 
 function enableDeviationCalc() {
@@ -1077,16 +1172,42 @@ function enableAutoUpdates() {
   $(".trigger-chart-update").on("change", generatePlot);
   $(".trigger-deviation-update").on("change", generatePlot);
   autoUpdating = true;
+  updateCanvasShape();
   generatePlot();
+}
+
+function enableToggles() {
+  $("#input-mode-toggle").on("click", toggleInputMode);
+  $("#fan-toggle").on("click", toggleChartMode);
+
+  $("#auto-update-toggle").on("click", toggleAutoUpdates);
+}
+
+function enableButtons() {
+  $("#fill-random").on("click", fillRandom);
+  $("#fill-example").on("click", fillExample);
+
+  $("#generate-plot").on("click", generatePlot);
+
+  $("#reset-plot-dims").on("click", resetPlotDims);
+
+}
+
+function enableOnChangeTriggers() {
+  enableOutputLabelUpdate();
+  enableDeviationCalc();
+  enableCanvasUpdate();
+
+  $(".output-label-select").on("change", updateOutputLabelSelection);
+  $("#color-select").on("change", updateColourSchemeSelection);
 }
 
 function disableAutoUpdates() {
   $(".trigger-chart-update").off("change");
   autoUpdating = false;
 
-  // Set to still run some tasks on change
-  enableOutputLabelUpdate();
-  enableDeviationCalc();
+  // Re-enable any on change triggers aside from chart updating
+  enableOnChangeTriggers();
 }
 
 function toggleInputMode(e) {
@@ -1176,32 +1297,44 @@ function toggleAutoUpdates(e) {
     disableAutoUpdates();
 }
 
-$(document).ready(function () {
-  // Enable all tooltips on the page
+/**
+ * Initialize global variables in this script that rely on values in the document
+ */
+function initGlobals() {
+  lastAspectRatio = getAspectRatio();
+  lastFontSizeWidthRatio = getFontSizeWidthRatio();
+  lastFontSizeHeightRatio = getFontSizeHeightRatio();
+
+  initWidth = getWidth();
+  initHeight = getHeight();
+  initFontSize = getFontSize();
+}
+
+/**
+ * Enable all tooltips on the page
+ */
+function initTooltips() {
   const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
-  const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
+  [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
+}
 
+$(document).ready(function () {
+
+  initTooltips();
+  initGlobals();
   initDirtyForms();
-
-  $("#input-mode-toggle").on("click", toggleInputMode);
-  $("#fan-toggle").on("click", toggleChartMode);
 
   L_DIMS.forEach(dim => initNumDimControls(dim));
 
-  $(".output-label-select").on("change", updateOutputLabelSelection);
   enableOutputLabelUpdate();
+
+  enableOnChangeTriggers();
+  enableToggles();
+  enableButtons();
 
   enableDeviationCalc();
 
-  $("#fill-random").on("click", fillRandom);
-  $("#fill-example").on("click", fillExample);
-
-  $("#generate-plot").on("click", generatePlot);
-
-  $("#auto-update-toggle").on("click", toggleAutoUpdates)
   enableAutoUpdates();
 
-  $("#width-input").on("change", updateWidth);
-
-  $("#color-select").on("change", updateColourSchemeSelection);
+  enableCanvasUpdate();
 });
