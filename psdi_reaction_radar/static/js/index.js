@@ -422,11 +422,39 @@ function removeOutput(e, updateAfter = true) {
   postTableUpdateCleanup("output", updateAfter);
 }
 
-function updateWidth() {
+function updateCanvasShape() {
   $("#glorius-plot").css({
     "width": getWidth().toString(),
     "height": getHeight().toString()
   })
+}
+
+let lastAspectRatio;
+
+/**
+ * Called when the width is updated, so that if the aspect ratio is locked, the height can be updated as well
+ */
+function updateWidth() {
+
+  if (getAspectRatioLock())
+    $("#height-input").val(getWidth() / lastAspectRatio);
+  else
+    lastAspectRatio = getAspectRatio();
+
+  updateCanvasShape();
+}
+
+/**
+ * Called when the height is updated, so that if the aspect ratio is locked, the width can be updated as well
+ */
+function updateHeight() {
+
+  if (getAspectRatioLock())
+    $("#width-input").val(getHeight() * lastAspectRatio);
+  else
+    lastAspectRatio = getAspectRatio();
+
+  updateCanvasShape();
 }
 
 // Functions to get various options set by the user
@@ -441,6 +469,10 @@ function getHeight() {
 
 function getAspectRatio() {
   return getWidth() / getHeight();
+}
+
+function getAspectRatioLock() {
+  return $("#lock-aspect-ratio").is(":checked");
 }
 
 function getMinOutput() {
@@ -1035,11 +1067,6 @@ function fillExample() {
   lDataCells.eq(8).val("48");
   lDataCells.eq(9).val("85");
 
-  // Set to an appropriate styling
-  $("#width-input").val("800");
-  $("#height-input").val("600");
-  $("#font-size-input").val("18");
-
   // Make sure the deviation is calculated, even in direct input mode (if not in this mode, it will be calculated when
   // the plot is generated)
   if (directInput) {
@@ -1050,6 +1077,11 @@ function fillExample() {
     generatePlot();
   }
 
+}
+
+function enableCanvasShapeUpdate() {
+  $("#width-input").on("change", updateWidth);
+  $("#height-input").on("change", updateHeight);
 }
 
 function enableDeviationCalc() {
@@ -1089,6 +1121,7 @@ function disableAutoUpdates() {
   // Set to still run some tasks on change
   enableOutputLabelUpdate();
   enableDeviationCalc();
+  enableCanvasShapeUpdate();
 }
 
 function toggleInputMode(e) {
@@ -1183,6 +1216,8 @@ $(document).ready(function () {
   const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
   const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
 
+  lastAspectRatio = getAspectRatio();
+
   initDirtyForms();
 
   $("#input-mode-toggle").on("click", toggleInputMode);
@@ -1203,7 +1238,7 @@ $(document).ready(function () {
   $("#auto-update-toggle").on("click", toggleAutoUpdates)
   enableAutoUpdates();
 
-  $("#width-input").on("change", updateWidth);
+  enableCanvasShapeUpdate();
 
   $("#color-select").on("change", updateColourSchemeSelection);
 });
