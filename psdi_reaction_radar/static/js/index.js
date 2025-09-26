@@ -60,6 +60,7 @@ const OUTPUT_LABEL_TEXT = "Output {N} Label:";
 // Plot styling
 const L_BORDER_DASHES = [[], [6, 6], [4, 4], [2, 2], [1, 1]];
 const BORDER_WIDTH = 4;
+const BASELINE_WIDTH = 2;
 const DATA_BG_COLOR = ["#FFFFFF00"];
 const GRID_WIDTH = 1;
 const GRID_COLOR = "#00000080";
@@ -544,15 +545,25 @@ function getFontSizeScaleLock() {
 }
 
 function getMinOutput() {
+  if (getDevCalcMode() == "none")
+    return 0;
   let minOutput = $("#min-output-input").val();
   minOutput = Math.min(Math.max(minOutput, -100), -1);
   return minOutput;
 }
 
 function getMaxOutput() {
+  if (getDevCalcMode() == "none")
+    return 100;
   let maxOutput = $("#max-output-input").val();
   maxOutput = Math.min(Math.max(maxOutput, 1), 1000);
   return maxOutput;
+}
+
+function getOutputMidpoint() {
+  if (getDevCalcMode() != "none")
+    return 0;
+  return +($(".baseline-row").find(".deviation-value").eq(0).val());
 }
 
 function getBandWidth() {
@@ -715,6 +726,7 @@ function generatePlot() {
 
   const minOutput = getMinOutput();
   const maxOutput = getMaxOutput();
+  const outputMidpoint = getOutputMidpoint();
   const bandWidth = getBandWidth();
 
   const fanMode = getFanMode();
@@ -743,6 +755,20 @@ function generatePlot() {
 
   let numDatasetMultiplier;
 
+  // Make a fake dataset at the midpoint value, which we can use as a reference as needed
+  lOutputLabels.push("");
+  let lMidpointData = [];
+  for (let i = 0; i < numConditions; ++i) {
+    lMidpointData.push(outputMidpoint);
+  }
+  llData.push(lMidpointData);
+  lOrder.push(0);
+  lBorderColors.push("black");
+  lBorderWidths.push(BASELINE_WIDTH);
+  lBackgroundColors.push("black");
+  lFill.push(false);
+  lBorderDashes.push([]);
+
 
   // If in radar mode, we make some fake data to use as background colors and grid lines
 
@@ -760,8 +786,8 @@ function generatePlot() {
 
     // Make fake data for each background color
 
-    const numLowBands = Math.ceil(-minOutput / bandWidth);
-    const numHiBands = Math.ceil(maxOutput / bandWidth);
+    const numLowBands = Math.ceil((outputMidpoint - minOutput) / bandWidth);
+    const numHiBands = Math.ceil((maxOutput - outputMidpoint) / bandWidth);
 
     numBgColorsLow = numLowBands;
     numBgColorsHi = numHiBands + 1;
@@ -772,14 +798,14 @@ function generatePlot() {
     const lBgColorBoundsLow = [];
     const lBgOrderLow = [];
     for (let i = 0; i < numBgColorsLow; ++i) {
-      lBgColorBoundsLow.push(Math.max(-bandWidth * (i + 1), minOutput));
+      lBgColorBoundsLow.push(Math.max(outputMidpoint - bandWidth * (i + 1), minOutput));
       lBgOrderLow.push(i + 1);
     }
 
     const lBgColorBoundsHi = [];
     const lBgOrderHi = [];
     for (let i = 0; i < numBgColorsHi; ++i) {
-      lBgColorBoundsHi.push(Math.min(bandWidth * i, maxOutput));
+      lBgColorBoundsHi.push(Math.min(outputMidpoint + bandWidth * i, maxOutput));
       lBgOrderHi.push(i + 1);
     }
 
@@ -792,7 +818,9 @@ function generatePlot() {
       llData.push(lFakeData);
       lOrder.push(lBgOrderHi[k]);
 
-      let colorRatio = k / (numBgColorsHi - 1);
+      let colorRatio = 1;
+      if (numBgColorsHi > 1)
+        colorRatio = k / (numBgColorsHi - 1);
       let backgroundColor = mix_hexes(maxColor, "#FFFFFF", colorRatio);
       lBackgroundColors.push(backgroundColor);
 
@@ -804,7 +832,7 @@ function generatePlot() {
         lBorderWidths.push(0);
       }
 
-      lFill.push(true);
+      lFill.push(0);
       lBorderDashes.push([]);
     }
 
@@ -829,7 +857,7 @@ function generatePlot() {
         lBorderWidths.push(0);
       }
 
-      lFill.push(true);
+      lFill.push(0);
       lBorderDashes.push([]);
     }
 
@@ -913,7 +941,7 @@ function generatePlot() {
 
       for (let j = 0; j < numOutputs; ++j) {
 
-        const lData = llData[numBgColors + numAxisLines + i + j * numConditions];
+        const lData = llData[1 + numBgColors + numAxisLines + i + j * numConditions];
         const tipCenter = barSize * (i + 0.5 * j / numOutputs);
 
         for (let l = 0; l < numAnglePoints; ++l) {
@@ -929,9 +957,9 @@ function generatePlot() {
           if (tipDistance <= tipSize)
             lData.push(conditionData.data[j]);
           else if (tipDistance <= tipSize + 1)
-            lData.push(0);
+            lData.push(outputMidpoint);
           else if (j == 0 && tipDistance <= tipSize + baseSeparation + 1)
-            lData.push(0);
+            lData.push(outputMidpoint);
           else
             lData.push(null);
         }
@@ -939,7 +967,7 @@ function generatePlot() {
     } else {
       lOutputConditionLabels[i] = conditionData.label;
       for (let j = 0; j < numOutputs; ++j) {
-        llData[numBgColors + numAxisLines + j].push(conditionData.data[j]);
+        llData[1 + numBgColors + numAxisLines + j].push(conditionData.data[j]);
       }
     }
   }
@@ -960,16 +988,24 @@ function generatePlot() {
       if (fanMode) {
         let color;
         let val = Math.min(Math.max(lConditionData[i].data[j], minOutput), maxOutput);
-        if (val >= 0) {
-          let colorRatio = val / maxOutput;
-          color = mix_hexes(maxColor, "#FFFFFF", colorRatio);
+        if (val >= outputMidpoint) {
+          if (maxOutput == outputMidpoint) {
+            color = maxColor;
+          } else {
+            let colorRatio = (val - outputMidpoint) / (maxOutput - outputMidpoint);
+            color = mix_hexes(maxColor, "#FFFFFF", colorRatio);
+          }
         }
         else {
-          let colorRatio = val / minOutput;
-          color = mix_hexes(minColor, "#FFFFFF", colorRatio);
+          if (minOutput == outputMidpoint) {
+            color = minColor;
+          } else {
+            let colorRatio = (outputMidpoint - val) / (outputMidpoint - minOutput);
+            color = mix_hexes(minColor, "#FFFFFF", colorRatio);
+          }
         }
         lBackgroundColors.push(color);
-        lFill.push(true);
+        lFill.push(0);
       } else {
         lBackgroundColors.push(DATA_BG_COLOR);
         lFill.push(false);
@@ -979,7 +1015,7 @@ function generatePlot() {
 
   // Prepare the data as Datasets in the format expected by ChartJS
   const lDatasets = [];
-  for (let j = 0; j < numBgColors + numAxisLines + numOutputs * numDatasetMultiplier; ++j) {
+  for (let j = 0; j < 1 + numBgColors + numAxisLines + numOutputs * numDatasetMultiplier; ++j) {
     lDatasets.push({
       label: lOutputLabels[j],
       data: llData[j],
