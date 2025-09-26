@@ -9,6 +9,9 @@
 
   --radar-mode-display: block;
   --fan-mode-display  : none;
+
+  --rel-dev-mode-display: inline;
+  --abs-dev-mode-display: none;
 }
 
 [input-mode="direct"] {
@@ -23,6 +26,11 @@
 [chart-mode="fan"] {
   --radar-mode-display: none;
   --fan-mode-display  : block;
+}
+
+[dev-calc-mode="absolute"] {
+  --rel-dev-mode-display: none;
+  --abs-dev-mode-display: inline;
 }
 
 .calc-mode-only {
@@ -57,6 +65,14 @@ tr.direct-mode-only {
 
 .fan-mode-only {
   display: var(--fan-mode-display) !important;
+}
+
+.rel-dev-mode-only {
+  display: var(--rel-dev-mode-display) !important;
+}
+
+.abs-dev-mode-only {
+  display: var(--abs-dev-mode-display) !important;
 }
 
 /* Customisation of input boxes */
@@ -106,6 +122,11 @@ tr td:first-child button {
 
 .output-label-row {
   height: 2rem;
+}
+
+#table-options td {
+  max-width    : 16rem;
+  padding-right: 0.5rem;
 }
 
 /* Style the sensitivity table */

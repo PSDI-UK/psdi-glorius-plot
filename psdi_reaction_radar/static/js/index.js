@@ -68,6 +68,7 @@ const GRID_COLOR = "#00000080";
 let autoUpdating = false;
 let directInput = false;
 let radarChart = null;
+let absDevCalc = false;
 
 let lastAspectRatio;
 let lastFontSizeWidthRatio;
@@ -669,10 +670,14 @@ function calcDeviation() {
       else
         conditionMean = baselineMean;
 
-      const deviation = (conditionMean - baselineMean) / baselineMean * 100;
+      const absDeviation = conditionMean - baselineMean;
+      const relDeviation = (conditionMean - baselineMean) / baselineMean * 100;
 
       const deviationInput = lDeviationInputs.eq(j).find(".deviation-value");
-      deviationInput.val(deviation);
+      if (absDevCalc)
+        deviationInput.val(absDeviation);
+      else
+        deviationInput.val(relDeviation);
     }
 
   }
@@ -1198,6 +1203,7 @@ function enableOnChangeTriggers() {
   enableDeviationCalc();
   enableCanvasUpdate();
 
+  $("#dev-calc-select").on("change", setDeviationCalcMode);
   $(".output-label-select").on("change", updateOutputLabelSelection);
   $("#color-select").on("change", updateColourSchemeSelection);
 }
@@ -1208,6 +1214,17 @@ function disableAutoUpdates() {
 
   // Re-enable any on change triggers aside from chart updating
   enableOnChangeTriggers();
+}
+
+function setDeviationCalcMode(e) {
+  document.documentElement.setAttribute("dev-calc-mode", e.target.value);
+  if (e.target.value == "relative")
+    absDevCalc = false;
+  else
+    absDevCalc = true;
+  calcDeviation();
+  if (autoUpdating)
+    generatePlot();
 }
 
 function toggleInputMode(e) {
