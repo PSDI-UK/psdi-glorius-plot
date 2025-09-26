@@ -50,7 +50,7 @@ const COLOR_SCHEMES = {
 
 }
 
-const DEFAULT_VALUE_MEAN = 66.6667;
+const DEFAULT_VALUE_MEAN = 100;
 const VALUE_MIN = 0.;
 const VALUE_MAX = 100.;
 
@@ -1231,9 +1231,7 @@ function disableAutoUpdates() {
 
 function setDeviationCalcMode(e) {
   document.documentElement.setAttribute("dev-calc-mode", e.target.value);
-  if (autoUpdating)
-    generatePlot();
-  else
+  if (!autoUpdating)
     calcDeviation();
 }
 
