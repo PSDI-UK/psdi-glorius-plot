@@ -10,8 +10,10 @@
   --radar-mode-display: block;
   --fan-mode-display  : none;
 
-  --rel-dev-mode-display: inline;
-  --abs-dev-mode-display: none;
+  --rel-dev-mode-display     : inline;
+  --abs-dev-mode-display     : none;
+  --non-none-dev-mode-display: inline;
+  --none-dev-mode-display    : none;
 }
 
 [input-mode="direct"] {
@@ -29,8 +31,17 @@
 }
 
 [dev-calc-mode="absolute"] {
-  --rel-dev-mode-display: none;
-  --abs-dev-mode-display: inline;
+  --rel-dev-mode-display     : none;
+  --abs-dev-mode-display     : inline;
+  --non-none-dev-mode-display: inline;
+  --none-dev-mode-display    : none;
+}
+
+[dev-calc-mode="none"] {
+  --rel-dev-mode-display     : none;
+  --abs-dev-mode-display     : none;
+  --non-none-dev-mode-display: none;
+  --none-dev-mode-display    : inline;
 }
 
 .calc-mode-only {
@@ -73,6 +84,14 @@ tr.direct-mode-only {
 
 .abs-dev-mode-only {
   display: var(--abs-dev-mode-display) !important;
+}
+
+.non-none-dev-mode-only {
+  display: var(--non-none-dev-mode-display) !important;
+}
+
+.none-dev-mode-only {
+  display: var(--none-dev-mode-display) !important;
 }
 
 /* Customisation of input boxes */

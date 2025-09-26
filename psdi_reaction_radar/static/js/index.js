@@ -68,7 +68,6 @@ const GRID_COLOR = "#00000080";
 let autoUpdating = false;
 let directInput = false;
 let radarChart = null;
-let absDevCalc = false;
 
 let lastAspectRatio;
 let lastFontSizeWidthRatio;
@@ -508,6 +507,10 @@ function resetPlotDims() {
 
 // Functions to get various options set by the user
 
+function getDevCalcMode() {
+  return $("#dev-calc-select").find(":selected").val();
+}
+
 function getWidth() {
   return +$("#width-input").val();
 }
@@ -602,7 +605,9 @@ function calcDeviation() {
   const numOutputs = getNumOutputs();
   const numSamples = getNumSamples();
 
-  const lBaselineCells = $(".baseline-value-cell");
+  const baselineRow = $(".baseline-row");
+  const lBaselineCells = baselineRow.find(".baseline-value-cell");
+  const lBaselineDeviationInputs = baselineRow.find(".deviation-value");
 
   // Start by calculating the mean baseline for each output
   const lBaselineMeans = [];
@@ -625,10 +630,14 @@ function calcDeviation() {
 
   for (let j = 0; j < numOutputs; j++) {
     const lBaselineSamples = llBaselineSamples[j];
+    let baselineMean;
     if (lBaselineSamples.length > 0)
-      lBaselineMeans.push(lBaselineSamples.reduce((a, b) => a + b) / lBaselineSamples.length);
+      baselineMean = lBaselineSamples.reduce((a, b) => a + b) / lBaselineSamples.length;
     else
-      lBaselineMeans.push(DEFAULT_VALUE_MEAN);
+      baselineMean = DEFAULT_VALUE_MEAN;
+
+    lBaselineMeans.push(baselineMean);
+    lBaselineDeviationInputs.eq(j).val(baselineMean);
   }
 
   // Now calculate the mean for each output of each condition, and use it and the baseline mean to calculate and fill in
@@ -674,10 +683,14 @@ function calcDeviation() {
       const relDeviation = (conditionMean - baselineMean) / baselineMean * 100;
 
       const deviationInput = lDeviationInputs.eq(j).find(".deviation-value");
-      if (absDevCalc)
+
+      const devCalcMode = getDevCalcMode();
+      if (devCalcMode == "relative")
+        deviationInput.val(relDeviation);
+      else if (devCalcMode == "absolute")
         deviationInput.val(absDeviation);
       else
-        deviationInput.val(relDeviation);
+        deviationInput.val(conditionMean);
     }
 
   }
@@ -1218,13 +1231,10 @@ function disableAutoUpdates() {
 
 function setDeviationCalcMode(e) {
   document.documentElement.setAttribute("dev-calc-mode", e.target.value);
-  if (e.target.value == "relative")
-    absDevCalc = false;
-  else
-    absDevCalc = true;
-  calcDeviation();
   if (autoUpdating)
     generatePlot();
+  else
+    calcDeviation();
 }
 
 function toggleInputMode(e) {

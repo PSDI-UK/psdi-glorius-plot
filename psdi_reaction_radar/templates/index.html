@@ -32,12 +32,15 @@
       <label for="dev-calc-select" class="mouseover" data-bs-toggle="tooltip" data-bs-custom-class="tooltip-on-light"
         data-bs-placement="top" title="“Absolute” deviation is the difference of the outcome from the standard conditions. 
                                        “Relative” deviation is this value divided by the standard conditions, 
-                                       expressed as a per cent.">Deviation calculation: </label>
+                                       expressed as a per cent. “None” will result in outcomes being displayed directly 
+                                       on the plot, alongside a line for the standard conditions.">Deviation
+        calculation: </label>
     </td>
     <td>
-      <select name="dev-calc-select" id="dev-calc-select">
+      <select name="dev-calc-select" id="dev-calc-select" class="trigger-chart-update">
         <option value="relative">Relative</option>
         <option value="absolute">Absolute</option>
+        <option value="none">None</option>
       </select>
     </td>
   </tr>
@@ -133,7 +136,8 @@
       <th class="sample-heading calc-mode-only">Isolated Yield (%)</th>
 
       <th class="deviation-heading">
-        Deviation <span class="rel-dev-mode-only">(%)</span>
+        <span class="non-none-dev-mode-only">Deviation <span class="rel-dev-mode-only">(%)</span></span>
+        <span class="none-dev-mode-only">Mean</span>
       </th>
 
     </tr>
@@ -148,7 +152,10 @@
           </div>
         </div>
       </td>
-      <td class="empty-cell baseline-deviation-cell"></td>
+      <td class="empty-cell baseline-deviation-cell">
+        <input type="number" step="any"
+          class="calc-mode-disabled none-dev-mode-only deviation-value trigger-chart-update" value="0" disabled>
+      </td>
     </tr>
 
     <tr class="condition-row">
