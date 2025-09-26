@@ -9,49 +9,75 @@
 {% block hero_title %}PSDI Glorius Plot Generator{% endblock %}
 
 {% block inner_content %}
-<div id="table-options">
-  <p id="input-mode-control" class="hidden">
-    <input type="checkbox" name="input-mode-toggle" id="input-mode-toggle">
-    <label for="input-mode-toggle"> Directly input deviations</label>
-  </p>
-  <p id="num-condition-control">
-    <label for="num-condition">Test conditions: </label>
-    <select name="num-condition" id="num-condition">
-      <option value="3">3</option>
-      <option value="4">4</option>
-      <option value="5" selected>5</option>
-      <option value="6">6</option>
-      <option value="7">7</option>
-      <option value="8">8</option>
-      <option value="9">9</option>
-      <option value="10">10</option>
-      <option value="11">11</option>
-      <option value="12">12</option>
-    </select>
-  </p>
-  <p id="num-sample-control">
-    <label for="num-sample" class="calc-mode-only"> Number of experiments conducted for each test condition: </label>
-    <select name="num-sample" id="num-sample" class="calc-mode-only">
-      <option value="1">1</option>
-      <option value="2">2</option>
-      <option value="3">3</option>
-      <option value="4">4</option>
-      <option value="5">5</option>
-      <option value="6">6</option>
-      <option value="7">7</option>
-      <option value="8">8</option>
-      <option value="9">9</option>
-      <option value="10">10</option>
-    </select>
-  </p>
-  <p id="num-output-control" class="hidden">
-    <label for="num-output"> Reaction outcomes: </label>
-    <select name="num-output" id="num-output">
-      <option value="1">1</option>
-      <option value="2">2</option>
-    </select>
-  </p>
-</div>
+<table id="table-options">
+  <tr>
+    <td>
+      <label for="num-condition">Test conditions: </label>
+    </td>
+    <td>
+      <select name="num-condition" id="num-condition">
+        <option value="3">3</option>
+        <option value="4">4</option>
+        <option value="5" selected>5</option>
+        <option value="6">6</option>
+        <option value="7">7</option>
+        <option value="8">8</option>
+        <option value="9">9</option>
+        <option value="10">10</option>
+        <option value="11">11</option>
+        <option value="12">12</option>
+      </select>
+    </td>
+    <td>
+      <label for="dev-calc-select" class="mouseover" data-bs-toggle="tooltip" data-bs-custom-class="tooltip-on-light"
+        data-bs-placement="top" title="“Absolute” deviation is the difference of the outcome from the standard conditions. 
+                                       “Relative” deviation is this value divided by the standard conditions, 
+                                       expressed as a per cent.">Deviation calculation: </label>
+    </td>
+    <td>
+      <select name="dev-calc-select" id="dev-calc-select">
+        <option value="relative">Relative</option>
+        <option value="absolute">Absolute</option>
+      </select>
+    </td>
+  </tr>
+  <tr>
+    <td id="num-sample-cell">
+      <label for="num-sample" class="calc-mode-only">Number of experiments conducted for each test condition:</label>
+    </td>
+    <td>
+      <select name="num-sample" id="num-sample" class="calc-mode-only">
+        <option value="1">1</option>
+        <option value="2">2</option>
+        <option value="3">3</option>
+        <option value="4">4</option>
+        <option value="5">5</option>
+        <option value="6">6</option>
+        <option value="7">7</option>
+        <option value="8">8</option>
+        <option value="9">9</option>
+        <option value="10">10</option>
+      </select>
+    </td>
+  </tr>
+  <tr class="hidden">
+    <td>
+      <label for="num-output">Reaction outcomes: </label>
+    </td>
+    <td>
+      <select name="num-output" id="num-output">
+        <option value="1">1</option>
+        <option value="2">2</option>
+      </select>
+    </td>
+    <td>
+      <label for="input-mode-toggle">Directly input deviations: </label>
+    </td>
+    <td>
+      <input type="checkbox" name="input-mode-toggle" id="input-mode-toggle">
+    </td>
+  </tr>
+</table>
 
 <form class="sens-form">
 
@@ -107,14 +133,7 @@
       <th class="sample-heading calc-mode-only">Isolated Yield (%)</th>
 
       <th class="deviation-heading">
-        <span class="mouseover calc-mode-only" data-bs-toggle="tooltip" data-bs-custom-class="tooltip-on-light"
-          data-bs-placement="top"
-          title="Deviation is calculated as (Result - Standard Conditions)/(Standard Conditions) * 100%">
-          Deviation (%)</span>
-        <span class="mouseover direct-mode-only" data-bs-toggle="tooltip" data-bs-custom-class="tooltip-on-light"
-          data-bs-placement="top"
-          title="Enter the deviation from the baseline as a percentage, i.e. (Result - Standard Conditions)/(Standard Conditions) * 100%">
-          Deviation (%)</span>
+        Deviation <span class="rel-dev-mode-only">(%)</span>
       </th>
 
     </tr>
@@ -153,7 +172,7 @@
           <div class="deviation-input-line">
             <input type="number" step="any" class="calc-mode-disabled deviation-value trigger-chart-update" value="0"
               disabled>
-            <span>%</span>
+            <span class="rel-dev-mode-only">%</span>
           </div>
         </div>
       </td>
@@ -180,7 +199,7 @@
           <div class="deviation-input-line">
             <input type="number" step="any" class="calc-mode-disabled deviation-value trigger-chart-update" value="0"
               disabled>
-            <span>%</span>
+            <span class="rel-dev-mode-only">%</span>
           </div>
         </div>
       </td>
@@ -207,7 +226,7 @@
           <div class="deviation-input-line">
             <input type="number" step="any" class="calc-mode-disabled deviation-value trigger-chart-update" value="0"
               disabled>
-            <span>%</span>
+            <span class="rel-dev-mode-only">%</span>
           </div>
         </div>
       </td>
@@ -234,7 +253,7 @@
           <div class="deviation-input-line">
             <input type="number" step="any" class="calc-mode-disabled deviation-value trigger-chart-update" value="0"
               disabled>
-            <span>%</span>
+            <span class="rel-dev-mode-only">%</span>
           </div>
         </div>
       </td>
@@ -261,7 +280,7 @@
           <div class="deviation-input-line">
             <input type="number" step="any" class="calc-mode-disabled deviation-value trigger-chart-update" value="0"
               disabled>
-            <span>%</span>
+            <span class="rel-dev-mode-only">%</span>
           </div>
         </div>
       </td>
