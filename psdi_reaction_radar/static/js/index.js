@@ -69,6 +69,14 @@ let autoUpdating = false;
 let directInput = false;
 let radarChart = null;
 
+let lastAspectRatio;
+let lastFontSizeWidthRatio;
+let lastFontSizeHeightRatio;
+
+let initWidth;
+let initHeight;
+let initFontSize;
+
 // When the script is initially loaded, store a copy of a heading element and cell elements that we'll later use
 // as templates to add new rows
 
@@ -429,10 +437,6 @@ function updateCanvasShape() {
   })
 }
 
-let lastAspectRatio;
-let lastFontSizeWidthRatio;
-let lastFontSizeHeightRatio;
-
 /**
  * Called when the width is updated, so that if the aspect ratio is locked, the height can be updated as well, and
  * similarly if font scaling is enabled
@@ -451,7 +455,8 @@ function updateWidth() {
     lastFontSizeWidthRatio = getFontSizeWidthRatio();
   }
 
-  updateCanvasShape();
+  if (autoUpdating)
+    updateCanvasShape();
 }
 
 /**
@@ -472,7 +477,8 @@ function updateHeight() {
     lastFontSizeHeightRatio = getFontSizeHeightRatio();
   }
 
-  updateCanvasShape();
+  if (autoUpdating)
+    updateCanvasShape();
 }
 
 /**
@@ -481,6 +487,21 @@ function updateHeight() {
 function updateFontSize() {
   lastFontSizeWidthRatio = getFontSizeWidthRatio();
   lastFontSizeHeightRatio = getFontSizeHeightRatio();
+}
+
+/**
+ * Reset the width, height, and font size to their initial values, and also update globals tracking the ratios
+ */
+function resetPlotDims() {
+  $("#width-input").val(initWidth);
+  $("#height-input").val(initHeight);
+  $("#font-size-input").val(initFontSize);
+
+  lastAspectRatio = getAspectRatio();
+  updateFontSize();
+
+  if (autoUpdating)
+    generatePlot();
 }
 
 
@@ -1151,19 +1172,25 @@ function enableAutoUpdates() {
   $(".trigger-chart-update").on("change", generatePlot);
   $(".trigger-deviation-update").on("change", generatePlot);
   autoUpdating = true;
+  updateCanvasShape();
   generatePlot();
 }
 
-function enableButtons() {
+function enableToggles() {
   $("#input-mode-toggle").on("click", toggleInputMode);
   $("#fan-toggle").on("click", toggleChartMode);
 
+  $("#auto-update-toggle").on("click", toggleAutoUpdates);
+}
+
+function enableButtons() {
   $("#fill-random").on("click", fillRandom);
   $("#fill-example").on("click", fillExample);
 
   $("#generate-plot").on("click", generatePlot);
 
-  $("#auto-update-toggle").on("click", toggleAutoUpdates);
+  $("#reset-plot-dims").on("click", resetPlotDims);
+
 }
 
 function enableOnChangeTriggers() {
@@ -1271,12 +1298,16 @@ function toggleAutoUpdates(e) {
 }
 
 /**
- * Initialize global variables in this script
+ * Initialize global variables in this script that rely on values in the document
  */
 function initGlobals() {
   lastAspectRatio = getAspectRatio();
   lastFontSizeWidthRatio = getFontSizeWidthRatio();
   lastFontSizeHeightRatio = getFontSizeHeightRatio();
+
+  initWidth = getWidth();
+  initHeight = getHeight();
+  initFontSize = getFontSize();
 }
 
 /**
@@ -1298,6 +1329,7 @@ $(document).ready(function () {
   enableOutputLabelUpdate();
 
   enableOnChangeTriggers();
+  enableToggles();
   enableButtons();
 
   enableDeviationCalc();

@@ -154,6 +154,10 @@ input.deviation-value {
   gap            : 0.25rem;
 }
 
+button#reset-plot-dims {
+  margin-left: 0;
+}
+
 /* Dotted underline to indicate text that will show a tooltip on mouseover */
 .mouseover {
   text-decoration: underline dotted;
