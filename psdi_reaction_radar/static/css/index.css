@@ -121,7 +121,8 @@ button.fix-size-small {
   padding: 0;
 }
 
-tr td:first-child button {
+tr td:first-child button,
+#export-buttons button:first-child {
   margin-left: 0;
 }
 
