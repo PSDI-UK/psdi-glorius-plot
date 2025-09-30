@@ -1202,6 +1202,23 @@ function fillExample() {
 
 }
 
+
+/**
+ * Export the chart in the desired format
+ * @param {string} format 
+ */
+function exportImage(format) {
+  $("#glorius-plot")[0].toBlob((blob) => {
+    let objectURL = URL.createObjectURL(blob);
+
+    let link = document.createElement('a');
+    link.href = objectURL;
+    link.download = "glorius_plot." + format;
+    link.click();
+
+  }, "image/" + format);
+}
+
 function enableCanvasUpdate() {
   $("#width-input").on("change", updateWidth);
   $("#height-input").on("change", updateHeight);
@@ -1251,6 +1268,8 @@ function enableButtons() {
   $("#fill-example").on("click", fillExample);
 
   $("#generate-plot").on("click", generatePlot);
+
+  $("#export-image-png").on("click", () => exportImage("png"));
 
   $("#reset-plot-dims").on("click", resetPlotDims);
 
