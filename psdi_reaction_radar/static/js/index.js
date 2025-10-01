@@ -960,7 +960,7 @@ function generatePlot() {
       for (let j = 0; j < numOutputs; ++j) {
 
         const lData = llData[1 + numBgColors + numAxisLines + i + j * numConditions];
-        const tipCenter = barSize * (i + 0.5 * j / numOutputs);
+        const tipCenter = barSize * (i + 0.5 + 0.5 * j / numOutputs);
 
         for (let l = 0; l < numAnglePoints; ++l) {
           if (j == 0 && l == tipCenter)
