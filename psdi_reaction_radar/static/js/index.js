@@ -917,6 +917,32 @@ function generatePlot() {
     lConditionLabels.push(lConditionLabelCells[i].value);
   }
 
+  // Make a fake dataset to add the label to the legend for each output
+  const lOutputLabelInputs = $("input.output-input");
+  for (let j = 0; j < numOutputs; ++j) {
+    lOutputLabels.push(lOutputLabelInputs[j].value);
+    let lInvisibleData = [];
+    let numInvisiblePoints = numConditions;
+
+    if (fanMode)
+      numMidpointPoints = numAnglePoints;
+
+    for (let i = 0; i < numInvisiblePoints; ++i) {
+      if (i == 0)
+        lInvisibleData.push(outputMidpoint)
+      else
+        lInvisibleData.push(null);
+    }
+
+    llData.push(lInvisibleData);
+    lOrder.push(999);
+    lBorderColors.push("black");
+    lBorderWidths.push(BORDER_WIDTH);
+    lBorderDashes.push(L_BORDER_DASHES[j]);
+    lBackgroundColors.push("white");
+    lFill.push(false);
+  }
+
   // Get data for each output
   for (let j = 0; j < numOutputs * numDatasetMultiplier; ++j) {
     llData.push([]);
@@ -959,7 +985,7 @@ function generatePlot() {
 
       for (let j = 0; j < numOutputs; ++j) {
 
-        const lData = llData[1 + numBgColors + numAxisLines + i + j * numConditions];
+        const lData = llData[1 + numBgColors + numAxisLines + i + j * numConditions + numOutputs];
         const tipCenter = barSize * (i + 0.5 + 0.5 * j / numOutputs);
 
         for (let l = 0; l < numAnglePoints; ++l) {
@@ -985,19 +1011,16 @@ function generatePlot() {
     } else {
       lOutputConditionLabels[i] = conditionData.label;
       for (let j = 0; j < numOutputs; ++j) {
-        llData[1 + numBgColors + numAxisLines + j].push(clamp(conditionData.data[j], minOutput, maxOutput));
+        llData[1 + numBgColors + numAxisLines + j + numOutputs].push(clamp(conditionData.data[j], minOutput, maxOutput));
       }
     }
   }
 
   // Get the output labels, and also set other fixed data for normal datasets
-  const lOutputLabelInputs = $("input.output-input");
   for (let j = 0; j < numOutputs; ++j) {
+
     for (let i = 0; i < numDatasetMultiplier; ++i) {
-      if (i == 0)
-        lOutputLabels.push(lOutputLabelInputs[j].value);
-      else
-        lOutputLabels.push("")
+      lOutputLabels.push("")
       lOrder.push(0);
       lBorderColors.push("black");
       lBorderWidths.push(BORDER_WIDTH);
@@ -1033,7 +1056,7 @@ function generatePlot() {
 
   // Prepare the data as Datasets in the format expected by ChartJS
   const lDatasets = [];
-  for (let j = 0; j < 1 + numBgColors + numAxisLines + numOutputs * numDatasetMultiplier; ++j) {
+  for (let j = 0; j < 1 + numBgColors + numAxisLines + numOutputs * (1 + numDatasetMultiplier); ++j) {
     lDatasets.push({
       label: lOutputLabels[j],
       data: llData[j],
