@@ -66,6 +66,8 @@ const GRID_WIDTH = 1;
 const GRID_COLOR = "#00000080";
 
 // Globals
+let tooltipList;
+
 let autoUpdating = false;
 let directInput = false;
 let radarChart = null;
@@ -1190,6 +1192,12 @@ function fillExample() {
   lDataCells.eq(8).val("13");
   lDataCells.eq(9).val("50");
 
+  // Clear all tooltips after generating, since clicking the button interferes with the normal trigger to clear its
+  // tooltip
+  tooltipList.forEach((tooltip) => {
+    tooltip.hide();
+  });
+
   // Make sure the deviation is calculated, even in direct input mode (if not in this mode, it will be calculated when
   // the plot is generated)
   if (directInput) {
@@ -1404,7 +1412,7 @@ function initGlobals() {
  */
 function initTooltips() {
   const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
-  [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
+  tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
 }
 
 $(document).ready(function () {
