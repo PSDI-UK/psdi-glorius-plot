@@ -60,7 +60,8 @@ const OUTPUT_LABEL_TEXT = "Output {N} Label:";
 // Plot styling
 const L_BORDER_DASHES = [[], [6, 6], [4, 4], [2, 2], [1, 1]];
 const BORDER_WIDTH = 4;
-const BASELINE_WIDTH = 2;
+const BASELINE_WIDTH = 4;
+const BASELINE_COLOR = "#FFFFFF";
 const DATA_BG_COLOR = ["#FFFFFF00"];
 const GRID_WIDTH = 1;
 const GRID_COLOR = "#00000080";
@@ -794,9 +795,9 @@ function generatePlot() {
   }
 
   llData.push(lMidpointData);
-  lOrder.push(0);
-  lBorderColors.push("black");
-  lBackgroundColors.push("black");
+  lOrder.push(1);
+  lBorderColors.push(BASELINE_COLOR);
+  lBackgroundColors.push(BASELINE_COLOR);
   lFill.push(false);
   lBorderDashes.push([]);
 
