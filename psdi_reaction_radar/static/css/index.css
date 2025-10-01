@@ -127,7 +127,8 @@ tr td:first-child button,
 }
 
 #glorius-plot {
-  width: 700px;
+  width : 700px;
+  border: 1px solid black;
 }
 
 .hidden {
