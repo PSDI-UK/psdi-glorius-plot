@@ -36,8 +36,8 @@ const COLOR_SCHEMES = {
     max: "#20A020"
   },
   colourblind: {
-    min: "#FF66EB",
-    max: "#009639"
+    min: "#F05200",
+    max: "#0093F5"
   },
   greyscale: {
     min: "#A0A0A0",
