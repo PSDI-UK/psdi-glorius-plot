@@ -1151,7 +1151,7 @@ function fillRandom() {
 
 /**
  * Fill the table with preset example data, from
- * https://pubs.acs.org/doi/10.1021/acs.orglett.0c02068?goto=supporting-info
+ * https://onlinelibrary.wiley.com/doi/10.1002/anie.202418239 Table S9
  */
 function fillExample() {
   setNumDim(CONDITION, 10);
@@ -1165,30 +1165,30 @@ function fillExample() {
   const lRowLabelInputs = $(".condition-label");
   lRowLabelInputs.eq(0).val("High concentration");
   lRowLabelInputs.eq(1).val("Low concentration");
-  lRowLabelInputs.eq(2).val("Low oxygen");
-  lRowLabelInputs.eq(3).val("Longer reaction time");
-  lRowLabelInputs.eq(4).val("Low temperature");
-  lRowLabelInputs.eq(5).val("High temperature");
-  lRowLabelInputs.eq(6).val("High current");
+  lRowLabelInputs.eq(2).val("Water");
+  lRowLabelInputs.eq(3).val("Low Oxygen");
+  lRowLabelInputs.eq(4).val("High Oxygen");
+  lRowLabelInputs.eq(5).val("Low temperature");
+  lRowLabelInputs.eq(6).val("High temperature");
   lRowLabelInputs.eq(7).val("Low current");
-  lRowLabelInputs.eq(8).val("Small electrode distance");
+  lRowLabelInputs.eq(8).val("High current");
   lRowLabelInputs.eq(9).val("Big scale");
 
   // Fill the baseline value
-  $(".baseline-value").eq(0).val("100");
+  $(".baseline-value").eq(0).val("58");
 
   // Fill the output values
   const lDataCells = $(".sample-value");
-  lDataCells.eq(0).val("100");
-  lDataCells.eq(1).val("61");
-  lDataCells.eq(2).val("89");
-  lDataCells.eq(3).val("100");
-  lDataCells.eq(4).val("100");
-  lDataCells.eq(5).val("68");
-  lDataCells.eq(6).val("62");
-  lDataCells.eq(7).val("87");
-  lDataCells.eq(8).val("48");
-  lDataCells.eq(9).val("85");
+  lDataCells.eq(0).val("48");
+  lDataCells.eq(1).val("20");
+  lDataCells.eq(2).val("26");
+  lDataCells.eq(3).val("49");
+  lDataCells.eq(4).val("14");
+  lDataCells.eq(5).val("47");
+  lDataCells.eq(6).val("40");
+  lDataCells.eq(7).val("46");
+  lDataCells.eq(8).val("13");
+  lDataCells.eq(9).val("50");
 
   // Make sure the deviation is calculated, even in direct input mode (if not in this mode, it will be calculated when
   // the plot is generated)
