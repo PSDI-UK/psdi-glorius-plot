@@ -1118,14 +1118,7 @@ function fillRandom() {
   const numOutputs = getNumOutputs();
 
   // Fill the column labels
-  const lOutputLabelInputs = $(".output-input");
-  for (let j = 0; j < lOutputLabelInputs.length; ++j) {
-    let value = "Yield"
-    if (numOutputs > 1) {
-      value += " " + (j + 1).toString();
-    }
-    lOutputLabelInputs[j].value = value;
-  }
+  $(".output-label-select").val("Isolated Yield (%)").change();
 
   // Fill the row labels
   const lRowLabelInputs = $(".condition-label");
