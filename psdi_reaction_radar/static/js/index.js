@@ -88,6 +88,12 @@ const TEMPLATE_BASELINE_INPUT_LINE = $(".baseline-input-line")[0].cloneNode(true
 const TEMPLATE_SAMPLE_INPUT_LINE = $(".sample-input-line")[0].cloneNode(true);
 const TEMPLATE_DEVIATION_INPUT_LINE = $(".deviation-input-line")[0].cloneNode(true);
 
+// Common functions
+
+function clamp(x, min, max) {
+  return Math.min(Math.max(x, min), max);
+}
+
 /**
  * Get the index value stored at the end of an event's target's ID
  */
@@ -550,7 +556,7 @@ function getMinOutput() {
   if (getDevCalcMode() == "none")
     return 0;
   let minOutput = $("#min-output-input").val();
-  minOutput = Math.min(Math.max(minOutput, -100), -1);
+  minOutput = clamp(minOutput, -100, -1);
   return minOutput;
 }
 
@@ -558,7 +564,7 @@ function getMaxOutput() {
   if (getDevCalcMode() == "none")
     return 100;
   let maxOutput = $("#max-output-input").val();
-  maxOutput = Math.min(Math.max(maxOutput, 1), 1000);
+  maxOutput = clamp(maxOutput, 1, 1000);
   return maxOutput;
 }
 
@@ -570,7 +576,7 @@ function getOutputMidpoint() {
 
 function getBandWidth() {
   let bandWidth = $("#band-width-input").val();
-  bandWidth = Math.min(Math.max(bandWidth, 1), 1000);
+  bandWidth = clamp(bandWidth, 1, 1000);
   return bandWidth;
 }
 
@@ -966,7 +972,7 @@ function generatePlot() {
 
           // Set the point value based on the distance from the tip center
           if (tipDistance <= tipSize)
-            lData.push(conditionData.data[j]);
+            lData.push(clamp(conditionData.data[j], minOutput, maxOutput));
           else if (tipDistance <= tipSize + 1)
             lData.push(outputMidpoint);
           else if (j == 0 && tipDistance <= tipSize + baseSeparation + 1)
@@ -978,7 +984,7 @@ function generatePlot() {
     } else {
       lOutputConditionLabels[i] = conditionData.label;
       for (let j = 0; j < numOutputs; ++j) {
-        llData[1 + numBgColors + numAxisLines + j].push(conditionData.data[j]);
+        llData[1 + numBgColors + numAxisLines + j].push(clamp(conditionData.data[j], minOutput, maxOutput));
       }
     }
   }
@@ -998,12 +1004,12 @@ function generatePlot() {
 
       if (fanMode) {
         let color;
-        let val = Math.min(Math.max(lConditionData[i].data[j], minOutput), maxOutput);
-        if (val >= outputMidpoint) {
+        let clampedVal = clamp(lConditionData[i].data[j], minOutput, maxOutput);
+        if (clampedVal >= outputMidpoint) {
           if (maxOutput == outputMidpoint) {
             color = maxColor;
           } else {
-            let colorRatio = (val - outputMidpoint) / (maxOutput - outputMidpoint);
+            let colorRatio = (clampedVal - outputMidpoint) / (maxOutput - outputMidpoint);
             color = mix_hexes(maxColor, "#FFFFFF", colorRatio);
           }
         }
@@ -1011,7 +1017,7 @@ function generatePlot() {
           if (minOutput == outputMidpoint) {
             color = minColor;
           } else {
-            let colorRatio = (outputMidpoint - val) / (outputMidpoint - minOutput);
+            let colorRatio = (outputMidpoint - clampedVal) / (outputMidpoint - minOutput);
             color = mix_hexes(minColor, "#FFFFFF", colorRatio);
           }
         }
