@@ -201,7 +201,7 @@ button#reset-plot-dims {
 }
 
 /* How to indicate text which has a tooltip on mouseover */
-.mouseover::before {
+.mouseover-tooltip::before {
   display         : inline-flex;
   justify-content : center;
   align-items     : center;
