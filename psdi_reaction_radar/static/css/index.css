@@ -95,7 +95,9 @@ tr.direct-mode-only {
 }
 
 /* Customisation of input boxes */
-input.deviation-value {
+input.mean-value,
+input.abs-deviation-value,
+input.rel-deviation-value {
   text-align: right;
 }
 
@@ -156,6 +158,12 @@ tr td:first-child button,
   padding-right: 0.5rem;
 }
 
+.sensitivity-table th.rel-deviation-heading {
+  /* We add a little extra padding to the relative deviation heading heading, so it wraps the same way as the absolute
+  deviation heading */
+  padding-right: 1rem;
+}
+
 .sensitivity-table td {
   padding-top   : 0.25rem;
   padding-bottom: 0.25rem;
@@ -165,7 +173,9 @@ tr td:first-child button,
 .condition-label-cell,
 .baseline-value-cell,
 .sample-value-cell,
-.deviation-value-cell {
+.mean-value-cell,
+.abs-deviation-value-cell,
+.rel-deviation-value-cell {
   padding-right: 0.5rem;
 }
 
@@ -175,7 +185,9 @@ input.condition-label {
 
 .baseline-line-container,
 .sample-line-container,
-.deviation-line-container {
+.mean-line-container,
+.abs-deviation-line-container,
+.rel-deviation-line-container {
   display        : flex;
   flex-direction : column;
   justify-content: center;
@@ -183,13 +195,17 @@ input.condition-label {
 
 input.baseline-value,
 input.sample-value,
-input.deviation-value {
+input.mean-value,
+input.abs-deviation-value,
+input.rel-deviation-value {
   max-width: 5rem;
 }
 
 .baseline-input-line,
 .sample-input-line,
-.deviation-input-line {
+.mean-input-line,
+.abs-deviation-input-line,
+.rel-deviation-input-line {
   display        : flex;
   flex-direction : row;
   justify-content: start;

@@ -28,24 +28,6 @@
         <option value="12">12</option>
       </select>
     </td>
-    <td>
-      <label for="dev-calc-select" data-bs-toggle="tooltip" data-bs-custom-class="tooltip-on-light"
-        data-bs-placement="top" title="“Absolute” deviation is the difference of the outcome from the standard conditions. 
-                                       “Relative” deviation is this value divided by the standard conditions, 
-                                       expressed as a per cent. “None” will result in outcomes being displayed directly 
-                                       on the plot, alongside a line for the standard conditions."
-        class="mouseover-tooltip">Deviation
-        calculation: </label>
-    </td>
-    <td>
-      <select name="dev-calc-select" id="dev-calc-select" class="trigger-chart-update">
-        <option value="relative">Relative</option>
-        <option value="absolute">Absolute</option>
-        <option value="none">None</option>
-      </select>
-    </td>
-  </tr>
-  <tr>
     <td id="num-sample-cell">
       <label for="num-sample" class="calc-mode-only">Number of experiments conducted for each test condition:</label>
     </td>
@@ -95,7 +77,7 @@
         <label for="os-0" class="output-label">Outcome:</label>
       </td>
       <td class="output-label-select-cell">
-        <select name="output-label-select" class="output-label-select" id="os-0">
+        <select name="output-label-select" class="output-label-select trigger-chart-update" id="os-0">
           <option value="Isolated Yield (%)" selected>Isolated Yield (%)</option>
           <option value="Spectroscopic Yield (%)">Spectroscopic Yield (%)</option>
           <option value="ee (%)">ee (%)</option>
@@ -122,7 +104,9 @@
         <button type="button" id="remove-sb-0" class="remove-sample disabled fix-size-small" disabled="true">-</button>
         <button type="button" id="add-sb-0" class="add-sample fix-size-small">+</button>
       </td>
-      <td class="empty-cell button-deviation-cell"></td>
+      <td class="empty-cell button-mean-cell hidden"></td>
+      <td class="empty-cell button-abs-deviation-cell"></td>
+      <td class="empty-cell button-rel-deviation-cell"></td>
 
     </tr>
 
@@ -136,10 +120,11 @@
 
       <th class="sample-heading calc-mode-only">Isolated Yield (%)</th>
 
-      <th class="deviation-heading">
-        <span class="non-none-dev-mode-only">Deviation <span class="rel-dev-mode-only">(%)</span></span>
-        <span class="none-dev-mode-only">Mean</span>
-      </th>
+      <th class="mean-heading hidden">Mean</th>
+
+      <th class="abs-deviation-heading">Deviation (+/-)</th>
+
+      <th class="rel-deviation-heading">Deviation (%)</th>
 
     </tr>
 
@@ -153,10 +138,11 @@
           </div>
         </div>
       </td>
-      <td class="empty-cell baseline-deviation-cell">
-        <input type="number" step="any"
-          class="calc-mode-disabled none-dev-mode-only deviation-value trigger-chart-update" value="0" disabled>
+      <td class="baseline-mean-cell hidden">
+        <input type="number" step="any" class="calc-mode-disabled mean-value trigger-chart-update" value="100" disabled>
       </td>
+      <td class="empty-cell baseline-abs-deviation-cell"></td>
+      <td class="empty-cell baseline-rel-deviation-cell"></td>
     </tr>
 
     <tr class="condition-row">
@@ -175,12 +161,24 @@
           </div>
         </div>
       </td>
-      <td class="deviation-value-cell">
-        <div class="deviation-line-container">
-          <div class="deviation-input-line">
-            <input type="number" step="any" class="calc-mode-disabled deviation-value trigger-chart-update" value="0"
-              disabled>
-            <span class="rel-dev-mode-only">%</span>
+      <td class="mean-value-cell hidden">
+        <div class="mean-line-container">
+          <div class="mean-input-line">
+            <input type="number" step="any" class="mean-value trigger-chart-update" value="0" disabled>
+          </div>
+        </div>
+      </td>
+      <td class="abs-deviation-value-cell">
+        <div class="abs-deviation-line-container">
+          <div class="abs-deviation-input-line">
+            <input type="number" step="any" class="abs-deviation-value trigger-chart-update" value="0" disabled>
+          </div>
+        </div>
+      </td>
+      <td class="rel-deviation-value-cell">
+        <div class="rel-deviation-line-container">
+          <div class="rel-deviation-input-line">
+            <input type="number" step="any" class="rel-deviation-value trigger-chart-update" value="0" disabled>
           </div>
         </div>
       </td>
@@ -202,12 +200,24 @@
           </div>
         </div>
       </td>
-      <td class="deviation-value-cell">
-        <div class="deviation-line-container">
-          <div class="deviation-input-line">
-            <input type="number" step="any" class="calc-mode-disabled deviation-value trigger-chart-update" value="0"
-              disabled>
-            <span class="rel-dev-mode-only">%</span>
+      <td class="mean-value-cell hidden">
+        <div class="mean-line-container">
+          <div class="mean-input-line">
+            <input type="number" step="any" class="mean-value trigger-chart-update" value="0" disabled>
+          </div>
+        </div>
+      </td>
+      <td class="abs-deviation-value-cell">
+        <div class="abs-deviation-line-container">
+          <div class="abs-deviation-input-line">
+            <input type="number" step="any" class="abs-deviation-value trigger-chart-update" value="0" disabled>
+          </div>
+        </div>
+      </td>
+      <td class="rel-deviation-value-cell">
+        <div class="rel-deviation-line-container">
+          <div class="rel-deviation-input-line">
+            <input type="number" step="any" class="rel-deviation-value trigger-chart-update" value="0" disabled>
           </div>
         </div>
       </td>
@@ -229,12 +239,24 @@
           </div>
         </div>
       </td>
-      <td class="deviation-value-cell">
-        <div class="deviation-line-container">
-          <div class="deviation-input-line">
-            <input type="number" step="any" class="calc-mode-disabled deviation-value trigger-chart-update" value="0"
-              disabled>
-            <span class="rel-dev-mode-only">%</span>
+      <td class="mean-value-cell hidden">
+        <div class="mean-line-container">
+          <div class="mean-input-line">
+            <input type="number" step="any" class="mean-value trigger-chart-update" value="0" disabled>
+          </div>
+        </div>
+      </td>
+      <td class="abs-deviation-value-cell">
+        <div class="abs-deviation-line-container">
+          <div class="abs-deviation-input-line">
+            <input type="number" step="any" class="abs-deviation-value trigger-chart-update" value="0" disabled>
+          </div>
+        </div>
+      </td>
+      <td class="rel-deviation-value-cell">
+        <div class="rel-deviation-line-container">
+          <div class="rel-deviation-input-line">
+            <input type="number" step="any" class="rel-deviation-value trigger-chart-update" value="0" disabled>
           </div>
         </div>
       </td>
@@ -256,12 +278,24 @@
           </div>
         </div>
       </td>
-      <td class="deviation-value-cell">
-        <div class="deviation-line-container">
-          <div class="deviation-input-line">
-            <input type="number" step="any" class="calc-mode-disabled deviation-value trigger-chart-update" value="0"
-              disabled>
-            <span class="rel-dev-mode-only">%</span>
+      <td class="mean-value-cell hidden">
+        <div class="mean-line-container">
+          <div class="mean-input-line">
+            <input type="number" step="any" class="mean-value trigger-chart-update" value="0" disabled>
+          </div>
+        </div>
+      </td>
+      <td class="abs-deviation-value-cell">
+        <div class="abs-deviation-line-container">
+          <div class="abs-deviation-input-line">
+            <input type="number" step="any" class="abs-deviation-value trigger-chart-update" value="0" disabled>
+          </div>
+        </div>
+      </td>
+      <td class="rel-deviation-value-cell">
+        <div class="rel-deviation-line-container">
+          <div class="rel-deviation-input-line">
+            <input type="number" step="any" class="rel-deviation-value trigger-chart-update" value="0" disabled>
           </div>
         </div>
       </td>
@@ -283,12 +317,24 @@
           </div>
         </div>
       </td>
-      <td class="deviation-value-cell">
-        <div class="deviation-line-container">
-          <div class="deviation-input-line">
-            <input type="number" step="any" class="calc-mode-disabled deviation-value trigger-chart-update" value="0"
-              disabled>
-            <span class="rel-dev-mode-only">%</span>
+      <td class="mean-value-cell hidden">
+        <div class="mean-line-container">
+          <div class="mean-input-line">
+            <input type="number" step="any" class="mean-value trigger-chart-update" value="0" disabled>
+          </div>
+        </div>
+      </td>
+      <td class="abs-deviation-value-cell">
+        <div class="abs-deviation-line-container">
+          <div class="abs-deviation-input-line">
+            <input type="number" step="any" class="abs-deviation-value trigger-chart-update" value="0" disabled>
+          </div>
+        </div>
+      </td>
+      <td class="rel-deviation-value-cell">
+        <div class="rel-deviation-line-container">
+          <div class="rel-deviation-input-line">
+            <input type="number" step="any" class="rel-deviation-value trigger-chart-update" value="0" disabled>
           </div>
         </div>
       </td>
@@ -335,6 +381,19 @@
     <label for="scale-font-size"> Scale font size with plot size</label>
     <br>
     <button type="button" id="reset-plot-dims" class="trigger-chart-update">Reset Size and Shape</button>
+  </p>
+  <p>
+    <label for="dev-plot-select" data-bs-toggle="tooltip" data-bs-custom-class="tooltip-on-light"
+      data-bs-placement="top" title="“Mean” will result in outcomes being displayed directly on the plot, alongside a
+                                     line for the standard conditions.“Deviation (+/-)” will plot the difference of
+                                     the (mean) outcome from the standard conditions. “Deviation (%)” will plot this
+                                     value divided by the standard conditions, expressed as a per cent."
+      class="mouseover-tooltip">Value to plot: </label>
+    <select name="dev-plot-select" id="dev-plot-select" class="trigger-chart-update">
+      <option value="mean">Mean</option>
+      <option value="absolute">Deviation (+/-)</option>
+      <option value="relative" selected>Deviation (%)</option>
+    </select>
   </p>
   <p>
     <label for="min-output-input" class="non-none-dev-mode-only">Minimum output: </label>

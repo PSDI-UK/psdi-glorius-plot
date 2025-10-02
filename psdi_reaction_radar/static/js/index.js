@@ -87,7 +87,9 @@ let initFontSize;
 const TEMPLATE_OUTPUT_LABEL_ROW = $(".output-label-row")[0].cloneNode(true);
 const TEMPLATE_BASELINE_INPUT_LINE = $(".baseline-input-line")[0].cloneNode(true);
 const TEMPLATE_SAMPLE_INPUT_LINE = $(".sample-input-line")[0].cloneNode(true);
-const TEMPLATE_DEVIATION_INPUT_LINE = $(".deviation-input-line")[0].cloneNode(true);
+const TEMPLATE_MEAN_INPUT_LINE = $(".mean-input-line")[0].cloneNode(true);
+const TEMPLATE_ABS_DEVIATION_INPUT_LINE = $(".abs-deviation-input-line")[0].cloneNode(true);
+const TEMPLATE_REL_DEVIATION_INPUT_LINE = $(".rel-deviation-input-line")[0].cloneNode(true);
 
 // Common functions
 
@@ -200,6 +202,7 @@ function postTableUpdateCleanup(dim, updateAfter) {
     updateDimSelector(dim);
     initNumDimControls(dim);
     relabelDim(dim);
+    updateMeanVisibility();
   }
 
   // Update the plot if desired
@@ -257,6 +260,17 @@ function relabelDim(dim) {
 
 }
 
+/**
+ * Make the means visible only if we have more than one sample column
+ */
+function updateMeanVisibility() {
+  const meanElements = $(".button-mean-cell, .mean-heading, .baseline-mean-cell, .mean-value-cell");
+  if (getNumSamples() > 1)
+    meanElements.removeClass("hidden");
+  else
+    meanElements.addClass("hidden");
+}
+
 function addConditionRow(e, updateAfter = true) {
 
   // Check that we don't already have too many conditions
@@ -270,7 +284,9 @@ function addConditionRow(e, updateAfter = true) {
   const newRow = $(".condition-row")[0].cloneNode(true);
   $(newRow).find(".condition-label").val("");
   $(newRow).find(".sample-value").val("");
-  $(newRow).find(".deviation-value").val("0");
+  $(newRow).find(".mean-value").val("100");
+  $(newRow).find(".abs-deviation-value").val("0");
+  $(newRow).find(".rel-deviation-value").val("0");
 
   // Determine where to add the row based on which button was clicked
   const targetRowIndex = getTargetIndex(e, numConditions);
@@ -320,9 +336,9 @@ function addSampleCol(e, updateAfter = true) {
   $(newBaselineValueCell).find(".baseline-value").val("");
 
   if (targetColIndex >= numSamples - 1) {
-    $(".sensitivity-buttons")[0].insertBefore(newButtonCell, $(".button-deviation-cell")[0]);
-    $(".sensitivity-header")[0].insertBefore(newHeadingCell, $(".deviation-heading")[0]);
-    $(".baseline-row")[0].insertBefore(newBaselineValueCell, $(".baseline-deviation-cell")[0]);
+    $(".sensitivity-buttons")[0].insertBefore(newButtonCell, $(".button-mean-cell")[0]);
+    $(".sensitivity-header")[0].insertBefore(newHeadingCell, $(".mean-heading")[0]);
+    $(".baseline-row")[0].insertBefore(newBaselineValueCell, $(".baseline-mean-cell")[0]);
   } else {
     $(".sensitivity-buttons")[0].insertBefore(newButtonCell, $(".sample-button-cell")[targetColIndex + 1]);
     $(".sensitivity-header")[0].insertBefore(newHeadingCell, $(".sample-heading")[targetColIndex + 1]);
@@ -338,7 +354,7 @@ function addSampleCol(e, updateAfter = true) {
     $(newValueCell).find(".sample-value").val("");
 
     if (targetColIndex >= numSamples - 1)
-      conditionRow.insertBefore(newValueCell, $(conditionRow).find(".deviation-value-cell")[0]);
+      conditionRow.insertBefore(newValueCell, $(conditionRow).find(".mean-value-cell")[0]);
     else
       conditionRow.insertBefore(newValueCell, lValueCells[targetColIndex + 1]);
   }
@@ -396,23 +412,28 @@ function addOutput(e, updateAfter = true) {
     $(".output-label-table tbody")[0].insertBefore(newOutputLabelRow, $(".output-label-row")[targetOutputIndex + 1]);
 
   // Add a new input line to each value cell
-  $(".baseline-value-cell, .sample-value-cell, .deviation-value-cell").each(function () {
-    // Clone a new node from the proper template
-    let templateLine;
-    if (this.classList.contains("sample-value-cell"))
-      templateLine = TEMPLATE_SAMPLE_INPUT_LINE;
-    else if (this.classList.contains("baseline-value-cell"))
-      templateLine = TEMPLATE_BASELINE_INPUT_LINE;
-    else
-      templateLine = TEMPLATE_DEVIATION_INPUT_LINE;
+  $(".baseline-value-cell, .sample-value-cell, .mean-value-cell, .abs-deviation-value-cell, " +
+    ".rel-deviation-value-cell").each(function () {
+      // Clone a new node from the proper template
+      let templateLine;
+      if (this.classList.contains("sample-value-cell"))
+        templateLine = TEMPLATE_SAMPLE_INPUT_LINE;
+      else if (this.classList.contains("baseline-value-cell"))
+        templateLine = TEMPLATE_BASELINE_INPUT_LINE;
+      else if (this.classList.contains("mean-value-cell"))
+        templateLine = TEMPLATE_MEAN_INPUT_LINE;
+      else if (this.classList.contains("abs-deviation-value-cell"))
+        templateLine = TEMPLATE_ABS_DEVIATION_INPUT_LINE;
+      else
+        templateLine = TEMPLATE_REL_DEVIATION_INPUT_LINE;
 
-    const newSensInputLine = templateLine.cloneNode(true);
+      const newSensInputLine = templateLine.cloneNode(true);
 
-    if (targetOutputIndex >= numOutputs - 1)
-      this.appendChild(newSensInputLine);
-    else
-      this.insertBefore(newSensInputLine, this.children[targetOutputIndex + 1]);
-  })
+      if (targetOutputIndex >= numOutputs - 1)
+        this.appendChild(newSensInputLine);
+      else
+        this.insertBefore(newSensInputLine, this.children[targetOutputIndex + 1]);
+    })
 
   postTableUpdateCleanup("output", updateAfter);
 }
@@ -433,9 +454,10 @@ function removeOutput(e, updateAfter = true) {
   $(".output-label-table tbody")[0].removeChild($(".output-label-row")[targetOutputIndex]);
 
   // Remove the input line from each cell in the sens table
-  $(".baseline-value-cell, .sample-value-cell, .deviation-value-cell").each(function () {
-    this.removeChild(this.children[targetOutputIndex]);
-  });
+  $(".baseline-value-cell, .sample-value-cell, .mean-value-cell, .abs-deviation-value-cell, " +
+    ".rel-deviation-value-cell").each(function () {
+      this.removeChild(this.children[targetOutputIndex]);
+    });
 
   postTableUpdateCleanup("output", updateAfter);
 }
@@ -517,8 +539,8 @@ function resetPlotDims() {
 
 // Functions to get various options set by the user
 
-function getDevCalcMode() {
-  return $("#dev-calc-select").find(":selected").val();
+function getDevPlotMode() {
+  return $("#dev-plot-select").find(":selected").val();
 }
 
 function getWidth() {
@@ -554,7 +576,7 @@ function getFontSizeScaleLock() {
 }
 
 function getMinOutput() {
-  if (getDevCalcMode() == "none")
+  if (getDevPlotMode() == "mean")
     return 0;
   let minOutput = $("#min-output-input").val();
   minOutput = clamp(minOutput, -100, -1);
@@ -562,7 +584,7 @@ function getMinOutput() {
 }
 
 function getMaxOutput() {
-  if (getDevCalcMode() == "none")
+  if (getDevPlotMode() == "mean")
     return 100;
   let maxOutput = $("#max-output-input").val();
   maxOutput = clamp(maxOutput, 1, 1000);
@@ -570,9 +592,10 @@ function getMaxOutput() {
 }
 
 function getOutputMidpoint() {
-  if (getDevCalcMode() != "none")
+  // TODO: Update to depend on which column is selected to plot
+  if (getDevPlotMode() != "mean")
     return 0;
-  return +($(".baseline-row").find(".deviation-value").eq(0).val());
+  return +($(".baseline-row").find(".mean-value").eq(0).val());
 }
 
 function getBandWidth() {
@@ -627,7 +650,7 @@ function calcDeviation() {
 
   const baselineRow = $(".baseline-row");
   const lBaselineCells = baselineRow.find(".baseline-value-cell");
-  const lBaselineDeviationInputs = baselineRow.find(".deviation-value");
+  const lBaselineMeanInputs = baselineRow.find(".mean-value");
 
   // Start by calculating the mean baseline for each output
   const lBaselineMeans = [];
@@ -657,7 +680,7 @@ function calcDeviation() {
       baselineMean = DEFAULT_VALUE_MEAN;
 
     lBaselineMeans.push(baselineMean);
-    lBaselineDeviationInputs.eq(j).val(baselineMean);
+    lBaselineMeanInputs.eq(j).val(baselineMean);
   }
 
   // Now calculate the mean for each output of each condition, and use it and the baseline mean to calculate and fill in
@@ -687,7 +710,9 @@ function calcDeviation() {
       }
     }
 
-    const lDeviationInputs = conditionRow.find(".deviation-input-line");
+    const lMeanInputs = conditionRow.find(".mean-input-line");
+    const lAbsDeviationInputs = conditionRow.find(".abs-deviation-input-line");
+    const lRelDeviationInputs = conditionRow.find(".rel-deviation-input-line");
     for (let j = 0; j < numOutputs; j++) {
 
       const baselineMean = lBaselineMeans[j];
@@ -702,15 +727,9 @@ function calcDeviation() {
       const absDeviation = conditionMean - baselineMean;
       const relDeviation = (conditionMean - baselineMean) / baselineMean * 100;
 
-      const deviationInput = lDeviationInputs.eq(j).find(".deviation-value");
-
-      const devCalcMode = getDevCalcMode();
-      if (devCalcMode == "relative")
-        deviationInput.val(relDeviation);
-      else if (devCalcMode == "absolute")
-        deviationInput.val(absDeviation);
-      else
-        deviationInput.val(conditionMean);
+      lMeanInputs.eq(j).find(".mean-value").val(conditionMean);
+      lAbsDeviationInputs.eq(j).find(".abs-deviation-value").val(absDeviation);
+      lRelDeviationInputs.eq(j).find(".rel-deviation-value").val(relDeviation);
     }
 
   }
@@ -918,9 +937,28 @@ function generatePlot() {
   }
 
   // Make a fake dataset to add the label to the legend for each output
+
+  let devLabel;
+  const devPlotMode = getDevPlotMode();
+  if (devPlotMode == "mean")
+    devLabel = $(".mean-heading").text();
+  else if (devPlotMode == "absolute")
+    devLabel = $(".abs-deviation-heading").text();
+  else
+    devLabel = $(".rel-deviation-heading").text();
+
   const lOutputLabelInputs = $("input.output-input");
+
   for (let j = 0; j < numOutputs; ++j) {
-    lOutputLabels.push(lOutputLabelInputs[j].value);
+
+    // Get the output label, and strip the percentage indicator from it if present
+    let outputLabel = lOutputLabelInputs[j].value;
+    if (outputLabel.endsWith(" (%)")) {
+      outputLabel = outputLabel.slice(0, -" (%)".length);
+    }
+
+    lOutputLabels.push(outputLabel + " " + devLabel);
+
     let lInvisibleData = [];
     let numInvisiblePoints = numConditions;
 
@@ -952,8 +990,22 @@ function generatePlot() {
   const lConditionData = [];
   for (let i = 0; i < numConditions; ++i) {
     let lSingleConditionData = [];
-    const lCells = lSensRows.eq(i).find(".deviation-value-cell");
-    const lInputs = lCells.eq(0).find("input.deviation-value");
+
+    let valueSelector;
+    let inputSelector;
+    if (devPlotMode == "mean") {
+      valueSelector = ".mean-value-cell"
+      inputSelector = "input.mean-value"
+    } else if (devPlotMode == "absolute") {
+      valueSelector = ".abs-deviation-value-cell"
+      inputSelector = "input.abs-deviation-value"
+    } else {
+      valueSelector = ".rel-deviation-value-cell"
+      inputSelector = "input.rel-deviation-value"
+    }
+    const lCells = lSensRows.eq(i).find(valueSelector);
+    const lInputs = lCells.eq(0).find(inputSelector);
+
     for (let j = 0; j < numOutputs; ++j) {
       lSingleConditionData.push(lInputs[j].value);
     }
@@ -1311,7 +1363,7 @@ function enableOnChangeTriggers() {
   enableDeviationCalc();
   enableCanvasUpdate();
 
-  $("#dev-calc-select").on("change", setDeviationCalcMode);
+  $("#dev-plot-select").on("change", setDeviationPlotMode);
   $(".output-label-select").on("change", updateOutputLabelSelection);
   $("#color-select").on("change", updateColourSchemeSelection);
 }
@@ -1324,7 +1376,7 @@ function disableAutoUpdates() {
   enableOnChangeTriggers();
 }
 
-function setDeviationCalcMode(e) {
+function setDeviationPlotMode(e) {
   document.documentElement.setAttribute("dev-calc-mode", e.target.value);
   if (!autoUpdating)
     calcDeviation();
