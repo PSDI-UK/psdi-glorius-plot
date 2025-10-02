@@ -351,7 +351,7 @@
   <button type="button" id="fill-random">Fill with random data</button>
   <button type="button" id="fill-example" class="mouseover-tooltip" data-bs-toggle="tooltip"
     data-bs-custom-class="tooltip-on-light" data-bs-placement="top" title="This fills the table with an example 
-    dataset sourced from Zhang 𝑒𝑡 𝑎𝑙. (2024), “Solvent-Dependent Divergent Cyclization of Bicyclo[1.1.0]butanes”, Table 
+    dataset sourced from Zhang 𝘦𝘵 𝘢𝘭. (2024), “Solvent-Dependent Divergent Cyclization of Bicyclo[1.1.0]butanes”, Table 
     S9">Fill with example data</button>
 </form>
 
@@ -384,11 +384,13 @@
   </p>
   <p>
     <label for="dev-plot-select" data-bs-toggle="tooltip" data-bs-custom-class="tooltip-on-light"
-      data-bs-placement="top" title="“Mean” will result in outcomes being displayed directly on the plot, alongside a
-                                     line for the standard conditions.“Deviation (+/-)” will plot the difference of
-                                     the (mean) outcome from the standard conditions. “Deviation (%)” will plot this
+      data-bs-placement="top" title="“<b>Mean</b>” will result in outcomes being displayed directly on the plot, alongside a
+                                     line for the standard conditions.<br><br>
+                                     “<b>Deviation (+/-)</b>” will plot the difference of
+                                     the (mean) outcome from the standard conditions.<br><br>
+                                     “<b>Deviation (%)</b>” will plot this
                                      value divided by the standard conditions, expressed as a per cent."
-      class="mouseover-tooltip">Value to plot: </label>
+      class="mouseover-tooltip" data-bs-html="true">Value to plot: </label>
     <select name="dev-plot-select" id="dev-plot-select" class="trigger-chart-update">
       <option value="mean">Mean</option>
       <option value="absolute">Deviation (+/-)</option>
