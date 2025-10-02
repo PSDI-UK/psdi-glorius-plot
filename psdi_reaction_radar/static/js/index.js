@@ -925,9 +925,28 @@ function generatePlot() {
   }
 
   // Make a fake dataset to add the label to the legend for each output
+
+  let devLabel;
+  const devPlotMode = getDevPlotMode();
+  if (devPlotMode == "mean")
+    devLabel = $(".mean-heading").text();
+  else if (devPlotMode == "absolute")
+    devLabel = $(".abs-deviation-heading").text();
+  else
+    devLabel = $(".rel-deviation-heading").text();
+
   const lOutputLabelInputs = $("input.output-input");
+
   for (let j = 0; j < numOutputs; ++j) {
-    lOutputLabels.push(lOutputLabelInputs[j].value);
+
+    // Get the output label, and strip the percentage indicator from it if present
+    let outputLabel = lOutputLabelInputs[j].value;
+    if (outputLabel.endsWith(" (%)")) {
+      outputLabel = outputLabel.slice(0, -" (%)".length);
+    }
+
+    lOutputLabels.push(outputLabel + " " + devLabel);
+
     let lInvisibleData = [];
     let numInvisiblePoints = numConditions;
 
@@ -960,7 +979,6 @@ function generatePlot() {
   for (let i = 0; i < numConditions; ++i) {
     let lSingleConditionData = [];
 
-    const devPlotMode = getDevPlotMode();
     let valueSelector;
     let inputSelector;
     if (devPlotMode == "mean") {
