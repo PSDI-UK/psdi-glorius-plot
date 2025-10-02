@@ -202,6 +202,7 @@ function postTableUpdateCleanup(dim, updateAfter) {
     updateDimSelector(dim);
     initNumDimControls(dim);
     relabelDim(dim);
+    updateMeanVisibility();
   }
 
   // Update the plot if desired
@@ -257,6 +258,17 @@ function relabelDim(dim) {
     }
   }
 
+}
+
+/**
+ * Make the means visible only if we have more than one sample column
+ */
+function updateMeanVisibility() {
+  const meanElements = $(".button-mean-cell, .mean-heading, .baseline-mean-cell, .mean-value-cell");
+  if (getNumSamples() > 1)
+    meanElements.removeClass("hidden");
+  else
+    meanElements.addClass("hidden");
 }
 
 function addConditionRow(e, updateAfter = true) {
@@ -324,9 +336,9 @@ function addSampleCol(e, updateAfter = true) {
   $(newBaselineValueCell).find(".baseline-value").val("");
 
   if (targetColIndex >= numSamples - 1) {
-    $(".sensitivity-buttons")[0].insertBefore(newButtonCell, $(".button-deviation-cell")[0]);
+    $(".sensitivity-buttons")[0].insertBefore(newButtonCell, $(".button-mean-cell")[0]);
     $(".sensitivity-header")[0].insertBefore(newHeadingCell, $(".mean-heading")[0]);
-    $(".baseline-row")[0].insertBefore(newBaselineValueCell, $(".baseline-deviation-cell")[0]);
+    $(".baseline-row")[0].insertBefore(newBaselineValueCell, $(".baseline-mean-cell")[0]);
   } else {
     $(".sensitivity-buttons")[0].insertBefore(newButtonCell, $(".sample-button-cell")[targetColIndex + 1]);
     $(".sensitivity-header")[0].insertBefore(newHeadingCell, $(".sample-heading")[targetColIndex + 1]);
