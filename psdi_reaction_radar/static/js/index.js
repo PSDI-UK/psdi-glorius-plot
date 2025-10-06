@@ -683,7 +683,7 @@ function calcDeviation() {
       baselineMean = DEFAULT_VALUE_MEAN;
 
     lBaselineMeans.push(baselineMean);
-    lBaselineMeanInputs.eq(j).val(baselineMean);
+    lBaselineMeanInputs.eq(j).val(Math.round(baselineMean));
   }
 
   // Now calculate the mean for each output of each condition, and use it and the baseline mean to calculate and fill in
@@ -730,9 +730,9 @@ function calcDeviation() {
       const absDeviation = conditionMean - baselineMean;
       const relDeviation = (conditionMean - baselineMean) / baselineMean * 100;
 
-      lMeanInputs.eq(j).find(".mean-value").val(conditionMean);
-      lAbsDeviationInputs.eq(j).find(".abs-deviation-value").val(absDeviation);
-      lRelDeviationInputs.eq(j).find(".rel-deviation-value").val(relDeviation);
+      lMeanInputs.eq(j).find(".mean-value").val(Math.round(conditionMean));
+      lAbsDeviationInputs.eq(j).find(".abs-deviation-value").val(Math.round(absDeviation));
+      lRelDeviationInputs.eq(j).find(".rel-deviation-value").val(Math.round(relDeviation));
     }
 
   }
