@@ -25,6 +25,17 @@
   <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js"></script>
+  <script>
+    MathJax = {
+      svg: {
+        blacker: 1
+      },
+      output: {
+        font: 'mathjax-fira'
+      }
+    };
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-svg.js"></script>
 
   <script type="module" src="{{url_for('static', filename='js/psdi-common.js')}}"></script>
   {% endblock %}
@@ -37,7 +48,7 @@
   <div id="cover"></div>
 
   {% block announcement %}
-  <div class="announcementBar_mb4j" role="banner">
+  <div class="announcementBar_mb4j mathjax_ignore" role="banner">
     <div class="max-width-box announcementBarContent_xLdY"><strong>Alert:</strong> This page is currently under
       construction.
       <br>
@@ -48,13 +59,13 @@
   {% endblock %}
 
   {% block header %}
-  <header class="header" id="psdi-header">
+  <header class="header mathjax_ignore" id="psdi-header">
     {% include 'content/psdi-common-header.html' %}
   </header>
   {% endblock %}
 
   {% block hero_banner %}
-  <div class="hero">
+  <div class="hero mathjax_ignore">
     <div class="max-width-box">
       <h1 class="hero__title marginless_header">{% block hero_title %}{% endblock %}</h1>
     </div>
@@ -62,7 +73,7 @@
   {% endblock %}
 
   {% block outer_content %}
-  <div name="content">
+  <div name="content mathjax_ignore">
     <div class="max-width-box">
       {% block inner_content %}{% endblock %}
     </div>
@@ -70,7 +81,7 @@
   {% endblock %}
 
   {% block footer %}
-  <footer class="footer" id="psdi-footer">
+  <footer class="footer mathjax_ignore" id="psdi-footer">
     {% include 'content/psdi-common-footer.html' %}
   </footer>
   {% endblock %}

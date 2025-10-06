@@ -57,6 +57,9 @@ const VALUE_MAX = 100.;
 const RAND_BASELINE_MIN = 60.;
 const RAND_BASELINE_MAX = 100.;
 
+const MATHJAX_DEFAULT_FONT_SIZE = 16;
+const MATHJAX_FONT_SCALING = 1.125;
+
 // Table values and placeholders
 const OUTPUT_LABEL_TEXT = "Output {N} Label:";
 
@@ -98,6 +101,32 @@ const TEMPLATE_REL_DEVIATION_INPUT_LINE = $(".rel-deviation-input-line")[0].clon
 
 function clamp(x, min, max) {
   return Math.min(Math.max(x, min), max);
+}
+
+function getAsTex(s) {
+  // Escape any characters that need to be escaped
+  s = s.replace("%", "\\%");
+
+  // TODO: Replace with proper processing
+  s = "\\textbf{ " + s + " }";
+
+  return s;
+}
+
+function drawSvgElement(ctx, img, x = 0, y = 0, fontsize = 1) {
+  let DOMURL = window.URL || window.webkitURL || window;
+  let img1 = new Image();
+  let svg = new Blob([img.innerHTML], { type: 'image/svg+xml' });
+  let url = DOMURL.createObjectURL(svg);
+  let scale = MATHJAX_FONT_SCALING * fontsize / MATHJAX_DEFAULT_FONT_SIZE;
+  img1.onload = function () {
+    let w = img1.naturalWidth * scale;
+    let h = img1.naturalHeight * scale;
+    ctx.drawImage(img1, x, y, w, h);
+    DOMURL.revokeObjectURL(url);
+  }
+  img1.src = url;
+
 }
 
 // Plugins for Chart JS
@@ -1192,7 +1221,7 @@ function generatePlot() {
                 size: fontSize,
                 weight: "bold"
               },
-              // color: "#FFFFFF00", // Hide the normal label, since we implement it ourselves with custom styling
+              color: "#FFFFFF00", // Hide the normal label, since we implement it ourselves with custom styling
               filter: function (legendLabel, _) {
                 return legendLabel.text != "";
               }
@@ -1216,6 +1245,8 @@ function generatePlot() {
   // Manually draw formatted title, legend, and labels
   const ctx = radarChart.ctx;
   const legendHitBox = radarChart.legend.legendHitBoxes[0];
+  const svg = MathJax.tex2svg(getAsTex(getOutputLabel()));
+  drawSvgElement(ctx, svg, legendHitBox.left + 1.5 * fontSize, legendHitBox.top + 0.25 * fontSize, fontSize);
   // drawText(ctx, [
   //   { text: getOutputLabel(), format: { fontWeight: 'bold', fontColor: '#606060' } }
   // ], {
