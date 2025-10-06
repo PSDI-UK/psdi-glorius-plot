@@ -104,6 +104,19 @@ function clamp(x, min, max) {
   return Math.min(Math.max(x, min), max);
 }
 
+// Plugins for Chart JS
+const customCanvasBackgroundColorPlugin = {
+  id: 'customCanvasBackgroundColor',
+  beforeDraw: (chart, args, options) => {
+    const { ctx } = chart;
+    ctx.save();
+    ctx.globalCompositeOperation = 'destination-over';
+    ctx.fillStyle = options.color || '#99ffff';
+    ctx.fillRect(0, 0, chart.width, chart.height);
+    ctx.restore();
+  }
+};
+
 /**
  * Get the index value stored at the end of an event's target's ID
  */
@@ -1158,6 +1171,7 @@ function generatePlot() {
         labels: lOutputConditionLabels,
         datasets: lDatasets,
       },
+      plugins: [customCanvasBackgroundColorPlugin],
       options: {
         aspectRatio: getAspectRatio(),
         responsive: false,
@@ -1165,6 +1179,9 @@ function generatePlot() {
           r: plotR
         },
         plugins: {
+          customCanvasBackgroundColor: {
+            color: "white",
+          },
           legend: {
             labels: {
               boxHeight: 16,
