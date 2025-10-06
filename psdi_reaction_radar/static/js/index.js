@@ -561,6 +561,25 @@ function resetPlotDims() {
 
 // Functions to get various options set by the user
 
+function getOutputLabel(j = 0) {
+  let devLabel;
+  const devPlotMode = getDevPlotMode();
+  if (devPlotMode == "mean")
+    devLabel = $(".mean-heading").text();
+  else if (devPlotMode == "absolute")
+    devLabel = $(".abs-deviation-heading").text();
+  else
+    devLabel = $(".rel-deviation-heading").text();
+
+  // Get the output label, and strip the percentage indicator from it if present
+  let outputLabel = $("input.output-input")[j].value;
+  if (outputLabel.endsWith(" (%)")) {
+    outputLabel = outputLabel.slice(0, -" (%)".length);
+  }
+  outputLabel += " " + devLabel;
+  return outputLabel;
+}
+
 function getDevPlotMode() {
   return $("#dev-plot-select").find(":selected").val();
 }
@@ -959,27 +978,11 @@ function generatePlot() {
   }
 
   // Make a fake dataset to add the label to the legend for each output
-
-  let devLabel;
   const devPlotMode = getDevPlotMode();
-  if (devPlotMode == "mean")
-    devLabel = $(".mean-heading").text();
-  else if (devPlotMode == "absolute")
-    devLabel = $(".abs-deviation-heading").text();
-  else
-    devLabel = $(".rel-deviation-heading").text();
-
-  const lOutputLabelInputs = $("input.output-input");
 
   for (let j = 0; j < numOutputs; ++j) {
 
-    // Get the output label, and strip the percentage indicator from it if present
-    let outputLabel = lOutputLabelInputs[j].value;
-    if (outputLabel.endsWith(" (%)")) {
-      outputLabel = outputLabel.slice(0, -" (%)".length);
-    }
-
-    lOutputLabels.push(outputLabel + " " + devLabel);
+    lOutputLabels.push(getOutputLabel(j));
 
     let lInvisibleData = [];
     let numInvisiblePoints = numConditions;
@@ -1144,7 +1147,10 @@ function generatePlot() {
     })
   }
 
-  // Prepare the plot scale options
+  // Prepare the plot options
+
+  const fontSize = getFontSize();
+
   const plotR = {
     grid: {
       circular: fanMode
@@ -1153,7 +1159,7 @@ function generatePlot() {
     max: maxOutput,
     pointLabels: {
       font: {
-        size: getFontSize()
+        size: fontSize
       }
     },
     reverse: true,
@@ -1184,12 +1190,13 @@ function generatePlot() {
           },
           legend: {
             labels: {
-              boxHeight: 16,
-              boxWidth: 16,
+              boxHeight: fontSize,
+              boxWidth: fontSize,
               font: {
-                size: 16,
+                size: fontSize,
                 weight: "bold"
               },
+              color: "#FFFFFF00", // Hide the normal label, since we implement it ourselves with custom styling
               filter: function (legendLabel, _) {
                 return legendLabel.text != "";
               }
@@ -1209,6 +1216,20 @@ function generatePlot() {
     radarChart.update();
     radarChart.resize(getWidth(), getHeight());
   }
+
+  // Manually draw formatted title, legend, and labels
+  const ctx = radarChart.ctx;
+  const legendHitBox = radarChart.legend.legendHitBoxes[0];
+  drawText(ctx, [
+    { text: getOutputLabel(), format: { fontWeight: 'bold', fontColor: '#606060' } }
+  ], {
+    x: legendHitBox.left + 0.75 * fontSize,
+    y: legendHitBox.top,
+    width: legendHitBox.width,
+    height: legendHitBox.height,
+    fontSize: fontSize,
+    weight: "bold",
+  });
 
 }
 
