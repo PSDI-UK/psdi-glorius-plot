@@ -8,6 +8,7 @@
 
 import { initDirtyForms, cleanDirtyForms } from "./common.js";
 import { mix_hexes } from "./color.js"
+import { drawText, Word } from 'text-to-canvas';
 
 const CONDITION = "condition"
 const SAMPLE = "sample"
