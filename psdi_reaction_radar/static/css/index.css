@@ -134,7 +134,7 @@ tr td:first-child button,
 }
 
 .hidden {
-  display: none;
+  display: none !important;
 }
 
 /* Style the output label table */
