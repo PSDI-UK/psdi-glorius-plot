@@ -1227,8 +1227,7 @@ function generatePlot() {
     y: legendHitBox.top,
     width: legendHitBox.width,
     height: legendHitBox.height,
-    fontSize: fontSize,
-    weight: "bold",
+    fontSize: fontSize
   });
 
 }
