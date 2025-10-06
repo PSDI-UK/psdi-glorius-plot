@@ -8,7 +8,10 @@
 
 import { initDirtyForms, cleanDirtyForms } from "./common.js";
 import { mix_hexes } from "./color.js"
-import { drawText, Word } from 'text-to-canvas';
+
+// Get function exported by text-to-canvas (it wasn't playing nicely when loaded normally, so had to use a bit of a
+// workaround to import it)
+const drawText = exports.drawText;
 
 const CONDITION = "condition"
 const SAMPLE = "sample"
