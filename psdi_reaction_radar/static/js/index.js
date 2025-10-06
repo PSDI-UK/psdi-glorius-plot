@@ -9,10 +9,6 @@
 import { initDirtyForms, cleanDirtyForms } from "./common.js";
 import { mix_hexes } from "./color.js"
 
-// Get function exported by text-to-canvas (it wasn't playing nicely when loaded normally, so had to use a bit of a
-// workaround to import it)
-const drawText = exports.drawText;
-
 const CONDITION = "condition"
 const SAMPLE = "sample"
 const OUTPUT = "output"
@@ -1196,7 +1192,7 @@ function generatePlot() {
                 size: fontSize,
                 weight: "bold"
               },
-              color: "#FFFFFF00", // Hide the normal label, since we implement it ourselves with custom styling
+              // color: "#FFFFFF00", // Hide the normal label, since we implement it ourselves with custom styling
               filter: function (legendLabel, _) {
                 return legendLabel.text != "";
               }
@@ -1220,15 +1216,15 @@ function generatePlot() {
   // Manually draw formatted title, legend, and labels
   const ctx = radarChart.ctx;
   const legendHitBox = radarChart.legend.legendHitBoxes[0];
-  drawText(ctx, [
-    { text: getOutputLabel(), format: { fontWeight: 'bold', fontColor: '#606060' } }
-  ], {
-    x: legendHitBox.left + 0.75 * fontSize,
-    y: legendHitBox.top,
-    width: legendHitBox.width,
-    height: legendHitBox.height,
-    fontSize: fontSize
-  });
+  // drawText(ctx, [
+  //   { text: getOutputLabel(), format: { fontWeight: 'bold', fontColor: '#606060' } }
+  // ], {
+  //   x: legendHitBox.left + 0.75 * fontSize,
+  //   y: legendHitBox.top,
+  //   width: legendHitBox.width,
+  //   height: legendHitBox.height,
+  //   fontSize: fontSize
+  // });
 
 }
 
