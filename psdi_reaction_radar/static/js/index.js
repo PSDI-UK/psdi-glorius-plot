@@ -54,6 +54,9 @@ const DEFAULT_VALUE_MEAN = 100;
 const VALUE_MIN = 0.;
 const VALUE_MAX = 100.;
 
+const RAND_BASELINE_MIN = 60.;
+const RAND_BASELINE_MAX = 100.;
+
 // Table values and placeholders
 const OUTPUT_LABEL_TEXT = "Output {N} Label:";
 
@@ -1190,7 +1193,6 @@ function generatePlot() {
  * Fill the existing cells with random data
  */
 function fillRandom() {
-  const numOutputs = getNumOutputs();
 
   // Fill the column labels
   $(".output-label-select").val("Isolated Yield (%)").change();
@@ -1204,14 +1206,15 @@ function fillRandom() {
   // Fill each baseline cell
   const lBaselineInputs = $(".baseline-value");
   for (let k = 0; k < lBaselineInputs.length; ++k) {
-    lBaselineInputs[k].value = DEFAULT_VALUE_MEAN;
+    let val = RAND_BASELINE_MIN + Math.random() * (RAND_BASELINE_MAX - RAND_BASELINE_MIN);
+    lBaselineInputs[k].value = Math.round(val);
   }
 
   // Fill each data cell
   const lDataCells = $(".sample-value");
   for (let k = 0; k < lDataCells.length; ++k) {
-    const e = lDataCells[k];
-    e.value = VALUE_MIN + Math.random() * (VALUE_MAX - VALUE_MIN);
+    let val = VALUE_MIN + Math.random() * (VALUE_MAX - VALUE_MIN);
+    lDataCells[k].value = Math.round(val);
   }
 
   // Make sure the deviation is calculated, even in direct input mode (if not in this mode, it will be calculated when
