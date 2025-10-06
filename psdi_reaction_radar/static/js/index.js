@@ -205,7 +205,7 @@ function postTableUpdateCleanup(dim, updateAfter) {
     updateDimSelector(dim);
     initNumDimControls(dim);
     relabelDim(dim);
-    updateMeanVisibility();
+    updateMeanColumn();
   }
 
   // Update the plot if desired
@@ -264,14 +264,16 @@ function relabelDim(dim) {
 }
 
 /**
- * Make the means visible only if we have more than one sample column
+ * Make the means visible only if we have more than one sample column, and set the proper heading label for it
  */
-function updateMeanVisibility() {
+function updateMeanColumn() {
   const meanElements = $(".button-mean-cell, .mean-heading, .baseline-mean-cell, .mean-value-cell");
   if (getNumSamples() > 1)
     meanElements.removeClass("hidden");
   else
     meanElements.addClass("hidden");
+
+  $(".mean-heading").text("Mean " + $("#ol-0").val());
 }
 
 function addConditionRow(e, updateAfter = true) {
@@ -1447,6 +1449,9 @@ function updateOutputLabel(label) {
       lOutputHeadings.eq(i).text(label + " " + (i + 1).toString());
     }
   }
+
+  // Update the Mean heading to include the new outcome value
+  updateMeanColumn();
 }
 
 function updateColourSchemeSelection() {
