@@ -103,6 +103,16 @@ function clamp(x, min, max) {
   return Math.min(Math.max(x, min), max);
 }
 
+/**
+ * MathJax is loaded asynchronously, so early calls to generate the plot may not have it. This waits to ensure it's
+ * available
+ */
+async function waitForMathJax() {
+  while (!MathJax.tex2svg) {
+    await new Promise(resolve => setTimeout(resolve, 100));
+  }
+}
+
 function getAsTex(s) {
   // Escape any characters that need to be escaped
   s = s.replace("%", "\\%");
@@ -804,7 +814,7 @@ function calcDeviation() {
 /**
  * Generate the plot using all the provided data
  */
-function generatePlot() {
+async function generatePlot() {
 
   // Set the form as clean when we generate a plot from it
   cleanDirtyForms();
@@ -1245,6 +1255,7 @@ function generatePlot() {
   // Manually draw formatted title, legend, and labels
   const ctx = radarChart.ctx;
   const legendHitBox = radarChart.legend.legendHitBoxes[0];
+  await waitForMathJax();
   const svg = MathJax.tex2svg(getAsTex(getOutputLabel()));
   drawSvgElement(ctx, svg, legendHitBox.left + 1.5 * fontSize, legendHitBox.top + 0.25 * fontSize, fontSize);
   // drawText(ctx, [
