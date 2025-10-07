@@ -1598,22 +1598,32 @@ function initTooltips() {
 function addQuillEditor(selector, placeholder = "", toolbar = QUILL_TOOLBAR) {
   const editor = new Quill(selector, {
     modules: {
-      toolbar: false // Hide the toolbar initially
+      toolbar: toolbar
     },
     placeholder: placeholder,
     theme: QUILL_THEME
   });
 
-  d_quill_editors[selector] = {
-    editor: editor,
-    selector: selector,
-    placeholder: placeholder,
-    toolbar: toolbar
-  };
+  d_quill_editors[selector] = editor;
+
+  editor.on("selection-change", (range) => {
+    if (range)
+      enableQuillToolbar(selector);
+    else
+      disableQuillToolbar(selector);
+  });
 }
 
 function removeQuillEditor(selector) {
   d_quill_editors.delete(selector);
+}
+
+function enableQuillToolbar(selector) {
+  $(selector).parent().find(".ql-toolbar").addClass("visible");
+}
+
+function disableQuillToolbar(selector) {
+  $(selector).parent().find(".ql-toolbar").removeClass("visible");
 }
 
 function initQuill() {
