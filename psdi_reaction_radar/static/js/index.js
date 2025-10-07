@@ -11,6 +11,7 @@ import { mix_hexes } from "./color.js"
 
 const LABEL_FONT_FAMILY = "'Fira Sans', sans-serif";
 const QUILL_THEME = "snow";
+const QUILL_TOOLBAR = ['bold', 'italic', 'underline', { 'script': 'sub' }, { 'script': 'super' }];
 
 const CONDITION = "condition";
 const SAMPLE = "sample";
@@ -91,6 +92,8 @@ let initHeight;
 let initFontSize;
 
 let output_label_quill;
+
+const d_quill_editors = {};
 
 // When the script is initially loaded, store a copy of a heading element and cell elements that we'll later use
 // as templates to add new rows
@@ -1592,14 +1595,29 @@ function initTooltips() {
 /**
  * Initialise Quill editors
  */
-function initQuill() {
-  output_label_quill = new Quill('#output-label-editor', {
+function addQuillEditor(selector, placeholder = "", toolbar = QUILL_TOOLBAR) {
+  const editor = new Quill(selector, {
     modules: {
-      toolbar: ['bold', 'italic', 'underline', { 'script': 'sub' }, { 'script': 'super' }]
+      toolbar: false // Hide the toolbar initially
     },
-    placeholder: "Define outcome",
+    placeholder: placeholder,
     theme: QUILL_THEME
   });
+
+  d_quill_editors[selector] = {
+    editor: editor,
+    selector: selector,
+    placeholder: placeholder,
+    toolbar: toolbar
+  };
+}
+
+function removeQuillEditor(selector) {
+  d_quill_editors.delete(selector);
+}
+
+function initQuill() {
+  addQuillEditor("#output-label-editor", "Define outcome");
 }
 
 $(document).ready(function () {
