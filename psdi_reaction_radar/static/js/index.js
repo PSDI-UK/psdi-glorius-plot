@@ -9,7 +9,8 @@
 import { initDirtyForms, cleanDirtyForms } from "./common.js";
 import { mix_hexes } from "./color.js"
 
-const LABEL_PLOT_FAMILY = "'Fira Sans', sans-serif";
+const LABEL_FONT_FAMILY = "'Fira Sans', sans-serif";
+const QUILL_THEME = "snow";
 
 const CONDITION = "condition";
 const SAMPLE = "sample";
@@ -88,6 +89,8 @@ let lastFontSizeHeightRatio;
 let initWidth;
 let initHeight;
 let initFontSize;
+
+let output_label_quill;
 
 // When the script is initially loaded, store a copy of a heading element and cell elements that we'll later use
 // as templates to add new rows
@@ -1196,7 +1199,7 @@ async function generatePlot() {
     max: maxOutput,
     pointLabels: {
       font: {
-        family: LABEL_PLOT_FAMILY,
+        family: LABEL_FONT_FAMILY,
         size: fontSize
       }
     },
@@ -1212,7 +1215,7 @@ async function generatePlot() {
       boxHeight: fontSize,
       boxWidth: fontSize,
       font: {
-        family: LABEL_PLOT_FAMILY,
+        family: LABEL_FONT_FAMILY,
         size: fontSize,
         weight: "bold"
       },
@@ -1408,9 +1411,9 @@ function enableDeviationCalc() {
 }
 
 function enableOutputLabelUpdate() {
-  let outputLabelInput = $("#ol-0");
-  $("#ol-0").off("change");
-  $("#ol-0").on("change", (e) => updateOutputLabel(e.target.value));
+  const outputLabelInput = $("#ol-0");
+  outputLabelInput.off("change");
+  outputLabelInput.on("change", (e) => updateOutputLabel(e.target.value));
 }
 
 function disableDeviationCalc() {
@@ -1586,15 +1589,27 @@ function initTooltips() {
   tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
 }
 
+/**
+ * Initialise Quill editors
+ */
+function initQuill() {
+  output_label_quill = new Quill('#output-label-editor', {
+    modules: {
+      toolbar: ['bold', 'italic', 'underline', { 'script': 'sub' }, { 'script': 'super' }]
+    },
+    placeholder: "Define outcome",
+    theme: QUILL_THEME
+  });
+}
+
 $(document).ready(function () {
 
   initTooltips();
   initGlobals();
   initDirtyForms();
+  initQuill();
 
   L_DIMS.forEach(dim => initNumDimControls(dim));
-
-  enableOutputLabelUpdate();
 
   enableOnChangeTriggers();
   enableToggles();
