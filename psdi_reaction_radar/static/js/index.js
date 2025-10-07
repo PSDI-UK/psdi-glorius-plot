@@ -9,11 +9,15 @@
 import { initDirtyForms, cleanDirtyForms } from "./common.js";
 import { mix_hexes } from "./color.js"
 
-const CONDITION = "condition"
-const SAMPLE = "sample"
-const OUTPUT = "output"
+const LABEL_FONT_FAMILY = "'Fira Sans', sans-serif";
+const QUILL_THEME = "snow";
+const QUILL_TOOLBAR = ['bold', 'italic', 'underline', { 'script': 'sub' }, { 'script': 'super' }];
 
-const L_DIMS = [CONDITION, SAMPLE, OUTPUT]
+const CONDITION = "condition";
+const SAMPLE = "sample";
+const OUTPUT = "output";
+
+const L_DIMS = [CONDITION, SAMPLE, OUTPUT];
 
 const DIM_LIMITS = {
   condition: {
@@ -28,7 +32,7 @@ const DIM_LIMITS = {
     min: 1,
     max: 2
   }
-}
+};
 
 const COLOR_SCHEMES = {
   classic: {
@@ -48,7 +52,7 @@ const COLOR_SCHEMES = {
     max: null
   }
 
-}
+};
 
 const DEFAULT_VALUE_MEAN = 100;
 const VALUE_MIN = 0.;
@@ -56,6 +60,9 @@ const VALUE_MAX = 100.;
 
 const RAND_BASELINE_MIN = 60.;
 const RAND_BASELINE_MAX = 100.;
+
+const MATHJAX_DEFAULT_FONT_SIZE = 16;
+const MATHJAX_FONT_SCALING = 1.125;
 
 // Table values and placeholders
 const OUTPUT_LABEL_TEXT = "Output {N} Label:";
@@ -84,6 +91,10 @@ let initWidth;
 let initHeight;
 let initFontSize;
 
+let output_label_quill;
+
+const d_quill_editors = {};
+
 // When the script is initially loaded, store a copy of a heading element and cell elements that we'll later use
 // as templates to add new rows
 
@@ -99,6 +110,78 @@ const TEMPLATE_REL_DEVIATION_INPUT_LINE = $(".rel-deviation-input-line")[0].clon
 function clamp(x, min, max) {
   return Math.min(Math.max(x, min), max);
 }
+
+/**
+ * MathJax is loaded asynchronously, so early calls to generate the plot may not have it. This waits to ensure it's
+ * available
+ */
+async function waitForMathJax() {
+  while (!MathJax.tex2svg) {
+    await new Promise(resolve => setTimeout(resolve, 100));
+  }
+}
+
+function stripTags(s) {
+
+  // Remove any relevant HTML tags from text
+  s = s.replaceAll("<p>", "").replaceAll("</p>", "");
+  s = s.replaceAll("<em>", "").replaceAll("</em>", "");
+  s = s.replaceAll("<strong>", "").replaceAll("</strong>", "");
+  s = s.replaceAll("<u>", "").replaceAll("</u>", "");
+  s = s.replaceAll("<sub>", "").replaceAll("</sub>", "");
+  s = s.replaceAll("<sup>", "").replaceAll("</sup>", "");
+
+  return s;
+}
+
+function getAsTex(s) {
+  // Escape any characters that need to be escaped
+  s = s.replaceAll("%", "\\%");
+
+  // Replace spaces with the LaTeX command for a space
+  s = s.replaceAll(" ", "\\:")
+
+  // Wrap in tags for normal text
+  s = "{\\rm " + s + "}";
+
+  // Replace HTML tags with the equivalent TeX markup
+  s = s.replaceAll("<em>", "\\textit{").replaceAll("</em>", "}");
+  s = s.replaceAll("<strong>", "\\textbf{").replaceAll("</strong>", "}");
+  s = s.replaceAll("<u>", "\\underline{").replaceAll("</u>", "}");
+  s = s.replaceAll("<sub>", "_{\\rm ").replaceAll("</sub>", "}");
+  s = s.replaceAll("<sup>", "^{\\rm ").replaceAll("</sup>", "}");
+
+  return s;
+}
+
+function drawSvgElement(ctx, img, x = 0, y = 0, fontsize = 1) {
+  let DOMURL = window.URL || window.webkitURL || window;
+  let img1 = new Image();
+  let svg = new Blob([img.innerHTML], { type: 'image/svg+xml' });
+  let url = DOMURL.createObjectURL(svg);
+  let scale = MATHJAX_FONT_SCALING * fontsize / MATHJAX_DEFAULT_FONT_SIZE;
+  img1.onload = function () {
+    let w = img1.naturalWidth * scale;
+    let h = img1.naturalHeight * scale;
+    ctx.drawImage(img1, x, y, w, h);
+    DOMURL.revokeObjectURL(url);
+  }
+  img1.src = url;
+
+}
+
+// Plugins for Chart JS
+const customCanvasBackgroundColorPlugin = {
+  id: 'customCanvasBackgroundColor',
+  beforeDraw: (chart, args, options) => {
+    const { ctx } = chart;
+    ctx.save();
+    ctx.globalCompositeOperation = 'destination-over';
+    ctx.fillStyle = options.color || '#99ffff';
+    ctx.fillRect(0, 0, chart.width, chart.height);
+    ctx.restore();
+  }
+};
 
 /**
  * Get the index value stored at the end of an event's target's ID
@@ -155,7 +238,7 @@ function removeDim(dim, e, updateAfter) {
     return removeOutput(e, updateAfter);
 }
 
-function setNumDim(dim, num) {
+function setNumDim(dim, num, updateAfter = true) {
 
   const numDim = getDimSize(dim);
 
@@ -171,7 +254,7 @@ function setNumDim(dim, num) {
     return;
   }
 
-  postTableUpdateCleanup(dim, true);
+  postTableUpdateCleanup(dim, updateAfter);
 }
 
 function updateDimSelector(dim) {
@@ -194,11 +277,6 @@ function updateButtonStatus(dim) {
 
 function postTableUpdateCleanup(dim, updateAfter) {
 
-  // Enable auto updates for new cells if it's turned on
-  if (autoUpdating) {
-    enableAutoUpdates();
-  }
-
   // Update affected properties if desired at this point
   if (updateAfter) {
     updateButtonStatus(dim);
@@ -208,7 +286,7 @@ function postTableUpdateCleanup(dim, updateAfter) {
     updateMeanColumn();
   }
 
-  // Update the plot if desired
+  // Enable auto updates for new cells if it's turned on, and update the plot if desired
   if (updateAfter && autoUpdating) {
     generatePlot();
   }
@@ -246,10 +324,8 @@ function relabelDim(dim) {
 
     // Set the heading text if we have any heading cells
     if (lHeadings.length > 0) {
-      let headingText = $("#ol-0").val();
-      if (num > 1)
-        headingText += " " + sI1;
-      lHeadings.eq(i).text(headingText);
+      let headingText = d_quill_editors["#ol-0"].getSemanticHTML();
+      updateOutputLabel(headingText);
     }
 
     // Set the label and input text if we have any of those cells
@@ -544,6 +620,25 @@ function resetPlotDims() {
 
 // Functions to get various options set by the user
 
+function getOutputLabel(j = 0) {
+  let devLabel;
+  const devPlotMode = getDevPlotMode();
+  if (devPlotMode == "mean")
+    devLabel = $(".mean-heading").text();
+  else if (devPlotMode == "absolute")
+    devLabel = $(".abs-deviation-heading").text();
+  else
+    devLabel = $(".rel-deviation-heading").text();
+
+  // Get the output label, and strip the percentage indicator from it if present
+  let outputLabel = $("#ol-" + j + " .ql-editor p")[0].innerHTML;
+  if (outputLabel.endsWith(" (%)")) {
+    outputLabel = outputLabel.slice(0, -" (%)".length);
+  }
+  outputLabel += " " + devLabel;
+  return outputLabel;
+}
+
 function getDevPlotMode() {
   return $("#dev-plot-select").find(":selected").val();
 }
@@ -743,7 +838,7 @@ function calcDeviation() {
 /**
  * Generate the plot using all the provided data
  */
-function generatePlot() {
+async function generatePlot() {
 
   // Set the form as clean when we generate a plot from it
   cleanDirtyForms();
@@ -942,27 +1037,11 @@ function generatePlot() {
   }
 
   // Make a fake dataset to add the label to the legend for each output
-
-  let devLabel;
   const devPlotMode = getDevPlotMode();
-  if (devPlotMode == "mean")
-    devLabel = $(".mean-heading").text();
-  else if (devPlotMode == "absolute")
-    devLabel = $(".abs-deviation-heading").text();
-  else
-    devLabel = $(".rel-deviation-heading").text();
-
-  const lOutputLabelInputs = $("input.output-input");
 
   for (let j = 0; j < numOutputs; ++j) {
 
-    // Get the output label, and strip the percentage indicator from it if present
-    let outputLabel = lOutputLabelInputs[j].value;
-    if (outputLabel.endsWith(" (%)")) {
-      outputLabel = outputLabel.slice(0, -" (%)".length);
-    }
-
-    lOutputLabels.push(outputLabel + " " + devLabel);
+    lOutputLabels.push(stripTags(getOutputLabel(j)));
 
     let lInvisibleData = [];
     let numInvisiblePoints = numConditions;
@@ -1127,8 +1206,11 @@ function generatePlot() {
     })
   }
 
-  // Prepare the plot scale options
-  const plotR = {
+  // Prepare the plot options
+
+  const fontSize = getFontSize();
+
+  const plotROptions = {
     grid: {
       circular: fanMode
     },
@@ -1136,7 +1218,8 @@ function generatePlot() {
     max: maxOutput,
     pointLabels: {
       font: {
-        size: getFontSize()
+        family: LABEL_FONT_FAMILY,
+        size: fontSize
       }
     },
     reverse: true,
@@ -1146,6 +1229,24 @@ function generatePlot() {
     }
   };
 
+  const plotLegendOptions = {
+    labels: {
+      boxHeight: fontSize,
+      boxWidth: fontSize,
+      font: {
+        family: LABEL_FONT_FAMILY,
+        size: fontSize,
+        weight: "bold"
+      },
+      // Hide the normal label, since we implement it ourselves with custom styling. We still use it so we get the
+      // optimal positioning, which is why we don't filter it all out.
+      color: "#FFFFFF00",
+      filter: function (legendLabel, _) {
+        return legendLabel.text != "";
+      }
+    }
+  }
+
   if (radarChart === null) {
     // Generate the plot for the first time
     radarChart = new Chart("glorius-plot", {
@@ -1154,26 +1255,18 @@ function generatePlot() {
         labels: lOutputConditionLabels,
         datasets: lDatasets,
       },
+      plugins: [customCanvasBackgroundColorPlugin],
       options: {
         aspectRatio: getAspectRatio(),
         responsive: false,
         scales: {
-          r: plotR
+          r: plotROptions
         },
         plugins: {
-          legend: {
-            labels: {
-              boxHeight: 16,
-              boxWidth: 16,
-              font: {
-                size: 16,
-                weight: "bold"
-              },
-              filter: function (legendLabel, _) {
-                return legendLabel.text != "";
-              }
-            }
-          }
+          customCanvasBackgroundColor: {
+            color: "white",
+          },
+          legend: plotLegendOptions
         },
         animation: false
       }
@@ -1183,11 +1276,28 @@ function generatePlot() {
       labels: lOutputConditionLabels,
       datasets: lDatasets,
     }
-    radarChart.options.scales.r = plotR;
+    radarChart.options.scales.r = plotROptions;
     radarChart.options.aspectRatio = getAspectRatio();
+    radarChart.options.plugins.legend = plotLegendOptions;
     radarChart.update();
     radarChart.resize(getWidth(), getHeight());
   }
+
+  // Manually draw formatted title, legend, and labels
+  const ctx = radarChart.ctx;
+  const legendHitBox = radarChart.legend.legendHitBoxes[0];
+  await waitForMathJax();
+  const svg = MathJax.tex2svg(getAsTex(getOutputLabel()));
+  drawSvgElement(ctx, svg, legendHitBox.left + 1.25 * fontSize, legendHitBox.top + 0.125 * fontSize, fontSize);
+  // drawText(ctx, [
+  //   { text: getOutputLabel(), format: { fontWeight: 'bold', fontColor: '#606060' } }
+  // ], {
+  //   x: legendHitBox.left + 0.75 * fontSize,
+  //   y: legendHitBox.top,
+  //   width: legendHitBox.width,
+  //   height: legendHitBox.height,
+  //   fontSize: fontSize
+  // });
 
 }
 
@@ -1195,9 +1305,6 @@ function generatePlot() {
  * Fill the existing cells with random data
  */
 function fillRandom() {
-
-  // Fill the column labels
-  $(".output-label-select").val("Isolated Yield (%)").change();
 
   // Fill the row labels
   const lRowLabelInputs = $(".condition-label");
@@ -1236,9 +1343,9 @@ function fillRandom() {
  * https://onlinelibrary.wiley.com/doi/10.1002/anie.202418239 Table S9
  */
 function fillExample() {
-  setNumDim(CONDITION, 10);
-  setNumDim(SAMPLE, 1);
-  setNumDim(OUTPUT, 1);
+  setNumDim(OUTPUT, 1, false);
+  setNumDim(CONDITION, 10, false);
+  setNumDim(SAMPLE, 1, true);
 
   // Set the output label
   $(".output-label-select").val("Isolated Yield (%)").change();
@@ -1320,9 +1427,13 @@ function enableDeviationCalc() {
 }
 
 function enableOutputLabelUpdate() {
-  let outputLabelInput = $("#ol-0");
-  $("#ol-0").off("change");
-  $("#ol-0").on("change", (e) => updateOutputLabel(e.target.value));
+  const outputLabelEditor = d_quill_editors["#ol-0"];
+  outputLabelEditor.off("text-change");
+  outputLabelEditor.on("text-change", () => {
+    updateOutputLabel(outputLabelEditor.getSemanticHTML());
+    if (autoUpdating)
+      generatePlot();
+  });
 }
 
 function disableDeviationCalc() {
@@ -1425,28 +1536,29 @@ function updateOutputLabelSelection(e) {
   let targetIndex = getTargetIndex(e, DIM_LIMITS.output.max);
   let newValue = this.value;
   let lOutcomeValueCells = $(".output-label-value-cell");
-  let outcomeInput = $("#ol-" + targetIndex.toString());
+  let outcomeInput = $("#ol-" + targetIndex + " .ql-editor p");
 
   if (newValue != "Other") {
     lOutcomeValueCells.addClass("hidden");
+    outcomeInput.html(newValue);
   } else {
-    newValue = "";
     lOutcomeValueCells.removeClass("hidden");
   }
-  outcomeInput.val(newValue);
-  updateOutputLabel(newValue);
 }
 
 function updateOutputLabel(label) {
   let lOutputHeadings = $(".sample-heading");
   let numSamples = getNumSamples();
 
+  // Replace any non-breaking spaces in the label with normal spaces, and strip <p> tags
+  label = label.replaceAll("&nbsp;", " ").replaceAll("<p>", "").replaceAll("</p>", "");
+
   // If only one output, don't number it
   if (numSamples == 1) {
-    lOutputHeadings.text(label);
+    lOutputHeadings.html(label);
   } else {
     for (let i = 0; i < numSamples; ++i) {
-      lOutputHeadings.eq(i).text(label + " " + (i + 1).toString());
+      lOutputHeadings.eq(i).html(label + " " + (i + 1).toString());
     }
   }
 
@@ -1498,15 +1610,52 @@ function initTooltips() {
   tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
 }
 
+/**
+ * Initialise Quill editors
+ */
+function addQuillEditor(selector, placeholder = "", toolbar = QUILL_TOOLBAR) {
+  const editor = new Quill(selector, {
+    modules: {
+      toolbar: toolbar
+    },
+    placeholder: placeholder,
+    theme: QUILL_THEME
+  });
+
+  d_quill_editors[selector] = editor;
+
+  editor.on("selection-change", (range) => {
+    if (range)
+      enableQuillToolbar(selector);
+    else
+      disableQuillToolbar(selector);
+  });
+}
+
+function removeQuillEditor(selector) {
+  d_quill_editors.delete(selector);
+}
+
+function enableQuillToolbar(selector) {
+  $(selector).parent().find(".ql-toolbar").addClass("visible");
+}
+
+function disableQuillToolbar(selector) {
+  $(selector).parent().find(".ql-toolbar").removeClass("visible");
+}
+
+function initQuill() {
+  addQuillEditor("#ol-0", "Define outcome");
+}
+
 $(document).ready(function () {
 
   initTooltips();
   initGlobals();
   initDirtyForms();
+  initQuill();
 
   L_DIMS.forEach(dim => initNumDimControls(dim));
-
-  enableOutputLabelUpdate();
 
   enableOnChangeTriggers();
   enableToggles();

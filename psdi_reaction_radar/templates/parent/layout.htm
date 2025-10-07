@@ -10,11 +10,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>{% block page_title %}PSDI Glorius Plot Generator - Physical Sciences Data Infrastructure{% endblock %}</title>
   <link rel="icon" type="image/x-icon" href="{{url_for('static', filename='img/psdi-icon-dark.svg')}}">
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Sans&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css?family=Lato:400" rel="stylesheet" type="text/css">
   <link href="https://fonts.googleapis.com/css?family=Open+Sans+Condensed:700" rel="stylesheet" type="text/css">
   <link href="https://fonts.googleapis.com/css?family=Open+Sans:400" rel="stylesheet" type="text/css">
   <link href="https://fonts.googleapis.com/css?family=Lexend:400" rel="stylesheet" type="text/css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css" />
   <link rel="stylesheet" href="{{url_for('static', filename='css/psdi-common.css')}}">
 
   <script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4="
@@ -23,6 +25,18 @@
   <script type="module" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js"></script>
+  <script>
+    MathJax = {
+      svg: {
+        blacker: 1
+      },
+      output: {
+        font: 'mathjax-fira'
+      }
+    };
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-svg.js"></script>
 
   <script type="module" src="{{url_for('static', filename='js/psdi-common.js')}}"></script>
   {% endblock %}
@@ -35,7 +49,7 @@
   <div id="cover"></div>
 
   {% block announcement %}
-  <div class="announcementBar_mb4j" role="banner">
+  <div class="announcementBar_mb4j mathjax_ignore" role="banner">
     <div class="max-width-box announcementBarContent_xLdY"><strong>Alert:</strong> This page is currently under
       construction.
       <br>
@@ -46,13 +60,13 @@
   {% endblock %}
 
   {% block header %}
-  <header class="header" id="psdi-header">
+  <header class="header mathjax_ignore" id="psdi-header">
     {% include 'content/psdi-common-header.html' %}
   </header>
   {% endblock %}
 
   {% block hero_banner %}
-  <div class="hero">
+  <div class="hero mathjax_ignore">
     <div class="max-width-box">
       <h1 class="hero__title marginless_header">{% block hero_title %}{% endblock %}</h1>
     </div>
@@ -60,7 +74,7 @@
   {% endblock %}
 
   {% block outer_content %}
-  <div name="content">
+  <div name="content mathjax_ignore">
     <div class="max-width-box">
       {% block inner_content %}{% endblock %}
     </div>
@@ -68,7 +82,7 @@
   {% endblock %}
 
   {% block footer %}
-  <footer class="footer" id="psdi-footer">
+  <footer class="footer mathjax_ignore" id="psdi-footer">
     {% include 'content/psdi-common-footer.html' %}
   </footer>
   {% endblock %}

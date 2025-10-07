@@ -77,18 +77,17 @@
         <label for="os-0" class="output-label">Outcome:</label>
       </td>
       <td class="output-label-select-cell">
-        <select name="output-label-select" class="output-label-select trigger-chart-update" id="os-0">
+        <select name="output-label-select" class="output-label-select" id="os-0">
           <option value="Isolated Yield (%)" selected>Isolated Yield (%)</option>
           <option value="Spectroscopic Yield (%)">Spectroscopic Yield (%)</option>
           <option value="Chromatographic Yield (%)">Chromatographic Yield (%)</option>
-          <option value="ee (%)">ee (%)</option>
-          <option value="de (%)">de (%)</option>
+          <option value="<em>ee</em> (%)">ee (%)</option>
+          <option value="<em>de</em> (%)">de (%)</option>
           <option value="Other">Other</option>
         </select>
       </td>
       <td class="output-label-value-cell hidden">
-        <input type="text" id="ol-0" class="output-input trigger-chart-update" placeholder="Define outcome"
-          value="Isolated Yield (%)">
+        <div id="ol-0">Isolated Yield (%)</div>
       </td>
     </tr>
   </table>
