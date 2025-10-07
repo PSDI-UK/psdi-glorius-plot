@@ -615,7 +615,7 @@ function getOutputLabel(j = 0) {
     devLabel = $(".rel-deviation-heading").text();
 
   // Get the output label, and strip the percentage indicator from it if present
-  let outputLabel = $("input.output-input")[j].value;
+  let outputLabel = $("#ol-" + j + " .ql-editor p")[0].innerHTML;
   if (outputLabel.endsWith(" (%)")) {
     outputLabel = outputLabel.slice(0, -" (%)".length);
   }
@@ -1290,9 +1290,6 @@ async function generatePlot() {
  */
 function fillRandom() {
 
-  // Fill the column labels
-  $(".output-label-select").val("Isolated Yield (%)").change();
-
   // Fill the row labels
   const lRowLabelInputs = $(".condition-label");
   for (let i = 0; i < lRowLabelInputs.length; ++i) {
@@ -1414,9 +1411,9 @@ function enableDeviationCalc() {
 }
 
 function enableOutputLabelUpdate() {
-  const outputLabelInput = $("#ol-0");
-  outputLabelInput.off("change");
-  outputLabelInput.on("change", (e) => updateOutputLabel(e.target.value));
+  const outputLabelEditor = d_quill_editors["#ol-0"];
+  outputLabelEditor.off("text-change");
+  outputLabelEditor.on("text-change", () => updateOutputLabel(outputLabelEditor.getSemanticHTML()));
 }
 
 function disableDeviationCalc() {
@@ -1519,16 +1516,15 @@ function updateOutputLabelSelection(e) {
   let targetIndex = getTargetIndex(e, DIM_LIMITS.output.max);
   let newValue = this.value;
   let lOutcomeValueCells = $(".output-label-value-cell");
-  let outcomeInput = $("#ol-" + targetIndex.toString());
+  let outcomeInput = $("#ol-" + targetIndex + " .ql-editor p");
 
   if (newValue != "Other") {
     lOutcomeValueCells.addClass("hidden");
+    outcomeInput.html(newValue);
+    updateOutputLabel(newValue);
   } else {
-    newValue = "";
     lOutcomeValueCells.removeClass("hidden");
   }
-  outcomeInput.val(newValue);
-  updateOutputLabel(newValue);
 }
 
 function updateOutputLabel(label) {
@@ -1537,7 +1533,7 @@ function updateOutputLabel(label) {
 
   // If only one output, don't number it
   if (numSamples == 1) {
-    lOutputHeadings.text(label);
+    lOutputHeadings.html(label);
   } else {
     for (let i = 0; i < numSamples; ++i) {
       lOutputHeadings.eq(i).text(label + " " + (i + 1).toString());
@@ -1627,7 +1623,7 @@ function disableQuillToolbar(selector) {
 }
 
 function initQuill() {
-  addQuillEditor("#output-label-editor", "Define outcome");
+  addQuillEditor("#ol-0", "Define outcome");
 }
 
 $(document).ready(function () {
