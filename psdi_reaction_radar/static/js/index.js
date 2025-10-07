@@ -1186,7 +1186,7 @@ async function generatePlot() {
 
   const fontSize = getFontSize();
 
-  const plotR = {
+  const plotROptions = {
     grid: {
       circular: fanMode
     },
@@ -1204,6 +1204,21 @@ async function generatePlot() {
     }
   };
 
+  const plotLegendOptions = {
+    labels: {
+      boxHeight: fontSize,
+      boxWidth: fontSize,
+      font: {
+        size: fontSize,
+        weight: "bold"
+      },
+      color: "#FFFFFF00", // Hide the normal label, since we implement it ourselves with custom styling
+      filter: function (legendLabel, _) {
+        return legendLabel.text != "";
+      }
+    }
+  }
+
   if (radarChart === null) {
     // Generate the plot for the first time
     radarChart = new Chart("glorius-plot", {
@@ -1217,26 +1232,13 @@ async function generatePlot() {
         aspectRatio: getAspectRatio(),
         responsive: false,
         scales: {
-          r: plotR
+          r: plotROptions
         },
         plugins: {
           customCanvasBackgroundColor: {
             color: "white",
           },
-          legend: {
-            labels: {
-              boxHeight: fontSize,
-              boxWidth: fontSize,
-              font: {
-                size: fontSize,
-                weight: "bold"
-              },
-              color: "#FFFFFF00", // Hide the normal label, since we implement it ourselves with custom styling
-              filter: function (legendLabel, _) {
-                return legendLabel.text != "";
-              }
-            }
-          }
+          legend: plotLegendOptions
         },
         animation: false
       }
@@ -1246,8 +1248,9 @@ async function generatePlot() {
       labels: lOutputConditionLabels,
       datasets: lDatasets,
     }
-    radarChart.options.scales.r = plotR;
+    radarChart.options.scales.r = plotROptions;
     radarChart.options.aspectRatio = getAspectRatio();
+    radarChart.options.plugins.legend = plotLegendOptions;
     radarChart.update();
     radarChart.resize(getWidth(), getHeight());
   }
@@ -1257,7 +1260,7 @@ async function generatePlot() {
   const legendHitBox = radarChart.legend.legendHitBoxes[0];
   await waitForMathJax();
   const svg = MathJax.tex2svg(getAsTex(getOutputLabel()));
-  drawSvgElement(ctx, svg, legendHitBox.left + 1.5 * fontSize, legendHitBox.top + 0.25 * fontSize, fontSize);
+  drawSvgElement(ctx, svg, legendHitBox.left + 1.25 * fontSize, legendHitBox.top + 0.125 * fontSize, fontSize);
   // drawText(ctx, [
   //   { text: getOutputLabel(), format: { fontWeight: 'bold', fontColor: '#606060' } }
   // ], {
