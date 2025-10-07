@@ -9,11 +9,13 @@
 import { initDirtyForms, cleanDirtyForms } from "./common.js";
 import { mix_hexes } from "./color.js"
 
-const CONDITION = "condition"
-const SAMPLE = "sample"
-const OUTPUT = "output"
+const LABEL_PLOT_FAMILY = "'Fira Sans', sans-serif";
 
-const L_DIMS = [CONDITION, SAMPLE, OUTPUT]
+const CONDITION = "condition";
+const SAMPLE = "sample";
+const OUTPUT = "output";
+
+const L_DIMS = [CONDITION, SAMPLE, OUTPUT];
 
 const DIM_LIMITS = {
   condition: {
@@ -28,7 +30,7 @@ const DIM_LIMITS = {
     min: 1,
     max: 2
   }
-}
+};
 
 const COLOR_SCHEMES = {
   classic: {
@@ -48,7 +50,7 @@ const COLOR_SCHEMES = {
     max: null
   }
 
-}
+};
 
 const DEFAULT_VALUE_MEAN = 100;
 const VALUE_MIN = 0.;
@@ -1194,6 +1196,7 @@ async function generatePlot() {
     max: maxOutput,
     pointLabels: {
       font: {
+        family: LABEL_PLOT_FAMILY,
         size: fontSize
       }
     },
@@ -1209,10 +1212,13 @@ async function generatePlot() {
       boxHeight: fontSize,
       boxWidth: fontSize,
       font: {
+        family: LABEL_PLOT_FAMILY,
         size: fontSize,
         weight: "bold"
       },
-      color: "#FFFFFF00", // Hide the normal label, since we implement it ourselves with custom styling
+      // Hide the normal label, since we implement it ourselves with custom styling. We still use it so we get the
+      // optimal positioning, which is why we don't filter it all out.
+      color: "#FFFFFF00",
       filter: function (legendLabel, _) {
         return legendLabel.text != "";
       }
