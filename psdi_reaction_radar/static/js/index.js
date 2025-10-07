@@ -121,12 +121,35 @@ async function waitForMathJax() {
   }
 }
 
+function stripTags(s) {
+
+  // Remove any relevant HTML tags from text
+  s = s.replaceAll("<p>", "").replaceAll("</p>", "");
+  s = s.replaceAll("<em>", "").replaceAll("</em>", "");
+  s = s.replaceAll("<strong>", "").replaceAll("</strong>", "");
+  s = s.replaceAll("<u>", "").replaceAll("</u>", "");
+  s = s.replaceAll("<sub>", "").replaceAll("</sub>", "");
+  s = s.replaceAll("<sup>", "").replaceAll("</sup>", "");
+
+  return s;
+}
+
 function getAsTex(s) {
   // Escape any characters that need to be escaped
-  s = s.replace("%", "\\%");
+  s = s.replaceAll("%", "\\%");
 
-  // TODO: Replace with proper processing
-  s = "\\textbf{ " + s + " }";
+  // Replace spaces with the LaTeX command for a space
+  s = s.replaceAll(" ", "\\:")
+
+  // Wrap in tags for normal text
+  s = "{\\rm " + s + "}";
+
+  // Replace HTML tags with the equivalent TeX markup
+  s = s.replaceAll("<em>", "\\textit{").replaceAll("</em>", "}");
+  s = s.replaceAll("<strong>", "\\textbf{").replaceAll("</strong>", "}");
+  s = s.replaceAll("<u>", "\\underline{").replaceAll("</u>", "}");
+  s = s.replaceAll("<sub>", "_{\\rm ").replaceAll("</sub>", "}");
+  s = s.replaceAll("<sup>", "^{\\rm ").replaceAll("</sup>", "}");
 
   return s;
 }
@@ -215,7 +238,7 @@ function removeDim(dim, e, updateAfter) {
     return removeOutput(e, updateAfter);
 }
 
-function setNumDim(dim, num) {
+function setNumDim(dim, num, updateAfter = true) {
 
   const numDim = getDimSize(dim);
 
@@ -231,7 +254,7 @@ function setNumDim(dim, num) {
     return;
   }
 
-  postTableUpdateCleanup(dim, true);
+  postTableUpdateCleanup(dim, updateAfter);
 }
 
 function updateDimSelector(dim) {
@@ -254,11 +277,6 @@ function updateButtonStatus(dim) {
 
 function postTableUpdateCleanup(dim, updateAfter) {
 
-  // Enable auto updates for new cells if it's turned on
-  if (autoUpdating) {
-    enableAutoUpdates();
-  }
-
   // Update affected properties if desired at this point
   if (updateAfter) {
     updateButtonStatus(dim);
@@ -268,7 +286,7 @@ function postTableUpdateCleanup(dim, updateAfter) {
     updateMeanColumn();
   }
 
-  // Update the plot if desired
+  // Enable auto updates for new cells if it's turned on, and update the plot if desired
   if (updateAfter && autoUpdating) {
     generatePlot();
   }
@@ -306,10 +324,8 @@ function relabelDim(dim) {
 
     // Set the heading text if we have any heading cells
     if (lHeadings.length > 0) {
-      let headingText = $("#ol-0").val();
-      if (num > 1)
-        headingText += " " + sI1;
-      lHeadings.eq(i).text(headingText);
+      let headingText = d_quill_editors["#ol-0"].getSemanticHTML();
+      updateOutputLabel(headingText);
     }
 
     // Set the label and input text if we have any of those cells
@@ -1025,7 +1041,7 @@ async function generatePlot() {
 
   for (let j = 0; j < numOutputs; ++j) {
 
-    lOutputLabels.push(getOutputLabel(j));
+    lOutputLabels.push(stripTags(getOutputLabel(j)));
 
     let lInvisibleData = [];
     let numInvisiblePoints = numConditions;
@@ -1327,9 +1343,9 @@ function fillRandom() {
  * https://onlinelibrary.wiley.com/doi/10.1002/anie.202418239 Table S9
  */
 function fillExample() {
-  setNumDim(CONDITION, 10);
-  setNumDim(SAMPLE, 1);
-  setNumDim(OUTPUT, 1);
+  setNumDim(OUTPUT, 1, false);
+  setNumDim(CONDITION, 10, false);
+  setNumDim(SAMPLE, 1, true);
 
   // Set the output label
   $(".output-label-select").val("Isolated Yield (%)").change();
@@ -1413,7 +1429,11 @@ function enableDeviationCalc() {
 function enableOutputLabelUpdate() {
   const outputLabelEditor = d_quill_editors["#ol-0"];
   outputLabelEditor.off("text-change");
-  outputLabelEditor.on("text-change", () => updateOutputLabel(outputLabelEditor.getSemanticHTML()));
+  outputLabelEditor.on("text-change", () => {
+    updateOutputLabel(outputLabelEditor.getSemanticHTML());
+    if (autoUpdating)
+      generatePlot();
+  });
 }
 
 function disableDeviationCalc() {
@@ -1521,7 +1541,6 @@ function updateOutputLabelSelection(e) {
   if (newValue != "Other") {
     lOutcomeValueCells.addClass("hidden");
     outcomeInput.html(newValue);
-    updateOutputLabel(newValue);
   } else {
     lOutcomeValueCells.removeClass("hidden");
   }
@@ -1531,12 +1550,15 @@ function updateOutputLabel(label) {
   let lOutputHeadings = $(".sample-heading");
   let numSamples = getNumSamples();
 
+  // Replace any non-breaking spaces in the label with normal spaces, and strip <p> tags
+  label = label.replaceAll("&nbsp;", " ").replaceAll("<p>", "").replaceAll("</p>", "");
+
   // If only one output, don't number it
   if (numSamples == 1) {
     lOutputHeadings.html(label);
   } else {
     for (let i = 0; i < numSamples; ++i) {
-      lOutputHeadings.eq(i).text(label + " " + (i + 1).toString());
+      lOutputHeadings.eq(i).html(label + " " + (i + 1).toString());
     }
   }
 
