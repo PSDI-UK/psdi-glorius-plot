@@ -159,19 +159,30 @@ function getAsTex(s) {
   s = "{\\rm " + s + "}";
 
   // Replace HTML tags with the equivalent TeX markup
-  s = s.replaceAll("<em>", "\\textit{").replaceAll("</em>", "}");
-  s = s.replaceAll("<strong>", "\\textbf{").replaceAll("</strong>", "}");
-  s = s.replaceAll("<u>", "\\underline{").replaceAll("</u>", "}");
-  s = s.replaceAll("<sub>", "_{\\rm ").replaceAll("</sub>", "}");
-  s = s.replaceAll("<sup>", "^{\\rm ").replaceAll("</sup>", "}");
+
+  // Check for combined bold/italics sections specially, since we need a different command to handle both at once
+  let changed = true;
+  while (changed) {
+    let old_s = s;
+    s = s.replaceAll(/<strong>((?!<\/strong>).*?)<em>(.*?)<\/em>(.*?)<\/strong>/gm,
+      "<strong>$1<\/strong>\\mathbfit{$2}<strong>$3<\/strong>");
+    if (s == old_s)
+      changed = false;
+  }
+
+  s = s.replaceAll("<em>", "\\textit{").replaceAll("</em>", "}")
+    .replaceAll("<strong>", "\\textbf{").replaceAll("</strong>", "}")
+    .replaceAll("<u>", "\\underline{").replaceAll("</u>", "}")
+    .replaceAll("<sub>", "_{\\rm ").replaceAll("</sub>", "}")
+    .replaceAll("<sup>", "^{\\rm ").replaceAll("</sup>", "}");
 
   return s;
 }
 
-function drawSvgElement(ctx, img, x = 0, y = 0, fontsize = 1) {
+function drawMathJaxSVG(ctx, img, x = 0, y = 0, fontsize = 1) {
   let DOMURL = window.URL || window.webkitURL || window;
   let img1 = new Image();
-  let svg = new Blob([img.innerHTML], { type: 'image/svg+xml' });
+  let svg = new Blob([$(img).find("svg")[0].outerHTML], { type: 'image/svg+xml' });
   let url = DOMURL.createObjectURL(svg);
   let scale = MATHJAX_FONT_SCALING * fontsize / MATHJAX_DEFAULT_FONT_SIZE;
   img1.onload = function () {
@@ -1302,18 +1313,8 @@ async function generatePlot() {
   const ctx = radarChart.ctx;
   const legendHitBox = radarChart.legend.legendHitBoxes[0];
   await waitForMathJax();
-  const svg = MathJax.tex2svg(getAsTex(getOutputLabel()));
-  drawSvgElement(ctx, svg, legendHitBox.left + 1.25 * fontSize, legendHitBox.top + 0.125 * fontSize, fontSize);
-  // drawText(ctx, [
-  //   { text: getOutputLabel(), format: { fontWeight: 'bold', fontColor: '#606060' } }
-  // ], {
-  //   x: legendHitBox.left + 0.75 * fontSize,
-  //   y: legendHitBox.top,
-  //   width: legendHitBox.width,
-  //   height: legendHitBox.height,
-  //   fontSize: fontSize
-  // });
-
+  const mathJaxSVG = await MathJax.tex2svgPromise(getAsTex(getOutputLabel()));
+  drawMathJaxSVG(ctx, mathJaxSVG, legendHitBox.left + 1.25 * fontSize, legendHitBox.top + 0.125 * fontSize, fontSize);
 }
 
 /**
