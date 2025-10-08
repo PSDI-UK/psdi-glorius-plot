@@ -121,17 +121,31 @@ async function waitForMathJax() {
   }
 }
 
+/**
+ * Cleans up an HTML string to replace non-breaking spaces with regular spaces and remove any semantic tags we aren't
+ * doing anything with.
+ * @param {string} s 
+ * @returns {string}
+ */
+function cleanTags(s) {
+  return s.replaceAll("&nbsp;", " ")
+    .replaceAll("<p>", "").replaceAll("</p>", "")
+    .replaceAll("<br>", "")
+    .replaceAll(/<span\b[^>]*>/gm, "").replaceAll("</span>", "");
+}
+
+/**
+ * Removes all relevant HTML tags from a string, including those that are used in other parts of the code for formatting
+ * @param {string} s 
+ * @returns {string}
+ */
 function stripTags(s) {
-
-  // Remove any relevant HTML tags from text
-  s = s.replaceAll("<p>", "").replaceAll("</p>", "");
-  s = s.replaceAll("<em>", "").replaceAll("</em>", "");
-  s = s.replaceAll("<strong>", "").replaceAll("</strong>", "");
-  s = s.replaceAll("<u>", "").replaceAll("</u>", "");
-  s = s.replaceAll("<sub>", "").replaceAll("</sub>", "");
-  s = s.replaceAll("<sup>", "").replaceAll("</sup>", "");
-
-  return s;
+  return cleanTags(s)
+    .replaceAll("<em>", "").replaceAll("</em>", "")
+    .replaceAll("<strong>", "").replaceAll("</strong>", "")
+    .replaceAll("<u>", "").replaceAll("</u>", "")
+    .replaceAll("<sub>", "").replaceAll("</sub>", "")
+    .replaceAll("<sup>", "").replaceAll("</sup>", "");
 }
 
 function getAsTex(s) {
@@ -631,7 +645,8 @@ function getOutputLabel(j = 0) {
     devLabel = $(".rel-deviation-heading").text();
 
   // Get the output label, and strip the percentage indicator from it if present
-  let outputLabel = $("#ol-" + j + " .ql-editor p")[0].innerHTML;
+  let outputLabel = d_quill_editors["#ol-0"].getSemanticHTML();
+  outputLabel = cleanTags(outputLabel);
   if (outputLabel.endsWith(" (%)")) {
     outputLabel = outputLabel.slice(0, -" (%)".length);
   }
@@ -1550,8 +1565,7 @@ function updateOutputLabel(label) {
   let lOutputHeadings = $(".sample-heading");
   let numSamples = getNumSamples();
 
-  // Replace any non-breaking spaces in the label with normal spaces, and strip <p> tags
-  label = label.replaceAll("&nbsp;", " ").replaceAll("<p>", "").replaceAll("</p>", "");
+  label = cleanTags(label);
 
   // If only one output, don't number it
   if (numSamples == 1) {
