@@ -1284,6 +1284,7 @@ async function generatePlot() {
       plugins: [customCanvasBackgroundColorPlugin],
       options: {
         aspectRatio: getAspectRatio(),
+        events: ['mousemove', 'mouseout', 'touchstart', 'touchmove'],
         responsive: false,
         scales: {
           r: plotROptions
@@ -1559,6 +1560,7 @@ function updateOutputLabelSelection(e) {
     outcomeInput.html(newValue);
   } else {
     lOutcomeValueCells.removeClass("hidden");
+    outcomeInput.html("");
   }
 }
 
