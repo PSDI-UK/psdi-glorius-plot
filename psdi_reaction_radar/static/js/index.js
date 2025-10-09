@@ -122,7 +122,7 @@ async function waitForMathJax() {
 }
 
 /**
- * Cleans up an HTML string to replace non-breaking spaces with regular spaces and remove any semantic tags we aren't
+ * Cleans up an HTML string to replace non-breaking spaces with regular spaces and remove any tags and data we aren't
  * doing anything with.
  * @param {string} s 
  * @returns {string}
@@ -131,7 +131,8 @@ function cleanTags(s) {
   return s.replaceAll("&nbsp;", " ")
     .replaceAll("<p>", "").replaceAll("</p>", "")
     .replaceAll("<br>", "")
-    .replaceAll(/<span\b[^>]*>/gm, "").replaceAll("</span>", "");
+    .replaceAll(/<span\b[^>]*>/gm, "").replaceAll("</span>", "")
+    .replaceAll(/<([a-zA-Z]+)\b[^>]*>/gm, "<$1>");
 }
 
 /**
