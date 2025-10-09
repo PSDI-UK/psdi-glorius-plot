@@ -117,7 +117,7 @@ function clamp(x, min, max) {
  */
 async function waitForMathJax() {
   while (!MathJax.tex2svg) {
-    await new Promise(resolve => setTimeout(resolve, 100));
+    await new Promise(resolve => setTimeout(l, 100));
   }
 }
 
@@ -1257,6 +1257,7 @@ async function generatePlot() {
   };
 
   const plotLegendOptions = {
+    position: "bottom",
     labels: {
       boxHeight: fontSize,
       boxWidth: fontSize,
