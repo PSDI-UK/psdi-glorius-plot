@@ -137,14 +137,19 @@ tr td:first-child button,
   display: none !important;
 }
 
-/* Style the output label table */
-.output-label {
+/* Style the title and output label tables */
+.output-label,
+#title-label {
   font-weight  : bold;
   padding-right: 0.5rem;
 }
 
+#title-input {
+  width: 20rem;
+}
+
 .output-label-row {
-  height: 2rem;
+  height: calc(2rem + 2px);
 }
 
 #table-options td {
@@ -270,6 +275,7 @@ button#reset-plot-dims {
 .ql-editor {
   padding  : 1px 2px;
   min-width: 10.5rem;
+  height   : 2rem;
 }
 
 .ql-editor {
@@ -277,13 +283,13 @@ button#reset-plot-dims {
 }
 
 .ql-toolbar.ql-snow {
-  display      : none;
-  border       : 1px solid #3A3A3A;
-  border-bottom: none;
-  position     : absolute;
-  bottom       : calc(2rem - 2px);
-  z-index      : 1;
-  background   : var(--ifm-background-color);
+  display            : none;
+  border             : 1px solid #3A3A3A;
+  border-bottom-width: 2px;
+  position           : absolute;
+  bottom             : calc(2rem - 1px);
+  z-index            : 1;
+  background         : var(--ifm-background-color);
 }
 
 .ql-toolbar.ql-snow.visible {

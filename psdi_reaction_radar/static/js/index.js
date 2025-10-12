@@ -1664,6 +1664,7 @@ function disableQuillToolbar(selector) {
 }
 
 function initQuill() {
+  addQuillEditor("#title-input", "Sensitivity analysis of the XXX reaction");
   addQuillEditor("#ol-0", "Define outcome");
 }
 
