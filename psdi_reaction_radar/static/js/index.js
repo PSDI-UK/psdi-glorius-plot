@@ -149,6 +149,11 @@ function stripTags(s) {
     .replaceAll("<sup>", "").replaceAll("</sup>", "");
 }
 
+async function drawFormatted(ctx, labelHTML, x, y, fontSize, hAlign) {
+  const mathJaxSVG = await MathJax.tex2svgPromise(getAsTex(labelHTML));
+  drawMathJaxSVG(ctx, mathJaxSVG, x, y, fontSize, hAlign);
+}
+
 function getAsTex(s) {
   // Escape any characters that need to be escaped
   s = s.replaceAll("%", "\\%");
@@ -180,7 +185,7 @@ function getAsTex(s) {
   return s;
 }
 
-function drawMathJaxSVG(ctx, img, x = 0, y = 0, fontsize = 1) {
+function drawMathJaxSVG(ctx, img, x = 0, y = 0, fontsize = 16, hAlign = "left") {
   let DOMURL = window.URL || window.webkitURL || window;
   let img1 = new Image();
   let svg = new Blob([$(img).find("svg")[0].outerHTML], { type: 'image/svg+xml' });
@@ -189,7 +194,10 @@ function drawMathJaxSVG(ctx, img, x = 0, y = 0, fontsize = 1) {
   img1.onload = function () {
     let w = img1.naturalWidth * scale;
     let h = img1.naturalHeight * scale;
-    ctx.drawImage(img1, x, y, w, h);
+    let finalX = x;
+    if (hAlign == "center")
+      finalX -= w / 2;
+    ctx.drawImage(img1, finalX, y, w, h);
     DOMURL.revokeObjectURL(url);
   }
   img1.src = url;
@@ -645,6 +653,10 @@ function resetPlotDims() {
 
 
 // Functions to get various options set by the user
+
+function getTitle() {
+  return d_quill_editors["#title-input"].getSemanticHTML();
+}
 
 function getOutputLabel(j = 0) {
   let devLabel;
@@ -1275,6 +1287,21 @@ async function generatePlot() {
     }
   }
 
+  const titleHTML = getTitle();
+
+  const plotTitleOptions = {
+    display: true,
+    text: stripTags(titleHTML),
+    font: {
+      family: LABEL_FONT_FAMILY,
+      size: fontSize,
+      weight: "bold"
+    },
+    // Hide the normal label, since we implement it ourselves with custom styling. We still use it so we get the
+    // optimal positioning, which is why we don't filter it all out.
+    color: "#FFFFFF00",
+  }
+
   if (radarChart === null) {
     // Generate the plot for the first time
     radarChart = new Chart("glorius-plot", {
@@ -1295,7 +1322,8 @@ async function generatePlot() {
           customCanvasBackgroundColor: {
             color: "white",
           },
-          legend: plotLegendOptions
+          legend: plotLegendOptions,
+          title: plotTitleOptions
         },
         animation: false
       }
@@ -1308,16 +1336,23 @@ async function generatePlot() {
     radarChart.options.scales.r = plotROptions;
     radarChart.options.aspectRatio = getAspectRatio();
     radarChart.options.plugins.legend = plotLegendOptions;
+    radarChart.options.plugins.title = plotTitleOptions;
     radarChart.update();
     radarChart.resize(getWidth(), getHeight());
   }
 
   // Manually draw formatted title, legend, and labels
-  const ctx = radarChart.ctx;
-  const legendHitBox = radarChart.legend.legendHitBoxes[0];
   await waitForMathJax();
-  const mathJaxSVG = await MathJax.tex2svgPromise(getAsTex(getOutputLabel()));
-  drawMathJaxSVG(ctx, mathJaxSVG, legendHitBox.left + 1.25 * fontSize, legendHitBox.top + 0.125 * fontSize, fontSize);
+  const ctx = radarChart.ctx;
+
+  const titleBlock = radarChart.titleBlock;
+  drawFormatted(ctx, cleanTags(titleHTML),
+    (titleBlock.left + titleBlock.right) / 2, titleBlock.top + titleBlock.options.padding + 0.125 * fontSize,
+    fontSize, "center");
+
+  const legendHitBox = radarChart.legend.legendHitBoxes[0];
+  drawFormatted(ctx, getOutputLabel(),
+    legendHitBox.left + 1.25 * fontSize, legendHitBox.top + 0.125 * fontSize, fontSize, "left");
 }
 
 /**
