@@ -1288,10 +1288,11 @@ async function generatePlot() {
   }
 
   const titleHTML = getTitle();
+  const titleHTMLText = stripTags(titleHTML);
 
   const plotTitleOptions = {
-    display: true,
-    text: stripTags(titleHTML),
+    display: (titleHTMLText != ""),
+    text: titleHTMLText,
     font: {
       family: LABEL_FONT_FAMILY,
       size: fontSize,
@@ -1480,14 +1481,10 @@ function enableDeviationCalc() {
   $(".trigger-deviation-update").on("change", calcDeviation);
 }
 
-function enableOutputLabelUpdate() {
-  const outputLabelEditor = d_quill_editors["#ol-0"];
-  outputLabelEditor.off("text-change");
-  outputLabelEditor.on("text-change", () => {
-    updateOutputLabel(outputLabelEditor.getSemanticHTML());
-    if (autoUpdating)
-      generatePlot();
-  });
+function enableQuillUpdate(selector, callback) {
+  const editor = d_quill_editors[selector];
+  editor.off("text-change");
+  editor.on("text-change", callback);
 }
 
 function disableDeviationCalc() {
@@ -1529,7 +1526,16 @@ function enableButtons() {
 }
 
 function enableOnChangeTriggers() {
-  enableOutputLabelUpdate();
+
+  enableQuillUpdate("#title-input", () => {
+    if (autoUpdating)
+      generatePlot();
+  });
+  enableQuillUpdate("#ol-0", () => {
+    updateOutputLabel(editor.getSemanticHTML());
+    if (autoUpdating)
+      generatePlot();
+  });
   enableDeviationCalc();
   enableCanvasUpdate();
 
