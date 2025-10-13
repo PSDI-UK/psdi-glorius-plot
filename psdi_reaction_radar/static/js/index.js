@@ -19,7 +19,7 @@ const OUTPUT = "output";
 
 const L_DIMS = [CONDITION, SAMPLE, OUTPUT];
 
-const DIM_LIMITS = {
+const D_DIM_LIMITS = {
   condition: {
     min: 3,
     max: 12
@@ -34,7 +34,7 @@ const DIM_LIMITS = {
   }
 };
 
-const COLOR_SCHEMES = {
+const D_COLOR_SCHEMES = {
   classic: {
     min: "#FF8080",
     max: "#20A020"
@@ -64,8 +64,34 @@ const RAND_BASELINE_MAX = 100.;
 const MATHJAX_DEFAULT_FONT_SIZE = 16;
 const MATHJAX_FONT_SCALING = 1.125;
 
-// Table values and placeholders
 const OUTPUT_LABEL_TEXT = "Output {N} Label:";
+
+const D_DEV_PLOT_MODE_INFO = {
+  relative: {
+    beforeOutput: "Deviation of ",
+    afterOutput: " (%)",
+    stripBegin: null,
+    stripEnd: " (%)"
+  },
+  absolute: {
+    beforeOutput: "Deviation of ",
+    afterOutput: " (+/-)",
+    stripBegin: null,
+    stripEnd: " (%)"
+  },
+  mean: {
+    beforeOutput: "Mean ",
+    afterOutput: "",
+    stripBegin: null,
+    stripEnd: null
+  },
+  value: {
+    beforeOutput: "",
+    afterOutput: "",
+    stripBegin: null,
+    stripEnd: null
+  }
+}
 
 // Plot styling
 const L_BORDER_DASHES = [[], [6, 6], [4, 4], [2, 2], [1, 1]];
@@ -91,9 +117,7 @@ let initWidth;
 let initHeight;
 let initFontSize;
 
-let output_label_quill;
-
-const d_quill_editors = {};
+const dQuillEditors = {};
 
 // When the script is initially loaded, store a copy of a heading element and cell elements that we'll later use
 // as templates to add new rows
@@ -298,12 +322,12 @@ function updateDimSelector(dim) {
 function updateButtonStatus(dim) {
   const num = getDimSize(dim);
 
-  if (num >= DIM_LIMITS[dim].max)
+  if (num >= D_DIM_LIMITS[dim].max)
     disableButton($("button.add-" + dim));
   else
     enableButton($("button.add-" + dim));
 
-  if (num <= DIM_LIMITS[dim].min)
+  if (num <= D_DIM_LIMITS[dim].min)
     disableButton($("button.remove-" + dim));
   else
     enableButton($("button.remove-" + dim));
@@ -358,7 +382,7 @@ function relabelDim(dim) {
 
     // Set the heading text if we have any heading cells
     if (lHeadings.length > 0) {
-      let headingText = d_quill_editors["#ol-0"].getSemanticHTML();
+      let headingText = dQuillEditors["#ol-0"].getSemanticHTML();
       updateOutputLabel(headingText);
     }
 
@@ -390,7 +414,7 @@ function addConditionRow(e, updateAfter = true) {
 
   // Check that we don't already have too many conditions
   const numConditions = getNumConditions();
-  if (numConditions >= DIM_LIMITS.condition.max) {
+  if (numConditions >= D_DIM_LIMITS.condition.max) {
     console.error("Attempt to add condition when maximum rows already reached");
     return;
   }
@@ -418,7 +442,7 @@ function removeConditionRow(e, updateAfter = true) {
 
   // Check that we don't already have too few rows
   const numConditions = getNumConditions();
-  if (numConditions <= DIM_LIMITS.condition.min) {
+  if (numConditions <= D_DIM_LIMITS.condition.min) {
     console.error("Attempt to remove row when minimum rows already reached");
     return;
   }
@@ -436,7 +460,7 @@ function addSampleCol(e, updateAfter = true) {
 
   // Check that we don't already have too many samples
   const numSamples = getNumSamples();
-  if (numSamples >= DIM_LIMITS.sample.max) {
+  if (numSamples >= D_DIM_LIMITS.sample.max) {
     console.error("Attempt to add sample when maximum samples already reached");
     return;
   }
@@ -481,7 +505,7 @@ function removeSampleCol(e, updateAfter = true) {
 
   // Check that we don't already have too few samples
   const numSamples = getNumSamples();
-  if (numSamples <= DIM_LIMITS.sample.min) {
+  if (numSamples <= D_DIM_LIMITS.sample.min) {
     console.error("Attempt to remove sample when minimum samples already reached");
     return;
   }
@@ -509,7 +533,7 @@ function addOutput(e, updateAfter = true) {
 
   // Check that we don't already have too many outputs
   const numOutputs = getNumOutputs();
-  if (numOutputs >= DIM_LIMITS.output.max) {
+  if (numOutputs >= D_DIM_LIMITS.output.max) {
     console.error("Attempt to add output when maximum outputs already reached");
     return;
   }
@@ -557,7 +581,7 @@ function removeOutput(e, updateAfter = true) {
 
   // Check that we don't already have too few outputs
   const numOutputs = getNumOutputs();
-  if (numOutputs <= DIM_LIMITS.output.min) {
+  if (numOutputs <= D_DIM_LIMITS.output.min) {
     console.error("Attempt to remove output when minimum outputs already reached");
     return;
   }
@@ -655,26 +679,34 @@ function resetPlotDims() {
 // Functions to get various options set by the user
 
 function getTitle() {
-  return d_quill_editors["#title-input"].getSemanticHTML();
+  return dQuillEditors["#title-input"].getSemanticHTML();
 }
 
 function getOutputLabel(j = 0) {
-  let devLabel;
-  const devPlotMode = getDevPlotMode();
-  if (devPlotMode == "mean")
-    devLabel = $(".mean-heading").text();
-  else if (devPlotMode == "absolute")
-    devLabel = $(".abs-deviation-heading").text();
-  else
-    devLabel = $(".rel-deviation-heading").text();
 
-  // Get the output label, and strip the percentage indicator from it if present
-  let outputLabel = d_quill_editors["#ol-0"].getSemanticHTML();
+  // Get the deviation plot mode, and check in case it's mean with only one sample. In that case, use different text
+  // for it
+  let devPlotMode = getDevPlotMode();
+  if (devPlotMode == "mean" && getNumSamples() == 1)
+    devPlotMode = "value";
+
+  const dDevPlotModeInfo = D_DEV_PLOT_MODE_INFO[devPlotMode];
+
+  // Get the cleaned output label
+  let outputLabel = dQuillEditors["#ol-0"].getSemanticHTML();
   outputLabel = cleanTags(outputLabel);
-  if (outputLabel.endsWith(" (%)")) {
-    outputLabel = outputLabel.slice(0, -" (%)".length);
+
+  // Strip appropriate strings from the beginning and end of the output label
+  if (dDevPlotModeInfo.stripEnd != null && (outputLabel.endsWith(dDevPlotModeInfo.stripEnd))) {
+    outputLabel = outputLabel.slice(0, -dDevPlotModeInfo.stripEnd.length);
   }
-  outputLabel += " " + devLabel;
+  if (dDevPlotModeInfo.stripBegin != null && (outputLabel.endsWith(dDevPlotModeInfo.stripBegin))) {
+    outputLabel = outputLabel.slice(dDevPlotModeInfo.stripBegin.length);
+  }
+
+  // Add appropriate segments to the beginning and end of the output label
+  outputLabel = dDevPlotModeInfo.beforeOutput + outputLabel + dDevPlotModeInfo.afterOutput;
+
   return outputLabel;
 }
 
@@ -1482,7 +1514,7 @@ function enableDeviationCalc() {
 }
 
 function enableQuillUpdate(selector, callback) {
-  const editor = d_quill_editors[selector];
+  const editor = dQuillEditors[selector];
   editor.off("text-change");
   editor.on("text-change", callback);
 }
@@ -1532,7 +1564,7 @@ function enableOnChangeTriggers() {
       generatePlot();
   });
   enableQuillUpdate("#ol-0", () => {
-    updateOutputLabel(d_quill_editors["#ol-0"].getSemanticHTML());
+    updateOutputLabel(dQuillEditors["#ol-0"].getSemanticHTML());
     if (autoUpdating)
       generatePlot();
   });
@@ -1593,7 +1625,7 @@ function initNumDimControls(dim) {
 }
 
 function updateOutputLabelSelection(e) {
-  let targetIndex = getTargetIndex(e, DIM_LIMITS.output.max);
+  let targetIndex = getTargetIndex(e, D_DIM_LIMITS.output.max);
   let newValue = this.value;
   let lOutcomeValueCells = $(".output-label-value-cell");
   let outcomeInput = $("#ol-" + targetIndex + " .ql-editor p");
@@ -1632,8 +1664,8 @@ function updateColourSchemeSelection() {
 
   if (newValue != "custom") {
     customColorInput.addClass("hidden");
-    $("#min-color-input").val(COLOR_SCHEMES[newValue].min);
-    $("#max-color-input").val(COLOR_SCHEMES[newValue].max);
+    $("#min-color-input").val(D_COLOR_SCHEMES[newValue].min);
+    $("#max-color-input").val(D_COLOR_SCHEMES[newValue].max);
   } else {
     customColorInput.removeClass("hidden");
   }
@@ -1682,7 +1714,7 @@ function addQuillEditor(selector, placeholder = "", toolbar = QUILL_TOOLBAR) {
     theme: QUILL_THEME
   });
 
-  d_quill_editors[selector] = editor;
+  dQuillEditors[selector] = editor;
 
   editor.on("selection-change", (range) => {
     if (range)
@@ -1693,7 +1725,7 @@ function addQuillEditor(selector, placeholder = "", toolbar = QUILL_TOOLBAR) {
 }
 
 function removeQuillEditor(selector) {
-  d_quill_editors.delete(selector);
+  dQuillEditors.delete(selector);
 }
 
 function enableQuillToolbar(selector) {
