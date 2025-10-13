@@ -1434,7 +1434,8 @@ function fillExample() {
   setNumDim(CONDITION, 10, false);
   setNumDim(SAMPLE, 1, true);
 
-  // Set the output label
+  // Set the title and output label
+  $("#title-input .ql-editor p").html("<b>Reaction-condition-based assignment for 1,3-cyclization</b>");
   $(".output-label-select").val("Isolated Yield (%)").change();
 
   // Fill the row labels
