@@ -355,9 +355,11 @@
   </table>
 
   <button type="button" id="generate-plot">Generate</button>
-  <span id="auto-update">
+  <span id="auto-update" class="mouseover-tooltip" data-bs-toggle="tooltip" data-bs-custom-class="tooltip-on-light"
+    data-bs-placement="top" title="This may result in some artifacts on the
+      plot when labels are changed. If this happens, click the “Generate” button to re-render the plot">
     <input type="checkbox" name="auto-update-toggle" id="auto-update-toggle" checked>
-    <label for="auto-update-toggle"> Auto-update</label>
+    <label for="auto-update-toggle">Auto-update</label>
   </span>
   <br>
   <button type="button" id="fill-random">Fill with random data</button>
