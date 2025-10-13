@@ -1532,7 +1532,7 @@ function enableOnChangeTriggers() {
       generatePlot();
   });
   enableQuillUpdate("#ol-0", () => {
-    updateOutputLabel(editor.getSemanticHTML());
+    updateOutputLabel(d_quill_editors["#ol-0"].getSemanticHTML());
     if (autoUpdating)
       generatePlot();
   });
