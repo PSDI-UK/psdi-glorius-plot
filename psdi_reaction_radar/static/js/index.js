@@ -183,7 +183,10 @@ function getAsTex(s) {
   s = s.replaceAll("%", "\\%");
 
   // Replace spaces with the LaTeX command for a space
-  s = s.replaceAll(" ", "\\:")
+  s = s.replaceAll(" ", "\\:");
+
+  // Replace hyphens with non-breaking hyphens so they won't get interpreted as minus symbols by the parser
+  s = s.replaceAll("-", "\u2011");
 
   // Wrap in tags for normal text
   s = "{\\rm " + s + "}";
