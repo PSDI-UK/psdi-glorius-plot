@@ -69,13 +69,13 @@ const OUTPUT_LABEL_TEXT = "Output {N} Label:";
 const D_DEV_PLOT_MODE_INFO = {
   relative: {
     beforeOutput: "Deviation of ",
-    afterOutput: " (%)",
+    afterOutput: " from standard conditions (%)",
     stripBegin: null,
     stripEnd: " (%)"
   },
   absolute: {
     beforeOutput: "Deviation of ",
-    afterOutput: " (+/-)",
+    afterOutput: " from standard conditions (+/-)",
     stripBegin: null,
     stripEnd: " (%)"
   },
