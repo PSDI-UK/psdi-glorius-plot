@@ -1166,7 +1166,7 @@ async function generatePlot() {
     }
   }
 
-  const lConditionLabels = getLConditionLabelsHTML().map(cleanTags);
+  const lConditionLabels = getLConditionLabelsHTML();
 
   // Make a fake dataset to add the label to the legend for each output
   const devPlotMode = getDevPlotMode();
@@ -1226,8 +1226,10 @@ async function generatePlot() {
       lSingleConditionData.push(lInputs[j].value);
     }
     lConditionData.push({
-      label: lConditionLabels[i],
-      data: lSingleConditionData
+      label: stripTags(lConditionLabels[i]),
+      labelHTML: cleanTags(lConditionLabels[i]),
+      data: lSingleConditionData,
+      displayIndex: i
     })
   }
 
@@ -1236,6 +1238,11 @@ async function generatePlot() {
   lConditionData.sort(function (a, b) {
     return (a.data[0] - b.data[0]) * sort_mode;
   });
+
+  // Fix the displayIndex for each item
+  lConditionData.map((d, i) => {
+    d.displayIndex = i;
+  })
 
   let lOutputConditionLabels = lConditionLabels;
   if (fanMode) {
@@ -1257,8 +1264,10 @@ async function generatePlot() {
         const tipCenter = barSize * (i + 0.5 + 0.5 * j / numOutputs);
 
         for (let l = 0; l < numAnglePoints; ++l) {
-          if (j == 0 && l == tipCenter)
+          if (j == 0 && l == tipCenter) {
             lOutputConditionLabels[l] = conditionData.label;
+            conditionData.displayIndex = l;
+          }
 
           // Calculate how far the point is from the tip center, taking into account that it's a circular array
           let tipDistance = Math.abs(l - tipCenter);
@@ -1352,7 +1361,10 @@ async function generatePlot() {
       font: {
         family: LABEL_FONT_FAMILY,
         size: fontSize
-      }
+      },
+      // Hide the normal label, since we implement it ourselves with custom styling. We still use it so we get the
+      // optimal positioning, which is why we don't filter it all out.
+      color: "#FFFFFF00",
     },
     reverse: true,
     ticks: {
@@ -1447,6 +1459,14 @@ async function generatePlot() {
   const legendHitBox = radarChart.legend.legendHitBoxes[0];
   drawFormatted(ctx, getOutputLabel(),
     legendHitBox.left + 1.25 * fontSize, legendHitBox.top + 0.125 * fontSize, fontSize, "left");
+
+  const lPointLabelItems = radarChart.scales.r._pointLabelItems;
+  for (let i = 0; i < lConditionData.length; ++i) {
+    const conditionData = lConditionData[i];
+    const labelData = lPointLabelItems[conditionData.displayIndex];
+    drawFormatted(ctx, conditionData.labelHTML,
+      (labelData.left + labelData.right) / 2, labelData.y + 0.125 * fontSize, fontSize, "center");
+  }
 }
 
 /**
