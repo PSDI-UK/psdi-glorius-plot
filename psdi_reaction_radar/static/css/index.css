@@ -307,6 +307,6 @@ button#reset-plot-dims {
   font-size  : var(--ifm-font-size-base);
 }
 
-.condition-label-input .ql-editor {
+.condition-input .ql-editor {
   width: 12rem;
 }

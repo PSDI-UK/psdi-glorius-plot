@@ -54,6 +54,8 @@ const D_COLOR_SCHEMES = {
 
 };
 
+const CONDITION_PLACEHOLDER = "Condition (e.g. “High c”)";
+
 const DEFAULT_VALUE_MEAN = 100;
 const VALUE_MIN = 0.;
 const VALUE_MAX = 100.;
@@ -345,11 +347,11 @@ function postTableUpdateCleanup(dim, updateAfter) {
     initNumDimControls(dim);
     relabelDim(dim);
     updateMeanColumn();
-  }
 
-  // Enable auto updates for new cells if it's turned on, and update the plot if desired
-  if (updateAfter && autoUpdating) {
-    generatePlot();
+    // Also update the plot if desired
+    if (autoUpdating) {
+      generatePlot();
+    }
   }
 }
 
@@ -390,11 +392,13 @@ function relabelDim(dim) {
     }
 
     // Set the label and input text if we have any of those cells
-    if (lLabels.length > 0 && lInputs.length > 0) {
-      const label = lLabels.eq(i);
-      label.text(OUTPUT_LABEL_TEXT.replace("{N}", sI1));
-      label.attr("for", `${d}l-${sI}`);
+    if (lInputs.length > 0) {
       lInputs.eq(i).attr("id", `${d}l-${sI}`);
+      if (lLabels.length > 0) {
+        const label = lLabels.eq(i);
+        label.text(OUTPUT_LABEL_TEXT.replace("{N}", sI1));
+        label.attr("for", `${d}l-${sI}`);
+      }
     }
   }
 
@@ -416,29 +420,48 @@ function updateMeanColumn() {
 function addConditionRow(e, updateAfter = true) {
 
   // Check that we don't already have too many conditions
-  const numConditions = getNumConditions();
-  if (numConditions >= D_DIM_LIMITS.condition.max) {
+  const oldNumConditions = getNumConditions();
+  if (oldNumConditions >= D_DIM_LIMITS.condition.max) {
     console.error("Attempt to add condition when maximum rows already reached");
     return;
   }
 
   // Construct a new row by copying the first and clearing its input
   const newRow = $(".condition-row")[0].cloneNode(true);
-  $(newRow).find(".condition-label").val("");
+  $(newRow).find(".condition-input .ql-editor p").html("");
   $(newRow).find(".sample-value").val("");
   $(newRow).find(".mean-value").val("100");
   $(newRow).find(".abs-deviation-value").val("0");
   $(newRow).find(".rel-deviation-value").val("0");
 
   // Determine where to add the row based on which button was clicked
-  const targetRowIndex = getTargetIndex(e, numConditions);
+  const targetRowIndex = getTargetIndex(e, oldNumConditions);
 
-  if (targetRowIndex >= numConditions - 1)
+  if (targetRowIndex >= oldNumConditions - 1)
     $(".sensitivity-table tbody")[0].appendChild(newRow);
   else
     $(".sensitivity-table tbody")[0].insertBefore(newRow, $(".condition-row")[targetRowIndex + 1]);
 
-  postTableUpdateCleanup("condition", updateAfter);
+  if (updateAfter) {
+    // Temporarily disable auto-updating the plot if it's enabled
+    const lastAutoUpdating = autoUpdating;
+    autoUpdating = false;
+    postTableUpdateCleanup("condition", updateAfter);
+    autoUpdating = lastAutoUpdating;
+  }
+  else {
+    // We need to at least relabel the elements so we can clean up Quill editors
+    relabelDim("condition");
+  }
+
+  // Clean up the Quill dict to point to the moved positions of the editors, and add an editor for the new row
+  for (let i = oldNumConditions; i > targetRowIndex + 1; --i) {
+    dQuillEditors["#cl-" + i] = dQuillEditors["#cl-" + (i - 1)];
+    delete dQuillEditors["#cl-" + (i - 1)];
+  }
+  $("#cl-" + (targetRowIndex + 1)).html("");
+  addQuillEditor("#cl-" + (targetRowIndex + 1), CONDITION_PLACEHOLDER);
+  resetQuillToolbarEvents();
 }
 
 function removeConditionRow(e, updateAfter = true) {
@@ -719,7 +742,7 @@ function getConditionLabelHTML(i) {
 
 function getLConditionLabelsHTML() {
   const lCondtionLabelsHTML = [];
-  $(".condition-label-input").each((i, e) => {
+  $(".condition-input").each((i, e) => {
     lCondtionLabelsHTML.push(getConditionLabelHTML(i));
   })
   return lCondtionLabelsHTML;
@@ -1714,7 +1737,7 @@ function initTooltips() {
 }
 
 /**
- * Initialise Quill editors
+ * Initialise a Quill editor
  */
 function addQuillEditor(selector, placeholder = "", toolbar = QUILL_TOOLBAR) {
   const editor = new Quill(selector, {
@@ -1747,11 +1770,24 @@ function disableQuillToolbar(selector) {
   $(selector).parent().find(".ql-toolbar").removeClass("visible");
 }
 
+function resetQuillToolbarEvents() {
+  Object.entries(dQuillEditors).forEach((entry) => {
+    const [selector, editor] = entry;
+    editor.off("selection-change");
+    editor.on("selection-change", (range) => {
+      if (range)
+        enableQuillToolbar(selector);
+      else
+        disableQuillToolbar(selector);
+    });
+  });
+}
+
 function initQuill() {
   addQuillEditor("#title-input", "“Sensitivity analysis of the XXX reaction”");
   addQuillEditor("#ol-0", "Define outcome");
-  $(".condition-label-input").each((i, e) => {
-    addQuillEditor("#cl-" + i, "Condition (e.g. “High c”)");
+  $(".condition-input").each((i, e) => {
+    addQuillEditor("#cl-" + i, CONDITION_PLACEHOLDER);
   })
 }
 
