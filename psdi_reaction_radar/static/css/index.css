@@ -175,6 +175,12 @@ tr td:first-child button,
   min-height    : 3rem;
 }
 
+td.condition-button-cell {
+  display        : flex;
+  flex-direction : row;
+  justify-content: space-between;
+}
+
 .condition-label-cell,
 .baseline-value-cell,
 .sample-value-cell,
@@ -200,6 +206,7 @@ input.condition-label {
   display        : flex;
   flex-direction : column;
   justify-content: center;
+  align-items    : center;
 }
 
 input.baseline-value,
