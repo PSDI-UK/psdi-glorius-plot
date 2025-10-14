@@ -462,24 +462,52 @@ function addConditionRow(e, updateAfter = true) {
   $("#cl-" + (targetRowIndex + 1)).html("");
   addQuillEditor("#cl-" + (targetRowIndex + 1), CONDITION_PLACEHOLDER);
   resetQuillToolbarEvents();
+
+  // If we skipped updating the plot before, do it now
+  if (updateAfter && autoUpdating)
+    generatePlot();
 }
 
 function removeConditionRow(e, updateAfter = true) {
 
   // Check that we don't already have too few rows
-  const numConditions = getNumConditions();
-  if (numConditions <= D_DIM_LIMITS.condition.min) {
+  const oldNumConditions = getNumConditions();
+  if (oldNumConditions <= D_DIM_LIMITS.condition.min) {
     console.error("Attempt to remove row when minimum rows already reached");
     return;
   }
 
   // Determine which row to remove based on which button was clicked
-  const targetRowIndex = getTargetIndex(e, numConditions);
+  const targetRowIndex = getTargetIndex(e, oldNumConditions);
+
+  // Remove the Quill editor first, so we don't hit a dangling reference by doing this after removing the row
+  removeQuillEditor("#cl-" + targetRowIndex);
 
   // Remove the row from the table
   $(".sensitivity-table tbody")[0].removeChild($(".condition-row")[targetRowIndex]);
 
-  postTableUpdateCleanup("condition", updateAfter);
+  if (updateAfter) {
+    // Temporarily disable auto-updating the plot if it's enabled
+    const lastAutoUpdating = autoUpdating;
+    autoUpdating = false;
+    postTableUpdateCleanup("condition", updateAfter);
+    autoUpdating = lastAutoUpdating;
+  }
+  else {
+    // We need to at least relabel the elements so we can clean up Quill editors
+    relabelDim("condition");
+  }
+
+  // Clean up the Quill dict to point to the moved positions of the editors, and add an editor for the new row
+  for (let i = targetRowIndex; i < oldNumConditions - 1; ++i) {
+    dQuillEditors["#cl-" + i] = dQuillEditors["#cl-" + (i + 1)];
+    delete dQuillEditors["#cl-" + (i + 1)];
+  }
+  resetQuillToolbarEvents();
+
+  // If we skipped updating the plot before, do it now
+  if (updateAfter && autoUpdating)
+    generatePlot();
 }
 
 function addSampleCol(e, updateAfter = true) {
@@ -1759,7 +1787,8 @@ function addQuillEditor(selector, placeholder = "", toolbar = QUILL_TOOLBAR) {
 }
 
 function removeQuillEditor(selector) {
-  dQuillEditors.delete(selector);
+  delete dQuillEditors[selector];
+  $(selector).html("");
 }
 
 function enableQuillToolbar(selector) {
