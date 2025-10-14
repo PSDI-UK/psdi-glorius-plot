@@ -461,7 +461,7 @@ function addConditionRow(e, updateAfter = true) {
   }
   $("#cl-" + (targetRowIndex + 1)).html("");
   addQuillEditor("#cl-" + (targetRowIndex + 1), CONDITION_PLACEHOLDER);
-  resetQuillToolbarEvents();
+  enableQuillEvents();
 
   // If we skipped updating the plot before, do it now
   if (updateAfter && autoUpdating)
@@ -503,7 +503,7 @@ function removeConditionRow(e, updateAfter = true) {
     dQuillEditors["#cl-" + i] = dQuillEditors["#cl-" + (i + 1)];
     delete dQuillEditors["#cl-" + (i + 1)];
   }
-  resetQuillToolbarEvents();
+  enableQuillEvents();
 
   // If we skipped updating the plot before, do it now
   if (updateAfter && autoUpdating)
@@ -1454,10 +1454,13 @@ async function generatePlot() {
  */
 function fillRandom() {
 
-  // Fill the row labels
-  const lRowLabelInputs = $(".condition-label");
-  for (let i = 0; i < lRowLabelInputs.length; ++i) {
-    lRowLabelInputs[i].value = (i + 1).toString();
+  // Suppress autoUpdating until the end
+  const lastAutoUpdating = autoUpdating;
+  autoUpdating = false;
+
+  // Fill the condition labels
+  for (let i = 0; i < getNumConditions(); ++i) {
+    updateQuillContents("#cl-" + i, i + 1);
   }
 
   // Fill each baseline cell
@@ -1480,6 +1483,7 @@ function fillRandom() {
     calcDeviation();
   }
 
+  autoUpdating = lastAutoUpdating;
   if (autoUpdating) {
     generatePlot();
   }
@@ -1491,6 +1495,11 @@ function fillRandom() {
  * https://onlinelibrary.wiley.com/doi/10.1002/anie.202418239 Table S9
  */
 function fillExample() {
+
+  // Suppress autoUpdating until the end
+  const lastAutoUpdating = autoUpdating;
+  autoUpdating = false;
+
   setNumDim(OUTPUT, 1, false);
   setNumDim(CONDITION, 10, false);
   setNumDim(SAMPLE, 1, true);
@@ -1499,18 +1508,17 @@ function fillExample() {
   $("#title-input .ql-editor p").html("<b>Reaction-condition-based assignment for 1,3-cyclization</b>");
   $(".output-label-select").val("Isolated Yield (%)").change();
 
-  // Fill the row labels
-  const lRowLabelInputs = $(".condition-label");
-  lRowLabelInputs.eq(0).val("High concentration");
-  lRowLabelInputs.eq(1).val("Low concentration");
-  lRowLabelInputs.eq(2).val("Water");
-  lRowLabelInputs.eq(3).val("Low Oxygen");
-  lRowLabelInputs.eq(4).val("High Oxygen");
-  lRowLabelInputs.eq(5).val("Low temperature");
-  lRowLabelInputs.eq(6).val("High temperature");
-  lRowLabelInputs.eq(7).val("Low current");
-  lRowLabelInputs.eq(8).val("High current");
-  lRowLabelInputs.eq(9).val("Big scale");
+  // Fill the condition labels
+  updateQuillContents("#cl-0", "High <em>c</em>")
+  updateQuillContents("#cl-1", "Low <em>c</em>")
+  updateQuillContents("#cl-2", "H<sub>2</sub>O")
+  updateQuillContents("#cl-3", "Low O<sub>2</sub>")
+  updateQuillContents("#cl-4", "High O<sub>2</sub>")
+  updateQuillContents("#cl-5", "Low <em>T</em>")
+  updateQuillContents("#cl-6", "High <em>T</em>")
+  updateQuillContents("#cl-7", "Low <em>I</em>")
+  updateQuillContents("#cl-8", "High <em>I</em>")
+  updateQuillContents("#cl-9", "Big scale")
 
   // Fill the baseline value
   $(".baseline-value").eq(0).val("58");
@@ -1540,6 +1548,7 @@ function fillExample() {
     calcDeviation();
   }
 
+  autoUpdating = lastAutoUpdating;
   if (autoUpdating) {
     generatePlot();
   }
@@ -1573,12 +1582,6 @@ function enableDeviationCalc() {
   // Clear any update triggers first so we don't inadvertently double-up
   disableDeviationCalc();
   $(".trigger-deviation-update").on("change", calcDeviation);
-}
-
-function enableQuillUpdate(selector, callback) {
-  const editor = dQuillEditors[selector];
-  editor.off("text-change");
-  editor.on("text-change", callback);
 }
 
 function disableDeviationCalc() {
@@ -1621,15 +1624,6 @@ function enableButtons() {
 
 function enableOnChangeTriggers() {
 
-  enableQuillUpdate("#title-input", () => {
-    if (autoUpdating)
-      generatePlot();
-  });
-  enableQuillUpdate("#ol-0", () => {
-    updateOutputLabel(dQuillEditors["#ol-0"].getSemanticHTML());
-    if (autoUpdating)
-      generatePlot();
-  });
   enableDeviationCalc();
   enableCanvasUpdate();
 
@@ -1791,6 +1785,11 @@ function removeQuillEditor(selector) {
   $(selector).html("");
 }
 
+function updateQuillContents(selector, contents) {
+  $(selector + " .ql-editor p").html(contents);
+  dQuillEditors[selector].updateContents();
+}
+
 function enableQuillToolbar(selector) {
   $(selector).parent().find(".ql-toolbar").addClass("visible");
 }
@@ -1799,9 +1798,11 @@ function disableQuillToolbar(selector) {
   $(selector).parent().find(".ql-toolbar").removeClass("visible");
 }
 
-function resetQuillToolbarEvents() {
+function enableQuillEvents() {
+  // Set all editors to toggle toolbars when selected and auto-update the plot on change
   Object.entries(dQuillEditors).forEach((entry) => {
     const [selector, editor] = entry;
+
     editor.off("selection-change");
     editor.on("selection-change", (range) => {
       if (range)
@@ -1809,6 +1810,18 @@ function resetQuillToolbarEvents() {
       else
         disableQuillToolbar(selector);
     });
+
+    editor.off("text-change");
+    editor.on("text-change", () => {
+      if (autoUpdating)
+        generatePlot();
+    });
+
+  });
+
+  // Also set the output label editor to update the output label in column headings when changed
+  dQuillEditors["#ol-0"].on("text-change", () => {
+    updateOutputLabel(dQuillEditors["#ol-0"].getSemanticHTML());
   });
 }
 
@@ -1818,6 +1831,7 @@ function initQuill() {
   $(".condition-input").each((i, e) => {
     addQuillEditor("#cl-" + i, CONDITION_PLACEHOLDER);
   })
+  enableQuillEvents();
 }
 
 $(document).ready(function () {
