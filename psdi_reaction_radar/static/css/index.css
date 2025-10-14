@@ -278,10 +278,6 @@ button#reset-plot-dims {
   height   : 2rem;
 }
 
-.ql-editor {
-  border: 2px inset #767676;
-}
-
 .ql-toolbar.ql-snow {
   display            : none;
   border             : 1px solid #3A3A3A;
@@ -301,6 +297,7 @@ button#reset-plot-dims {
 }
 
 .ql-editor {
+  border     : 2px inset #767676;
   font-family: 'Fira Sans', sans-serif;
   font-size  : var(--ifm-font-size-base);
 }
@@ -308,4 +305,8 @@ button#reset-plot-dims {
 .ql-editor::before {
   font-family: var(--ifm-font-family-base);
   font-size  : var(--ifm-font-size-base);
+}
+
+.condition-label-input .ql-editor {
+  width: 12rem;
 }

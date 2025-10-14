@@ -713,6 +713,18 @@ function getOutputLabel(j = 0) {
   return outputLabel;
 }
 
+function getConditionLabelHTML(i) {
+  return dQuillEditors["#cl-" + i].getSemanticHTML();
+}
+
+function getLConditionLabelsHTML() {
+  const lCondtionLabelsHTML = [];
+  $(".condition-label-input").each((i, e) => {
+    lCondtionLabelsHTML.push(getConditionLabelHTML(i));
+  })
+  return lCondtionLabelsHTML;
+}
+
 function getDevPlotMode() {
   return $("#dev-plot-select").find(":selected").val();
 }
@@ -1103,12 +1115,7 @@ async function generatePlot() {
     }
   }
 
-  // Get the condition labels
-  const lConditionLabels = [];
-  const lConditionLabelCells = $(".condition-label");
-  for (let i = 0; i < numConditions; ++i) {
-    lConditionLabels.push(lConditionLabelCells[i].value);
-  }
+  const lConditionLabels = getLConditionLabelsHTML().map(cleanTags);
 
   // Make a fake dataset to add the label to the legend for each output
   const devPlotMode = getDevPlotMode();
@@ -1741,8 +1748,11 @@ function disableQuillToolbar(selector) {
 }
 
 function initQuill() {
-  addQuillEditor("#title-input", "Sensitivity analysis of the XXX reaction");
+  addQuillEditor("#title-input", "“Sensitivity analysis of the XXX reaction”");
   addQuillEditor("#ol-0", "Define outcome");
+  $(".condition-label-input").each((i, e) => {
+    addQuillEditor("#cl-" + i, "Condition (e.g. “High c”)");
+  })
 }
 
 $(document).ready(function () {
