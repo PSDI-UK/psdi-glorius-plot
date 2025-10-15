@@ -175,6 +175,13 @@ tr td:first-child button,
   min-height    : 3rem;
 }
 
+.sample-button-container {
+  display        : flex;
+  flex-direction : row;
+  justify-content: center;
+  align-items    : center;
+}
+
 td.condition-button-cell {
   display        : flex;
   flex-direction : row;
@@ -187,7 +194,8 @@ td.condition-button-cell {
 .mean-value-cell,
 .abs-deviation-value-cell,
 .rel-deviation-value-cell {
-  padding-right: 0.5rem;
+  padding-left : 0.125rem;
+  padding-right: 0.125rem;
 }
 
 input {
