@@ -1,10 +1,10 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: psdi-reaction-radar
+  name: psdi-glorius-plot
 spec:
   selector:
-    app: psdi-reaction-radar
+    app: psdi-glorius-plot
   ports:
     - port: 8000
       targetPort: 8000

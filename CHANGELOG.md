@@ -1,4 +1,4 @@
-# Changelog for PSDI Reaction Sensitivity Radar Plot Generator
+# Changelog for PSDI Glorius Plot Generator
 
 ## v0.2.0
 

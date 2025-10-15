@@ -2,4 +2,4 @@
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: psdi-reaction-radar-admin-sa
+  name: psdi-glorius-plot-admin-sa

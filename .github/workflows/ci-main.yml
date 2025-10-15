@@ -35,7 +35,7 @@ jobs:
       container_tag: ${{ github.sha }}
   # Deploy to Kubernetes Job
   # Requires an environment, which must reflect the target environment as defined in the
-  # GitHub repository: https://github.com/PSDI-UK/psdi-reaction-radar/settings/environments
+  # GitHub repository: https://github.com/PSDI-UK/psdi-glorius-plot/settings/environments
   # The downstream deploy job leverages on Environment specific secrets, which also must be defined
   # For the tag, we need something unique for each push, so we use the SHA of the latest commit
   deploy-stfc-dev-k8s:

@@ -27,12 +27,12 @@ on:
       container_tag:
         description: "Container Tag"
         value: ${{ jobs.tag.outputs.container_tag }}
-    
+
 jobs:
   tag:
     outputs:
       container_tag: ${{ steps.tag_version.outputs.new_tag }}
-    runs-on: psdi-reaction-radar-runners
+    runs-on: psdi-glorius-plot-runners
     steps:
       - uses: actions/checkout@v5
       - name: Bump version and push tag

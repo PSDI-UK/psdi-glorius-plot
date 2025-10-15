@@ -1,4 +1,4 @@
-# PSDI Reaction Sensitivity Radar Plot Generator
+# PSDI Glorius Plot Generator
 
 [![License Badge](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
@@ -12,7 +12,7 @@ Release date: 2025-08-18
 
 This projects provides the code for a Flask-hosted web app to generate a Glorius-style radar plot of reaction sensitivity for the user.
 
-For internal testing, the main branch of this project is published to https://psdi-uk.github.io/psdi-reaction-radar
+For internal testing, the main branch of this project is published to https://psdi-uk.github.io/psdi-glorius-plot
 
 ## Table of Contents
 
@@ -36,7 +36,7 @@ For internal testing, the main branch of this project is published to https://ps
     - (Automated workflows for various tasks related to project maintenance)
 - `deploy`
   - (Files used as part of the deployment to STFC infrastructure)
-- `psdi_reaction_radar` (Primary source directory)
+- `psdi_glorius_plot` (Primary source directory)
   - `static` (Static code and assets for the web app)
     - `img`
       - (Image assets for the web app)
@@ -135,7 +135,7 @@ In addition to the dependencies listed above, this project uses the assets made 
 
 ## Using the online app
 
-Enter https://psdi_reaction_radar.psdi.ac.uk/ in a browser. Guidance on usage is given on each page of the website.
+Enter https://psdi_glorius_plot.psdi.ac.uk/ in a browser. Guidance on usage is given on each page of the website.
 
 ## Testing
 

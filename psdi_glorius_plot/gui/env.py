@@ -11,8 +11,8 @@ from subprocess import run
 from traceback import format_exc
 from typing import TypeVar
 
-from psdi_reaction_radar import constants as const
-from psdi_reaction_radar import log_utility
+from psdi_glorius_plot import constants as const
+from psdi_glorius_plot import log_utility
 
 
 class SiteEnv:

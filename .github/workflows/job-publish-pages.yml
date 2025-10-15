@@ -41,7 +41,7 @@ jobs:
           pip install .
 
       - name: Render Static Content
-        run: psdi-reaction-radar-render
+        run: psdi-glorius-plot-render
 
       - name: Setup Pages
         uses: actions/configure-pages@v5

@@ -1,4 +1,4 @@
-"""@file psdi_reaction_radar/constants.py
+"""@file psdi_glorius_plot/constants.py
 
 Miscellaneous constant values used within this project.
 
@@ -31,10 +31,10 @@ import shutil
 # ---------
 
 # The name of the command-line script
-CL_SCRIPT_NAME = "psdi-reaction-radar"
+CL_SCRIPT_NAME = "psdi-glorius-plot"
 
 # The name of the Flask app
-APP_NAME = "psdi_reaction_radar"
+APP_NAME = "psdi_glorius_plot"
 
 # Environmental variables
 LOG_MODE_EV = "LOG_MODE"

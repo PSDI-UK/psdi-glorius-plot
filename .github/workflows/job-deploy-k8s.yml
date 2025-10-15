@@ -5,20 +5,20 @@
 name: Job - Deploy to k8s
 run-name: Deploy to k8s
 on:
-  workflow_call:  # allow this workflow to be called from other workflows
+  workflow_call: # allow this workflow to be called from other workflows
     inputs:
       environment: # pass the environment, used for targettinbg env specific K8s manifests
         required: true
         type: string
       container_tag: # define our version tag created from the upstream container build job
-        description: 'The latest tag for the container'
+        description: "The latest tag for the container"
         required: true
         type: string
 jobs:
   deploy-k8s:
     environment: ${{ inputs.environment }}
     # run on our self hosted github runners enabling access to STFC infrastructure
-    runs-on: psdi-reaction-radar-runners
+    runs-on: psdi-glorius-plot-runners
     steps:
       - uses: actions/checkout@v5
 
@@ -69,7 +69,7 @@ jobs:
           DEPLOY_ENV="${{ inputs.environment }}"
           cd deploy/$DEPLOY_ENV
           # update image with version passed from upstream build job
-          kustomize edit set image psdi-reaction-radar=ghcr.io/psdi-uk/psdi-reaction-radar/psdi-reaction-radar:$CONTAINER_TAG
+          kustomize edit set image psdi-glorius-plot=ghcr.io/psdi-uk/psdi-glorius-plot/psdi-glorius-plot:$CONTAINER_TAG
           # return to root of repository
           cd -
           # Apply env specific kustomizations

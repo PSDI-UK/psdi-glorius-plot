@@ -54,7 +54,7 @@ The following tasks should be completed before merging a release candidate branc
 
 - Ensure that all automated tests and checks pass - these should be run automatically on the PR opened above
 
-- Manually test the web interface. At this stage, it should be deployed to dev at https://psdi-reaction-radar-dev.psdi.ac.uk/ (requires VPN to access), and it can be run locally as well
+- Manually test the web interface. At this stage, it should be deployed to dev at https://psdi-glorius-plot-dev.psdi.ac.uk/ (requires VPN to access), and it can be run locally as well
 
   - If there have been any changes to the Python backend, run a test that a file can be converted successfully and produces a proper log
   - If there have been any changes to the web frontend, check the appearance of the site to ensure that it looks as desired. Test the Accessibility page to ensure that changes there work properly, are saved when requested and apply to other pages
@@ -66,9 +66,9 @@ If any of these tasks fail and require changes, make the needed changes and then
 Then, follow the following steps to make the release:
 
 1. Merge the pull request to `release`. The release candidate branch can be safely deleted. This should trigger an automated pipeline to tag, publish, and deploy and the new code.
-2. After the above pipeline finishes, confirm that the changes are shown live on the staging site at https://psdi-reaction-radar-staging.psdi.ac.uk/ by checking the version shown at the bottom of the Documentation page. If necessary, double-check that nothing has broken due to the slight changes in appearance between the dev and staging sites
+2. After the above pipeline finishes, confirm that the changes are shown live on the staging site at https://psdi-glorius-plot-staging.psdi.ac.uk/ by checking the version shown at the bottom of the Documentation page. If necessary, double-check that nothing has broken due to the slight changes in appearance between the dev and staging sites
 3. Manually trigger the `Manual Trigger - Deploy to production cluster` workflow on the `release` branch to deploy the site from the staging to release environment, which will make the changes visible to users
-4. After completion of the workflow, confirm that the changes are live on the production site at https://psdi-reaction-radar.psdi.ac.uk/ by checking the version shown at the bottom of the Documentation page
+4. After completion of the workflow, confirm that the changes are live on the production site at https://psdi-glorius-plot.psdi.ac.uk/ by checking the version shown at the bottom of the Documentation page
 5. Merge `release` into `main` via PR (obviously don't delete `release` - if it even gives you the option to, something has gone wrong in the project rulesets, so report this).
 
 ## Changelog
@@ -219,7 +219,7 @@ The `ci-release.yml` workflow is planned to publish any new releases to PyPI aft
 
 ### Project Management
 
-This project is published on PyPI at https://pypi.org/project/psdi-reaction-radar/ and on TestPyPI at https://test.pypi.org/project/psdi-reaction-radar/. Maintainers can manage the project through the "Manage" link on that page or from their own projects page.
+This project is published on PyPI at https://pypi.org/project/psdi-glorius-plot/ and on TestPyPI at https://test.pypi.org/project/psdi-glorius-plot/. Maintainers can manage the project through the "Manage" link on that page or from their own projects page.
 
 The most important setting to be aware of here is Publishing -> Trusted Publisher Management. This is the system used to allow automatic publishing of releases from GitHub. It's set up so that the current project, organisation, environment, and workflow for publishing are approved. If any of these change, this will need to be updated by adding a new trusted publisher with the new settings (on both PyPI and TestPyPI) and removing the old one.
 
@@ -240,11 +240,11 @@ branch deploys to which environment. The table also shows, for each environment:
   upon a commit to the source branch which passes the unit-tests job; or results from a _manual_ invocation of a workflow by a
   developer.
 
-| Environment   | URL                                            | Accessibility                              | Source branch | Deployment trigger |
-| ------------- | ---------------------------------------------- | ------------------------------------------ | ------------- | ------------------ |
-| `development` | https://psdi-reaction-radar-dev.psdi.ac.uk     | STFC and University of Southampton subnets | `main`        | Automatic          |
-| `staging`     | https://psdi-reaction-radar-staging.psdi.ac.uk | STFC and University of Southampton subnets | `release`     | Automatic          |
-| `production`  | https://psdi-reaction-radar.psdi.ac.uk         | public                                     | `release`     | Manual             |
+| Environment   | URL                                          | Accessibility                              | Source branch | Deployment trigger |
+| ------------- | -------------------------------------------- | ------------------------------------------ | ------------- | ------------------ |
+| `development` | https://psdi-glorius-plot-dev.psdi.ac.uk     | STFC and University of Southampton subnets | `main`        | Automatic          |
+| `staging`     | https://psdi-glorius-plot-staging.psdi.ac.uk | STFC and University of Southampton subnets | `release`     | Automatic          |
+| `production`  | https://psdi-glorius-plot.psdi.ac.uk         | public                                     | `release`     | Manual             |
 
 Thus the `main` is automatically deployed to the `development` environment, and the `release` branch is automatically deployed to the `staging`
 environment. However deployment from the `release` branch to the `production` environment is a manual process. This is to allow developers to
@@ -254,8 +254,8 @@ section [Release Checklist and Procedure](#release-checklist-and-procedure).
 
 ### How to deploy to the `production` environment
 
-To trigger the workflow which deploys the service to the `production` environment, from the [main page of the repo](https://github.com/PSDI-UK/psdi-reaction-radar)
-navigate to [Actions](https://github.com/PSDI-UK/psdi-reaction-radar/actions). Here you should see on the right a list of recent workflow
+To trigger the workflow which deploys the service to the `production` environment, from the [main page of the repo](https://github.com/PSDI-UK/psdi-glorius-plot)
+navigate to [Actions](https://github.com/PSDI-UK/psdi-glorius-plot/actions). Here you should see on the right a list of recent workflow
 runs, including whether or not they are successful (as indicated by a green tick); and on the left you should see a list of all workflows.
 
 The workflow which deploys the `release` branch to the `staging` environment is named `CI - Release`. As mentioned above, you should verify
@@ -263,10 +263,10 @@ that this workflow successfully deployed the `release` version to `staging` befo
 latest workflow run of `CI - Release` then you can see a breakdown of the workflow into its constituent workflows. Note the `deploy-stfc-staging-k8s`
 job. If this job is successful then the `release` version has been successfully deployed to `staging`.
 
-Assuming this is the case, navigating back to [Actions](https://github.com/PSDI-UK/psdi-reaction-radar/actions), note that there is a workflow
+Assuming this is the case, navigating back to [Actions](https://github.com/PSDI-UK/psdi-glorius-plot/actions), note that there is a workflow
 listed on the left named `Manual Trigger - Deploy to production cluster`. This is the workflow which must be invoked manually to deploy the `release`
 version to the `production` environment. Clicking on the link to this workflow gives
-[a list of recent invocations](https://github.com/PSDI-UK/psdi-reaction-radar/actions/workflows/manual-deploy-production.yml) of the workflow.
+[a list of recent invocations](https://github.com/PSDI-UK/psdi-glorius-plot/actions/workflows/manual-deploy-production.yml) of the workflow.
 Moreover, a light blue banner appears which says `This workflow has a workflow_dispatch event trigger` on the left and has a `Run workflow` button
 on the right. To invoke the workflow, press this button, _select the `release` branch_ as the option for `Use workflow from` dropdown menu, and
 then finally click the green `Run workflow` button. Once the workflow has been invoked you should be able to see its progress in real time on the

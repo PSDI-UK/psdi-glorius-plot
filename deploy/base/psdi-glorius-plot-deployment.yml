@@ -1,18 +1,18 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: psdi-reaction-radar
+  name: psdi-glorius-plot
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: psdi-reaction-radar
+      app: psdi-glorius-plot
   template:
     metadata:
       labels:
-        app: psdi-reaction-radar
+        app: psdi-glorius-plot
       annotations:
-        elastic.co/dataset: kubernetes.container_logs.psdi_reaction_radar
+        elastic.co/dataset: kubernetes.container_logs.psdi_glorius_plot
     spec:
       affinity:
         podAntiAffinity:
@@ -24,11 +24,11 @@ spec:
                     - key: app
                       operator: In
                       values:
-                        - psdi-reaction-radar
+                        - psdi-glorius-plot
                 topologyKey: "kubernetes.io/hostname"
       containers:
-        - name: psdi-reaction-radar
-          image: psdi-reaction-radar
+        - name: psdi-glorius-plot
+          image: psdi-glorius-plot
           volumeMounts:
             - mountPath: /tmp
               name: uploads

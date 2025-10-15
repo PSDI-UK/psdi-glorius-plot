@@ -16,7 +16,7 @@ jobs:
   check-branch:
     # Check that this job is being run on the release branch
     name: Check this is release branch
-    runs-on: psdi-reaction-radar-runners
+    runs-on: psdi-glorius-plot-runners
     steps:
       - name: Check branch (success)
         if: github.ref == 'refs/heads/release'
@@ -30,7 +30,7 @@ jobs:
   get-latest-release-tag:
     # run on our self hosted github runners enabling access to STFC infrastructure
     name: Get latest release tag
-    runs-on: psdi-reaction-radar-runners
+    runs-on: psdi-glorius-plot-runners
     needs: check-branch
     outputs:
       tag: ${{ steps.get-tag.outputs.TARGET_TAG }}
@@ -48,7 +48,7 @@ jobs:
   build-python:
     needs: get-latest-release-tag
     name: Build distribution 📦
-    runs-on: psdi-reaction-radar-runners
+    runs-on: psdi-glorius-plot-runners
 
     steps:
       - uses: actions/checkout@v5
@@ -83,7 +83,7 @@ jobs:
     runs-on: ubuntu-latest
     # environment:
     #   name: pypi
-    #   url: https://pypi.org/p/psdi_reaction_radar
+    #   url: https://pypi.org/p/psdi_glorius_plot
     permissions:
       id-token: write # IMPORTANT: mandatory for trusted publishing
 

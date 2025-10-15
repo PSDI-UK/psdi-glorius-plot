@@ -3,7 +3,7 @@ requires = ["hatchling==1.27.0", "hatch-vcs"]
 build-backend = "hatchling.build"
 
 [project]
-name = "psdi_reaction_radar"
+name = "psdi_glorius_plot"
 authors = [
   # Add your name and email here
   { name = "Bryan Gillis", email = "7204836+brgillis@users.noreply.github.com" },
@@ -52,18 +52,18 @@ doc = ["pdoc3", "gunicorn", "pytest", "selenium"]
 plots = ["matplotlib"]
 
 [project.scripts]
-psdi-reaction-radar-gui = "psdi_reaction_radar.main_gui:main"
-psdi-reaction-radar-render = "psdi_reaction_radar.render_static:main"
+psdi-glorius-plot-gui = "psdi_glorius_plot.main_gui:main"
+psdi-glorius-plot-render = "psdi_glorius_plot.render_static:main"
 
 [project.urls]
-Homepage = "https://psdi-reaction-radar.psdi.ac.uk/"
-Documentation = "https://psdi-uk.github.io/psdi-reaction-radar/"
-Issues = "https://github.com/PSDI-UK/psdi-reaction-radar/issues"
-Changelog = "https://github.com/PSDI-UK/psdi-reaction-radar/blob/main/CHANGELOG.md"
+Homepage = "https://psdi-glorius-plot.psdi.ac.uk/"
+Documentation = "https://psdi-uk.github.io/psdi-glorius-plot/"
+Issues = "https://github.com/PSDI-UK/psdi-glorius-plot/issues"
+Changelog = "https://github.com/PSDI-UK/psdi-glorius-plot/blob/main/CHANGELOG.md"
 
 # Repository currently isn't public - when it goes public, uncomment the below
-# Repository = "https://github.com/PSDI-UK/psdi-reaction-radar"
-# Download = "https://github.com/PSDI-UK/psdi-reaction-radar/releases/latest"
+# Repository = "https://github.com/PSDI-UK/psdi-glorius-plot"
+# Download = "https://github.com/PSDI-UK/psdi-glorius-plot/releases/latest"
 
 [tool.hatch.build]
 exclude = [
@@ -78,7 +78,7 @@ exclude = [
 pythonpath = ["."]
 
 [tool.coverage.run]
-source_pkgs = ["psdi_reaction_radar"]
+source_pkgs = ["psdi_glorius_plot"]
 branch = true
 # main_gui.py is tested via the Selenium tests, which are indirect enough that the coverage tool doesn't pick up that
 # the lines are being tested, so we exclude it from the coverage % calculation

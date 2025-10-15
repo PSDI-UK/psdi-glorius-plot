@@ -1,17 +1,17 @@
 #!/usr/bin/env python
 
-# Selenium test script for PSDI Reaction Sensitivity Radar Plot Generator Service.
+# Selenium test script for PSDI Glorius Plot Generator Service.
 
 import os
 import time
 from multiprocessing import Process
 
+import psdi_glorius_plot
 import pytest
-
-import psdi_reaction_radar
 
 # Skip all tests in this module if required packages for GUI testing aren't installed
 try:
+    from psdi_glorius_plot.gui.setup import start_app
     from selenium import webdriver
     from selenium.webdriver import FirefoxOptions
     from selenium.webdriver.common.action_chains import ActionChains
@@ -22,8 +22,6 @@ try:
     from selenium.webdriver.support import expected_conditions as EC
     from selenium.webdriver.support.ui import WebDriverWait
     from webdriver_manager.firefox import GeckoDriverManager
-
-    from psdi_reaction_radar.gui.setup import start_app
 
 except ImportError:
     # We put the importorskip commands here rather than above so that standard imports can be used by static analysis
@@ -56,7 +54,7 @@ def common_setup():
 
     # Change to the root dir of the project for running the tests, in case this was invoked elsewhere
     old_cwd = os.getcwd()
-    os.chdir(os.path.join(psdi_reaction_radar.__path__[0], ".."))
+    os.chdir(os.path.join(psdi_glorius_plot.__path__[0], ".."))
 
     yield
 

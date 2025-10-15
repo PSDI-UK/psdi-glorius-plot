@@ -1,13 +1,13 @@
 """main_gui.py
 
-This script acts as a server for the PSDI Reaction Sensitivity Radar Plot Generator website.
+This script acts as a server for the PSDI Glorius Plot Generator website.
 """
 
 from argparse import ArgumentParser
 
-from psdi_reaction_radar.gui.env import update_env
-from psdi_reaction_radar.gui.setup import start_app
-from psdi_reaction_radar.utils import print_wrap
+from psdi_glorius_plot.gui.env import update_env
+from psdi_glorius_plot.gui.setup import start_app
+from psdi_glorius_plot.utils import print_wrap
 
 
 def main():
@@ -42,7 +42,7 @@ def main():
         # Overwrite the values from environmental variables with the values from the command-line arguments
         update_env(args)
 
-    print_wrap("Starting the PSDI Reaction Sensitivity Radar Plot Generator GUI. This GUI is run as a webpage, which"
+    print_wrap("Starting the PSDI Glorius Plot Generator GUI. This GUI is run as a webpage, which"
                "you can open by right-clicking the link below to open it in your default browser, or by "
                "copy-and-pasting it into your browser of choice.")
 

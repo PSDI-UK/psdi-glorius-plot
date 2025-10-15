@@ -8,7 +8,7 @@ Miscellaneous utility functions used by this project
 import sys
 import textwrap
 
-from psdi_reaction_radar.constants import TERM_WIDTH
+from psdi_glorius_plot.constants import TERM_WIDTH
 
 
 class TextColors:

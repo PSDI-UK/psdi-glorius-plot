@@ -1,4 +1,4 @@
-"""@file psdi_reaction_radar/logging.py
+"""@file psdi_glorius_plot/logging.py
 
 Functions and classes related to logging and other messaging for the user
 """

@@ -48,7 +48,7 @@ jobs:
 
   # Deploy to Kubernetes Job
   # Requires an environment, which must reflect the target environment as defined in the
-  # GitHub repository: https://github.com/PSDI-UK/psdi_reaction_radar/settings/environments
+  # GitHub repository: https://github.com/PSDI-UK/psdi_glorius_plot/settings/environments
   # The downstream deploy job leverages on Environment specific secrets, which also must be defined
   deploy-stfc-staging-k8s:
     # When ready to enable this step, remove the following line
@@ -64,7 +64,7 @@ jobs:
   build:
     needs: [tag]
     name: Build distribution 📦
-    runs-on: psdi-reaction-radar-runners
+    runs-on: psdi-glorius-plot-runners
 
     steps:
       - uses: actions/checkout@v5
@@ -100,7 +100,7 @@ jobs:
 
     # environment:
     #   name: testpypi
-    #   url: https://test.pypi.org/p/psdi_reaction_radar
+    #   url: https://test.pypi.org/p/psdi_glorius_plot
 
     permissions:
       id-token: write # IMPORTANT: mandatory for trusted publishing

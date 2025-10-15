@@ -17,7 +17,7 @@ on:
 
 jobs:
   container-push:
-    runs-on: psdi-reaction-radar-runners
+    runs-on: psdi-glorius-plot-runners
     steps:
       - uses: actions/checkout@v5
         with:
@@ -39,7 +39,7 @@ jobs:
           GIT_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
       - name: Docker build API
         env:
-          IMAGE_NAME: "ghcr.io/psdi-uk/psdi_reaction_radar/psdi_reaction_radar:${{ inputs.container_tag }}"
+          IMAGE_NAME: "ghcr.io/psdi-uk/psdi_glorius_plot/psdi_glorius_plot:${{ inputs.container_tag }}"
         run: |
           SHA=`git log -n 1 | head -n 1 | awk '{print($2)}'`
           TAG=`git tag --sort -version:refname | head -n 1`
