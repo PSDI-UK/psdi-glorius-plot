@@ -248,6 +248,13 @@ input.rel-deviation-value {
   width : 100%;
 }
 
+.plot-select-container:hover,
+.plot-select:hover {
+  cursor          : pointer;
+  background-color: var(--ifm-color-secondary);
+  border-radius   : 0.5rem;
+}
+
 button#reset-plot-dims {
   margin-left: 0;
 }
