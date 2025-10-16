@@ -143,7 +143,7 @@ function clamp(x, min, max) {
  */
 async function waitForMathJax() {
   while (!MathJax.tex2svg) {
-    await new Promise(resolve => setTimeout(l, 100));
+    await new Promise(resolve => setTimeout(() => { }, 100));
   }
 }
 
@@ -408,7 +408,8 @@ function relabelDim(dim) {
  * Make the means visible only if we have more than one sample column, and set the proper heading label for it
  */
 function updateMeanColumn() {
-  const meanElements = $(".button-mean-cell, .mean-heading, .baseline-mean-cell, .mean-value-cell");
+  const meanElements = $(".button-mean-cell, .mean-heading, .baseline-mean-cell, .mean-value-cell, " +
+    ".empty-cell.mean-shown-only");
   if (getNumSamples() > 1)
     meanElements.removeClass("hidden");
   else
@@ -527,6 +528,7 @@ function addSampleCol(e, updateAfter = true) {
   const newHeadingCell = $(".sample-heading")[0].cloneNode(true);
   const newBaselineValueCell = $(".baseline-value-cell")[0].cloneNode(true);
   $(newBaselineValueCell).find(".baseline-value").val("");
+  const newEmptyCell = $("#plot-select-row .empty-cell")[0].cloneNode(true);
 
   if (targetColIndex >= numSamples - 1) {
     $(".sensitivity-buttons")[0].insertBefore(newButtonCell, $(".button-mean-cell")[0]);
@@ -537,6 +539,9 @@ function addSampleCol(e, updateAfter = true) {
     $(".sensitivity-header")[0].insertBefore(newHeadingCell, $(".sample-heading")[targetColIndex + 1]);
     $(".baseline-row")[0].insertBefore(newBaselineValueCell, $(".baseline-value-cell")[targetColIndex + 1]);
   }
+
+  // All empty cells are identical, so we don't worry about exact positioning for it
+  $("#plot-select-row")[0].insertBefore(newEmptyCell, $("#plot-select-row .empty-cell.mean-shown-only")[0]);
 
   // For each row of the table, construnct and insert a new value cell
   const numConditions = getNumConditions();
@@ -572,6 +577,7 @@ function removeSampleCol(e, updateAfter = true) {
   $(".sensitivity-buttons")[0].removeChild($(".sample-button-cell")[targetColIndex]);
   $(".sensitivity-header")[0].removeChild($(".sample-heading")[targetColIndex]);
   $(".baseline-row")[0].removeChild($(".baseline-value-cell")[targetColIndex]);
+  $("#plot-select-row")[0].removeChild($("#plot-select-row .empty-cell")[targetColIndex]);
 
   // For each row of the table, remove the appropriate value cell
   const numConditions = getNumConditions();
