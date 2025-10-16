@@ -143,7 +143,7 @@ function clamp(x, min, max) {
  */
 async function waitForMathJax() {
   while (!MathJax.tex2svg) {
-    await new Promise(resolve => setTimeout(l, 100));
+    await new Promise(resolve => setTimeout(() => { }, 100));
   }
 }
 
@@ -347,6 +347,7 @@ function postTableUpdateCleanup(dim, updateAfter) {
     initNumDimControls(dim);
     relabelDim(dim);
     updateMeanColumn();
+    updatePlotSelect();
 
     // Also update the plot if desired
     if (autoUpdating) {
@@ -408,7 +409,8 @@ function relabelDim(dim) {
  * Make the means visible only if we have more than one sample column, and set the proper heading label for it
  */
 function updateMeanColumn() {
-  const meanElements = $(".button-mean-cell, .mean-heading, .baseline-mean-cell, .mean-value-cell");
+  const meanElements = $(".button-mean-cell, .mean-heading, .baseline-mean-cell, .mean-value-cell, " +
+    ".empty-cell.mean-shown-only");
   if (getNumSamples() > 1)
     meanElements.removeClass("hidden");
   else
@@ -438,7 +440,7 @@ function addConditionRow(e, updateAfter = true) {
   const targetRowIndex = getTargetIndex(e, oldNumConditions);
 
   if (targetRowIndex >= oldNumConditions - 1)
-    $(".sensitivity-table tbody")[0].appendChild(newRow);
+    $(".sensitivity-table tbody")[0].insertBefore(newRow, $("#plot-select-row")[0]);
   else
     $(".sensitivity-table tbody")[0].insertBefore(newRow, $(".condition-row")[targetRowIndex + 1]);
 
@@ -527,6 +529,7 @@ function addSampleCol(e, updateAfter = true) {
   const newHeadingCell = $(".sample-heading")[0].cloneNode(true);
   const newBaselineValueCell = $(".baseline-value-cell")[0].cloneNode(true);
   $(newBaselineValueCell).find(".baseline-value").val("");
+  const newEmptyCell = $("#plot-select-row .empty-cell")[0].cloneNode(true);
 
   if (targetColIndex >= numSamples - 1) {
     $(".sensitivity-buttons")[0].insertBefore(newButtonCell, $(".button-mean-cell")[0]);
@@ -537,6 +540,9 @@ function addSampleCol(e, updateAfter = true) {
     $(".sensitivity-header")[0].insertBefore(newHeadingCell, $(".sample-heading")[targetColIndex + 1]);
     $(".baseline-row")[0].insertBefore(newBaselineValueCell, $(".baseline-value-cell")[targetColIndex + 1]);
   }
+
+  // All empty cells are identical, so we don't worry about exact positioning for it
+  $("#plot-select-row")[0].insertBefore(newEmptyCell, $("#plot-select-row .empty-cell.mean-shown-only")[0]);
 
   // For each row of the table, construnct and insert a new value cell
   const numConditions = getNumConditions();
@@ -572,6 +578,7 @@ function removeSampleCol(e, updateAfter = true) {
   $(".sensitivity-buttons")[0].removeChild($(".sample-button-cell")[targetColIndex]);
   $(".sensitivity-header")[0].removeChild($(".sample-heading")[targetColIndex]);
   $(".baseline-row")[0].removeChild($(".baseline-value-cell")[targetColIndex]);
+  $("#plot-select-row")[0].removeChild($("#plot-select-row .empty-cell")[targetColIndex]);
 
   // For each row of the table, remove the appropriate value cell
   const numConditions = getNumConditions();
@@ -777,7 +784,14 @@ function getLConditionLabelsHTML() {
 }
 
 function getDevPlotMode() {
-  return $("#dev-plot-select").find(":selected").val();
+  const lPlotSelectRadio = $("input.plot-select");
+  let rVal = "absolute";
+  lPlotSelectRadio.each(function () {
+    const oThis = $(this);
+    if (oThis.is(":checked"))
+      rVal = oThis.val();
+  });
+  return rVal;
 }
 
 function getWidth() {
@@ -1616,8 +1630,7 @@ function enableAutoUpdates() {
   // Disable deviation calculation, since that will be handled by the plot generation now
   disableDeviationCalc();
 
-  $(".trigger-chart-update").on("change", generatePlot);
-  $(".trigger-deviation-update").on("change", generatePlot);
+  $(".trigger-chart-update, .trigger-deviation-update").on("change", generatePlot);
   autoUpdating = true;
   updateCanvasShape();
   generatePlot();
@@ -1650,6 +1663,7 @@ function enableOnChangeTriggers() {
   $("#dev-plot-select").on("change", setDeviationPlotMode);
   $(".output-label-select").on("change", updateOutputLabelSelection);
   $("#color-select").on("change", updateColourSchemeSelection);
+  $(".plot-select").on("change", updatePlotSelect);
 }
 
 function disableAutoUpdates() {
@@ -1748,6 +1762,39 @@ function updateColourSchemeSelection() {
 
   if (autoUpdating)
     generatePlot();
+}
+
+/**
+ * Outline the desired column depending on the selected plot mode
+ */
+function updatePlotSelect() {
+  const devPlotMode = getDevPlotMode();
+
+  $(".sample-button-cell, .sample-heading .mean-heading, .abs-deviation-heading, " +
+    ".rel-deviation-heading").removeClass("col-selected-top");
+  $(".sample-heading, .baseline-value-cell, .sample-value-cell, .baseline-mean-cell, .baseline-abs-deviation-cell, " +
+    ".baseline-rel-deviation-cell, .mean-value-cell, .abs-deviation-value-cell, " +
+    ".rel-deviation-value-cell").removeClass("col-selected");
+  $(".plot-select-mean-cell, .plot-select-abs-cell, .plot-select-rel-cell").removeClass("col-selected-bottom");
+
+  if (devPlotMode == "mean") {
+    if (getNumSamples() == 1) {
+      $(".sample-button-cell").addClass("col-selected-top");
+      $(".sample-heading, .baseline-value-cell, .sample-value-cell").addClass("col-selected");
+    } else {
+      $(".mean-heading").addClass("col-selected-top");
+      $(".baseline-mean-cell, .mean-value-cell").addClass("col-selected");
+    }
+    $(".plot-select-mean-cell").addClass("col-selected-bottom");
+  } else if (devPlotMode == "absolute") {
+    $(".abs-deviation-heading").addClass("col-selected-top");
+    $(".baseline-abs-deviation-cell, .abs-deviation-value-cell").addClass("col-selected");
+    $(".plot-select-abs-cell").addClass("col-selected-bottom");
+  } else {
+    $(".rel-deviation-heading").addClass("col-selected-top");
+    $(".baseline-rel-deviation-cell, .rel-deviation-value-cell").addClass("col-selected");
+    $(".plot-select-rel-cell").addClass("col-selected-bottom");
+  }
 }
 
 function toggleAutoUpdates(e) {
