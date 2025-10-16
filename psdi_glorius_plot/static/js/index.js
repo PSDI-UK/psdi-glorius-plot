@@ -438,7 +438,7 @@ function addConditionRow(e, updateAfter = true) {
   const targetRowIndex = getTargetIndex(e, oldNumConditions);
 
   if (targetRowIndex >= oldNumConditions - 1)
-    $(".sensitivity-table tbody")[0].appendChild(newRow);
+    $(".sensitivity-table tbody")[0].insertBefore(newRow, $("#plot-select-row")[0]);
   else
     $(".sensitivity-table tbody")[0].insertBefore(newRow, $(".condition-row")[targetRowIndex + 1]);
 

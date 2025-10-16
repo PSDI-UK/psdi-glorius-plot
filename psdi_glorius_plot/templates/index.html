@@ -73,7 +73,9 @@
         <label for="title-input" id="title-label">Title:</label>
       </td>
       <td class="title-input-cell">
-        <div id="title-input"></div>
+        <div class="title-input-container">
+          <div id="title-input"></div>
+        </div>
       </td>
     </tr>
 
@@ -99,12 +101,12 @@
         </select>
       </td>
       <td class="output-label-value-cell hidden">
-        <div id="ol-0">Isolated Yield (%)</div>
+        <div class="output-input-container">
+          <div id="ol-0">Isolated Yield (%)</div>
+        </div>
       </td>
     </tr>
   </table>
-
-  <br>
 
   <table class="sensitivity-table">
 
@@ -167,7 +169,9 @@
         <button type="button" id="add-rb-0" class="add-condition fix-size-small">+</button>
       </td>
       <td class="condition-label-cell">
-        <div class="condition-input" id="cl-0"></div>
+        <div class="condition-label-container">
+          <div class="condition-input" id="cl-0"></div>
+        </div>
       </td>
       <td class="sample-value-cell calc-mode-only">
         <div class="sample-line-container">
@@ -206,7 +210,9 @@
         <button type="button" id="add-rb-1" class="add-condition fix-size-small">+</button>
       </td>
       <td class="condition-label-cell">
-        <div class="condition-input" id="cl-1"></div>
+        <div class="condition-label-container">
+          <div class="condition-input" id="cl-1"></div>
+        </div>
       </td>
       <td class="sample-value-cell calc-mode-only">
         <div class="sample-line-container">
@@ -245,7 +251,9 @@
         <button type="button" id="add-rb-2" class="add-condition fix-size-small">+</button>
       </td>
       <td class="condition-label-cell">
-        <div class="condition-input" id="cl-2"></div>
+        <div class="condition-label-container">
+          <div class="condition-input" id="cl-2"></div>
+        </div>
       </td>
       <td class="sample-value-cell calc-mode-only">
         <div class="sample-line-container">
@@ -284,7 +292,9 @@
         <button type="button" id="add-rb-3" class="add-condition fix-size-small">+</button>
       </td>
       <td class="condition-label-cell">
-        <div class="condition-input" id="cl-3"></div>
+        <div class="condition-label-container">
+          <div class="condition-input" id="cl-3"></div>
+        </div>
       </td>
       <td class="sample-value-cell calc-mode-only">
         <div class="sample-line-container">
@@ -323,7 +333,9 @@
         <button type="button" id="add-rb-4" class="add-condition fix-size-small">+</button>
       </td>
       <td class="condition-label-cell">
-        <div class="condition-input" id="cl-4"></div>
+        <div class="condition-label-container">
+          <div class="condition-input" id="cl-4"></div>
+        </div>
       </td>
       <td class="sample-value-cell calc-mode-only">
         <div class="sample-line-container">
@@ -351,6 +363,29 @@
           <div class="rel-deviation-input-line">
             <input type="number" step="any" class="rel-deviation-value trigger-chart-update" value="0" disabled>
           </div>
+        </div>
+      </td>
+    </tr>
+
+    <tr id="plot-select-row">
+      <td class="empty-cell"></td>
+      <td class="empty-cell"></td>
+      <td class="empty-cell mean-shown-only hidden"></td>
+      <td class="plot-select-cell plot-select-mean-cell">
+        <div class="plot-select-container">
+          <input type="radio" name="plot-select" id="plot-mean" value="mean" label="Plot the (mean) sample values">
+        </div>
+      </td>
+      <td class="plot-select-cell plot-select-abs-cell">
+        <div class="plot-select-container">
+          <input type="radio" name="plot-select" id="plot-abs" value="absolute"
+            label="Plot the deviation from the standard conditions (+/-)">
+        </div>
+      </td>
+      <td class="plot-select-cell plot-select-rel-cell">
+        <div class="plot-select-container">
+          <input type="radio" name="plot-select" id="plot-rel" value="relative" checked
+            label="Plot the deviation from the standard conditions (%)">
         </div>
       </td>
     </tr>

@@ -170,12 +170,12 @@ tr td:first-child button,
 }
 
 .sensitivity-table td {
-  padding-top   : 0.25rem;
-  padding-bottom: 0.25rem;
-  min-height    : 3rem;
+  padding-top: 0.5rem;
+  min-height : 3rem;
 }
 
-.sample-button-container {
+.sample-button-container,
+.plot-select-container {
   display        : flex;
   flex-direction : row;
   justify-content: center;
@@ -298,7 +298,7 @@ button#reset-plot-dims {
   border             : 1px solid #3A3A3A;
   border-bottom-width: 2px;
   position           : absolute;
-  bottom             : calc(2rem - 1px);
+  bottom             : calc(2rem - 2px);
   z-index            : 1;
   background         : var(--ifm-background-color);
 }
