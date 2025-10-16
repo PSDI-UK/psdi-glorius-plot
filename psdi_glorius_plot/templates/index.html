@@ -369,24 +369,25 @@
 
     <tr id="plot-select-row">
       <td class="empty-cell"></td>
-      <td class="empty-cell"></td>
+      <td class="plot-select-label"><strong>Value to plot:</strong></td>
       <td class="empty-cell mean-shown-only hidden"></td>
       <td class="plot-select-cell plot-select-mean-cell">
-        <div class="plot-select-container">
-          <input type="radio" name="plot-select" id="plot-mean" value="mean" label="Plot the (mean) sample values">
-        </div>
+        <label class="plot-select-container" for="plot-mean">
+          <input type="radio" name="plot-select" class="plot-select" id="plot-mean" value="mean"
+            label="Plot the (mean) sample values">
+        </label>
       </td>
       <td class="plot-select-cell plot-select-abs-cell">
-        <div class="plot-select-container">
-          <input type="radio" name="plot-select" id="plot-abs" value="absolute"
+        <label class="plot-select-container" for="plot-abs">
+          <input type="radio" name="plot-select" class="plot-select" id="plot-abs" value="absolute"
             label="Plot the deviation from the standard conditions (+/-)">
-        </div>
+        </label>
       </td>
       <td class="plot-select-cell plot-select-rel-cell">
-        <div class="plot-select-container">
-          <input type="radio" name="plot-select" id="plot-rel" value="relative" checked
+        <label class="plot-select-container" for="plot-rel">
+          <input type="radio" name="plot-select" class="plot-select" id="plot-rel" value="relative" checked
             label="Plot the deviation from the standard conditions (%)">
-        </div>
+        </label>
       </td>
     </tr>
 

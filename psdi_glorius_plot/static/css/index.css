@@ -170,8 +170,9 @@ tr td:first-child button,
 }
 
 .sensitivity-table td {
-  padding-top: 0.5rem;
-  min-height : 3rem;
+  padding-top   : 0.25rem;
+  padding-bottom: 0.25rem;
+  min-height    : 3rem;
 }
 
 .sample-button-container,
@@ -234,6 +235,17 @@ input.rel-deviation-value {
   flex-direction : row;
   justify-content: start;
   gap            : 0.25rem;
+}
+
+.sensitivity-table td.plot-select-cell,
+.plot-select-container,
+.plot-select {
+  padding: 0;
+}
+
+.plot-select-container {
+  height: 3rem;
+  width : 100%;
 }
 
 button#reset-plot-dims {
