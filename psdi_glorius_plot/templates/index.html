@@ -373,20 +373,20 @@
       <td class="empty-cell mean-shown-only hidden"></td>
       <td class="plot-select-cell plot-select-mean-cell">
         <label class="plot-select-container" for="plot-mean">
-          <input type="radio" name="plot-select" class="plot-select" id="plot-mean" value="mean"
+          <input type="radio" name="plot-select" class="plot-select trigger-chart-update" id="plot-mean" value="mean"
             label="Plot the (mean) sample values">
         </label>
       </td>
       <td class="plot-select-cell plot-select-abs-cell">
         <label class="plot-select-container" for="plot-abs">
-          <input type="radio" name="plot-select" class="plot-select" id="plot-abs" value="absolute"
+          <input type="radio" name="plot-select" class="plot-select trigger-chart-update" id="plot-abs" value="absolute"
             label="Plot the deviation from the standard conditions (+/-)">
         </label>
       </td>
       <td class="plot-select-cell plot-select-rel-cell">
         <label class="plot-select-container" for="plot-rel">
-          <input type="radio" name="plot-select" class="plot-select" id="plot-rel" value="relative" checked
-            label="Plot the deviation from the standard conditions (%)">
+          <input type="radio" name="plot-select" class="plot-select trigger-chart-update" id="plot-rel" value="relative"
+            checked label="Plot the deviation from the standard conditions (%)">
         </label>
       </td>
     </tr>
@@ -417,23 +417,6 @@
 <br>
 
 <div id="plot-options">
-  <p>
-    <label for="dev-plot-select" data-bs-toggle="tooltip" data-bs-custom-class="tooltip-on-light"
-      data-bs-placement="top" title="“<b>Mean</b>” will result in outcomes being displayed directly on the plot, with
-                                     the plot colours or baseline centred on the outcome from the standard conditions.
-                                     <br><br>
-                                     “<b>Deviation (+/-)</b>” will plot the difference of the (mean) outcome from the
-                                     standard conditions.
-                                     <br><br>
-                                     “<b>Deviation (%)</b>” will plot this value divided by the standard conditions,
-                                     expressed as a per cent." class="mouseover-tooltip" data-bs-html="true">Value to
-      plot: </label>
-    <select name="dev-plot-select" id="dev-plot-select" class="trigger-chart-update">
-      <option value="mean">Mean</option>
-      <option value="absolute">Deviation (+/-)</option>
-      <option value="relative" selected>Deviation (%)</option>
-    </select>
-  </p>
   <p>
     <label for="width-input">Plot width in pixels: </label>
     <input type="number" step="50" value="600" min="200" max="4000" name="width-input" id="width-input"

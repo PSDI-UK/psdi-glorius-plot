@@ -783,7 +783,14 @@ function getLConditionLabelsHTML() {
 }
 
 function getDevPlotMode() {
-  return $("#dev-plot-select").find(":selected").val();
+  const lPlotSelectRadio = $("input.plot-select");
+  let rVal = "absolute";
+  lPlotSelectRadio.each(function () {
+    const oThis = $(this);
+    if (oThis.is(":checked"))
+      rVal = oThis.val();
+  });
+  return rVal;
 }
 
 function getWidth() {
@@ -1622,8 +1629,7 @@ function enableAutoUpdates() {
   // Disable deviation calculation, since that will be handled by the plot generation now
   disableDeviationCalc();
 
-  $(".trigger-chart-update").on("change", generatePlot);
-  $(".trigger-deviation-update").on("change", generatePlot);
+  $(".trigger-chart-update, .trigger-deviation-update").on("change", generatePlot);
   autoUpdating = true;
   updateCanvasShape();
   generatePlot();
