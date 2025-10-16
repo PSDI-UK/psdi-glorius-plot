@@ -153,20 +153,27 @@ tr td:first-child button,
 }
 
 #table-options td {
-  max-width    : 16rem;
-  padding-right: 0.5rem;
+  max-width: 16rem;
 }
 
 /* Style the sensitivity table */
 .sensitivity-table th {
   max-width    : 8.5rem;
-  padding-right: 0.5rem;
+  padding-left : 0.25rem;
+  padding-right: 0.25rem;
+  text-align   : center;
 }
 
 .sensitivity-table th.rel-deviation-heading {
   /* We add a little extra padding to the relative deviation heading heading, so it wraps the same way as the absolute
   deviation heading */
-  padding-right: 1rem;
+  padding-left : 0.5rem;
+  padding-right: 0.5rem;
+}
+
+.sensitivity-table {
+  border-collapse: separate;
+  border-spacing : 0 0;
 }
 
 .sensitivity-table td {
@@ -189,7 +196,11 @@ td.condition-button-cell {
   justify-content: space-between;
 }
 
-.condition-label-cell,
+.condition-label-cell {
+  padding-left : 0.125rem;
+  padding-right: 0.5rem;
+}
+
 .baseline-value-cell,
 .sample-value-cell,
 .mean-value-cell,
@@ -253,6 +264,23 @@ input.rel-deviation-value {
   cursor          : pointer;
   background-color: var(--ifm-color-secondary);
   border-radius   : 0.5rem;
+}
+
+.col-selected,
+.col-selected-top,
+.col-selected-bottom {
+  border-right: 1px solid var(--ifm-font-color-base);
+  border-left : 1px solid var(--ifm-font-color-base);
+}
+
+.col-selected-top {
+  border-top   : 1px solid var(--ifm-font-color-base);
+  border-radius: 0.5rem 0.5rem 0 0;
+}
+
+.col-selected-bottom {
+  border-bottom: 1px solid var(--ifm-font-color-base);
+  border-radius: 0 0 0.5rem 0.5rem;
 }
 
 button#reset-plot-dims {

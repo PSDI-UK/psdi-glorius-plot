@@ -347,6 +347,7 @@ function postTableUpdateCleanup(dim, updateAfter) {
     initNumDimControls(dim);
     relabelDim(dim);
     updateMeanColumn();
+    updatePlotSelect();
 
     // Also update the plot if desired
     if (autoUpdating) {
@@ -1662,6 +1663,7 @@ function enableOnChangeTriggers() {
   $("#dev-plot-select").on("change", setDeviationPlotMode);
   $(".output-label-select").on("change", updateOutputLabelSelection);
   $("#color-select").on("change", updateColourSchemeSelection);
+  $(".plot-select").on("change", updatePlotSelect);
 }
 
 function disableAutoUpdates() {
@@ -1760,6 +1762,39 @@ function updateColourSchemeSelection() {
 
   if (autoUpdating)
     generatePlot();
+}
+
+/**
+ * Outline the desired column depending on the selected plot mode
+ */
+function updatePlotSelect() {
+  const devPlotMode = getDevPlotMode();
+
+  $(".sample-button-cell, .sample-heading .mean-heading, .abs-deviation-heading, " +
+    ".rel-deviation-heading").removeClass("col-selected-top");
+  $(".sample-heading, .baseline-value-cell, .sample-value-cell, .baseline-mean-cell, .baseline-abs-deviation-cell, " +
+    ".baseline-rel-deviation-cell, .mean-value-cell, .abs-deviation-value-cell, " +
+    ".rel-deviation-value-cell").removeClass("col-selected");
+  $(".plot-select-mean-cell, .plot-select-abs-cell, .plot-select-rel-cell").removeClass("col-selected-bottom");
+
+  if (devPlotMode == "mean") {
+    if (getNumSamples() == 1) {
+      $(".sample-button-cell").addClass("col-selected-top");
+      $(".sample-heading, .baseline-value-cell, .sample-value-cell").addClass("col-selected");
+    } else {
+      $(".mean-heading").addClass("col-selected-top");
+      $(".baseline-mean-cell, .mean-value-cell").addClass("col-selected");
+    }
+    $(".plot-select-mean-cell").addClass("col-selected-bottom");
+  } else if (devPlotMode == "absolute") {
+    $(".abs-deviation-heading").addClass("col-selected-top");
+    $(".baseline-abs-deviation-cell, .abs-deviation-value-cell").addClass("col-selected");
+    $(".plot-select-abs-cell").addClass("col-selected-bottom");
+  } else {
+    $(".rel-deviation-heading").addClass("col-selected-top");
+    $(".baseline-rel-deviation-cell, .rel-deviation-value-cell").addClass("col-selected");
+    $(".plot-select-rel-cell").addClass("col-selected-bottom");
+  }
 }
 
 function toggleAutoUpdates(e) {
