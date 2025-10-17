@@ -1534,9 +1534,9 @@ function fillExample() {
   const lastAutoUpdating = autoUpdating;
   autoUpdating = false;
 
-  setNumDim(OUTPUT, 1, false);
-  setNumDim(CONDITION, 10, false);
-  setNumDim(SAMPLE, 1, true);
+  setNumDim(OUTPUT, 1);
+  setNumDim(CONDITION, 10);
+  setNumDim(SAMPLE, 1);
 
   // Set the title and output label
   $("#title-input .ql-editor p").html("<b>Reaction-condition-based assignment for 1,3-cyclization</b>");
