@@ -266,6 +266,11 @@ input.rel-deviation-value {
   border-radius   : 0.5rem;
 }
 
+.plot-select-container:active,
+.plot-select:active {
+  background-color: var(--ifm-background-color);
+}
+
 .col-selected,
 .col-selected-top,
 .col-selected-bottom {
@@ -303,6 +308,68 @@ button#reset-plot-dims {
   margin-right    : 0.125rem;
 }
 
+/* How to indicate text opens more details on clicking it */
+
+details {
+  border        : 1px solid var(--ifm-font-color-base);
+  margin-bottom : 0.5rem;
+  padding       : 0.25rem;
+  padding-bottom: 0;
+}
+
+details>*:nth-child(2) {
+  margin-top: 0.75rem;
+}
+
+details>*:last-child {
+  margin-bottom: 0.25rem;
+}
+
+summary {
+  display       : block;
+  position      : relative;
+  cursor        : pointer;
+  user-select   : none;
+  margin        : -0.25rem;
+  margin-bottom : 0rem;
+  padding       : 0.25rem;
+  padding-bottom: 0.25;
+}
+
+details>summary:before {
+  display         : inline-block;
+  text-align      : center;
+  padding         : 0;
+  content         : "?";
+  line-height     : 1rem;
+  background-color: var(--ifm-color-info);
+  color           : var(--psdi-light-text-color-body);
+  font-family     : serif;
+  font-weight     : bold;
+  width           : 1rem;
+  height          : 1rem;
+  border-radius   : 0.5rem;
+  margin-right    : 0.125rem;
+  position        : relative;
+  top             : 0;
+  right           : 0;
+}
+
+details[open]>summary:before {
+  /* n-dash is used here, which is slightly wider than a hyphen */
+  content    : "–";
+  top        : -0.125rem;
+  line-height: 0.75rem;
+}
+
+details summary:hover {
+  background-color: var(--ifm-background-color-secondary);
+}
+
+details summary:active {
+  background-color: var(--ifm-background-color);
+}
+
 /* Style the popup tooltips */
 .tooltip {
   --bs-tooltip-opacity: 1;
@@ -335,9 +402,8 @@ button#reset-plot-dims {
 
 .ql-toolbar.ql-snow,
 .ql-editor {
-  padding  : 1px 2px;
-  min-width: 10.5rem;
-  height   : 2rem;
+  padding: 1px 2px;
+  height : 2rem;
 }
 
 .ql-toolbar.ql-snow {
@@ -348,6 +414,63 @@ button#reset-plot-dims {
   bottom             : calc(2rem - 2px);
   z-index            : 1;
   background         : var(--ifm-background-color);
+}
+
+.ql-toolbar.ql-snow .ql-formats {
+  margin-right: 0.25rem;
+}
+
+.ql-toolbar.ql-snow .ql-formats button {
+  color: var(--ifm-font-color-base);
+}
+
+.ql-toolbar.ql-snow .ql-formats button .ql-stroke {
+  stroke: var(--ifm-font-color-base);
+}
+
+.ql-toolbar.ql-snow .ql-formats button .ql-fill {
+  fill: var(--ifm-font-color-base);
+}
+
+.ql-toolbar.ql-snow .ql-formats button.ql-active {
+  color: #06c;
+}
+
+.ql-toolbar.ql-snow .ql-formats button.ql-active .ql-stroke {
+  stroke: #06c;
+}
+
+.ql-toolbar.ql-snow .ql-formats button.ql-active .ql-fill {
+  fill: #06c;
+}
+
+.ql-toolbar.ql-snow .ql-formats button:hover {
+  color           : var(--ifm-font-color-base);
+  background-color: var(--ifm-color-secondary);
+}
+
+.ql-toolbar.ql-snow .ql-formats button:hover .ql-stroke {
+  stroke: var(--ifm-font-color-base);
+}
+
+.ql-toolbar.ql-snow .ql-formats button:hover .ql-fill {
+  fill: var(--ifm-font-color-base);
+}
+
+.ql-toolbar.ql-snow .ql-formats button:hover.ql-active {
+  color: #06c;
+}
+
+.ql-toolbar.ql-snow .ql-formats button:hover.ql-active .ql-stroke {
+  stroke: #06c;
+}
+
+.ql-toolbar.ql-snow .ql-formats button:hover.ql-active .ql-fill {
+  fill: #06c;
+}
+
+.ql-toolbar.ql-snow .ql-formats button:active {
+  background-color: var(--ifm-background-color);
 }
 
 .ql-toolbar.ql-snow.visible {
@@ -364,9 +487,10 @@ button#reset-plot-dims {
   font-size  : var(--ifm-font-size-base);
 }
 
-.ql-editor::before {
+.ql-editor.ql-blank::before {
   font-family: var(--ifm-font-family-base);
   font-size  : var(--ifm-font-size-base);
+  color      : color-mix(in srgb, var(--ifm-font-color-base), transparent 40%);
 }
 
 .condition-input .ql-editor {

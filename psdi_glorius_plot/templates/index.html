@@ -9,61 +9,45 @@
 {% block hero_title %}PSDI Glorius Plot Generator{% endblock %}
 
 {% block inner_content %}
-<table id="table-options">
-  <tr>
-    <td>
-      <label for="num-condition">Test conditions: </label>
-    </td>
-    <td>
-      <select name="num-condition" id="num-condition">
-        <option value="3">3</option>
-        <option value="4">4</option>
-        <option value="5" selected>5</option>
-        <option value="6">6</option>
-        <option value="7">7</option>
-        <option value="8">8</option>
-        <option value="9">9</option>
-        <option value="10">10</option>
-        <option value="11">11</option>
-        <option value="12">12</option>
-      </select>
-    </td>
-    <td id="num-sample-cell">
-      <label for="num-sample" class="calc-mode-only">Number of experiments conducted for each test condition:</label>
-    </td>
-    <td>
-      <select name="num-sample" id="num-sample" class="calc-mode-only">
-        <option value="1">1</option>
-        <option value="2">2</option>
-        <option value="3">3</option>
-        <option value="4">4</option>
-        <option value="5">5</option>
-        <option value="6">6</option>
-        <option value="7">7</option>
-        <option value="8">8</option>
-        <option value="9">9</option>
-        <option value="10">10</option>
-      </select>
-    </td>
-  </tr>
-  <tr class="hidden">
-    <td>
-      <label for="num-output">Reaction outcomes: </label>
-    </td>
-    <td>
-      <select name="num-output" id="num-output">
-        <option value="1">1</option>
-        <option value="2">2</option>
-      </select>
-    </td>
-    <td>
-      <label for="input-mode-toggle">Directly input deviations: </label>
-    </td>
-    <td>
-      <input type="checkbox" name="input-mode-toggle" id="input-mode-toggle">
-    </td>
-  </tr>
-</table>
+
+<details>
+  <summary>Help with formatting and special symbols - what to do if text appears as a black bar on the chart</summary>
+
+  <p>
+    <strong>Basic formatting:</strong> You can format text entered in the Title and various other fields by clicking
+    on the formatting buttons in the toolbar that appears above the text-input boxes when they're selected, either by
+    clicking the box then entering text, or by selecting text and then clicking the buttons. If the text is longer than
+    the box can fit in one line, a scrollbar will appear at the right side of the box allowing you to scroll up and down
+    lines of text.
+  </p>
+
+  <p>This formatting is done through a LaTeX equation rendering engine, which results in some unavoidable quirks such
+    as it always putting spaces around mathematical operators. If the renderer fails to parse the text, it will appear
+    as a black bar on the chart. The most common cause of this is less-than and greater-than symbols, which get
+    interpreted as HTML tags. This can by worked around by replacing them with “\gt” and “\lt” respectively.</p>
+
+  <p>
+    <strong>Special symbols:</strong> A toolbar option to insert special symbols is still under development. For the
+    time being, you can copy and paste desired symbols from the following lists:
+  </p>
+
+  <ul>
+    <li>Mathematical and numerical symbols: ° Å → ⟹ + - × ÷ ± ∓ = ≠ &lt; &gt; ≤ ≥ ≲ ≳ ≪ ≫</li>
+    <li>Lowercase Greek: α β γ δ ε ζ η θ ι κ λ μ ν ξ ο π ρ ς σ τ υ φ χ ψ ω</li>
+    <li>Uppercase Greek: Α Β Γ Δ Ε Ζ Η Θ Ι Κ Λ Μ Ν Ξ Ο Π Ρ Σ Τ Υ Φ Χ Ψ Ω</li>
+  </ul>
+
+  <p>If you need a symbol not listed here, you can search for it at <a href="https://unicodeplus.com/">UnicodePlus</a>
+    and copy it from there.
+  </p>
+
+  <p>
+    <strong>Advanced formatting:</strong> If you're familiar with LaTeX markup, you can use it to directly set the
+    text that will appear on the chart, or you can use <a href="https://latexeditor.lagrida.com/">a LaTeX equation
+      editor</a> to help. Malformed LaTeX markup will appear as red on the chart, or may result in the renderer
+    failing entirely, resulting in the text appearing as a black bar on the chart.
+  </p>
+</details>
 
 <form class="sens-form">
 
@@ -104,6 +88,61 @@
         <div class="output-input-container">
           <div id="ol-0">Isolated Yield (%)</div>
         </div>
+      </td>
+    </tr>
+  </table>
+  <table id="table-options">
+    <tr>
+      <td>
+        <label for="num-condition">Test conditions: </label>
+      </td>
+      <td>
+        <select name="num-condition" id="num-condition">
+          <option value="3">3</option>
+          <option value="4">4</option>
+          <option value="5" selected>5</option>
+          <option value="6">6</option>
+          <option value="7">7</option>
+          <option value="8">8</option>
+          <option value="9">9</option>
+          <option value="10">10</option>
+          <option value="11">11</option>
+          <option value="12">12</option>
+        </select>
+      </td>
+      <td id="num-sample-cell">
+        <label for="num-sample" class="calc-mode-only">Number of experiments conducted for each test condition:</label>
+      </td>
+      <td>
+        <select name="num-sample" id="num-sample" class="calc-mode-only">
+          <option value="1">1</option>
+          <option value="2">2</option>
+          <option value="3">3</option>
+          <option value="4">4</option>
+          <option value="5">5</option>
+          <option value="6">6</option>
+          <option value="7">7</option>
+          <option value="8">8</option>
+          <option value="9">9</option>
+          <option value="10">10</option>
+        </select>
+      </td>
+    </tr>
+    <tr class="hidden">
+      <td>
+        <label for="num-output">Reaction outcomes: </label>
+      </td>
+      <td>
+        <select name="num-output" id="num-output">
+          <option value="1">1</option>
+          <option value="2">2</option>
+        </select>
+      </td>
+      <td>
+        <label for="input-mode-toggle">Directly input deviations: </label>
+      </td>
+      <td>
+        <input type="checkbox" name="input-mode-toggle" id="input-mode-toggle">
       </td>
     </tr>
   </table>
