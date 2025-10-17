@@ -485,6 +485,7 @@ details summary:active {
   border     : 2px inset #767676;
   font-family: 'Fira Sans', sans-serif;
   font-size  : var(--ifm-font-size-base);
+  min-width  : 10.5rem;
 }
 
 .ql-editor.ql-blank::before {
