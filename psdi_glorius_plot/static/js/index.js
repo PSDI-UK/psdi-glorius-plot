@@ -228,11 +228,10 @@ async function drawMathJaxSVG(ctx, img, x = 0, y = 0, fontsize = 16, hAlign = "l
   // compatible with some browsers still in use
   await new Promise(resolve => {
     const waitForImage = () => {
-      if (img1.complete) {
+      if (img1.complete)
         resolve();
-      } else {
+      else
         setTimeout(waitForImage, 100);
-      }
     };
     waitForImage();
   });
