@@ -176,6 +176,8 @@ function stripTags(s) {
 }
 
 async function drawFormatted(ctx, labelHTML, x, y, fontSize, hAlign) {
+  if (labelHTML == "")
+    return;
   const mathJaxSVG = await MathJax.tex2svgPromise(getAsTex(labelHTML));
   drawMathJaxSVG(ctx, mathJaxSVG, x, y, fontSize, hAlign);
 }
@@ -214,23 +216,34 @@ function getAsTex(s) {
   return s;
 }
 
-function drawMathJaxSVG(ctx, img, x = 0, y = 0, fontsize = 16, hAlign = "left") {
+async function drawMathJaxSVG(ctx, img, x = 0, y = 0, fontsize = 16, hAlign = "left") {
   let DOMURL = window.URL || window.webkitURL || window;
   let img1 = new Image();
   let svg = new Blob([$(img).find("svg")[0].outerHTML], { type: 'image/svg+xml' });
   let url = DOMURL.createObjectURL(svg);
   let scale = MATHJAX_FONT_SCALING * fontsize / MATHJAX_DEFAULT_FONT_SIZE;
-  img1.onload = function () {
-    let w = img1.naturalWidth * scale;
-    let h = img1.naturalHeight * scale;
-    let finalX = x;
-    if (hAlign == "center")
-      finalX -= w / 2;
-    ctx.drawImage(img1, finalX, y, w, h);
-    DOMURL.revokeObjectURL(url);
-  }
   img1.src = url;
 
+  // Wait until the image is completely loaded to continue. We can't use an onload trigger here as that isn't
+  // compatible with some browsers still in use
+  await new Promise(resolve => {
+    const waitForImage = () => {
+      if (img1.complete) {
+        resolve();
+      } else {
+        setTimeout(waitForImage, 100);
+      }
+    };
+    waitForImage();
+  });
+
+  let w = img1.naturalWidth * scale;
+  let h = img1.naturalHeight * scale;
+  let finalX = x;
+  if (hAlign == "center")
+    finalX -= w / 2;
+  ctx.drawImage(img1, finalX, y, w, h);
+  DOMURL.revokeObjectURL(url);
 }
 
 // Plugins for Chart JS
