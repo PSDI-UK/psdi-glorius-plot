@@ -29,7 +29,8 @@
   <script>
     MathJax = {
       svg: {
-        blacker: 1
+        blacker: 1,
+        fontCache: 'none', // Don't use a fontcache, to improve Safari compatibility
       },
       output: {
         font: 'mathjax-fira'
