@@ -390,7 +390,7 @@ function postTableUpdateCleanup(dim, updateAfter) {
 
     // Also update the plot if desired
     if (autoUpdating) {
-      generatePlot();
+      enableAutoUpdates();
     }
   }
 }
@@ -1623,7 +1623,7 @@ function fillExample() {
 
   autoUpdating = lastAutoUpdating;
   if (autoUpdating) {
-    generatePlot();
+    enableAutoUpdates();
   }
 
 }
