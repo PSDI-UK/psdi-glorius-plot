@@ -66,6 +66,9 @@ const RAND_BASELINE_MAX = 100.;
 const MATHJAX_DEFAULT_FONT_SIZE = 16;
 const MATHJAX_FONT_SCALING = 1.125;
 
+const T_WAIT = 100;
+const MAX_ELAPSED = 500;
+
 const OUTPUT_LABEL_TEXT = "Output {N} Label:";
 
 const D_DEV_PLOT_MODE_INFO = {
@@ -142,9 +145,21 @@ function clamp(x, min, max) {
  * available
  */
 async function waitForMathJax() {
-  while (!MathJax.tex2svg) {
-    await new Promise(resolve => setTimeout(() => { }, 100));
-  }
+  await new Promise(resolve => {
+
+    let interval;
+    let elapsed = 0;
+
+    const checkForMathJax = function () {
+      elapsed += T_WAIT;
+      if (MathJax.tex2svg || elapsed >= MAX_ELAPSED) {
+        clearInterval(interval);
+        resolve();
+      }
+    };
+
+    interval = setInterval(checkForMathJax, T_WAIT);
+  });
 }
 
 /**
@@ -222,27 +237,39 @@ async function drawMathJaxSVG(ctx, img, x = 0, y = 0, fontsize = 16, hAlign = "l
   let svg = new Blob([$(img).find("svg")[0].outerHTML], { type: 'image/svg+xml' });
   let url = DOMURL.createObjectURL(svg);
   let scale = MATHJAX_FONT_SCALING * fontsize / MATHJAX_DEFAULT_FONT_SIZE;
+
+  // Wait until the image is completely loaded to continue. We can't fully rely an onload trigger here as that isn't
+  // compatible with some browsers still in use, so we use an interval to periodically check if it's loaded, and if we
+  // hit a timeout, hope for the best and go ahead anyway
+
+  const drawToCanvas = function () {
+
+    let w = img1.naturalWidth * scale;
+    let h = img1.naturalHeight * scale;
+    let finalX = x;
+    if (hAlign == "center")
+      finalX -= w / 2;
+    ctx.drawImage(img1, finalX, y, w, h);
+
+    DOMURL.revokeObjectURL(url);
+  };
+
+  let interval;
+  let elapsed = 0;
+
+  const checkForImage = function () {
+    elapsed += T_WAIT;
+    if (img1.complete || elapsed >= MAX_ELAPSED) {
+      clearInterval(interval);
+      drawToCanvas();
+    }
+  };
+
+  // Even though we can't rely on it, set an onload trigger to speed things up a bit for browsers which do support it
+  img1.onload = checkForImage;
+
+  interval = setInterval(checkForImage, T_WAIT);
   img1.src = url;
-
-  // Wait until the image is completely loaded to continue. We can't use an onload trigger here as that isn't
-  // compatible with some browsers still in use
-  await new Promise(resolve => {
-    const waitForImage = () => {
-      if (img1.complete)
-        resolve();
-      else
-        setTimeout(waitForImage, 100);
-    };
-    waitForImage();
-  });
-
-  let w = img1.naturalWidth * scale;
-  let h = img1.naturalHeight * scale;
-  let finalX = x;
-  if (hAlign == "center")
-    finalX -= w / 2;
-  ctx.drawImage(img1, finalX, y, w, h);
-  DOMURL.revokeObjectURL(url);
 }
 
 // Plugins for Chart JS
