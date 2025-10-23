@@ -242,14 +242,15 @@ async function drawMathJaxSVG(ctx, img, x = 0, y = 0, fontsize = 16, hAlign = "l
   // compatible with some browsers still in use, so we use an interval to periodically check if it's loaded, and if we
   // hit a timeout, hope for the best and go ahead anyway
 
-  const drawToCanvas = function () {
+  const drawToCanvas = async function () {
 
     let w = img1.naturalWidth * scale;
     let h = img1.naturalHeight * scale;
     let finalX = x;
     if (hAlign == "center")
       finalX -= w / 2;
-    ctx.drawImage(img1, finalX, y, w, h);
+    await img1.decode()
+      .then(() => ctx.drawImage(img1, finalX, y, w, h));
 
     DOMURL.revokeObjectURL(url);
   };
