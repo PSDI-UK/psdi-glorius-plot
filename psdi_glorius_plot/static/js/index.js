@@ -8,6 +8,7 @@
 
 import { initDirtyForms, cleanDirtyForms } from "./common.js";
 import { mix_hexes } from "./color.js"
+import { Canvg } from 'https://cdn.skypack.dev/canvg@^4.0.0';
 
 const LABEL_FONT_FAMILY = "'Fira Sans', sans-serif";
 const QUILL_THEME = "snow";
@@ -64,7 +65,8 @@ const RAND_BASELINE_MIN = 60.;
 const RAND_BASELINE_MAX = 100.;
 
 const MATHJAX_DEFAULT_FONT_SIZE = 16;
-const MATHJAX_FONT_SCALING = 1.125;
+const MATHJAX_FONT_SCALING = 8.5;
+const RENDERING_UPSCALE = 16;
 
 const MATHJAX_EXTRA_CSS = [
   'svg a{fill:blue;stroke:blue}',
@@ -254,45 +256,24 @@ function getAsTex(s) {
 
 async function drawMathJaxSVG(ctx, svgHTML, x = 0, y = 0, fontsize = 16, hAlign = "left") {
 
-  let DOMURL = window.URL || window.webkitURL || window;
-  let img = new Image();
-  let svgBlob = new Blob([svgHTML], { type: 'image/svg+xml' });
-  let url = DOMURL.createObjectURL(svgBlob);
-  let scale = MATHJAX_FONT_SCALING * fontsize / MATHJAX_DEFAULT_FONT_SIZE;
+  const svgElem = $(new DOMParser().parseFromString(svgHTML, "image/svg+xml")).find("svg");
 
-  // Wait until the image is completely loaded to continue. We can't fully rely an onload trigger here as that isn't
-  // compatible with some browsers still in use, so we use an interval to periodically check if it's loaded, and if we
-  // hit a timeout, hope for the best and go ahead anyway
+  const scale = MATHJAX_FONT_SCALING * fontsize / MATHJAX_DEFAULT_FONT_SIZE;
+  const w = svgElem.attr("width").slice(0, -2) * scale;
+  const h = svgElem.attr("height").slice(0, -2) * scale;
 
-  const drawToCanvas = async function () {
+  const canvgCanvas = document.createElement("canvas");
+  $(canvgCanvas).attr("width", w * RENDERING_UPSCALE);
+  $(canvgCanvas).attr("height", h * RENDERING_UPSCALE);
+  const canvgCtx = canvgCanvas.getContext("2d")
 
-    let w = img.naturalWidth * scale;
-    let h = img.naturalHeight * scale;
-    let finalX = x;
-    if (hAlign == "center")
-      finalX -= w / 2;
-    await img.decode()
-      .then(() => ctx.drawImage(img, finalX, y, w, h));
-
-    DOMURL.revokeObjectURL(url);
-  };
-
-  let interval;
-  let elapsed = 0;
-
-  const checkForImage = function () {
-    elapsed += T_WAIT;
-    if (img.complete || elapsed >= MAX_ELAPSED) {
-      clearInterval(interval);
-      drawToCanvas();
-    }
-  };
-
-  // Even though we can't rely on it, set an onload trigger to speed things up a bit for browsers which do support it
-  img.onload = checkForImage;
-
-  interval = setInterval(checkForImage, T_WAIT);
-  img.src = url;
+  const v = await Canvg.fromString(canvgCtx, svgHTML);
+  v.resize(w * RENDERING_UPSCALE, h * RENDERING_UPSCALE);
+  v.start();
+  let finalX = x;
+  if (hAlign == "center")
+    finalX -= w / 2;
+  ctx.drawImage(canvgCanvas, finalX, y, w, h);
 }
 
 // Plugins for Chart JS
@@ -1534,7 +1515,7 @@ async function generatePlot() {
 
   const legendHitBox = radarChart.legend.legendHitBoxes[0];
   drawFormatted(ctx, getOutputLabel(),
-    legendHitBox.left + 1.25 * fontSize, legendHitBox.top + 0.125 * fontSize, fontSize, "left");
+    legendHitBox.left + 1.5 * fontSize, legendHitBox.top, fontSize, "left");
 
   const lPointLabelItems = radarChart.scales.r._pointLabelItems;
   for (let i = 0; i < lConditionData.length; ++i) {
