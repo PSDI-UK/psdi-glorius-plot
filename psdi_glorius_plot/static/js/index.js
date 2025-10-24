@@ -66,6 +66,17 @@ const RAND_BASELINE_MAX = 100.;
 const MATHJAX_DEFAULT_FONT_SIZE = 16;
 const MATHJAX_FONT_SCALING = 1.125;
 
+const MATHJAX_EXTRA_CSS = [
+  'svg a{fill:blue;stroke:blue}',
+  '[data-mml-node="merror"]>g{fill:red;stroke:red}',
+  '[data-mml-node="merror"]>rect[data-background]{fill:yellow;stroke:none}',
+  '[data-frame],[data-line]{stroke-width:70px;fill:none}',
+  '.mjx-dashed{stroke-dasharray:140}',
+  '.mjx-dotted{stroke-linecap:round;stroke-dasharray:0,140}',
+  'use[data-c]{stroke-width:3px}'
+].join('');
+const XML_DECLARATION = '<?xml version="1.0" encoding="UTF-8" standalone="no"?>';
+
 const T_WAIT = 100;
 const MAX_ELAPSED = 500;
 
@@ -193,8 +204,18 @@ function stripTags(s) {
 async function drawFormatted(ctx, labelHTML, x, y, fontSize, hAlign) {
   if (labelHTML == "")
     return;
+
+  const adaptor = MathJax.startup.adaptor;
   const mathJaxSVG = await MathJax.tex2svgPromise(getAsTex(labelHTML));
-  drawMathJaxSVG(ctx, mathJaxSVG, x, y, fontSize, hAlign);
+  let svgHTML = adaptor.tags(mathJaxSVG, 'svg')[0].outerHTML;
+  svgHTML = (svgHTML.match(/^<svg.*?><defs>/)
+    ? svgHTML.replace(/<defs>/, `<defs><style>${MATHJAX_EXTRA_CSS}</style>`)
+    : svgHTML.replace(/^(<svg.*?>)/, `$1<defs><style>${MATHJAX_EXTRA_CSS}</style></defs>`));
+  svgHTML = svgHTML.replace(/ (?:role|focusable|aria-hidden)=".*?"/g, '')
+    .replace(/"currentColor"/g, '"black"');
+  svgHTML = XML_DECLARATION + '\n' + svgHTML;
+
+  drawMathJaxSVG(ctx, svgHTML, x, y, fontSize, hAlign);
 }
 
 function getAsTex(s) {
@@ -231,11 +252,12 @@ function getAsTex(s) {
   return s;
 }
 
-async function drawMathJaxSVG(ctx, img, x = 0, y = 0, fontsize = 16, hAlign = "left") {
+async function drawMathJaxSVG(ctx, svgHTML, x = 0, y = 0, fontsize = 16, hAlign = "left") {
+
   let DOMURL = window.URL || window.webkitURL || window;
-  let img1 = new Image();
-  let svg = new Blob([$(img).find("svg")[0].outerHTML], { type: 'image/svg+xml' });
-  let url = DOMURL.createObjectURL(svg);
+  let img = new Image();
+  let svgBlob = new Blob([svgHTML], { type: 'image/svg+xml' });
+  let url = DOMURL.createObjectURL(svgBlob);
   let scale = MATHJAX_FONT_SCALING * fontsize / MATHJAX_DEFAULT_FONT_SIZE;
 
   // Wait until the image is completely loaded to continue. We can't fully rely an onload trigger here as that isn't
@@ -244,13 +266,13 @@ async function drawMathJaxSVG(ctx, img, x = 0, y = 0, fontsize = 16, hAlign = "l
 
   const drawToCanvas = async function () {
 
-    let w = img1.naturalWidth * scale;
-    let h = img1.naturalHeight * scale;
+    let w = img.naturalWidth * scale;
+    let h = img.naturalHeight * scale;
     let finalX = x;
     if (hAlign == "center")
       finalX -= w / 2;
-    await img1.decode()
-      .then(() => ctx.drawImage(img1, finalX, y, w, h));
+    await img.decode()
+      .then(() => ctx.drawImage(img, finalX, y, w, h));
 
     DOMURL.revokeObjectURL(url);
   };
@@ -260,17 +282,17 @@ async function drawMathJaxSVG(ctx, img, x = 0, y = 0, fontsize = 16, hAlign = "l
 
   const checkForImage = function () {
     elapsed += T_WAIT;
-    if (img1.complete || elapsed >= MAX_ELAPSED) {
+    if (img.complete || elapsed >= MAX_ELAPSED) {
       clearInterval(interval);
       drawToCanvas();
     }
   };
 
   // Even though we can't rely on it, set an onload trigger to speed things up a bit for browsers which do support it
-  img1.onload = checkForImage;
+  img.onload = checkForImage;
 
   interval = setInterval(checkForImage, T_WAIT);
-  img1.src = url;
+  img.src = url;
 }
 
 // Plugins for Chart JS
