@@ -215,7 +215,7 @@ async function drawFormatted(ctx, labelHTML, x, y, fontSize, hAlign) {
     : svgHTML.replace(/^(<svg.*?>)/, `$1<defs><style>${MATHJAX_EXTRA_CSS}</style></defs>`));
   svgHTML = svgHTML.replace(/ (?:role|focusable|aria-hidden)=".*?"/g, '')
     .replace(/"currentColor"/g, '"black"');
-  svgHTML = XML_DECLARATION + '\n' + svgHTML;
+  svgHTML = XML_DECLARATION + svgHTML;
 
   drawMathJaxSVG(ctx, svgHTML, x, y, fontSize, hAlign);
 }
