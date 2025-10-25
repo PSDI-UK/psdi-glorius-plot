@@ -210,6 +210,11 @@ async function drawFormatted(ctx, labelHTML, x, y, fontSize, hAlign) {
   const adaptor = MathJax.startup.adaptor;
   const mathJaxSVG = await MathJax.tex2svgPromise(getAsTex(labelHTML));
   let svgHTML = adaptor.tags(mathJaxSVG, 'svg')[0].outerHTML;
+
+  // MathJax SVG's use &lt; and &gt; within their tags, which older versions of Safari can't handle. Since the tags
+  // where these are used end up being irrelevant for our use case, we can safely strip them out
+  svgHTML = svgHTML.replaceAll("&lt;", "").replaceAll("&gt;", "")
+
   svgHTML = (svgHTML.match(/^<svg.*?><defs>/)
     ? svgHTML.replace(/<defs>/, `<defs><style>${MATHJAX_EXTRA_CSS}</style>`)
     : svgHTML.replace(/^(<svg.*?>)/, `$1<defs><style>${MATHJAX_EXTRA_CSS}</style></defs>`));
