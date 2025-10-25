@@ -208,12 +208,11 @@ async function drawFormatted(ctx, labelHTML, x, y, fontSize, hAlign) {
     return;
 
   const adaptor = MathJax.startup.adaptor;
-  const mathJaxSVG = await MathJax.tex2svgPromise(getAsTex(labelHTML));
+  const  = await MathJax.tex2svgPromise(getAsTex(labelHTML));
   let svgHTML = adaptor.tags(mathJaxSVG, 'svg')[0].outerHTML;
 
-  // MathJax SVG's use &lt; and &gt; within their tags, which older versions of Safari can't handle. Since the tags
-  // where these are used end up being irrelevant for our use case, we can safely strip them out
-  svgHTML = svgHTML.replaceAll("&lt;", "").replaceAll("&gt;", "")
+  // TODO: MathJax SVG's use &lt; and &gt; within their tags. Normally this is fine, but in Safari the above command will
+  // convert them to < and >, which causes problems. Need to find a way to detect and strip them here
 
   svgHTML = (svgHTML.match(/^<svg.*?><defs>/)
     ? svgHTML.replace(/<defs>/, `<defs><style>${MATHJAX_EXTRA_CSS}</style>`)
