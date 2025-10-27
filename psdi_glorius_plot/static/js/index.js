@@ -19,6 +19,8 @@ const OUTPUT = "output";
 
 const L_DIMS = [CONDITION, SAMPLE, OUTPUT];
 
+const COLOR_TRANSPARENT = "red";
+
 const D_DIM_LIMITS = {
   condition: {
     min: 3,
@@ -65,6 +67,7 @@ const RAND_BASELINE_MAX = 100.;
 
 const MATHJAX_DEFAULT_FONT_SIZE = 16;
 const MATHJAX_FONT_SCALING = 1.125;
+// TODO: It looks like we might need a different scaling factor for Webkit-based browsers like Safari
 
 const T_WAIT = 100;
 const MAX_ELAPSED = 500;
@@ -103,7 +106,7 @@ const L_BORDER_DASHES = [[], [6, 6], [4, 4], [2, 2], [1, 1]];
 const BORDER_WIDTH = 4;
 const BASELINE_WIDTH = 4;
 const BASELINE_COLOR = "#FFFFFF";
-const DATA_BG_COLOR = ["#FFFFFF00"];
+const DATA_BG_COLOR = [COLOR_TRANSPARENT];
 const GRID_WIDTH = 1;
 const GRID_COLOR = "#00000080";
 
@@ -1427,7 +1430,7 @@ async function generatePlot() {
       },
       // Hide the normal label, since we implement it ourselves with custom styling. We still use it so we get the
       // optimal positioning, which is why we don't filter it all out.
-      color: "#FFFFFF00",
+      color: COLOR_TRANSPARENT,
     },
     reverse: true,
     ticks: {
@@ -1448,7 +1451,7 @@ async function generatePlot() {
       },
       // Hide the normal label, since we implement it ourselves with custom styling. We still use it so we get the
       // optimal positioning, which is why we don't filter it all out.
-      color: "#FFFFFF00",
+      color: COLOR_TRANSPARENT,
       filter: function (legendLabel, _) {
         return legendLabel.text != "";
       }
@@ -1468,7 +1471,7 @@ async function generatePlot() {
     },
     // Hide the normal label, since we implement it ourselves with custom styling. We still use it so we get the
     // optimal positioning, which is why we don't filter it all out.
-    color: "#FFFFFF00",
+    color: COLOR_TRANSPARENT,
   }
 
   if (radarChart === null) {
@@ -1521,7 +1524,7 @@ async function generatePlot() {
 
   const legendHitBox = radarChart.legend.legendHitBoxes[0];
   drawFormatted(ctx, getOutputLabel(),
-    legendHitBox.left + 1.5 * fontSize, legendHitBox.top + 0.125 * fontSize, fontSize, "left");
+    legendHitBox.left + 1.5 * fontSize, legendHitBox.top, fontSize, "left");
 
   const lPointLabelItems = radarChart.scales.r._pointLabelItems;
   for (let i = 0; i < lConditionData.length; ++i) {
