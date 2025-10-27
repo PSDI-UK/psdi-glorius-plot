@@ -208,7 +208,7 @@ async function drawFormatted(ctx, labelHTML, x, y, fontSize, hAlign) {
     return;
 
   const adaptor = MathJax.startup.adaptor;
-  const  = await MathJax.tex2svgPromise(getAsTex(labelHTML));
+  const mathJaxSVG = await MathJax.tex2svgPromise(getAsTex(labelHTML));
   let svgHTML = adaptor.tags(mathJaxSVG, 'svg')[0].outerHTML;
 
   // TODO: MathJax SVG's use &lt; and &gt; within their tags. Normally this is fine, but in Safari the above command will
