@@ -135,6 +135,8 @@ let initWidth;
 let initHeight;
 let initFontSize;
 
+let compatibilityMode = "unknown";
+
 const dQuillEditors = {};
 
 // When the script is initially loaded, store a copy of a heading element and cell elements that we'll later use
@@ -211,15 +213,32 @@ async function drawFormatted(ctx, labelHTML, x, y, fontSize, hAlign) {
   const mathJaxSVG = await MathJax.tex2svgPromise(getAsTex(labelHTML));
   let svgHTML = adaptor.tags(mathJaxSVG, 'svg')[0].outerHTML;
 
-  // TODO: MathJax SVG's use &lt; and &gt; within their tags. Normally this is fine, but in Safari the above command will
-  // convert them to < and >, which causes problems. Need to find a way to detect and strip them here
+  // MathJax SVGs use &lt; and &gt; within their tags. Normally this is fine, but in older versions of Safari the above
+  // command will convert them to < and >, which causes problems. We use a Regex to find and correct these instances.
 
-  svgHTML = (svgHTML.match(/^<svg.*?><defs>/)
-    ? svgHTML.replace(/<defs>/, `<defs><style>${MATHJAX_EXTRA_CSS}</style>`)
-    : svgHTML.replace(/^(<svg.*?>)/, `$1<defs><style>${MATHJAX_EXTRA_CSS}</style></defs>`));
-  svgHTML = svgHTML.replace(/ (?:role|focusable|aria-hidden)=".*?"/g, '')
-    .replace(/"currentColor"/g, '"black"');
-  svgHTML = XML_DECLARATION + svgHTML;
+  // The regex is complicated to search for, so we save some time by checking if this is necessary the first time this
+  // comes up, and skipping afterwards if it isn't
+  const doubleTagRegex = /(<[^>]+?)<([^>]+?)>([^>]+?>)/g;
+  if (compatibilityMode == "unknown") {
+    if (svgHTML.search(doubleTagRegex) > 0)
+      compatibilityMode = true;
+    else
+      compatibilityMode = false;
+  }
+
+  if (compatibilityMode) {
+    // Since there may be multiple tags within each set of enclosing tags, we run this in a while loop until all have been
+    // found
+    let noChange = false;
+    let lastSvgHTML = svgHTML;
+    while (!noChange) {
+      svgHTML = svgHTML.replaceAll(doubleTagRegex, "$1&lt;$2&gt;$3");
+      if (svgHTML == lastSvgHTML)
+        noChange = true;
+      else
+        lastSvgHTML = svgHTML;
+    }
+  }
 
   drawMathJaxSVG(ctx, svgHTML, x, y, fontSize, hAlign);
 }
