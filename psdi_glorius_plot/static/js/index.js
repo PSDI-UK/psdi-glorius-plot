@@ -68,17 +68,6 @@ const MATHJAX_DEFAULT_FONT_SIZE = 16;
 const MATHJAX_FONT_SCALING = 8.5;
 const RENDERING_UPSCALE = 16;
 
-const MATHJAX_EXTRA_CSS = [
-  'svg a{fill:blue;stroke:blue}',
-  '[data-mml-node="merror"]>g{fill:red;stroke:red}',
-  '[data-mml-node="merror"]>rect[data-background]{fill:yellow;stroke:none}',
-  '[data-frame],[data-line]{stroke-width:70px;fill:none}',
-  '.mjx-dashed{stroke-dasharray:140}',
-  '.mjx-dotted{stroke-linecap:round;stroke-dasharray:0,140}',
-  'use[data-c]{stroke-width:3px}'
-].join('');
-const XML_DECLARATION = '<?xml version="1.0" encoding="UTF-8" standalone="no"?>';
-
 const T_WAIT = 100;
 const MAX_ELAPSED = 500;
 
