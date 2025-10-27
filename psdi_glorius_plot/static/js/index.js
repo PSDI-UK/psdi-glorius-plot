@@ -8,7 +8,6 @@
 
 import { initDirtyForms, cleanDirtyForms } from "./common.js";
 import { mix_hexes } from "./color.js"
-import { Canvg } from 'https://cdn.skypack.dev/canvg@^4.0.0';
 
 const LABEL_FONT_FAMILY = "'Fira Sans', sans-serif";
 const QUILL_THEME = "snow";
@@ -65,8 +64,7 @@ const RAND_BASELINE_MIN = 60.;
 const RAND_BASELINE_MAX = 100.;
 
 const MATHJAX_DEFAULT_FONT_SIZE = 16;
-const MATHJAX_FONT_SCALING = 8.5;
-const RENDERING_UPSCALE = 16;
+const MATHJAX_FONT_SCALING = 1.125;
 
 const T_WAIT = 100;
 const MAX_ELAPSED = 500;
@@ -267,25 +265,21 @@ function getAsTex(s) {
 }
 
 async function drawMathJaxSVG(ctx, svgHTML, x = 0, y = 0, fontsize = 16, hAlign = "left") {
-
-  const svgElem = $(new DOMParser().parseFromString(svgHTML, "image/svg+xml")).find("svg");
-
-  const scale = MATHJAX_FONT_SCALING * fontsize / MATHJAX_DEFAULT_FONT_SIZE;
-  const w = svgElem.attr("width").slice(0, -2) * scale;
-  const h = svgElem.attr("height").slice(0, -2) * scale;
-
-  const canvgCanvas = document.createElement("canvas");
-  $(canvgCanvas).attr("width", w * RENDERING_UPSCALE);
-  $(canvgCanvas).attr("height", h * RENDERING_UPSCALE);
-  const canvgCtx = canvgCanvas.getContext("2d")
-
-  const v = await Canvg.fromString(canvgCtx, svgHTML);
-  v.resize(w * RENDERING_UPSCALE, h * RENDERING_UPSCALE);
-  v.start();
-  let finalX = x;
-  if (hAlign == "center")
-    finalX -= w / 2;
-  ctx.drawImage(canvgCanvas, finalX, y, w, h);
+  let DOMURL = window.URL || window.webkitURL || window;
+  let img1 = new Image();
+  let svg = new Blob([svgHTML], { type: 'image/svg+xml' });
+  let url = DOMURL.createObjectURL(svg);
+  let scale = MATHJAX_FONT_SCALING * fontsize / MATHJAX_DEFAULT_FONT_SIZE;
+  img1.onload = function () {
+    let w = img1.naturalWidth * scale;
+    let h = img1.naturalHeight * scale;
+    let finalX = x;
+    if (hAlign == "center")
+      finalX -= w / 2;
+    ctx.drawImage(img1, finalX, y, w, h);
+    DOMURL.revokeObjectURL(url);
+  }
+  img1.src = url;
 }
 
 // Plugins for Chart JS
@@ -1527,7 +1521,7 @@ async function generatePlot() {
 
   const legendHitBox = radarChart.legend.legendHitBoxes[0];
   drawFormatted(ctx, getOutputLabel(),
-    legendHitBox.left + 1.5 * fontSize, legendHitBox.top, fontSize, "left");
+    legendHitBox.left + 1.5 * fontSize, legendHitBox.top + 0.125 * fontSize, fontSize, "left");
 
   const lPointLabelItems = radarChart.scales.r._pointLabelItems;
   for (let i = 0; i < lConditionData.length; ++i) {
