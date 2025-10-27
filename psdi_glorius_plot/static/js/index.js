@@ -19,7 +19,7 @@ const OUTPUT = "output";
 
 const L_DIMS = [CONDITION, SAMPLE, OUTPUT];
 
-const COLOR_TRANSPARENT = "red";
+const COLOR_TRANSPARENT = "FFFFFF00";
 
 const D_DIM_LIMITS = {
   condition: {
@@ -1591,7 +1591,7 @@ function fillExample() {
   setNumDim(SAMPLE, 1);
 
   // Set the title and output label
-  $("#title-input .ql-editor p").html("<b>Reaction-condition-based assignment for 1,3-cyclization</b>");
+  $("#title-input .ql-editor p").html("<b>Reaction-condition sensitivity analysis for 1,3-cyclization</b>");
   $(".output-label-select").val("Isolated Yield (%)").change();
 
   // Fill the condition labels
@@ -1945,7 +1945,7 @@ function enableQuillEvents() {
 }
 
 function initQuill() {
-  addQuillEditor("#title-input", "“Sensitivity analysis of the XXX reaction”");
+  addQuillEditor("#title-input", "“Reaction-condition sensitivity analysis”");
   addQuillEditor("#ol-0", "Define outcome");
   $(".condition-input").each((i, e) => {
     addQuillEditor("#cl-" + i, CONDITION_PLACEHOLDER);
