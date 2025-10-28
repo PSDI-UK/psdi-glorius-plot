@@ -19,8 +19,7 @@ const OUTPUT = "output";
 
 const L_DIMS = [CONDITION, SAMPLE, OUTPUT];
 
-// const COLOR_TRANSPARENT = "#FFFFFF00";
-const COLOR_TRANSPARENT = "red";
+const COLOR_TRANSPARENT = "#FFFFFF00";
 
 const D_DIM_LIMITS = {
   condition: {
