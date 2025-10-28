@@ -151,7 +151,7 @@ function clamp(x, min, max) {
  */
 function getWebKitMode() {
   if (webkitMode === null) {
-    if (navigator.userAgent.indexOf('AppleWebKit') != -1)
+    if (typeof window.webkitConvertPointFromNodeToPage === 'function')
       webkitMode = true;
     else
       webkitMode = false;
