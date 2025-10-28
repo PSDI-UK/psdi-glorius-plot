@@ -66,7 +66,8 @@ const RAND_BASELINE_MIN = 60.;
 const RAND_BASELINE_MAX = 100.;
 
 const MATHJAX_DEFAULT_FONT_SIZE = 16;
-const MATHJAX_FONT_SCALING = 1.125;
+const MATHJAX_BASE_FONT_SCALING = 1.125;
+const MATHJAX_WEBKIT_FONT_SCALING = 1.125;
 // TODO: It looks like we might need a different scaling factor for Webkit-based browsers like Safari
 
 const T_WAIT = 100;
@@ -126,6 +127,7 @@ let initHeight;
 let initFontSize;
 
 let compatibilityMode = "unknown";
+let webkitMode = null;
 
 const dQuillEditors = {};
 
@@ -143,6 +145,19 @@ const TEMPLATE_REL_DEVIATION_INPUT_LINE = $(".rel-deviation-input-line")[0].clon
 
 function clamp(x, min, max) {
   return Math.min(Math.max(x, min), max);
+}
+
+/**
+ * Get whether or not a WebKit-based browser is being used
+ */
+function getWebKitMode() {
+  if (webkitMode === null) {
+    if (navigator.userAgent.indexOf('AppleWebKit') != -1)
+      webkitMode = true;
+    else
+      webkitMode = false;
+  }
+  return webkitMode;
 }
 
 /**
@@ -272,7 +287,7 @@ async function drawMathJaxSVG(ctx, svgHTML, x = 0, y = 0, fontsize = 16, hAlign 
   let img1 = new Image();
   let svg = new Blob([svgHTML], { type: 'image/svg+xml' });
   let url = DOMURL.createObjectURL(svg);
-  let scale = MATHJAX_FONT_SCALING * fontsize / MATHJAX_DEFAULT_FONT_SIZE;
+  let scale = MATHJAX_BASE_FONT_SCALING * fontsize / MATHJAX_DEFAULT_FONT_SIZE;
   img1.onload = function () {
     let w = img1.naturalWidth * scale;
     let h = img1.naturalHeight * scale;
@@ -1523,8 +1538,18 @@ async function generatePlot() {
     fontSize, "center");
 
   const legendHitBox = radarChart.legend.legendHitBoxes[0];
+  let legendLeftOffset, legendTopOffset;
+  if (getWebKitMode()) {
+    // Font sizing ends up being different in WebKit-based browsers, so we need to use different alignment here since
+    // this is left-aligned and we need to make sure the label is close to the box
+    legendLeftOffset = 0.75 * fontSize;
+    legendTopOffset = 0.125 * fontSize;
+  } else {
+    legendLeftOffset = 1.5 * fontSize;
+    legendTopOffset = 0;
+  }
   drawFormatted(ctx, getOutputLabel(),
-    legendHitBox.left + 1.5 * fontSize, legendHitBox.top, fontSize, "left");
+    legendHitBox.left + legendLeftOffset, legendHitBox.top + legendTopOffset, fontSize, "left");
 
   const lPointLabelItems = radarChart.scales.r._pointLabelItems;
   for (let i = 0; i < lConditionData.length; ++i) {
