@@ -66,8 +66,8 @@ const RAND_BASELINE_MIN = 60.;
 const RAND_BASELINE_MAX = 100.;
 
 const MATHJAX_DEFAULT_FONT_SIZE = 16;
-const MATHJAX_FONT_SCALING = 1.125;
-// TODO: It looks like we might need a different scaling factor for Webkit-based browsers like Safari
+const MATHJAX_BASE_FONT_SCALING = 1.125;
+const WEBKIT_FONT_SCALING = 0.89;
 
 const T_WAIT = 100;
 const MAX_ELAPSED = 500;
@@ -126,6 +126,7 @@ let initHeight;
 let initFontSize;
 
 let compatibilityMode = "unknown";
+let webkitMode = null;
 
 const dQuillEditors = {};
 
@@ -143,6 +144,19 @@ const TEMPLATE_REL_DEVIATION_INPUT_LINE = $(".rel-deviation-input-line")[0].clon
 
 function clamp(x, min, max) {
   return Math.min(Math.max(x, min), max);
+}
+
+/**
+ * Get whether or not a WebKit-based browser is being used
+ */
+function getWebKitMode() {
+  if (webkitMode === null) {
+    if (typeof window.webkitConvertPointFromNodeToPage === 'function')
+      webkitMode = true;
+    else
+      webkitMode = false;
+  }
+  return webkitMode;
 }
 
 /**
@@ -272,7 +286,7 @@ async function drawMathJaxSVG(ctx, svgHTML, x = 0, y = 0, fontsize = 16, hAlign 
   let img1 = new Image();
   let svg = new Blob([svgHTML], { type: 'image/svg+xml' });
   let url = DOMURL.createObjectURL(svg);
-  let scale = MATHJAX_FONT_SCALING * fontsize / MATHJAX_DEFAULT_FONT_SIZE;
+  let scale = MATHJAX_BASE_FONT_SCALING * fontsize / MATHJAX_DEFAULT_FONT_SIZE;
   img1.onload = function () {
     let w = img1.naturalWidth * scale;
     let h = img1.naturalHeight * scale;
@@ -1415,7 +1429,12 @@ async function generatePlot() {
 
   // Prepare the plot options
 
+  // Use the user's desired font size for labels to get ideal positioning. Since WebKit displays it larger for some
+  // reason, we apply a scaling factor if a WebKit browser is being used
   const fontSize = getFontSize();
+  let alignmentFontSize = fontSize;
+  if (getWebKitMode())
+    alignmentFontSize *= WEBKIT_FONT_SCALING;
 
   const plotROptions = {
     grid: {
@@ -1426,7 +1445,7 @@ async function generatePlot() {
     pointLabels: {
       font: {
         family: LABEL_FONT_FAMILY,
-        size: fontSize
+        size: alignmentFontSize
       },
       // Hide the normal label, since we implement it ourselves with custom styling. We still use it so we get the
       // optimal positioning, which is why we don't filter it all out.
@@ -1446,7 +1465,7 @@ async function generatePlot() {
       boxWidth: fontSize,
       font: {
         family: LABEL_FONT_FAMILY,
-        size: fontSize,
+        size: alignmentFontSize,
         weight: "bold"
       },
       // Hide the normal label, since we implement it ourselves with custom styling. We still use it so we get the
@@ -1466,7 +1485,7 @@ async function generatePlot() {
     text: titleHTMLText,
     font: {
       family: LABEL_FONT_FAMILY,
-      size: fontSize,
+      size: alignmentFontSize,
       weight: "bold"
     },
     // Hide the normal label, since we implement it ourselves with custom styling. We still use it so we get the
@@ -1505,12 +1524,12 @@ async function generatePlot() {
       labels: lOutputConditionLabels,
       datasets: lDatasets,
     }
-    radarChart.options.scales.r = plotROptions;
     radarChart.options.aspectRatio = getAspectRatio();
+    radarChart.options.scales.r = plotROptions;
     radarChart.options.plugins.legend = plotLegendOptions;
     radarChart.options.plugins.title = plotTitleOptions;
-    radarChart.update();
     radarChart.resize(getWidth(), getHeight());
+    radarChart.update();
   }
 
   // Manually draw formatted title, legend, and labels
@@ -1522,9 +1541,19 @@ async function generatePlot() {
     (titleBlock.left + titleBlock.right) / 2, titleBlock.top + titleBlock.options.padding + 0.125 * fontSize,
     fontSize, "center");
 
+  // Font sizing ends up being different in WebKit-based browsers, so we need to use different alignment here since
+  // this is left-aligned and we need to make sure the label is close to the box
+  let legendLeftOffset, legendTopOffset;
+  if (getWebKitMode()) {
+    legendLeftOffset = 0.75 * WEBKIT_FONT_SCALING * fontSize;
+    legendTopOffset = 0.125 * WEBKIT_FONT_SCALING * fontSize;
+  } else {
+    legendLeftOffset = 1.5 * fontSize;
+    legendTopOffset = 0;
+  }
   const legendHitBox = radarChart.legend.legendHitBoxes[0];
   drawFormatted(ctx, getOutputLabel(),
-    legendHitBox.left + 1.5 * fontSize, legendHitBox.top, fontSize, "left");
+    legendHitBox.left + legendLeftOffset, legendHitBox.top + legendTopOffset, fontSize, "left");
 
   const lPointLabelItems = radarChart.scales.r._pointLabelItems;
   for (let i = 0; i < lConditionData.length; ++i) {
