@@ -19,7 +19,8 @@ const OUTPUT = "output";
 
 const L_DIMS = [CONDITION, SAMPLE, OUTPUT];
 
-const COLOR_TRANSPARENT = "#FFFFFF00";
+// const COLOR_TRANSPARENT = "#FFFFFF00";
+const COLOR_TRANSPARENT = "red";
 
 const D_DIM_LIMITS = {
   condition: {
@@ -67,8 +68,7 @@ const RAND_BASELINE_MAX = 100.;
 
 const MATHJAX_DEFAULT_FONT_SIZE = 16;
 const MATHJAX_BASE_FONT_SCALING = 1.125;
-const MATHJAX_WEBKIT_FONT_SCALING = 1.125;
-// TODO: It looks like we might need a different scaling factor for Webkit-based browsers like Safari
+const WEBKIT_FONT_SCALING = 0.89;
 
 const T_WAIT = 100;
 const MAX_ELAPSED = 500;
@@ -1430,7 +1430,12 @@ async function generatePlot() {
 
   // Prepare the plot options
 
+  // Use the user's desired font size for labels to get ideal positioning. Since WebKit displays it larger for some
+  // reason, we apply a scaling factor if a WebKit browser is being used
   const fontSize = getFontSize();
+  let alignmentFontSize = fontSize;
+  if (getWebKitMode())
+    alignmentFontSize *= WEBKIT_FONT_SCALING;
 
   const plotROptions = {
     grid: {
@@ -1441,7 +1446,7 @@ async function generatePlot() {
     pointLabels: {
       font: {
         family: LABEL_FONT_FAMILY,
-        size: fontSize
+        size: alignmentFontSize
       },
       // Hide the normal label, since we implement it ourselves with custom styling. We still use it so we get the
       // optimal positioning, which is why we don't filter it all out.
@@ -1461,7 +1466,7 @@ async function generatePlot() {
       boxWidth: fontSize,
       font: {
         family: LABEL_FONT_FAMILY,
-        size: fontSize,
+        size: alignmentFontSize,
         weight: "bold"
       },
       // Hide the normal label, since we implement it ourselves with custom styling. We still use it so we get the
@@ -1481,7 +1486,7 @@ async function generatePlot() {
     text: titleHTMLText,
     font: {
       family: LABEL_FONT_FAMILY,
-      size: fontSize,
+      size: alignmentFontSize,
       weight: "bold"
     },
     // Hide the normal label, since we implement it ourselves with custom styling. We still use it so we get the
@@ -1520,12 +1525,12 @@ async function generatePlot() {
       labels: lOutputConditionLabels,
       datasets: lDatasets,
     }
-    radarChart.options.scales.r = plotROptions;
     radarChart.options.aspectRatio = getAspectRatio();
+    radarChart.options.scales.r = plotROptions;
     radarChart.options.plugins.legend = plotLegendOptions;
     radarChart.options.plugins.title = plotTitleOptions;
-    radarChart.update();
     radarChart.resize(getWidth(), getHeight());
+    radarChart.update();
   }
 
   // Manually draw formatted title, legend, and labels
@@ -1541,8 +1546,8 @@ async function generatePlot() {
   // this is left-aligned and we need to make sure the label is close to the box
   let legendLeftOffset, legendTopOffset;
   if (getWebKitMode()) {
-    legendLeftOffset = 0.75 * fontSize;
-    legendTopOffset = 0.125 * fontSize;
+    legendLeftOffset = 0.75 * WEBKIT_FONT_SCALING * fontSize;
+    legendTopOffset = 0.125 * WEBKIT_FONT_SCALING * fontSize;
   } else {
     legendLeftOffset = 1.5 * fontSize;
     legendTopOffset = 0;
