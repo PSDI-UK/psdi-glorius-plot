@@ -1537,17 +1537,17 @@ async function generatePlot() {
     (titleBlock.left + titleBlock.right) / 2, titleBlock.top + titleBlock.options.padding + 0.125 * fontSize,
     fontSize, "center");
 
-  const legendHitBox = radarChart.legend.legendHitBoxes[0];
+  // Font sizing ends up being different in WebKit-based browsers, so we need to use different alignment here since
+  // this is left-aligned and we need to make sure the label is close to the box
   let legendLeftOffset, legendTopOffset;
   if (getWebKitMode()) {
-    // Font sizing ends up being different in WebKit-based browsers, so we need to use different alignment here since
-    // this is left-aligned and we need to make sure the label is close to the box
     legendLeftOffset = 0.75 * fontSize;
     legendTopOffset = 0.125 * fontSize;
   } else {
     legendLeftOffset = 1.5 * fontSize;
     legendTopOffset = 0;
   }
+  const legendHitBox = radarChart.legend.legendHitBoxes[0];
   drawFormatted(ctx, getOutputLabel(),
     legendHitBox.left + legendLeftOffset, legendHitBox.top + legendTopOffset, fontSize, "left");
 
