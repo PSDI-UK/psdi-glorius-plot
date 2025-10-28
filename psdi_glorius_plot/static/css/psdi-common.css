@@ -313,11 +313,11 @@ body>* {
   align-items     : center;
   padding         : 0;
   border-bottom   : 1px solid var(--psdi-border-color);
-  height          : auto;
+  height          : auto !important;
 }
 
 .announcementBarContent_xLdY {
-  font-size : 0.9rem;
+  font-size : 1rem;
   padding   : 5px 0;
   text-align: center;
 }
