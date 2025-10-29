@@ -67,7 +67,7 @@ const RAND_BASELINE_MAX = 100.;
 
 const MATHJAX_DEFAULT_FONT_SIZE = 16;
 const MATHJAX_BASE_FONT_SCALING = 1.125;
-const WEBKIT_FONT_SCALING = 0.89;
+const WEBKIT_FONT_SCALING = 8. / 9.;
 
 const T_WAIT = 100;
 const MAX_ELAPSED = 500;
@@ -1461,8 +1461,8 @@ async function generatePlot() {
   const plotLegendOptions = {
     position: "bottom",
     labels: {
-      boxHeight: fontSize,
-      boxWidth: fontSize,
+      boxHeight: alignmentFontSize,
+      boxWidth: alignmentFontSize,
       font: {
         family: LABEL_FONT_FAMILY,
         size: alignmentFontSize,
@@ -1544,14 +1544,14 @@ async function generatePlot() {
   // Font sizing ends up being different in WebKit-based browsers, so we need to use different alignment here since
   // this is left-aligned and we need to make sure the label is close to the box
   let legendLeftOffset, legendTopOffset;
+  const legendHitBox = radarChart.legend.legendHitBoxes[0];
   if (getWebKitMode()) {
-    legendLeftOffset = 0.75 * WEBKIT_FONT_SCALING * fontSize;
-    legendTopOffset = 0.125 * WEBKIT_FONT_SCALING * fontSize;
+    legendLeftOffset = 1.5 * alignmentFontSize - 0.0325 * legendHitBox.width;
+    legendTopOffset = 0.05 * alignmentFontSize;
   } else {
     legendLeftOffset = 1.5 * fontSize;
     legendTopOffset = 0;
   }
-  const legendHitBox = radarChart.legend.legendHitBoxes[0];
   drawFormatted(ctx, getOutputLabel(),
     legendHitBox.left + legendLeftOffset, legendHitBox.top + legendTopOffset, fontSize, "left");
 
