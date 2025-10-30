@@ -56,7 +56,7 @@ const D_COLOR_SCHEMES = {
 
 };
 
-const CONDITION_PLACEHOLDER = "“High conc.”";
+const CONDITION_PLACEHOLDER = "e.g. “High conc.”";
 
 const DEFAULT_VALUE_MEAN = 100;
 const VALUE_MIN = 0.;
@@ -1976,7 +1976,7 @@ function enableQuillEvents() {
 }
 
 function initQuill() {
-  addQuillEditor("#title-input", "“Reaction-condition sensitivity analysis”");
+  addQuillEditor("#title-input", "e.g. “Reaction-condition sensitivity analysis”");
   addQuillEditor("#ol-0", "Define outcome");
   $(".condition-input").each((i, e) => {
     addQuillEditor("#cl-" + i, CONDITION_PLACEHOLDER);
