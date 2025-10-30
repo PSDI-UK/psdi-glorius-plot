@@ -8,46 +8,117 @@
 
 {% block hero_title %}PSDI Glorius Plot Generator{% endblock %}
 
+{% block outer_content %}
+<div class="secondary mathjax_ignore">
+  <div class="max-width-box">
+    <p>
+      This web tool enables users to visualise the sensitivity of a given chemical transformation to user-defined
+      reaction
+      conditions. The output plots are closely based on an
+      <a href="https://onlinelibrary.wiley.com/doi/10.1002/anie.201901935">original concept from the Glorius research
+        group</a>.
+    </p>
+    <p>
+      This tool is still a work in progress, and feedback is very welcome, whether feature requests, bug reports, or
+      even
+      highlighting a feature you find particularly useful so we know not to remove it when streamlining the tool. To
+      provide
+      feedback, click the “Provide Feedback” link on the right side of the header, which will open up a form to submit
+      it.
+    </p>
+    <div class="multicol-container">
+      <div class="multicol-cell">
+        <details open>
+          <summary><strong>Instructions</strong></summary>
+          <p>
+            Select the reaction outcome of interest (e.g., commonly reaction yield, <em>ee</em> or <em>de</em>) and
+            define
+            the
+            number of experimental parameters, or “test conditions”, that you have used in your sensitivity analysis.
+          </p>
+          <p>
+            If you have conducted repeat reactions for each test condition, then select the number of experiments that
+            were
+            carried out.
+          </p>
+          <p>
+            Input the value of the reaction outcome (yield, <em>ee</em> or <em>de</em>) for your optimised “standard
+            conditions”.
+          </p>
+          <p>
+            Add labels to define each test condition that was used in your sensitivity analysis, and add the value of
+            the
+            reaction outcome for each test reaction.
+          </p>
+          <p>
+            Select the “value to plot”. Values of the reaction outcome can be plotted directly, or deviation of the
+            outcome
+            from
+            the standard conditions may be used.
+          </p>
+          <p>
+            Tools for customisation of the plot are available beneath the plotting window.
+          </p>
+        </details>
+      </div>
+      <div class="multicol-cell">
+        <details>
+          <summary><strong>Help with formatting and special symbols</strong> - what to do if text appears as a black bar
+            on the chart
+          </summary>
+          <p>
+            <strong>Basic formatting:</strong> You can format text entered in the Title and various other fields by
+            clicking
+            on the formatting buttons in the toolbar that appears above the text-input boxes when they're selected,
+            either
+            by
+            clicking the box then entering text, or by selecting text and then clicking the buttons. If the text is
+            longer
+            than
+            the box can fit in one line, a scrollbar will appear at the right side of the box allowing you to scroll up
+            and
+            down
+            lines of text.
+          </p>
+          <p>This formatting is done through a LaTeX equation rendering engine, which results in some unavoidable quirks
+            such
+            as it always putting spaces around mathematical operators. If the renderer fails to parse the text, it will
+            appear
+            as a black bar on the chart. The most common cause of this is less-than and greater-than symbols, which get
+            interpreted as HTML tags. This can by worked around by replacing them with “\gt” and “\lt” respectively.</p>
+          <p>
+            <strong>Special symbols:</strong> A toolbar option to insert special symbols is still under development. For
+            the
+            time being, you can copy and paste desired symbols from the following lists:
+          </p>
+          <ul>
+            <li>Mathematical and numerical symbols: ° Å → ⟹ + - × ÷ ± ∓ = ≠ &lt; &gt; ≤ ≥ ≲ ≳ ≪ ≫</li>
+            <li>Lowercase Greek: α β γ δ ε ζ η θ ι κ λ μ ν ξ ο π ρ ς σ τ υ φ χ ψ ω</li>
+            <li>Uppercase Greek: Α Β Γ Δ Ε Ζ Η Θ Ι Κ Λ Μ Ν Ξ Ο Π Ρ Σ Τ Υ Φ Χ Ψ Ω</li>
+          </ul>
+          <p>If you need a symbol not listed here, you can search for it at <a
+              href="https://unicodeplus.com/">UnicodePlus</a>
+            and copy it from there.
+          </p>
+          <p>
+            <strong>Advanced formatting:</strong> If you're familiar with LaTeX markup, you can use it to directly set
+            the
+            text that will appear on the chart, or you can use <a href="https://latexeditor.lagrida.com/">a LaTeX
+              equation
+              editor</a> to help. Malformed LaTeX markup will appear as red on the chart, or may result in the renderer
+            failing entirely, resulting in the text appearing as a black bar on the chart.
+          </p>
+        </details>
+      </div>
+    </div>
+  </div>
+</div>
+
+{{ super() }}
+
+{% endblock %}
+
 {% block inner_content %}
-
-<details>
-  <summary>Help with formatting and special symbols - what to do if text appears as a black bar on the chart</summary>
-
-  <p>
-    <strong>Basic formatting:</strong> You can format text entered in the Title and various other fields by clicking
-    on the formatting buttons in the toolbar that appears above the text-input boxes when they're selected, either by
-    clicking the box then entering text, or by selecting text and then clicking the buttons. If the text is longer than
-    the box can fit in one line, a scrollbar will appear at the right side of the box allowing you to scroll up and down
-    lines of text.
-  </p>
-
-  <p>This formatting is done through a LaTeX equation rendering engine, which results in some unavoidable quirks such
-    as it always putting spaces around mathematical operators. If the renderer fails to parse the text, it will appear
-    as a black bar on the chart. The most common cause of this is less-than and greater-than symbols, which get
-    interpreted as HTML tags. This can by worked around by replacing them with “\gt” and “\lt” respectively.</p>
-
-  <p>
-    <strong>Special symbols:</strong> A toolbar option to insert special symbols is still under development. For the
-    time being, you can copy and paste desired symbols from the following lists:
-  </p>
-
-  <ul>
-    <li>Mathematical and numerical symbols: ° Å → ⟹ + - × ÷ ± ∓ = ≠ &lt; &gt; ≤ ≥ ≲ ≳ ≪ ≫</li>
-    <li>Lowercase Greek: α β γ δ ε ζ η θ ι κ λ μ ν ξ ο π ρ ς σ τ υ φ χ ψ ω</li>
-    <li>Uppercase Greek: Α Β Γ Δ Ε Ζ Η Θ Ι Κ Λ Μ Ν Ξ Ο Π Ρ Σ Τ Υ Φ Χ Ψ Ω</li>
-  </ul>
-
-  <p>If you need a symbol not listed here, you can search for it at <a href="https://unicodeplus.com/">UnicodePlus</a>
-    and copy it from there.
-  </p>
-
-  <p>
-    <strong>Advanced formatting:</strong> If you're familiar with LaTeX markup, you can use it to directly set the
-    text that will appear on the chart, or you can use <a href="https://latexeditor.lagrida.com/">a LaTeX equation
-      editor</a> to help. Malformed LaTeX markup will appear as red on the chart, or may result in the renderer
-    failing entirely, resulting in the text appearing as a black bar on the chart.
-  </p>
-</details>
 
 <form class="sens-form">
 

@@ -308,7 +308,13 @@ button#reset-plot-dims {
   margin-right    : 0.125rem;
 }
 
-/* How to indicate text opens more details on clicking it */
+/* Style the details and summary boxes */
+
+.multicol-container {
+  display              : grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap           : 2rem;
+}
 
 details {
   border        : 1px solid var(--ifm-font-color-base);
@@ -363,11 +369,19 @@ details[open]>summary:before {
 }
 
 details summary:hover {
-  background-color: var(--ifm-background-color-secondary);
+  background-color: color-mix(in srgb, var(--ifm-background-color), var(--ifm-font-color-base) 20%);
+}
+
+.secondary details summary:hover {
+  background-color: color-mix(in srgb, var(--ifm-background-color-secondary), var(--ifm-font-color-base) 20%);
 }
 
 details summary:active {
   background-color: var(--ifm-background-color);
+}
+
+.secondary details summary:active {
+  background-color: var(--ifm-background-color-secondary);
 }
 
 /* Style the popup tooltips */
