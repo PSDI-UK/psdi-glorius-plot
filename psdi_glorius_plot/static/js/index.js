@@ -1058,9 +1058,6 @@ function calcDeviation() {
  */
 async function generatePlot() {
 
-  // Set the form as clean when we generate a plot from it
-  cleanDirtyForms();
-
   // Ensure deviation is calculated first if we aren't in directInput mode
   if (!directInput) {
     calcDeviation();
@@ -1677,6 +1674,10 @@ function fillExample() {
  * @param {string} format 
  */
 function exportImage(format) {
+
+  // Set the form as clean the user downloads the image
+  cleanDirtyForms();
+
   $("#glorius-plot")[0].toBlob((blob) => {
     let objectURL = URL.createObjectURL(blob);
 
