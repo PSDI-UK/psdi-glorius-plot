@@ -23,6 +23,7 @@ jobs:
   deploy-pages:
     uses: ./.github/workflows/job-publish-pages.yml
     needs: [test-all]
+    if: always() &&  (needs.test-all.result == 'skipped' || needs.test-all.result == 'success')
 
   container-push:
     uses: ./.github/workflows/job-container-push.yml
