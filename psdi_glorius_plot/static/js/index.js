@@ -56,7 +56,7 @@ const D_COLOR_SCHEMES = {
 
 };
 
-const CONDITION_PLACEHOLDER = "Condition (e.g. “High c”)";
+const CONDITION_PLACEHOLDER = "Condition (e.g. “High conc.”)";
 
 const DEFAULT_VALUE_MEAN = 100;
 const VALUE_MIN = 0.;
