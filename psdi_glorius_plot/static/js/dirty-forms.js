@@ -9,9 +9,14 @@
 /**
  * Initializes dirty forms checking for the current page
  * @param {string} selector CSS selector for the elements to apply this to, default "form"
+ * @param {string} message The message to be displayed to the user, asking if they're okay proceeding (note that this
+ *                         doesn't work on all browsers)
  */
-export function initDirtyForms(selector = "form") {
+export function initDirtyForms(selector = "form", message = null) {
+
   $(selector).dirtyForms();
+  if (message !== null)
+    $.DirtyForms.message = message;
 }
 
 /**

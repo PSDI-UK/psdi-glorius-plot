@@ -6,9 +6,11 @@
  * JavaScript code to handle the special functionality of the index.html page
  */
 
-import { initDirtyForms, cleanDirtyForms } from "./dirty-forms.js";
+import { initDirtyForms, cleanDirtyForms, checkIsDirty } from "./dirty-forms.js";
 import { mix_hexes } from "./color.js"
 import { clamp, getWebKitMode } from "./utility.js"
+
+const DIRTY_FORMS_MESSAGE = "Data currently entered in the form will be lost. Do you want to proceed?";
 
 const LABEL_FONT_FAMILY = "'Fira Sans', sans-serif";
 const QUILL_THEME = "snow";
@@ -1550,6 +1552,13 @@ async function generatePlot() {
  */
 function fillRandom() {
 
+  // Check if the form is currently dirty, and check with the user before filling if so
+  if (checkIsDirty()) {
+    if (!confirm(DIRTY_FORMS_MESSAGE)) {
+      return;
+    }
+  }
+
   // Suppress autoUpdating until the end
   const lastAutoUpdating = autoUpdating;
   autoUpdating = false;
@@ -1584,6 +1593,8 @@ function fillRandom() {
     generatePlot();
   }
 
+  // Set the current state of the form as "clean"
+  cleanDirtyForms();
 }
 
 /**
@@ -1591,6 +1602,13 @@ function fillRandom() {
  * https://onlinelibrary.wiley.com/doi/10.1002/anie.202418239 Table S9
  */
 function fillExample() {
+
+  // Check if the form is currently dirty, and check with the user before filling if so
+  if (checkIsDirty()) {
+    if (!confirm(DIRTY_FORMS_MESSAGE)) {
+      return;
+    }
+  }
 
   // Suppress autoUpdating until the end
   const lastAutoUpdating = autoUpdating;
@@ -1649,6 +1667,8 @@ function fillExample() {
     enableAutoUpdates();
   }
 
+  // Set the current state of the form as "clean"
+  cleanDirtyForms();
 }
 
 
@@ -1971,7 +1991,7 @@ $(document).ready(function () {
 
   initTooltips();
   initGlobals();
-  initDirtyForms();
+  initDirtyForms("form", DIRTY_FORMS_MESSAGE);
   initQuill();
 
   L_DIMS.forEach(dim => initNumDimControls(dim));
