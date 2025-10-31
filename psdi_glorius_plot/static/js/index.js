@@ -1516,7 +1516,7 @@ function updateColourSchemeSelection() {
 function updatePlotSelect() {
   const devPlotMode = getDevPlotMode();
 
-  $(".sample-button-cell, .sample-heading .mean-heading, .abs-deviation-heading, " +
+  $(".sample-button-cell, .mean-heading, .abs-deviation-heading, " +
     ".rel-deviation-heading").removeClass("col-selected-top");
   $(".sample-heading, .baseline-value-cell, .sample-value-cell, .baseline-mean-cell, .baseline-abs-deviation-cell, " +
     ".baseline-rel-deviation-cell, .mean-value-cell, .abs-deviation-value-cell, " +
