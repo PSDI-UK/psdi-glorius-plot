@@ -6,8 +6,9 @@
  * JavaScript code to handle the special functionality of the index.html page
  */
 
-import { initDirtyForms, cleanDirtyForms } from "./common.js";
+import { initDirtyForms, cleanDirtyForms } from "./dirty-forms.js";
 import { mix_hexes } from "./color.js"
+import { clamp, getWebKitMode } from "./utility.js"
 
 const LABEL_FONT_FAMILY = "'Fira Sans', sans-serif";
 const QUILL_THEME = "snow";
@@ -127,7 +128,6 @@ let initHeight;
 let initFontSize;
 
 let compatibilityMode = "unknown";
-let webkitMode = null;
 
 const dQuillEditors = {};
 
@@ -142,23 +142,6 @@ const TEMPLATE_ABS_DEVIATION_INPUT_LINE = $(".abs-deviation-input-line")[0].clon
 const TEMPLATE_REL_DEVIATION_INPUT_LINE = $(".rel-deviation-input-line")[0].cloneNode(true);
 
 // Common functions
-
-function clamp(x, min, max) {
-  return Math.min(Math.max(x, min), max);
-}
-
-/**
- * Get whether or not a WebKit-based browser is being used
- */
-function getWebKitMode() {
-  if (webkitMode === null) {
-    if (typeof window.webkitConvertPointFromNodeToPage === 'function')
-      webkitMode = true;
-    else
-      webkitMode = false;
-  }
-  return webkitMode;
-}
 
 /**
  * MathJax is loaded asynchronously, so early calls to generate the plot may not have it. This waits to ensure it's
