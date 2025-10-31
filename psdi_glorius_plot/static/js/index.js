@@ -6,13 +6,18 @@
 
 import { initDirtyForms, cleanDirtyForms, checkIsDirty } from "./dirty-forms.js";
 import { mixHexes } from "./color-mixing.js"
-import { clamp, getWebKitMode } from "./utility.js"
+import { clamp, disableButton, enableButton, getWebKitMode } from "./utility.js"
+import {
+  addQuillEditor as createQuillEditor, getQuillEditor, getQuillEditorHTML, setQuillEditor, removeQuillEditor,
+  updateQuillContents, enableQuillEvents, cleanTags, stripTags, waitForMathJax, drawFormatted,
+} from "./formatted-labels.js"
+
+const CHART_ID = "glorius-plot"
+const CHART_SELECTOR = `#${CHART_ID}`
 
 const DIRTY_FORMS_MESSAGE = "Data currently entered in the form will be lost. Do you want to proceed?";
 
 const LABEL_FONT_FAMILY = "'Fira Sans', sans-serif";
-const QUILL_THEME = "snow";
-const QUILL_TOOLBAR = ['bold', 'italic', 'underline', { 'script': 'sub' }, { 'script': 'super' }];
 
 const CONDITION = "condition";
 const SAMPLE = "sample";
@@ -66,14 +71,6 @@ const VALUE_MAX = 100.;
 const RAND_BASELINE_MIN = 60.;
 const RAND_BASELINE_MAX = 100.;
 
-const MATHJAX_DEFAULT_FONT_SIZE = 16;
-const MATHJAX_BASE_FONT_SCALING = 1.125;
-
-const WEBKIT_FONT_SCALING = 8. / 9.;
-
-const T_WAIT = 100;
-const MAX_ELAPSED = 500;
-
 const OUTPUT_LABEL_TEXT = "Output {N} Label:";
 
 const D_DEV_PLOT_MODE_INFO = {
@@ -112,6 +109,16 @@ const DATA_BG_COLOR = [COLOR_TRANSPARENT];
 const GRID_WIDTH = 1;
 const GRID_COLOR = "#00000080";
 
+// When the script is initially loaded, store a copy of a heading element and cell elements that we'll later use
+// as templates to add new rows
+
+const TEMPLATE_OUTPUT_LABEL_ROW = $(".output-label-row")[0].cloneNode(true);
+const TEMPLATE_BASELINE_INPUT_LINE = $(".baseline-input-line")[0].cloneNode(true);
+const TEMPLATE_SAMPLE_INPUT_LINE = $(".sample-input-line")[0].cloneNode(true);
+const TEMPLATE_MEAN_INPUT_LINE = $(".mean-input-line")[0].cloneNode(true);
+const TEMPLATE_ABS_DEVIATION_INPUT_LINE = $(".abs-deviation-input-line")[0].cloneNode(true);
+const TEMPLATE_REL_DEVIATION_INPUT_LINE = $(".rel-deviation-input-line")[0].cloneNode(true);
+
 // Globals
 let tooltipList;
 
@@ -127,189 +134,38 @@ let initWidth;
 let initHeight;
 let initFontSize;
 
-let compatibilityMode = "unknown";
-
-const dQuillEditors = {};
-
-// When the script is initially loaded, store a copy of a heading element and cell elements that we'll later use
-// as templates to add new rows
-
-const TEMPLATE_OUTPUT_LABEL_ROW = $(".output-label-row")[0].cloneNode(true);
-const TEMPLATE_BASELINE_INPUT_LINE = $(".baseline-input-line")[0].cloneNode(true);
-const TEMPLATE_SAMPLE_INPUT_LINE = $(".sample-input-line")[0].cloneNode(true);
-const TEMPLATE_MEAN_INPUT_LINE = $(".mean-input-line")[0].cloneNode(true);
-const TEMPLATE_ABS_DEVIATION_INPUT_LINE = $(".abs-deviation-input-line")[0].cloneNode(true);
-const TEMPLATE_REL_DEVIATION_INPUT_LINE = $(".rel-deviation-input-line")[0].cloneNode(true);
-
-// Common functions
-
 /**
- * MathJax is loaded asynchronously, so early calls to generate the plot may not have it. This waits to ensure it's
- * available
+ * A ChartJS plugin which allows a custom background color for the plot
  */
-async function waitForMathJax() {
-  await new Promise(resolve => {
-
-    let interval;
-    let elapsed = 0;
-
-    const checkForMathJax = function () {
-      elapsed += T_WAIT;
-      if (MathJax.tex2svg || elapsed >= MAX_ELAPSED) {
-        clearInterval(interval);
-        resolve();
-      }
-    };
-
-    interval = setInterval(checkForMathJax, T_WAIT);
-  });
-}
-
-/**
- * Cleans up an HTML string to replace non-breaking spaces with regular spaces and remove any tags and data we aren't
- * doing anything with.
- * @param {string} s 
- * @returns {string}
- */
-function cleanTags(s) {
-  return s.replaceAll("&nbsp;", " ")
-    .replaceAll("<p>", "").replaceAll("</p>", "")
-    .replaceAll("<br>", "")
-    .replaceAll(/<span\b[^>]*>/gm, "").replaceAll("</span>", "")
-    .replaceAll(/<([a-zA-Z]+)\b[^>]*>/gm, "<$1>");
-}
-
-/**
- * Removes all relevant HTML tags from a string, including those that are used in other parts of the code for formatting
- * @param {string} s 
- * @returns {string}
- */
-function stripTags(s) {
-  return cleanTags(s)
-    .replaceAll("<em>", "").replaceAll("</em>", "")
-    .replaceAll("<strong>", "").replaceAll("</strong>", "")
-    .replaceAll("<u>", "").replaceAll("</u>", "")
-    .replaceAll("<sub>", "").replaceAll("</sub>", "")
-    .replaceAll("<sup>", "").replaceAll("</sup>", "");
-}
-
-async function drawFormatted(ctx, labelHTML, x, y, fontSize, hAlign) {
-  if (labelHTML == "")
-    return;
-
-  const adaptor = MathJax.startup.adaptor;
-  const mathJaxSVG = await MathJax.tex2svgPromise(getAsTex(labelHTML));
-  let svgHTML = adaptor.tags(mathJaxSVG, 'svg')[0].outerHTML;
-
-  // MathJax SVGs use &lt; and &gt; within their tags. Normally this is fine, but in older versions of Safari the above
-  // command will convert them to < and >, which causes problems. We use a Regex to find and correct these instances.
-
-  // The regex is complicated to search for, so we save some time by checking if this is necessary the first time this
-  // comes up, and skipping afterwards if it isn't
-  const doubleTagRegex = /(<[^>]+?)<([^>]+?)>([^>]+?>)/g;
-  if (compatibilityMode == "unknown") {
-    if (svgHTML.search(doubleTagRegex) > 0)
-      compatibilityMode = true;
-    else
-      compatibilityMode = false;
-  }
-
-  if (compatibilityMode) {
-    // Since there may be multiple tags within each set of enclosing tags, we run this in a while loop until all have been
-    // found
-    let noChange = false;
-    let lastSvgHTML = svgHTML;
-    while (!noChange) {
-      svgHTML = svgHTML.replaceAll(doubleTagRegex, "$1&lt;$2&gt;$3");
-      if (svgHTML == lastSvgHTML)
-        noChange = true;
-      else
-        lastSvgHTML = svgHTML;
-    }
-  }
-
-  drawMathJaxSVG(ctx, svgHTML, x, y, fontSize, hAlign);
-}
-
-function getAsTex(s) {
-  // Escape any characters that need to be escaped
-  s = s.replaceAll("%", "\\%");
-
-  // Replace spaces with the LaTeX command for a space
-  s = s.replaceAll(" ", "\\:");
-
-  // Replace hyphens with non-breaking hyphens so they won't get interpreted as minus symbols by the parser
-  s = s.replaceAll("-", "\u2011");
-
-  // Wrap in tags for normal text
-  s = "{\\rm " + s + "}";
-
-  // Replace HTML tags with the equivalent TeX markup
-
-  // Check for combined bold/italics sections specially, since we need a different command to handle both at once
-  let changed = true;
-  while (changed) {
-    let old_s = s;
-    s = s.replaceAll(/<strong>((?!<\/strong>).*?)<em>(.*?)<\/em>(.*?)<\/strong>/gm,
-      "<strong>$1<\/strong>\\mathbfit{$2}<strong>$3<\/strong>");
-    if (s == old_s)
-      changed = false;
-  }
-
-  s = s.replaceAll("<em>", "\\textit{").replaceAll("</em>", "}")
-    .replaceAll("<strong>", "\\textbf{").replaceAll("</strong>", "}")
-    .replaceAll("<u>", "\\underline{").replaceAll("</u>", "}")
-    .replaceAll("<sub>", "_{\\rm ").replaceAll("</sub>", "}")
-    .replaceAll("<sup>", "^{\\rm ").replaceAll("</sup>", "}");
-
-  return s;
-}
-
-async function drawMathJaxSVG(ctx, svgHTML, x = 0, y = 0, fontsize = 16, hAlign = "left") {
-  let DOMURL = window.URL || window.webkitURL || window;
-  let img1 = new Image();
-  let svg = new Blob([svgHTML], { type: 'image/svg+xml' });
-  let url = DOMURL.createObjectURL(svg);
-  let scale = MATHJAX_BASE_FONT_SCALING * fontsize / MATHJAX_DEFAULT_FONT_SIZE;
-  img1.onload = function () {
-    let w = img1.naturalWidth * scale;
-    let h = img1.naturalHeight * scale;
-    let finalX = x;
-    if (hAlign == "center")
-      finalX -= w / 2;
-    ctx.drawImage(img1, finalX, y, w, h);
-    DOMURL.revokeObjectURL(url);
-  }
-  img1.src = url;
-}
-
-// Plugins for Chart JS
 const customCanvasBackgroundColorPlugin = {
   id: 'customCanvasBackgroundColor',
   beforeDraw: (chart, args, options) => {
     const { ctx } = chart;
     ctx.save();
     ctx.globalCompositeOperation = 'destination-over';
-    ctx.fillStyle = options.color || '#99ffff';
+    ctx.fillStyle = options.color || '#FFFFFF';
     ctx.fillRect(0, 0, chart.width, chart.height);
     ctx.restore();
   }
 };
 
 /**
- * Get the index value stored at the end of an event's target's ID
+ * Get the index value stored at the end of an event's target's ID, setting to the maximum possible index if the event
+ * is null
+ * @param {*} e The triggering event
+ * @param {number} indexLength The length of the axis for this index (one more than its maximum value if it's
+ *                             zero-indexed)
+ * @return {number} The index of the triggering event, or else the maximum index
  */
-function getIndexFromEvent(e) {
-  let eId = e.target.id;
-  return +(eId.split("-").at(-1));
-}
-
-function disableButton(button) {
-  button.prop({ disabled: true });
-}
-
-function enableButton(button) {
-  button.prop({ disabled: false });
+function getTargetIndex(e, indexLength) {
+  let targetIndex;
+  if (e === null) {
+    targetIndex = indexLength - 1;
+  } else {
+    let eId = e.target.id;
+    targetIndex = +(eId.split("-").at(-1));
+  }
+  return targetIndex
 }
 
 function getDimSize(dim) {
@@ -406,15 +262,6 @@ function postTableUpdateCleanup(dim, updateAfter) {
   }
 }
 
-function getTargetIndex(e, max) {
-  let targetIndex;
-  if (e === null)
-    targetIndex = max - 1;
-  else
-    targetIndex = getIndexFromEvent(e);
-  return targetIndex
-}
-
 /**
  * Relabel IDs and labels after a dimension is added to the table
  */
@@ -438,7 +285,7 @@ function relabelDim(dim) {
 
     // Set the heading text if we have any heading cells
     if (lHeadings.length > 0) {
-      let headingText = dQuillEditors["#ol-0"].getSemanticHTML();
+      let headingText = getQuillEditorHTML("#ol-0");
       updateOutputLabel(headingText);
     }
 
@@ -508,12 +355,15 @@ function addConditionRow(e, updateAfter = true) {
 
   // Clean up the Quill dict to point to the moved positions of the editors, and add an editor for the new row
   for (let i = oldNumConditions; i > targetRowIndex + 1; --i) {
-    dQuillEditors["#cl-" + i] = dQuillEditors["#cl-" + (i - 1)];
-    delete dQuillEditors["#cl-" + (i - 1)];
+    setQuillEditor("#cl-" + i, getQuillEditor("#cl-" + (i - 1)));
+    removeQuillEditor("#cl-" + (i - 1));
   }
   $("#cl-" + (targetRowIndex + 1)).html("");
-  addQuillEditor("#cl-" + (targetRowIndex + 1), CONDITION_PLACEHOLDER);
-  enableQuillEvents();
+  createQuillEditor("#cl-" + (targetRowIndex + 1), CONDITION_PLACEHOLDER);
+  enableQuillEvents(() => {
+    if (autoUpdating)
+      generatePlot();
+  });
 
   // If we skipped updating the plot before, do it now
   if (updateAfter && autoUpdating)
@@ -552,10 +402,13 @@ function removeConditionRow(e, updateAfter = true) {
 
   // Clean up the Quill dict to point to the moved positions of the editors, and add an editor for the new row
   for (let i = targetRowIndex; i < oldNumConditions - 1; ++i) {
-    dQuillEditors["#cl-" + i] = dQuillEditors["#cl-" + (i + 1)];
-    delete dQuillEditors["#cl-" + (i + 1)];
+    setQuillEditor("#cl-" + i, getQuillEditor("#cl-" + (i + 1)))
+    removeQuillEditor("#cl-" + (i + 1));
   }
-  enableQuillEvents();
+  enableQuillEvents(() => {
+    if (autoUpdating)
+      generatePlot();
+  });
 
   // If we skipped updating the plot before, do it now
   if (updateAfter && autoUpdating)
@@ -713,7 +566,7 @@ function removeOutput(e, updateAfter = true) {
 }
 
 function updateCanvasShape() {
-  $("#glorius-plot").css({
+  $(CHART_SELECTOR).css({
     "width": getWidth().toString(),
     "height": getHeight().toString()
   })
@@ -790,7 +643,7 @@ function resetPlotDims() {
 // Functions to get various options set by the user
 
 function getTitle() {
-  return dQuillEditors["#title-input"].getSemanticHTML();
+  return getQuillEditor("#title-input").getSemanticHTML();
 }
 
 function getOutputLabel(j = 0) {
@@ -804,7 +657,7 @@ function getOutputLabel(j = 0) {
   const dDevPlotModeInfo = D_DEV_PLOT_MODE_INFO[devPlotMode];
 
   // Get the cleaned output label
-  let outputLabel = dQuillEditors["#ol-0"].getSemanticHTML();
+  let outputLabel = getQuillEditorHTML("#ol-0");
   outputLabel = cleanTags(outputLabel);
 
   // Strip appropriate strings from the beginning and end of the output label
@@ -822,7 +675,7 @@ function getOutputLabel(j = 0) {
 }
 
 function getConditionLabelHTML(i) {
-  return dQuillEditors["#cl-" + i].getSemanticHTML();
+  return getQuillEditorHTML("#cl-" + i);
 }
 
 function getLConditionLabelsHTML() {
@@ -1476,7 +1329,7 @@ async function generatePlot() {
 
   if (radarChart === null) {
     // Generate the plot for the first time
-    radarChart = new Chart("glorius-plot", {
+    radarChart = new Chart(CHART_ID, {
       type: "radar",
       data: {
         labels: lOutputConditionLabels,
@@ -1492,7 +1345,7 @@ async function generatePlot() {
         },
         plugins: {
           customCanvasBackgroundColor: {
-            color: "white",
+            color: "#FFFFFF",
           },
           legend: plotLegendOptions,
           title: plotTitleOptions
@@ -1679,7 +1532,7 @@ function exportImage(format) {
   // Set the form as clean the user downloads the image
   cleanDirtyForms();
 
-  $("#glorius-plot")[0].toBlob((blob) => {
+  $(CHART_SELECTOR)[0].toBlob((blob) => {
     let objectURL = URL.createObjectURL(blob);
 
     let link = document.createElement('a');
@@ -1909,80 +1762,16 @@ function initTooltips() {
   tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
 }
 
-/**
- * Initialise a Quill editor
- */
-function addQuillEditor(selector, placeholder = "", toolbar = QUILL_TOOLBAR) {
-  const editor = new Quill(selector, {
-    modules: {
-      toolbar: toolbar
-    },
-    placeholder: placeholder,
-    theme: QUILL_THEME
-  });
-
-  dQuillEditors[selector] = editor;
-
-  editor.on("selection-change", (range) => {
-    if (range)
-      enableQuillToolbar(selector);
-    else
-      disableQuillToolbar(selector);
-  });
-}
-
-function removeQuillEditor(selector) {
-  delete dQuillEditors[selector];
-  $(selector).html("");
-}
-
-function updateQuillContents(selector, contents) {
-  $(selector + " .ql-editor p").html(contents);
-  dQuillEditors[selector].updateContents();
-}
-
-function enableQuillToolbar(selector) {
-  $(selector).parent().find(".ql-toolbar").addClass("visible");
-}
-
-function disableQuillToolbar(selector) {
-  $(selector).parent().find(".ql-toolbar").removeClass("visible");
-}
-
-function enableQuillEvents() {
-  // Set all editors to toggle toolbars when selected and auto-update the plot on change
-  Object.entries(dQuillEditors).forEach((entry) => {
-    const [selector, editor] = entry;
-
-    editor.off("selection-change");
-    editor.on("selection-change", (range) => {
-      if (range)
-        enableQuillToolbar(selector);
-      else
-        disableQuillToolbar(selector);
-    });
-
-    editor.off("text-change");
-    editor.on("text-change", () => {
-      if (autoUpdating)
-        generatePlot();
-    });
-
-  });
-
-  // Also set the output label editor to update the output label in column headings when changed
-  dQuillEditors["#ol-0"].on("text-change", () => {
-    updateOutputLabel(dQuillEditors["#ol-0"].getSemanticHTML());
-  });
-}
-
 function initQuill() {
-  addQuillEditor("#title-input", "e.g. “Reaction-condition sensitivity analysis”");
-  addQuillEditor("#ol-0", "Define outcome");
+  createQuillEditor("#title-input", "e.g. “Reaction-condition sensitivity analysis”");
+  createQuillEditor("#ol-0", "Define outcome");
   $(".condition-input").each((i, e) => {
-    addQuillEditor("#cl-" + i, CONDITION_PLACEHOLDER);
+    createQuillEditor("#cl-" + i, CONDITION_PLACEHOLDER);
   })
-  enableQuillEvents();
+  enableQuillEvents(() => {
+    if (autoUpdating)
+      generatePlot();
+  });
 }
 
 $(document).ready(function () {
