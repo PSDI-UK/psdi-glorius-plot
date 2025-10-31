@@ -360,10 +360,7 @@ function addConditionRow(e, updateAfter = true) {
   }
   $("#cl-" + (targetRowIndex + 1)).html("");
   createQuillEditor("#cl-" + (targetRowIndex + 1), CONDITION_PLACEHOLDER);
-  enableQuillEvents(() => {
-    if (autoUpdating)
-      generatePlot();
-  });
+  enableQuillEvents(generateIfUpdating);
 
   // If we skipped updating the plot before, do it now
   if (updateAfter && autoUpdating)
@@ -405,10 +402,7 @@ function removeConditionRow(e, updateAfter = true) {
     setQuillEditor("#cl-" + i, getQuillEditor("#cl-" + (i + 1)))
     removeQuillEditor("#cl-" + (i + 1));
   }
-  enableQuillEvents(() => {
-    if (autoUpdating)
-      generatePlot();
-  });
+  enableQuillEvents(() => generateIfUpdating);
 
   // If we skipped updating the plot before, do it now
   if (updateAfter && autoUpdating)
@@ -635,8 +629,7 @@ function resetPlotDims() {
   lastAspectRatio = getAspectRatio();
   updateFontSize();
 
-  if (autoUpdating)
-    generatePlot();
+  generateIfUpdating();
 }
 
 
@@ -1399,6 +1392,14 @@ async function generatePlot() {
 }
 
 /**
+ * Convenience function to generate a new plot only if auto updating is turned on
+ */
+function generateIfUpdating() {
+  if (autoUpdating)
+    generatePlot();
+}
+
+/**
  * Fill the existing cells with random data
  */
 function fillRandom() {
@@ -1440,9 +1441,7 @@ function fillRandom() {
   }
 
   autoUpdating = lastAutoUpdating;
-  if (autoUpdating) {
-    generatePlot();
-  }
+  generateIfUpdating();
 
   // Set the current state of the form as "clean"
   cleanDirtyForms();
@@ -1697,8 +1696,7 @@ function updateColourSchemeSelection() {
     customColorInput.removeClass("hidden");
   }
 
-  if (autoUpdating)
-    generatePlot();
+  generateIfUpdating();
 }
 
 /**
@@ -1768,10 +1766,7 @@ function initQuill() {
   $(".condition-input").each((i, e) => {
     createQuillEditor("#cl-" + i, CONDITION_PLACEHOLDER);
   })
-  enableQuillEvents(() => {
-    if (autoUpdating)
-      generatePlot();
-  });
+  enableQuillEvents(generateIfUpdating);
 }
 
 $(document).ready(function () {
