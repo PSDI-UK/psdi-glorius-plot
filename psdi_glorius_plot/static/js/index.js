@@ -12,20 +12,13 @@ import {
   updateQuillContents, enableQuillEvents, cleanTags, stripTags, waitForMathJax, drawFormatted,
 } from "./formatted-labels.js"
 
-const CHART_ID = "glorius-plot"
-const CHART_SELECTOR = `#${CHART_ID}`
+const CHART_ID = "glorius-plot", CHART_SELECTOR = `#${CHART_ID}`;
 
 const DIRTY_FORMS_MESSAGE = "Data currently entered in the form will be lost. Do you want to proceed?";
 
 const LABEL_FONT_FAMILY = "'Fira Sans', sans-serif";
 
-const CONDITION = "condition";
-const SAMPLE = "sample";
-const OUTPUT = "output";
-
-const L_DIMS = [CONDITION, SAMPLE, OUTPUT];
-
-const COLOR_TRANSPARENT = "#FFFFFF00";
+const CONDITION = "condition", SAMPLE = "sample", OUTPUT = "output", L_DIMS = [CONDITION, SAMPLE, OUTPUT];
 
 const D_DIM_LIMITS = {
   condition: {
@@ -64,12 +57,9 @@ const D_COLOR_SCHEMES = {
 
 const CONDITION_PLACEHOLDER = "e.g. “High conc.”";
 
-const DEFAULT_VALUE_MEAN = 100;
-const VALUE_MIN = 0.;
-const VALUE_MAX = 100.;
+const DEFAULT_VALUE_MEAN = 100, VALUE_MIN = 0., VALUE_MAX = 100.;
 
-const RAND_BASELINE_MIN = 60.;
-const RAND_BASELINE_MAX = 100.;
+const RAND_BASELINE_MIN = 60., RAND_BASELINE_MAX = 100.;
 
 const OUTPUT_LABEL_TEXT = "Output {N} Label:";
 
@@ -101,13 +91,11 @@ const D_DEV_PLOT_MODE_INFO = {
 }
 
 // Plot styling
-const L_BORDER_DASHES = [[], [6, 6], [4, 4], [2, 2], [1, 1]];
-const BORDER_WIDTH = 4;
-const BASELINE_WIDTH = 4;
-const BASELINE_COLOR = "#FFFFFF";
+const COLOR_TRANSPARENT = "#FFFFFF00";
+const BORDER_WIDTH = 4, L_BORDER_DASHES = [[], [6, 6], [4, 4], [2, 2], [1, 1]];
+const BASELINE_WIDTH = 4, BASELINE_COLOR = "#FFFFFF";
 const DATA_BG_COLOR = [COLOR_TRANSPARENT];
-const GRID_WIDTH = 1;
-const GRID_COLOR = "#00000080";
+const GRID_WIDTH = 1, GRID_COLOR = "#00000080";
 
 // When the script is initially loaded, store a copy of a heading element and cell elements that we'll later use
 // as templates to add new rows
@@ -121,18 +109,9 @@ const TEMPLATE_REL_DEVIATION_INPUT_LINE = $(".rel-deviation-input-line")[0].clon
 
 // Globals
 let tooltipList;
-
-let autoUpdating = false;
-let directInput = false;
-let radarChart = null;
-
-let lastAspectRatio;
-let lastFontSizeWidthRatio;
-let lastFontSizeHeightRatio;
-
-let initWidth;
-let initHeight;
-let initFontSize;
+let autoUpdating = false, directInput = false, radarChart = null;
+let lastAspectRatio, lastFontSizeWidthRatio, lastFontSizeHeightRatio;
+let initWidth, initHeight, initFontSize;
 
 /**
  * A ChartJS plugin which allows a custom background color for the plot
@@ -791,9 +770,7 @@ function getDataSorting() {
  * Calculate the deviation for each condition
  */
 function calcDeviation() {
-  const numConditions = getNumConditions();
-  const numOutputs = getNumOutputs();
-  const numSamples = getNumSamples();
+  const numConditions = getNumConditions(), numOutputs = getNumOutputs(), numSamples = getNumSamples();
 
   const baselineRow = $(".baseline-row");
   const lBaselineCells = baselineRow.find(".baseline-value-cell");
@@ -893,55 +870,38 @@ async function generatePlot() {
   }
 
   // Collect info from the settings and determine data based on them
-  const numConditions = getNumConditions();
-  const numOutputs = getNumOutputs();
+  const numConditions = getNumConditions(), numOutputs = getNumOutputs();
 
-  const minOutput = getMinOutput();
-  const maxOutput = getMaxOutput();
-  const outputMidpoint = getOutputMidpoint();
+  const minOutput = getMinOutput(), maxOutput = getMaxOutput(), outputMidpoint = getOutputMidpoint();
   const bandWidth = getBandWidth();
 
   const fanMode = getFanMode();
 
-  const showGridLines = getShowGridLines();
-  const showAxisLines = getShowAxisLines();
+  const showGridLines = getShowGridLines(), showAxisLines = getShowAxisLines();
 
-  const minColor = getMinColor();
-  const maxColor = getMaxColor();
+  const minColor = getMinColor(), maxColor = getMaxColor();
 
-  const tipSize = getTipSize();
-  const baseSeparation = getBarSeparation();
+  const tipSize = getTipSize(), baseSeparation = getBarSeparation();
   const barSize = 2 * (tipSize + baseSeparation + 1);
   const numAnglePoints = numConditions * barSize;
 
   // Create data we'll plot in the chart
-  const lOutputLabels = [];
   const llData = [];
+  const lOutputLabels = [];
   const lOrder = [];
-  const lBorderColors = [];
-  const lBorderWidths = [];
-  const lBackgroundColors = [];
-  const lFill = [];
+  const lBorderColors = [], lBorderWidths = [];
+  const lBackgroundColors = [], lFill = [];
   const lBorderDashes = [];
 
   let numAxisLines;
-
-  let numBgColorsLow;
-  let numBgColorsHi;
-  let numBgColors;
-
+  let numBgColorsLow, numBgColorsHi, numBgColors;
   let numDatasetMultiplier;
 
 
   // If in radar mode, we make some fake data to use as background colors and grid lines
 
   if (fanMode) {
-    numAxisLines = 0;
-
-    numBgColorsLow = 0;
-    numBgColorsHi = 0;
-    numBgColors = 0;
-
+    numAxisLines = numBgColorsLow = numBgColorsHi = numBgColors = 0;
     numDatasetMultiplier = numConditions;
   }
 
@@ -959,10 +919,8 @@ async function generatePlot() {
 
   llData.push(lMidpointData);
   lOrder.push(1);
-  lBorderColors.push(BASELINE_COLOR);
-  lBackgroundColors.push(BASELINE_COLOR);
-  lFill.push(false);
-  lBorderDashes.push([]);
+  lBorderColors.push(BASELINE_COLOR), lBorderDashes.push([]);
+  lBackgroundColors.push(BASELINE_COLOR), lFill.push(false);
 
   if (fanMode)
     lBorderWidths.push(0);
@@ -976,21 +934,18 @@ async function generatePlot() {
     const numLowBands = Math.ceil((outputMidpoint - minOutput) / bandWidth);
     const numHiBands = Math.ceil((maxOutput - outputMidpoint) / bandWidth);
 
-    numBgColorsLow = numLowBands;
-    numBgColorsHi = numHiBands + 1;
+    numBgColorsLow = numLowBands, numBgColorsHi = numHiBands + 1;
     numBgColors = numBgColorsLow + numBgColorsHi;
 
     numDatasetMultiplier = 1;
 
-    const lBgColorBoundsLow = [];
-    const lBgOrderLow = [];
+    const lBgColorBoundsLow = [], lBgOrderLow = [];
     for (let i = 0; i < numBgColorsLow; ++i) {
       lBgColorBoundsLow.push(Math.max(outputMidpoint - bandWidth * (i + 1), minOutput));
       lBgOrderLow.push(i + 1);
     }
 
-    const lBgColorBoundsHi = [];
-    const lBgOrderHi = [];
+    const lBgColorBoundsHi = [], lBgOrderHi = [];
     for (let i = 0; i < numBgColorsHi; ++i) {
       lBgColorBoundsHi.push(Math.min(outputMidpoint + bandWidth * i, maxOutput));
       lBgOrderHi.push(i + 1);
@@ -1009,17 +964,13 @@ async function generatePlot() {
       if (numBgColorsHi > 1)
         colorRatio = k / (numBgColorsHi - 1);
       let backgroundColor = mixHexes(maxColor, "#FFFFFF", colorRatio);
-      lBackgroundColors.push(backgroundColor);
+      lBackgroundColors.push(backgroundColor), lFill.push(0);
 
-      if (showGridLines) {
-        lBorderColors.push(GRID_COLOR);
-        lBorderWidths.push(GRID_WIDTH);
-      } else {
-        lBorderColors.push(backgroundColor);
-        lBorderWidths.push(0);
-      }
+      if (showGridLines)
+        lBorderColors.push(GRID_COLOR), lBorderWidths.push(GRID_WIDTH);
+      else
+        lBorderColors.push(backgroundColor), lBorderWidths.push(0);
 
-      lFill.push(0);
       lBorderDashes.push([]);
     }
 
@@ -1034,17 +985,12 @@ async function generatePlot() {
 
       let colorRatio = (k + 1) / numBgColorsLow;
       let backgroundColor = mixHexes(minColor, "#FFFFFF", colorRatio);
-      lBackgroundColors.push(backgroundColor);
+      lBackgroundColors.push(backgroundColor), lFill.push(0);
 
-      if (showGridLines) {
-        lBorderColors.push(GRID_COLOR);
-        lBorderWidths.push(GRID_WIDTH);
-      } else {
-        lBorderColors.push(backgroundColor);
-        lBorderWidths.push(0);
-      }
-
-      lFill.push(0);
+      if (showGridLines)
+        lBorderColors.push(GRID_COLOR), lBorderWidths.push(GRID_WIDTH);
+      else
+        lBorderColors.push(backgroundColor), lBorderWidths.push(0);
       lBorderDashes.push([]);
     }
 
@@ -1062,11 +1008,8 @@ async function generatePlot() {
         }
         llData.push(lFakeData);
         lOrder.push(-1);
-        lBorderColors.push(GRID_COLOR);
-        lBorderWidths.push(GRID_WIDTH);
-        lBackgroundColors.push(DATA_BG_COLOR);
-        lFill.push(false);
-        lBorderDashes.push([]);
+        lBorderColors.push(GRID_COLOR), lBorderWidths.push(GRID_WIDTH), lBorderDashes.push([]);
+        lBackgroundColors.push(DATA_BG_COLOR), lFill.push(false);
       }
     } else {
       numAxisLines = 0;
@@ -1097,11 +1040,8 @@ async function generatePlot() {
 
     llData.push(lInvisibleData);
     lOrder.push(999);
-    lBorderColors.push("black");
-    lBorderWidths.push(BORDER_WIDTH);
-    lBorderDashes.push(L_BORDER_DASHES[j]);
-    lBackgroundColors.push("white");
-    lFill.push(false);
+    lBorderColors.push("black"), lBorderWidths.push(BORDER_WIDTH), lBorderDashes.push(L_BORDER_DASHES[j]);
+    lBackgroundColors.push("white"), lFill.push(false);
   }
 
   // Get data for each output
@@ -1114,18 +1054,13 @@ async function generatePlot() {
   for (let i = 0; i < numConditions; ++i) {
     let lSingleConditionData = [];
 
-    let valueSelector;
-    let inputSelector;
-    if (devPlotMode == "mean") {
-      valueSelector = ".mean-value-cell"
-      inputSelector = "input.mean-value"
-    } else if (devPlotMode == "absolute") {
-      valueSelector = ".abs-deviation-value-cell"
-      inputSelector = "input.abs-deviation-value"
-    } else {
-      valueSelector = ".rel-deviation-value-cell"
-      inputSelector = "input.rel-deviation-value"
-    }
+    let valueSelector, inputSelector;
+    if (devPlotMode == "mean")
+      valueSelector = ".mean-value-cell", inputSelector = "input.mean-value"
+    else if (devPlotMode == "absolute")
+      valueSelector = ".abs-deviation-value-cell", inputSelector = "input.abs-deviation-value"
+    else
+      valueSelector = ".rel-deviation-value-cell", inputSelector = "input.rel-deviation-value"
     const lCells = lSensRows.eq(i).find(valueSelector);
     const lInputs = lCells.eq(0).find(inputSelector);
 
@@ -1206,9 +1141,7 @@ async function generatePlot() {
     for (let i = 0; i < numDatasetMultiplier; ++i) {
       lOutputLabels.push("")
       lOrder.push(0);
-      lBorderColors.push("black");
-      lBorderWidths.push(BORDER_WIDTH);
-      lBorderDashes.push(L_BORDER_DASHES[j]);
+      lBorderColors.push("black"), lBorderWidths.push(BORDER_WIDTH), lBorderDashes.push(L_BORDER_DASHES[j]);
 
       if (fanMode) {
         let color;
@@ -1464,9 +1397,7 @@ function fillExample() {
   const lastAutoUpdating = autoUpdating;
   autoUpdating = false;
 
-  setNumDim(OUTPUT, 1);
-  setNumDim(CONDITION, 10);
-  setNumDim(SAMPLE, 1);
+  setNumDim(OUTPUT, 1), setNumDim(CONDITION, 10), setNumDim(SAMPLE, 1);
 
   // Set the title and output label
   $("#title-input .ql-editor p").html("<b>Reaction-condition sensitivity analysis for 1,3-cyclization</b>");
@@ -1744,12 +1675,9 @@ function toggleAutoUpdates(e) {
  */
 function initGlobals() {
   lastAspectRatio = getAspectRatio();
-  lastFontSizeWidthRatio = getFontSizeWidthRatio();
-  lastFontSizeHeightRatio = getFontSizeHeightRatio();
+  lastFontSizeWidthRatio = getFontSizeWidthRatio(), lastFontSizeHeightRatio = getFontSizeHeightRatio();
 
-  initWidth = getWidth();
-  initHeight = getHeight();
-  initFontSize = getFontSize();
+  initWidth = getWidth(), initHeight = getHeight(), initFontSize = getFontSize();
 }
 
 /**
@@ -1771,20 +1699,12 @@ function initQuill() {
 
 $(document).ready(function () {
 
-  initTooltips();
-  initGlobals();
   initDirtyForms("form", DIRTY_FORMS_MESSAGE);
-  initQuill();
+
+  initTooltips(), initGlobals(), initQuill();
 
   L_DIMS.forEach(dim => initNumDimControls(dim));
+  enableOnChangeTriggers(), enableToggles(), enableButtons();
 
-  enableOnChangeTriggers();
-  enableToggles();
-  enableButtons();
-
-  enableDeviationCalc();
-
-  enableAutoUpdates();
-
-  enableCanvasUpdate();
+  enableDeviationCalc(), enableAutoUpdates(), enableCanvasUpdate();
 });
