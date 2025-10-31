@@ -1,6 +1,8 @@
 /**
- * This file contains code to mix colors at a specified ratio, based off of code found at
+ * @file This file contains code to mix colors at a specified ratio, based off of code found at
  * https://stackoverflow.com/a/62369367/5099457
+ * @date 2025-10-31
+ * @author Bryan Gillis
  */
 
 function hex2dec(hex) {
@@ -45,7 +47,7 @@ function cmyk2rgb(c, m, y, k) {
   return [r, g, b];
 }
 
-function mix_cmyks(cmyk1, cmyk2, ratio1) {
+function mixCmyks(cmyk1, cmyk2, ratio1) {
 
   // Clamp the ratio between 0 and 1
   ratio1 = Math.min(Math.max(ratio1, 0), 1);
@@ -58,7 +60,14 @@ function mix_cmyks(cmyk1, cmyk2, ratio1) {
   return [c, m, y, k];
 }
 
-export function mix_hexes(hex1, hex2, ratio1) {
+/**
+ * Calculates the hev value mix of two colors, from their hex values
+ * @param {string} hex1 The hex value of the first color, not including transparency, e.g #FFFFFF
+ * @param {string} hex2 The hex value of the second color, not including transparency, e.g #FFFFFF
+ * @param {number} ratio1 The ratio of the first color to include in the mix, between 0 and 1
+ * @returns 
+ */
+export function mixHexes(hex1, hex2, ratio1) {
 
   let rgb1 = hex2dec(hex1);
   let rgb2 = hex2dec(hex2);
@@ -66,10 +75,10 @@ export function mix_hexes(hex1, hex2, ratio1) {
   let cmyk1 = rgb2cmyk(...rgb1);
   let cmyk2 = rgb2cmyk(...rgb2);
 
-  let cmyk_mix = mix_cmyks(cmyk1, cmyk2, ratio1);
+  let cmykMix = mixCmyks(cmyk1, cmyk2, ratio1);
 
-  let rgb_mix = cmyk2rgb(...cmyk_mix);
-  let hex_mix = rgb2hex(...rgb_mix);
+  let rgbMix = cmyk2rgb(...cmykMix);
+  let hexMix = rgb2hex(...rgbMix);
 
-  return hex_mix;
+  return hexMix;
 }

@@ -7,7 +7,7 @@
  */
 
 import { initDirtyForms, cleanDirtyForms, checkIsDirty } from "./dirty-forms.js";
-import { mix_hexes } from "./color.js"
+import { mixHexes } from "./color-mixing.js"
 import { clamp, getWebKitMode } from "./utility.js"
 
 const DIRTY_FORMS_MESSAGE = "Data currently entered in the form will be lost. Do you want to proceed?";
@@ -1164,7 +1164,7 @@ async function generatePlot() {
       let colorRatio = 1;
       if (numBgColorsHi > 1)
         colorRatio = k / (numBgColorsHi - 1);
-      let backgroundColor = mix_hexes(maxColor, "#FFFFFF", colorRatio);
+      let backgroundColor = mixHexes(maxColor, "#FFFFFF", colorRatio);
       lBackgroundColors.push(backgroundColor);
 
       if (showGridLines) {
@@ -1189,7 +1189,7 @@ async function generatePlot() {
       lOrder.push(lBgOrderLow[k]);
 
       let colorRatio = (k + 1) / numBgColorsLow;
-      let backgroundColor = mix_hexes(minColor, "#FFFFFF", colorRatio);
+      let backgroundColor = mixHexes(minColor, "#FFFFFF", colorRatio);
       lBackgroundColors.push(backgroundColor);
 
       if (showGridLines) {
@@ -1374,7 +1374,7 @@ async function generatePlot() {
             color = maxColor;
           } else {
             let colorRatio = (clampedVal - outputMidpoint) / (maxOutput - outputMidpoint);
-            color = mix_hexes(maxColor, "#FFFFFF", colorRatio);
+            color = mixHexes(maxColor, "#FFFFFF", colorRatio);
           }
         }
         else {
@@ -1382,7 +1382,7 @@ async function generatePlot() {
             color = minColor;
           } else {
             let colorRatio = (outputMidpoint - clampedVal) / (outputMidpoint - minOutput);
-            color = mix_hexes(minColor, "#FFFFFF", colorRatio);
+            color = mixHexes(minColor, "#FFFFFF", colorRatio);
           }
         }
         lBackgroundColors.push(color);
