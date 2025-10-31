@@ -1,9 +1,7 @@
 /**
- * @file index.js
+ * @file JavaScript code to handle the special functionality of the index.html page
  * @date 2025-08-06
  * @author Bryan Gillis
- *
- * JavaScript code to handle the special functionality of the index.html page
  */
 
 import { initDirtyForms, cleanDirtyForms, checkIsDirty } from "./dirty-forms.js";

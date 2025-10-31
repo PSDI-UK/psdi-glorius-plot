@@ -1,7 +1,6 @@
 /**
- * This file contains convenience functions for working the the Dirty Forms JQuery plugin, which keeps track if form
+ * @file This file contains convenience functions for working the the Dirty Forms JQuery plugin, which keeps track if form
  * data has been modified, and warns the user before leaving the page if this is the case
- * @file dirty-forms.js
  * @date 2025-02-14
  * @author Bryan Gillis
  */

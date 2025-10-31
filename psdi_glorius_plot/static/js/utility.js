@@ -1,6 +1,5 @@
 /**
- * Random utility functions not tied to any particular file
- * @file utility.js
+ * @file Random utility functions not tied to any particular file
  * @date 2025-10-31
  * @author Bryan Gillis
  */
