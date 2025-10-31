@@ -1,25 +1,24 @@
 /**
- * @file index.js
+ * @file JavaScript code to handle the special functionality of the index.html page
  * @date 2025-08-06
  * @author Bryan Gillis
- *
- * JavaScript code to handle the special functionality of the index.html page
  */
 
-import { initDirtyForms, cleanDirtyForms } from "./common.js";
-import { mix_hexes } from "./color.js"
+import { initDirtyForms, cleanDirtyForms, checkIsDirty } from "./dirty-forms.js";
+import { mixHexes } from "./color-mixing.js"
+import { clamp, disableButton, enableButton, getWebKitMode } from "./utility.js"
+import {
+  addQuillEditor as createQuillEditor, getQuillEditor, getQuillEditorHTML, setQuillEditor, removeQuillEditor,
+  updateQuillContents, enableQuillEvents, cleanTags, stripTags, waitForMathJax, drawFormatted,
+} from "./formatted-labels.js"
+
+const CHART_ID = "glorius-plot", CHART_SELECTOR = `#${CHART_ID}`;
+
+const DIRTY_FORMS_MESSAGE = "Data currently entered in the form will be lost. Do you want to proceed?";
 
 const LABEL_FONT_FAMILY = "'Fira Sans', sans-serif";
-const QUILL_THEME = "snow";
-const QUILL_TOOLBAR = ['bold', 'italic', 'underline', { 'script': 'sub' }, { 'script': 'super' }];
 
-const CONDITION = "condition";
-const SAMPLE = "sample";
-const OUTPUT = "output";
-
-const L_DIMS = [CONDITION, SAMPLE, OUTPUT];
-
-const COLOR_TRANSPARENT = "#FFFFFF00";
+const CONDITION = "condition", SAMPLE = "sample", L_DIMS = [CONDITION, SAMPLE];
 
 const D_DIM_LIMITS = {
   condition: {
@@ -29,10 +28,6 @@ const D_DIM_LIMITS = {
   sample: {
     min: 1,
     max: 10
-  },
-  output: {
-    min: 1,
-    max: 2
   }
 };
 
@@ -58,22 +53,9 @@ const D_COLOR_SCHEMES = {
 
 const CONDITION_PLACEHOLDER = "e.g. “High conc.”";
 
-const DEFAULT_VALUE_MEAN = 100;
-const VALUE_MIN = 0.;
-const VALUE_MAX = 100.;
+const DEFAULT_VALUE_MEAN = 100, VALUE_MIN = 0., VALUE_MAX = 100.;
 
-const RAND_BASELINE_MIN = 60.;
-const RAND_BASELINE_MAX = 100.;
-
-const MATHJAX_DEFAULT_FONT_SIZE = 16;
-const MATHJAX_BASE_FONT_SCALING = 1.125;
-
-const WEBKIT_FONT_SCALING = 8. / 9.;
-
-const T_WAIT = 100;
-const MAX_ELAPSED = 500;
-
-const OUTPUT_LABEL_TEXT = "Output {N} Label:";
+const RAND_BASELINE_MIN = 60., RAND_BASELINE_MAX = 100.;
 
 const D_DEV_PLOT_MODE_INFO = {
   relative: {
@@ -103,33 +85,11 @@ const D_DEV_PLOT_MODE_INFO = {
 }
 
 // Plot styling
-const L_BORDER_DASHES = [[], [6, 6], [4, 4], [2, 2], [1, 1]];
-const BORDER_WIDTH = 4;
-const BASELINE_WIDTH = 4;
-const BASELINE_COLOR = "#FFFFFF";
+const COLOR_TRANSPARENT = "#FFFFFF00";
+const BORDER_WIDTH = 4, L_BORDER_DASHES = [[], [6, 6], [4, 4], [2, 2], [1, 1]];
+const BASELINE_WIDTH = 4, BASELINE_COLOR = "#FFFFFF";
 const DATA_BG_COLOR = [COLOR_TRANSPARENT];
-const GRID_WIDTH = 1;
-const GRID_COLOR = "#00000080";
-
-// Globals
-let tooltipList;
-
-let autoUpdating = false;
-let directInput = false;
-let radarChart = null;
-
-let lastAspectRatio;
-let lastFontSizeWidthRatio;
-let lastFontSizeHeightRatio;
-
-let initWidth;
-let initHeight;
-let initFontSize;
-
-let compatibilityMode = "unknown";
-let webkitMode = null;
-
-const dQuillEditors = {};
+const GRID_WIDTH = 1, GRID_COLOR = "#00000080";
 
 // When the script is initially loaded, store a copy of a heading element and cell elements that we'll later use
 // as templates to add new rows
@@ -141,209 +101,55 @@ const TEMPLATE_MEAN_INPUT_LINE = $(".mean-input-line")[0].cloneNode(true);
 const TEMPLATE_ABS_DEVIATION_INPUT_LINE = $(".abs-deviation-input-line")[0].cloneNode(true);
 const TEMPLATE_REL_DEVIATION_INPUT_LINE = $(".rel-deviation-input-line")[0].cloneNode(true);
 
-// Common functions
-
-function clamp(x, min, max) {
-  return Math.min(Math.max(x, min), max);
-}
-
-/**
- * Get whether or not a WebKit-based browser is being used
- */
-function getWebKitMode() {
-  if (webkitMode === null) {
-    if (typeof window.webkitConvertPointFromNodeToPage === 'function')
-      webkitMode = true;
-    else
-      webkitMode = false;
-  }
-  return webkitMode;
-}
+// Globals
+let tooltipList;
+let autoUpdating = false, directInput = false, radarChart = null;
+let lastAspectRatio, lastFontSizeWidthRatio, lastFontSizeHeightRatio;
+let initWidth, initHeight, initFontSize;
 
 /**
- * MathJax is loaded asynchronously, so early calls to generate the plot may not have it. This waits to ensure it's
- * available
+ * A ChartJS plugin which allows a custom background color for the plot
  */
-async function waitForMathJax() {
-  await new Promise(resolve => {
-
-    let interval;
-    let elapsed = 0;
-
-    const checkForMathJax = function () {
-      elapsed += T_WAIT;
-      if (MathJax.tex2svg || elapsed >= MAX_ELAPSED) {
-        clearInterval(interval);
-        resolve();
-      }
-    };
-
-    interval = setInterval(checkForMathJax, T_WAIT);
-  });
-}
-
-/**
- * Cleans up an HTML string to replace non-breaking spaces with regular spaces and remove any tags and data we aren't
- * doing anything with.
- * @param {string} s 
- * @returns {string}
- */
-function cleanTags(s) {
-  return s.replaceAll("&nbsp;", " ")
-    .replaceAll("<p>", "").replaceAll("</p>", "")
-    .replaceAll("<br>", "")
-    .replaceAll(/<span\b[^>]*>/gm, "").replaceAll("</span>", "")
-    .replaceAll(/<([a-zA-Z]+)\b[^>]*>/gm, "<$1>");
-}
-
-/**
- * Removes all relevant HTML tags from a string, including those that are used in other parts of the code for formatting
- * @param {string} s 
- * @returns {string}
- */
-function stripTags(s) {
-  return cleanTags(s)
-    .replaceAll("<em>", "").replaceAll("</em>", "")
-    .replaceAll("<strong>", "").replaceAll("</strong>", "")
-    .replaceAll("<u>", "").replaceAll("</u>", "")
-    .replaceAll("<sub>", "").replaceAll("</sub>", "")
-    .replaceAll("<sup>", "").replaceAll("</sup>", "");
-}
-
-async function drawFormatted(ctx, labelHTML, x, y, fontSize, hAlign) {
-  if (labelHTML == "")
-    return;
-
-  const adaptor = MathJax.startup.adaptor;
-  const mathJaxSVG = await MathJax.tex2svgPromise(getAsTex(labelHTML));
-  let svgHTML = adaptor.tags(mathJaxSVG, 'svg')[0].outerHTML;
-
-  // MathJax SVGs use &lt; and &gt; within their tags. Normally this is fine, but in older versions of Safari the above
-  // command will convert them to < and >, which causes problems. We use a Regex to find and correct these instances.
-
-  // The regex is complicated to search for, so we save some time by checking if this is necessary the first time this
-  // comes up, and skipping afterwards if it isn't
-  const doubleTagRegex = /(<[^>]+?)<([^>]+?)>([^>]+?>)/g;
-  if (compatibilityMode == "unknown") {
-    if (svgHTML.search(doubleTagRegex) > 0)
-      compatibilityMode = true;
-    else
-      compatibilityMode = false;
-  }
-
-  if (compatibilityMode) {
-    // Since there may be multiple tags within each set of enclosing tags, we run this in a while loop until all have been
-    // found
-    let noChange = false;
-    let lastSvgHTML = svgHTML;
-    while (!noChange) {
-      svgHTML = svgHTML.replaceAll(doubleTagRegex, "$1&lt;$2&gt;$3");
-      if (svgHTML == lastSvgHTML)
-        noChange = true;
-      else
-        lastSvgHTML = svgHTML;
-    }
-  }
-
-  drawMathJaxSVG(ctx, svgHTML, x, y, fontSize, hAlign);
-}
-
-function getAsTex(s) {
-  // Escape any characters that need to be escaped
-  s = s.replaceAll("%", "\\%");
-
-  // Replace spaces with the LaTeX command for a space
-  s = s.replaceAll(" ", "\\:");
-
-  // Replace hyphens with non-breaking hyphens so they won't get interpreted as minus symbols by the parser
-  s = s.replaceAll("-", "\u2011");
-
-  // Wrap in tags for normal text
-  s = "{\\rm " + s + "}";
-
-  // Replace HTML tags with the equivalent TeX markup
-
-  // Check for combined bold/italics sections specially, since we need a different command to handle both at once
-  let changed = true;
-  while (changed) {
-    let old_s = s;
-    s = s.replaceAll(/<strong>((?!<\/strong>).*?)<em>(.*?)<\/em>(.*?)<\/strong>/gm,
-      "<strong>$1<\/strong>\\mathbfit{$2}<strong>$3<\/strong>");
-    if (s == old_s)
-      changed = false;
-  }
-
-  s = s.replaceAll("<em>", "\\textit{").replaceAll("</em>", "}")
-    .replaceAll("<strong>", "\\textbf{").replaceAll("</strong>", "}")
-    .replaceAll("<u>", "\\underline{").replaceAll("</u>", "}")
-    .replaceAll("<sub>", "_{\\rm ").replaceAll("</sub>", "}")
-    .replaceAll("<sup>", "^{\\rm ").replaceAll("</sup>", "}");
-
-  return s;
-}
-
-async function drawMathJaxSVG(ctx, svgHTML, x = 0, y = 0, fontsize = 16, hAlign = "left") {
-  let DOMURL = window.URL || window.webkitURL || window;
-  let img1 = new Image();
-  let svg = new Blob([svgHTML], { type: 'image/svg+xml' });
-  let url = DOMURL.createObjectURL(svg);
-  let scale = MATHJAX_BASE_FONT_SCALING * fontsize / MATHJAX_DEFAULT_FONT_SIZE;
-  img1.onload = function () {
-    let w = img1.naturalWidth * scale;
-    let h = img1.naturalHeight * scale;
-    let finalX = x;
-    if (hAlign == "center")
-      finalX -= w / 2;
-    ctx.drawImage(img1, finalX, y, w, h);
-    DOMURL.revokeObjectURL(url);
-  }
-  img1.src = url;
-}
-
-// Plugins for Chart JS
 const customCanvasBackgroundColorPlugin = {
   id: 'customCanvasBackgroundColor',
   beforeDraw: (chart, args, options) => {
     const { ctx } = chart;
     ctx.save();
     ctx.globalCompositeOperation = 'destination-over';
-    ctx.fillStyle = options.color || '#99ffff';
+    ctx.fillStyle = options.color || '#FFFFFF';
     ctx.fillRect(0, 0, chart.width, chart.height);
     ctx.restore();
   }
 };
 
 /**
- * Get the index value stored at the end of an event's target's ID
+ * Get the index value stored at the end of an event's target's ID, setting to the maximum possible index if the event
+ * is null
+ * @param {*} e The triggering event
+ * @param {number} indexLength The length of the axis for this index (one more than its maximum value if it's
+ *                             zero-indexed)
+ * @return {number} The index of the triggering event, or else the maximum index
  */
-function getIndexFromEvent(e) {
-  let eId = e.target.id;
-  return +(eId.split("-").at(-1));
-}
-
-function disableButton(button) {
-  button.prop({ disabled: true });
-}
-
-function enableButton(button) {
-  button.prop({ disabled: false });
+function getTargetIndex(e, indexLength) {
+  let targetIndex;
+  if (e === null) {
+    targetIndex = indexLength - 1;
+  } else {
+    let eId = e.target.id;
+    targetIndex = +(eId.split("-").at(-1));
+  }
+  return targetIndex
 }
 
 function getDimSize(dim) {
   if (dim == CONDITION)
     return getNumConditions();
-  else if (dim == OUTPUT)
-    return getNumOutputs();
   else
     return getNumSamples();
 }
 
 function getNumConditions() {
   return $(".condition-row").length;
-}
-
-function getNumOutputs() {
-  return $(".output-label-row").length;
 }
 
 function getNumSamples() {
@@ -353,19 +159,15 @@ function getNumSamples() {
 function addDim(dim, e, updateAfter) {
   if (dim == CONDITION)
     return addConditionRow(e, updateAfter);
-  else if (dim == SAMPLE)
-    return addSampleCol(e, updateAfter);
   else
-    return addOutput(e, updateAfter);
+    return addSampleCol(e, updateAfter);
 }
 
 function removeDim(dim, e, updateAfter) {
   if (dim == CONDITION)
     return removeConditionRow(e, updateAfter);
-  else if (dim == SAMPLE)
-    return removeSampleCol(e, updateAfter);
   else
-    return removeOutput(e, updateAfter);
+    return removeSampleCol(e, updateAfter);
 }
 
 function setNumDim(dim, num, updateAfter = true) {
@@ -416,20 +218,12 @@ function postTableUpdateCleanup(dim, updateAfter) {
     updateMeanColumn();
     updatePlotSelect();
 
-    // Also update the plot if desired
+    // Also update the plot if desired - we call enableAutoUpdates here to make sure any new inputs have proper triggers
+    // set up. This will also then call generatePlot
     if (autoUpdating) {
       enableAutoUpdates();
     }
   }
-}
-
-function getTargetIndex(e, max) {
-  let targetIndex;
-  if (e === null)
-    targetIndex = max - 1;
-  else
-    targetIndex = getIndexFromEvent(e);
-  return targetIndex
 }
 
 /**
@@ -441,12 +235,10 @@ function relabelDim(dim) {
   const num = getDimSize(dim);
   const lButtonCells = $(`.${dim}-button-cell`);
   const lHeadings = $(`.${dim}-heading`);
-  const lLabels = $(`.${dim}-label`);
   const lInputs = $(`.${dim}-input`);
 
   for (let i = 0; i < num; i++) {
     const sI = i.toString();
-    const sI1 = (i + 1).toString();
 
     // Fix the IDs of the buttons
     const buttonCell = lButtonCells.eq(i);
@@ -455,18 +247,13 @@ function relabelDim(dim) {
 
     // Set the heading text if we have any heading cells
     if (lHeadings.length > 0) {
-      let headingText = dQuillEditors["#ol-0"].getSemanticHTML();
+      let headingText = getQuillEditorHTML("#ol-0");
       updateOutputLabel(headingText);
     }
 
     // Set the label and input text if we have any of those cells
     if (lInputs.length > 0) {
       lInputs.eq(i).attr("id", `${d}l-${sI}`);
-      if (lLabels.length > 0) {
-        const label = lLabels.eq(i);
-        label.text(OUTPUT_LABEL_TEXT.replace("{N}", sI1));
-        label.attr("for", `${d}l-${sI}`);
-      }
     }
   }
 
@@ -525,12 +312,12 @@ function addConditionRow(e, updateAfter = true) {
 
   // Clean up the Quill dict to point to the moved positions of the editors, and add an editor for the new row
   for (let i = oldNumConditions; i > targetRowIndex + 1; --i) {
-    dQuillEditors["#cl-" + i] = dQuillEditors["#cl-" + (i - 1)];
-    delete dQuillEditors["#cl-" + (i - 1)];
+    setQuillEditor("#cl-" + i, getQuillEditor("#cl-" + (i - 1)));
+    removeQuillEditor("#cl-" + (i - 1));
   }
   $("#cl-" + (targetRowIndex + 1)).html("");
-  addQuillEditor("#cl-" + (targetRowIndex + 1), CONDITION_PLACEHOLDER);
-  enableQuillEvents();
+  createQuillEditor("#cl-" + (targetRowIndex + 1), CONDITION_PLACEHOLDER);
+  enableQuillEvents(generateIfUpdating, updateOutputLabelCallback);
 
   // If we skipped updating the plot before, do it now
   if (updateAfter && autoUpdating)
@@ -569,10 +356,10 @@ function removeConditionRow(e, updateAfter = true) {
 
   // Clean up the Quill dict to point to the moved positions of the editors, and add an editor for the new row
   for (let i = targetRowIndex; i < oldNumConditions - 1; ++i) {
-    dQuillEditors["#cl-" + i] = dQuillEditors["#cl-" + (i + 1)];
-    delete dQuillEditors["#cl-" + (i + 1)];
+    setQuillEditor("#cl-" + i, getQuillEditor("#cl-" + (i + 1)))
+    removeQuillEditor("#cl-" + (i + 1));
   }
-  enableQuillEvents();
+  enableQuillEvents(generateIfUpdating, updateOutputLabelCallback);
 
   // If we skipped updating the plot before, do it now
   if (updateAfter && autoUpdating)
@@ -657,80 +444,8 @@ function removeSampleCol(e, updateAfter = true) {
   postTableUpdateCleanup("sample", updateAfter);
 }
 
-function addOutput(e, updateAfter = true) {
-
-  // Check that we don't already have too many outputs
-  const numOutputs = getNumOutputs();
-  if (numOutputs >= D_DIM_LIMITS.output.max) {
-    console.error("Attempt to add output when maximum outputs already reached");
-    return;
-  }
-
-  // Set up the new output label row
-  const newOutputLabelRow = TEMPLATE_OUTPUT_LABEL_ROW.cloneNode(true);
-  $(newOutputLabelRow).find(".output-input").val("");
-
-  // Determine where to add the row based on which button was clicked
-  const targetOutputIndex = getTargetIndex(e, numOutputs);
-
-  if (targetOutputIndex >= numOutputs - 1)
-    $(".output-label-table tbody")[0].appendChild(newOutputLabelRow);
-  else
-    $(".output-label-table tbody")[0].insertBefore(newOutputLabelRow, $(".output-label-row")[targetOutputIndex + 1]);
-
-  // Add a new input line to each value cell
-  $(".baseline-value-cell, .sample-value-cell, .mean-value-cell, .abs-deviation-value-cell, " +
-    ".rel-deviation-value-cell").each(function () {
-      // Clone a new node from the proper template
-      let templateLine;
-      if (this.classList.contains("sample-value-cell"))
-        templateLine = TEMPLATE_SAMPLE_INPUT_LINE;
-      else if (this.classList.contains("baseline-value-cell"))
-        templateLine = TEMPLATE_BASELINE_INPUT_LINE;
-      else if (this.classList.contains("mean-value-cell"))
-        templateLine = TEMPLATE_MEAN_INPUT_LINE;
-      else if (this.classList.contains("abs-deviation-value-cell"))
-        templateLine = TEMPLATE_ABS_DEVIATION_INPUT_LINE;
-      else
-        templateLine = TEMPLATE_REL_DEVIATION_INPUT_LINE;
-
-      const newSensInputLine = templateLine.cloneNode(true);
-
-      if (targetOutputIndex >= numOutputs - 1)
-        this.appendChild(newSensInputLine);
-      else
-        this.insertBefore(newSensInputLine, this.children[targetOutputIndex + 1]);
-    })
-
-  postTableUpdateCleanup("output", updateAfter);
-}
-
-function removeOutput(e, updateAfter = true) {
-
-  // Check that we don't already have too few outputs
-  const numOutputs = getNumOutputs();
-  if (numOutputs <= D_DIM_LIMITS.output.min) {
-    console.error("Attempt to remove output when minimum outputs already reached");
-    return;
-  }
-
-  // Determine which row to remove based on which button was clicked
-  const targetOutputIndex = getTargetIndex(e, numOutputs);
-
-  // Remove the row from the output label table
-  $(".output-label-table tbody")[0].removeChild($(".output-label-row")[targetOutputIndex]);
-
-  // Remove the input line from each cell in the sens table
-  $(".baseline-value-cell, .sample-value-cell, .mean-value-cell, .abs-deviation-value-cell, " +
-    ".rel-deviation-value-cell").each(function () {
-      this.removeChild(this.children[targetOutputIndex]);
-    });
-
-  postTableUpdateCleanup("output", updateAfter);
-}
-
 function updateCanvasShape() {
-  $("#glorius-plot").css({
+  $(CHART_SELECTOR).css({
     "width": getWidth().toString(),
     "height": getHeight().toString()
   })
@@ -799,15 +514,14 @@ function resetPlotDims() {
   lastAspectRatio = getAspectRatio();
   updateFontSize();
 
-  if (autoUpdating)
-    generatePlot();
+  generateIfUpdating();
 }
 
 
 // Functions to get various options set by the user
 
 function getTitle() {
-  return dQuillEditors["#title-input"].getSemanticHTML();
+  return getQuillEditor("#title-input").getSemanticHTML();
 }
 
 function getOutputLabel(j = 0) {
@@ -821,7 +535,7 @@ function getOutputLabel(j = 0) {
   const dDevPlotModeInfo = D_DEV_PLOT_MODE_INFO[devPlotMode];
 
   // Get the cleaned output label
-  let outputLabel = dQuillEditors["#ol-0"].getSemanticHTML();
+  let outputLabel = getQuillEditorHTML("#ol-0");
   outputLabel = cleanTags(outputLabel);
 
   // Strip appropriate strings from the beginning and end of the output label
@@ -839,7 +553,7 @@ function getOutputLabel(j = 0) {
 }
 
 function getConditionLabelHTML(i) {
-  return dQuillEditors["#cl-" + i].getSemanticHTML();
+  return getQuillEditorHTML("#cl-" + i);
 }
 
 function getLConditionLabelsHTML() {
@@ -962,9 +676,7 @@ function getDataSorting() {
  * Calculate the deviation for each condition
  */
 function calcDeviation() {
-  const numConditions = getNumConditions();
-  const numOutputs = getNumOutputs();
-  const numSamples = getNumSamples();
+  const numConditions = getNumConditions(), numOutputs = 1, numSamples = getNumSamples();
 
   const baselineRow = $(".baseline-row");
   const lBaselineCells = baselineRow.find(".baseline-value-cell");
@@ -1058,61 +770,42 @@ function calcDeviation() {
  */
 async function generatePlot() {
 
-  // Ensure deviation is calculated first if we aren't in directInput mode
-  if (!directInput) {
-    calcDeviation();
-  }
+  // Ensure deviation is calculated first
+  calcDeviation();
 
   // Collect info from the settings and determine data based on them
-  const numConditions = getNumConditions();
-  const numOutputs = getNumOutputs();
+  const numConditions = getNumConditions(), numOutputs = 1;
 
-  const minOutput = getMinOutput();
-  const maxOutput = getMaxOutput();
-  const outputMidpoint = getOutputMidpoint();
+  const minOutput = getMinOutput(), maxOutput = getMaxOutput(), outputMidpoint = getOutputMidpoint();
   const bandWidth = getBandWidth();
 
   const fanMode = getFanMode();
 
-  const showGridLines = getShowGridLines();
-  const showAxisLines = getShowAxisLines();
+  const showGridLines = getShowGridLines(), showAxisLines = getShowAxisLines();
 
-  const minColor = getMinColor();
-  const maxColor = getMaxColor();
+  const minColor = getMinColor(), maxColor = getMaxColor();
 
-  const tipSize = getTipSize();
-  const baseSeparation = getBarSeparation();
+  const tipSize = getTipSize(), baseSeparation = getBarSeparation();
   const barSize = 2 * (tipSize + baseSeparation + 1);
   const numAnglePoints = numConditions * barSize;
 
   // Create data we'll plot in the chart
-  const lOutputLabels = [];
   const llData = [];
+  const lOutputLabels = [];
   const lOrder = [];
-  const lBorderColors = [];
-  const lBorderWidths = [];
-  const lBackgroundColors = [];
-  const lFill = [];
+  const lBorderColors = [], lBorderWidths = [];
+  const lBackgroundColors = [], lFill = [];
   const lBorderDashes = [];
 
   let numAxisLines;
-
-  let numBgColorsLow;
-  let numBgColorsHi;
-  let numBgColors;
-
+  let numBgColorsLow, numBgColorsHi, numBgColors;
   let numDatasetMultiplier;
 
 
   // If in radar mode, we make some fake data to use as background colors and grid lines
 
   if (fanMode) {
-    numAxisLines = 0;
-
-    numBgColorsLow = 0;
-    numBgColorsHi = 0;
-    numBgColors = 0;
-
+    numAxisLines = numBgColorsLow = numBgColorsHi = numBgColors = 0;
     numDatasetMultiplier = numConditions;
   }
 
@@ -1130,10 +823,8 @@ async function generatePlot() {
 
   llData.push(lMidpointData);
   lOrder.push(1);
-  lBorderColors.push(BASELINE_COLOR);
-  lBackgroundColors.push(BASELINE_COLOR);
-  lFill.push(false);
-  lBorderDashes.push([]);
+  lBorderColors.push(BASELINE_COLOR), lBorderDashes.push([]);
+  lBackgroundColors.push(BASELINE_COLOR), lFill.push(false);
 
   if (fanMode)
     lBorderWidths.push(0);
@@ -1147,21 +838,18 @@ async function generatePlot() {
     const numLowBands = Math.ceil((outputMidpoint - minOutput) / bandWidth);
     const numHiBands = Math.ceil((maxOutput - outputMidpoint) / bandWidth);
 
-    numBgColorsLow = numLowBands;
-    numBgColorsHi = numHiBands + 1;
+    numBgColorsLow = numLowBands, numBgColorsHi = numHiBands + 1;
     numBgColors = numBgColorsLow + numBgColorsHi;
 
     numDatasetMultiplier = 1;
 
-    const lBgColorBoundsLow = [];
-    const lBgOrderLow = [];
+    const lBgColorBoundsLow = [], lBgOrderLow = [];
     for (let i = 0; i < numBgColorsLow; ++i) {
       lBgColorBoundsLow.push(Math.max(outputMidpoint - bandWidth * (i + 1), minOutput));
       lBgOrderLow.push(i + 1);
     }
 
-    const lBgColorBoundsHi = [];
-    const lBgOrderHi = [];
+    const lBgColorBoundsHi = [], lBgOrderHi = [];
     for (let i = 0; i < numBgColorsHi; ++i) {
       lBgColorBoundsHi.push(Math.min(outputMidpoint + bandWidth * i, maxOutput));
       lBgOrderHi.push(i + 1);
@@ -1179,18 +867,14 @@ async function generatePlot() {
       let colorRatio = 1;
       if (numBgColorsHi > 1)
         colorRatio = k / (numBgColorsHi - 1);
-      let backgroundColor = mix_hexes(maxColor, "#FFFFFF", colorRatio);
-      lBackgroundColors.push(backgroundColor);
+      let backgroundColor = mixHexes(maxColor, "#FFFFFF", colorRatio);
+      lBackgroundColors.push(backgroundColor), lFill.push(0);
 
-      if (showGridLines) {
-        lBorderColors.push(GRID_COLOR);
-        lBorderWidths.push(GRID_WIDTH);
-      } else {
-        lBorderColors.push(backgroundColor);
-        lBorderWidths.push(0);
-      }
+      if (showGridLines)
+        lBorderColors.push(GRID_COLOR), lBorderWidths.push(GRID_WIDTH);
+      else
+        lBorderColors.push(backgroundColor), lBorderWidths.push(0);
 
-      lFill.push(0);
       lBorderDashes.push([]);
     }
 
@@ -1204,18 +888,13 @@ async function generatePlot() {
       lOrder.push(lBgOrderLow[k]);
 
       let colorRatio = (k + 1) / numBgColorsLow;
-      let backgroundColor = mix_hexes(minColor, "#FFFFFF", colorRatio);
-      lBackgroundColors.push(backgroundColor);
+      let backgroundColor = mixHexes(minColor, "#FFFFFF", colorRatio);
+      lBackgroundColors.push(backgroundColor), lFill.push(0);
 
-      if (showGridLines) {
-        lBorderColors.push(GRID_COLOR);
-        lBorderWidths.push(GRID_WIDTH);
-      } else {
-        lBorderColors.push(backgroundColor);
-        lBorderWidths.push(0);
-      }
-
-      lFill.push(0);
+      if (showGridLines)
+        lBorderColors.push(GRID_COLOR), lBorderWidths.push(GRID_WIDTH);
+      else
+        lBorderColors.push(backgroundColor), lBorderWidths.push(0);
       lBorderDashes.push([]);
     }
 
@@ -1233,11 +912,8 @@ async function generatePlot() {
         }
         llData.push(lFakeData);
         lOrder.push(-1);
-        lBorderColors.push(GRID_COLOR);
-        lBorderWidths.push(GRID_WIDTH);
-        lBackgroundColors.push(DATA_BG_COLOR);
-        lFill.push(false);
-        lBorderDashes.push([]);
+        lBorderColors.push(GRID_COLOR), lBorderWidths.push(GRID_WIDTH), lBorderDashes.push([]);
+        lBackgroundColors.push(DATA_BG_COLOR), lFill.push(false);
       }
     } else {
       numAxisLines = 0;
@@ -1268,11 +944,8 @@ async function generatePlot() {
 
     llData.push(lInvisibleData);
     lOrder.push(999);
-    lBorderColors.push("black");
-    lBorderWidths.push(BORDER_WIDTH);
-    lBorderDashes.push(L_BORDER_DASHES[j]);
-    lBackgroundColors.push("white");
-    lFill.push(false);
+    lBorderColors.push("black"), lBorderWidths.push(BORDER_WIDTH), lBorderDashes.push(L_BORDER_DASHES[j]);
+    lBackgroundColors.push("white"), lFill.push(false);
   }
 
   // Get data for each output
@@ -1285,18 +958,13 @@ async function generatePlot() {
   for (let i = 0; i < numConditions; ++i) {
     let lSingleConditionData = [];
 
-    let valueSelector;
-    let inputSelector;
-    if (devPlotMode == "mean") {
-      valueSelector = ".mean-value-cell"
-      inputSelector = "input.mean-value"
-    } else if (devPlotMode == "absolute") {
-      valueSelector = ".abs-deviation-value-cell"
-      inputSelector = "input.abs-deviation-value"
-    } else {
-      valueSelector = ".rel-deviation-value-cell"
-      inputSelector = "input.rel-deviation-value"
-    }
+    let valueSelector, inputSelector;
+    if (devPlotMode == "mean")
+      valueSelector = ".mean-value-cell", inputSelector = "input.mean-value"
+    else if (devPlotMode == "absolute")
+      valueSelector = ".abs-deviation-value-cell", inputSelector = "input.abs-deviation-value"
+    else
+      valueSelector = ".rel-deviation-value-cell", inputSelector = "input.rel-deviation-value"
     const lCells = lSensRows.eq(i).find(valueSelector);
     const lInputs = lCells.eq(0).find(inputSelector);
 
@@ -1377,9 +1045,7 @@ async function generatePlot() {
     for (let i = 0; i < numDatasetMultiplier; ++i) {
       lOutputLabels.push("")
       lOrder.push(0);
-      lBorderColors.push("black");
-      lBorderWidths.push(BORDER_WIDTH);
-      lBorderDashes.push(L_BORDER_DASHES[j]);
+      lBorderColors.push("black"), lBorderWidths.push(BORDER_WIDTH), lBorderDashes.push(L_BORDER_DASHES[j]);
 
       if (fanMode) {
         let color;
@@ -1389,7 +1055,7 @@ async function generatePlot() {
             color = maxColor;
           } else {
             let colorRatio = (clampedVal - outputMidpoint) / (maxOutput - outputMidpoint);
-            color = mix_hexes(maxColor, "#FFFFFF", colorRatio);
+            color = mixHexes(maxColor, "#FFFFFF", colorRatio);
           }
         }
         else {
@@ -1397,7 +1063,7 @@ async function generatePlot() {
             color = minColor;
           } else {
             let colorRatio = (outputMidpoint - clampedVal) / (outputMidpoint - minOutput);
-            color = mix_hexes(minColor, "#FFFFFF", colorRatio);
+            color = mixHexes(minColor, "#FFFFFF", colorRatio);
           }
         }
         lBackgroundColors.push(color);
@@ -1493,7 +1159,7 @@ async function generatePlot() {
 
   if (radarChart === null) {
     // Generate the plot for the first time
-    radarChart = new Chart("glorius-plot", {
+    radarChart = new Chart(CHART_ID, {
       type: "radar",
       data: {
         labels: lOutputConditionLabels,
@@ -1509,7 +1175,7 @@ async function generatePlot() {
         },
         plugins: {
           customCanvasBackgroundColor: {
-            color: "white",
+            color: "#FFFFFF",
           },
           legend: plotLegendOptions,
           title: plotTitleOptions
@@ -1563,9 +1229,24 @@ async function generatePlot() {
 }
 
 /**
+ * Convenience function to generate a new plot only if auto updating is turned on
+ */
+function generateIfUpdating() {
+  if (autoUpdating)
+    generatePlot();
+}
+
+/**
  * Fill the existing cells with random data
  */
 function fillRandom() {
+
+  // Check if the form is currently dirty, and check with the user before filling if so
+  if (checkIsDirty()) {
+    if (!confirm(DIRTY_FORMS_MESSAGE)) {
+      return;
+    }
+  }
 
   // Suppress autoUpdating until the end
   const lastAutoUpdating = autoUpdating;
@@ -1590,17 +1271,11 @@ function fillRandom() {
     lDataCells[k].value = Math.round(val);
   }
 
-  // Make sure the deviation is calculated, even in direct input mode (if not in this mode, it will be calculated when
-  // the plot is generated)
-  if (directInput) {
-    calcDeviation();
-  }
-
   autoUpdating = lastAutoUpdating;
-  if (autoUpdating) {
-    generatePlot();
-  }
+  generateIfUpdating();
 
+  // Set the current state of the form as "clean"
+  cleanDirtyForms();
 }
 
 /**
@@ -1609,13 +1284,18 @@ function fillRandom() {
  */
 function fillExample() {
 
+  // Check if the form is currently dirty, and check with the user before filling if so
+  if (checkIsDirty()) {
+    if (!confirm(DIRTY_FORMS_MESSAGE)) {
+      return;
+    }
+  }
+
   // Suppress autoUpdating until the end
   const lastAutoUpdating = autoUpdating;
   autoUpdating = false;
 
-  setNumDim(OUTPUT, 1);
-  setNumDim(CONDITION, 10);
-  setNumDim(SAMPLE, 1);
+  setNumDim(CONDITION, 10), setNumDim(SAMPLE, 1);
 
   // Set the title and output label
   $("#title-input .ql-editor p").html("<b>Reaction-condition sensitivity analysis for 1,3-cyclization</b>");
@@ -1657,15 +1337,15 @@ function fillExample() {
 
   // Make sure the deviation is calculated, even in direct input mode (if not in this mode, it will be calculated when
   // the plot is generated)
-  if (directInput) {
-    calcDeviation();
-  }
+  calcDeviation();
 
   autoUpdating = lastAutoUpdating;
   if (autoUpdating) {
     enableAutoUpdates();
   }
 
+  // Set the current state of the form as "clean"
+  cleanDirtyForms();
 }
 
 
@@ -1678,7 +1358,7 @@ function exportImage(format) {
   // Set the form as clean the user downloads the image
   cleanDirtyForms();
 
-  $("#glorius-plot")[0].toBlob((blob) => {
+  $(CHART_SELECTOR)[0].toBlob((blob) => {
     let objectURL = URL.createObjectURL(blob);
 
     let link = document.createElement('a');
@@ -1720,9 +1400,7 @@ function enableAutoUpdates() {
 }
 
 function enableToggles() {
-  $("#input-mode-toggle").on("click", toggleInputMode);
   $("#fan-toggle").on("click", toggleChartMode);
-
   $("#auto-update-toggle").on("click", toggleAutoUpdates);
 }
 
@@ -1763,23 +1441,6 @@ function setDeviationPlotMode(e) {
     calcDeviation();
 }
 
-function toggleInputMode(e) {
-  if ($(e.target).is(":checked")) {
-
-    directInput = true;
-    document.documentElement.setAttribute("input-mode", "direct");
-    $(".calc-mode-disabled").attr("disabled", false);
-
-  } else {
-
-    directInput = false;
-    document.documentElement.setAttribute("input-mode", "calc");
-    $(".calc-mode-disabled").attr("disabled", true);
-    generatePlot();
-
-  }
-}
-
 function toggleChartMode(e) {
   if ($(e.target).is(":checked"))
     document.documentElement.setAttribute("chart-mode", "fan");
@@ -1798,16 +1459,15 @@ function initNumDimControls(dim) {
 }
 
 function updateOutputLabelSelection(e) {
-  let targetIndex = getTargetIndex(e, D_DIM_LIMITS.output.max);
   let newValue = this.value;
-  let lOutcomeValueCells = $(".output-label-value-cell");
-  let outcomeInput = $("#ol-" + targetIndex + " .ql-editor p");
+  let outcomeInputCell = $(".output-label-value-cell");
+  let outcomeInput = $("#ol-0 .ql-editor p");
 
   if (newValue != "Other") {
-    lOutcomeValueCells.addClass("hidden");
+    outcomeInputCell.addClass("hidden");
     outcomeInput.html(newValue);
   } else {
-    lOutcomeValueCells.removeClass("hidden");
+    outcomeInputCell.removeClass("hidden");
     outcomeInput.html("");
   }
 }
@@ -1831,6 +1491,10 @@ function updateOutputLabel(label) {
   updateMeanColumn();
 }
 
+function updateOutputLabelCallback() {
+  updateOutputLabel(getQuillEditorHTML("#ol-0"));
+}
+
 function updateColourSchemeSelection() {
   let newValue = this.value;
   let customColorInput = $(".color-custom");
@@ -1843,8 +1507,7 @@ function updateColourSchemeSelection() {
     customColorInput.removeClass("hidden");
   }
 
-  if (autoUpdating)
-    generatePlot();
+  generateIfUpdating();
 }
 
 /**
@@ -1853,7 +1516,7 @@ function updateColourSchemeSelection() {
 function updatePlotSelect() {
   const devPlotMode = getDevPlotMode();
 
-  $(".sample-button-cell, .sample-heading .mean-heading, .abs-deviation-heading, " +
+  $(".sample-button-cell, .mean-heading, .abs-deviation-heading, " +
     ".rel-deviation-heading").removeClass("col-selected-top");
   $(".sample-heading, .baseline-value-cell, .sample-value-cell, .baseline-mean-cell, .baseline-abs-deviation-cell, " +
     ".baseline-rel-deviation-cell, .mean-value-cell, .abs-deviation-value-cell, " +
@@ -1892,12 +1555,9 @@ function toggleAutoUpdates(e) {
  */
 function initGlobals() {
   lastAspectRatio = getAspectRatio();
-  lastFontSizeWidthRatio = getFontSizeWidthRatio();
-  lastFontSizeHeightRatio = getFontSizeHeightRatio();
+  lastFontSizeWidthRatio = getFontSizeWidthRatio(), lastFontSizeHeightRatio = getFontSizeHeightRatio();
 
-  initWidth = getWidth();
-  initHeight = getHeight();
-  initFontSize = getFontSize();
+  initWidth = getWidth(), initHeight = getHeight(), initFontSize = getFontSize();
 }
 
 /**
@@ -1908,98 +1568,23 @@ function initTooltips() {
   tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
 }
 
-/**
- * Initialise a Quill editor
- */
-function addQuillEditor(selector, placeholder = "", toolbar = QUILL_TOOLBAR) {
-  const editor = new Quill(selector, {
-    modules: {
-      toolbar: toolbar
-    },
-    placeholder: placeholder,
-    theme: QUILL_THEME
-  });
-
-  dQuillEditors[selector] = editor;
-
-  editor.on("selection-change", (range) => {
-    if (range)
-      enableQuillToolbar(selector);
-    else
-      disableQuillToolbar(selector);
-  });
-}
-
-function removeQuillEditor(selector) {
-  delete dQuillEditors[selector];
-  $(selector).html("");
-}
-
-function updateQuillContents(selector, contents) {
-  $(selector + " .ql-editor p").html(contents);
-  dQuillEditors[selector].updateContents();
-}
-
-function enableQuillToolbar(selector) {
-  $(selector).parent().find(".ql-toolbar").addClass("visible");
-}
-
-function disableQuillToolbar(selector) {
-  $(selector).parent().find(".ql-toolbar").removeClass("visible");
-}
-
-function enableQuillEvents() {
-  // Set all editors to toggle toolbars when selected and auto-update the plot on change
-  Object.entries(dQuillEditors).forEach((entry) => {
-    const [selector, editor] = entry;
-
-    editor.off("selection-change");
-    editor.on("selection-change", (range) => {
-      if (range)
-        enableQuillToolbar(selector);
-      else
-        disableQuillToolbar(selector);
-    });
-
-    editor.off("text-change");
-    editor.on("text-change", () => {
-      if (autoUpdating)
-        generatePlot();
-    });
-
-  });
-
-  // Also set the output label editor to update the output label in column headings when changed
-  dQuillEditors["#ol-0"].on("text-change", () => {
-    updateOutputLabel(dQuillEditors["#ol-0"].getSemanticHTML());
-  });
-}
-
 function initQuill() {
-  addQuillEditor("#title-input", "e.g. “Reaction-condition sensitivity analysis”");
-  addQuillEditor("#ol-0", "Define outcome");
+  createQuillEditor("#title-input", "e.g. “Reaction-condition sensitivity analysis”");
+  createQuillEditor("#ol-0", "Define outcome");
   $(".condition-input").each((i, e) => {
-    addQuillEditor("#cl-" + i, CONDITION_PLACEHOLDER);
+    createQuillEditor("#cl-" + i, CONDITION_PLACEHOLDER);
   })
-  enableQuillEvents();
+  enableQuillEvents(generateIfUpdating, updateOutputLabelCallback);
 }
 
 $(document).ready(function () {
 
-  initTooltips();
-  initGlobals();
-  initDirtyForms();
-  initQuill();
+  initDirtyForms("form", DIRTY_FORMS_MESSAGE);
+
+  initTooltips(), initGlobals(), initQuill();
 
   L_DIMS.forEach(dim => initNumDimControls(dim));
+  enableOnChangeTriggers(), enableToggles(), enableButtons();
 
-  enableOnChangeTriggers();
-  enableToggles();
-  enableButtons();
-
-  enableDeviationCalc();
-
-  enableAutoUpdates();
-
-  enableCanvasUpdate();
+  enableDeviationCalc(), enableAutoUpdates(), enableCanvasUpdate();
 });

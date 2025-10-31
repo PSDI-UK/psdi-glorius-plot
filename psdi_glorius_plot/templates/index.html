@@ -13,18 +13,15 @@
   <div class="max-width-box">
     <p>
       This web tool enables users to visualise the sensitivity of a given chemical transformation to user-defined
-      reaction
-      conditions. The output plots are closely based on an
+      reaction conditions. The output plots are closely based on an
       <a href="https://onlinelibrary.wiley.com/doi/10.1002/anie.201901935" target="_blank">original concept from the
         Glorius research group</a>.
     </p>
     <p>
       This tool is still a work in progress, and feedback is very welcome, whether feature requests, bug reports, or
-      even
-      highlighting a feature you find particularly useful so we know not to remove it when streamlining the tool. To
-      provide
-      feedback, click the “Provide Feedback” link on the right side of the header, which will open up a form to submit
-      it.
+      even highlighting a feature you find particularly useful so we know not to remove it when streamlining the tool.
+      To provide feedback, click the “Provide Feedback” link on the right side of the header, which will open up a form
+      to submit it.
     </p>
     <div class="multicol-container">
       <div class="multicol-cell">
@@ -32,14 +29,12 @@
           <summary><strong>Instructions</strong></summary>
           <p>
             Select the reaction outcome of interest (e.g., commonly reaction yield, <em>ee</em> or <em>de</em>) and
-            define
-            the
-            number of experimental parameters, or “test conditions”, that you have used in your sensitivity analysis.
+            define the number of experimental parameters, or “test conditions”, that you have used in your sensitivity
+            analysis.
           </p>
           <p>
             If you have conducted repeat reactions for each test condition, then select the number of experiments that
-            were
-            carried out.
+            were carried out.
           </p>
           <p>
             Input the value of the reaction outcome (yield, <em>ee</em> or <em>de</em>) for your optimised “standard
@@ -47,14 +42,11 @@
           </p>
           <p>
             Add labels to define each test condition that was used in your sensitivity analysis, and add the value of
-            the
-            reaction outcome for each test reaction.
+            the reaction outcome for each test reaction.
           </p>
           <p>
             Select the “value to plot”. Values of the reaction outcome can be plotted directly, or deviation of the
-            outcome
-            from
-            the standard conditions may be used.
+            outcome from the standard conditions may be used.
           </p>
           <p>
             Tools for customisation of the plot are available beneath the plotting window.
@@ -68,28 +60,20 @@
           </summary>
           <p>
             <strong>Basic formatting:</strong> You can format text entered in the Title and various other fields by
-            clicking
-            on the formatting buttons in the toolbar that appears above the text-input boxes when they're selected,
-            either
-            by
-            clicking the box then entering text, or by selecting text and then clicking the buttons. If the text is
-            longer
-            than
-            the box can fit in one line, a scrollbar will appear at the right side of the box allowing you to scroll up
-            and
-            down
-            lines of text.
+            clicking on the formatting buttons in the toolbar that appears above the text-input boxes when they're
+            selected, either by clicking the box then entering text, or by selecting text and then clicking the buttons.
+            If the text is longer than the box can fit in one line, a scrollbar will appear at the right side of the box
+            allowing you to scroll up and down lines of text.
           </p>
           <p>This formatting is done through a LaTeX equation rendering engine, which results in some unavoidable quirks
-            such
-            as it always putting spaces around mathematical operators. If the renderer fails to parse the text, it will
-            appear
-            as a black bar on the chart. The most common cause of this is less-than and greater-than symbols, which get
-            interpreted as HTML tags. This can by worked around by replacing them with “\gt” and “\lt” respectively.</p>
+            such as it always putting spaces around mathematical operators. If the renderer fails to parse the text, it
+            will appear as a black bar on the chart. The most common cause of this is less-than and greater-than
+            symbols, which get interpreted as HTML tags. This can by worked around by replacing them with “\gt” and
+            “\lt” respectively.
+          </p>
           <p>
             <strong>Special symbols:</strong> A toolbar option to insert special symbols is still under development. For
-            the
-            time being, you can copy and paste desired symbols from the following lists:
+            the time being, you can copy and paste desired symbols from the following lists:
           </p>
           <ul>
             <li>Mathematical and numerical symbols: ° Å → ⟹ + - × ÷ ± ∓ = ≠ &lt; &gt; ≤ ≥ ≲ ≳ ≪ ≫</li>
@@ -97,16 +81,13 @@
             <li>Uppercase Greek: Α Β Γ Δ Ε Ζ Η Θ Ι Κ Λ Μ Ν Ξ Ο Π Ρ Σ Τ Υ Φ Χ Ψ Ω</li>
           </ul>
           <p>If you need a symbol not listed here, you can search for it at <a
-              href="https://unicodeplus.com/">UnicodePlus</a>
-            and copy it from there.
+              href="https://unicodeplus.com/">UnicodePlus</a> and copy it from there.
           </p>
           <p>
             <strong>Advanced formatting:</strong> If you're familiar with LaTeX markup, you can use it to directly set
-            the
-            text that will appear on the chart, or you can use <a href="https://latexeditor.lagrida.com/">a LaTeX
-              equation
-              editor</a> to help. Malformed LaTeX markup will appear as red on the chart, or may result in the renderer
-            failing entirely, resulting in the text appearing as a black bar on the chart.
+            the text that will appear on the chart, or you can use <a href="https://latexeditor.lagrida.com/">a LaTeX
+              equation editor</a> to help. Malformed LaTeX markup will appear as red on the chart, or may result in the
+            renderer failing entirely, resulting in the text appearing as a black bar on the chart.
           </p>
         </details>
       </div>
@@ -138,10 +119,6 @@
 
   <table class="output-label-table">
     <tr class="output-label-row">
-      <td class="output-button-cell hidden">
-        <button type="button" id="remove-ob-0" class="remove-output disabled fix-size-small" disabled="true">-</button>
-        <button type="button" id="add-ob-0" class="add-output fix-size-small">+</button>
-      </td>
       <td class="output-label-cell">
         <label for="os-0" class="output-label">Outcome:</label>
       </td>
@@ -150,8 +127,8 @@
           <option value="Isolated Yield (%)" selected>Isolated Yield (%)</option>
           <option value="Spectroscopic Yield (%)">Spectroscopic Yield (%)</option>
           <option value="Chromatographic Yield (%)">Chromatographic Yield (%)</option>
-          <option value="<em>ee</em> (%)">ee (%)</option>
-          <option value="<em>de</em> (%)">de (%)</option>
+          <option value="&lt;em&gt;ee&lt;/em&gt; (%)">ee (%)</option>
+          <option value="&lt;em&gt;de&lt;/em&gt; (%)">de (%)</option>
           <option value="Other">Other</option>
         </select>
       </td>
@@ -197,23 +174,6 @@
           <option value="9">9</option>
           <option value="10">10</option>
         </select>
-      </td>
-    </tr>
-    <tr class="hidden">
-      <td>
-        <label for="num-output">Reaction outcomes: </label>
-      </td>
-      <td>
-        <select name="num-output" id="num-output">
-          <option value="1">1</option>
-          <option value="2">2</option>
-        </select>
-      </td>
-      <td>
-        <label for="input-mode-toggle">Directly input deviations: </label>
-      </td>
-      <td>
-        <input type="checkbox" name="input-mode-toggle" id="input-mode-toggle">
       </td>
     </tr>
   </table>
@@ -473,7 +433,7 @@
     </tr>
 
     <tr id="plot-select-row">
-      <td class="empty-cell"></td>
+      <td class="empty-button-cell"></td>
       <td class="plot-select-label"><strong>Value to plot:</strong></td>
       <td class="empty-cell mean-shown-only hidden"></td>
       <td class="plot-select-cell plot-select-mean-cell">
