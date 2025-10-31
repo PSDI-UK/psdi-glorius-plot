@@ -18,7 +18,7 @@ const DIRTY_FORMS_MESSAGE = "Data currently entered in the form will be lost. Do
 
 const LABEL_FONT_FAMILY = "'Fira Sans', sans-serif";
 
-const CONDITION = "condition", SAMPLE = "sample", OUTPUT = "output", L_DIMS = [CONDITION, SAMPLE, OUTPUT];
+const CONDITION = "condition", SAMPLE = "sample", L_DIMS = [CONDITION, SAMPLE];
 
 const D_DIM_LIMITS = {
   condition: {
@@ -28,10 +28,6 @@ const D_DIM_LIMITS = {
   sample: {
     min: 1,
     max: 10
-  },
-  output: {
-    min: 1,
-    max: 2
   }
 };
 
@@ -60,8 +56,6 @@ const CONDITION_PLACEHOLDER = "e.g. “High conc.”";
 const DEFAULT_VALUE_MEAN = 100, VALUE_MIN = 0., VALUE_MAX = 100.;
 
 const RAND_BASELINE_MIN = 60., RAND_BASELINE_MAX = 100.;
-
-const OUTPUT_LABEL_TEXT = "Output {N} Label:";
 
 const D_DEV_PLOT_MODE_INFO = {
   relative: {
@@ -150,18 +144,12 @@ function getTargetIndex(e, indexLength) {
 function getDimSize(dim) {
   if (dim == CONDITION)
     return getNumConditions();
-  else if (dim == OUTPUT)
-    return getNumOutputs();
   else
     return getNumSamples();
 }
 
 function getNumConditions() {
   return $(".condition-row").length;
-}
-
-function getNumOutputs() {
-  return $(".output-label-row").length;
 }
 
 function getNumSamples() {
@@ -171,19 +159,15 @@ function getNumSamples() {
 function addDim(dim, e, updateAfter) {
   if (dim == CONDITION)
     return addConditionRow(e, updateAfter);
-  else if (dim == SAMPLE)
-    return addSampleCol(e, updateAfter);
   else
-    return addOutput(e, updateAfter);
+    return addSampleCol(e, updateAfter);
 }
 
 function removeDim(dim, e, updateAfter) {
   if (dim == CONDITION)
     return removeConditionRow(e, updateAfter);
-  else if (dim == SAMPLE)
-    return removeSampleCol(e, updateAfter);
   else
-    return removeOutput(e, updateAfter);
+    return removeSampleCol(e, updateAfter);
 }
 
 function setNumDim(dim, num, updateAfter = true) {
@@ -234,7 +218,8 @@ function postTableUpdateCleanup(dim, updateAfter) {
     updateMeanColumn();
     updatePlotSelect();
 
-    // Also update the plot if desired
+    // Also update the plot if desired - we call enableAutoUpdates here to make sure any new inputs have proper triggers
+    // set up. This will also then call generatePlot
     if (autoUpdating) {
       enableAutoUpdates();
     }
@@ -250,12 +235,10 @@ function relabelDim(dim) {
   const num = getDimSize(dim);
   const lButtonCells = $(`.${dim}-button-cell`);
   const lHeadings = $(`.${dim}-heading`);
-  const lLabels = $(`.${dim}-label`);
   const lInputs = $(`.${dim}-input`);
 
   for (let i = 0; i < num; i++) {
     const sI = i.toString();
-    const sI1 = (i + 1).toString();
 
     // Fix the IDs of the buttons
     const buttonCell = lButtonCells.eq(i);
@@ -271,11 +254,6 @@ function relabelDim(dim) {
     // Set the label and input text if we have any of those cells
     if (lInputs.length > 0) {
       lInputs.eq(i).attr("id", `${d}l-${sI}`);
-      if (lLabels.length > 0) {
-        const label = lLabels.eq(i);
-        label.text(OUTPUT_LABEL_TEXT.replace("{N}", sI1));
-        label.attr("for", `${d}l-${sI}`);
-      }
     }
   }
 
@@ -464,78 +442,6 @@ function removeSampleCol(e, updateAfter = true) {
   }
 
   postTableUpdateCleanup("sample", updateAfter);
-}
-
-function addOutput(e, updateAfter = true) {
-
-  // Check that we don't already have too many outputs
-  const numOutputs = getNumOutputs();
-  if (numOutputs >= D_DIM_LIMITS.output.max) {
-    console.error("Attempt to add output when maximum outputs already reached");
-    return;
-  }
-
-  // Set up the new output label row
-  const newOutputLabelRow = TEMPLATE_OUTPUT_LABEL_ROW.cloneNode(true);
-  $(newOutputLabelRow).find(".output-input").val("");
-
-  // Determine where to add the row based on which button was clicked
-  const targetOutputIndex = getTargetIndex(e, numOutputs);
-
-  if (targetOutputIndex >= numOutputs - 1)
-    $(".output-label-table tbody")[0].appendChild(newOutputLabelRow);
-  else
-    $(".output-label-table tbody")[0].insertBefore(newOutputLabelRow, $(".output-label-row")[targetOutputIndex + 1]);
-
-  // Add a new input line to each value cell
-  $(".baseline-value-cell, .sample-value-cell, .mean-value-cell, .abs-deviation-value-cell, " +
-    ".rel-deviation-value-cell").each(function () {
-      // Clone a new node from the proper template
-      let templateLine;
-      if (this.classList.contains("sample-value-cell"))
-        templateLine = TEMPLATE_SAMPLE_INPUT_LINE;
-      else if (this.classList.contains("baseline-value-cell"))
-        templateLine = TEMPLATE_BASELINE_INPUT_LINE;
-      else if (this.classList.contains("mean-value-cell"))
-        templateLine = TEMPLATE_MEAN_INPUT_LINE;
-      else if (this.classList.contains("abs-deviation-value-cell"))
-        templateLine = TEMPLATE_ABS_DEVIATION_INPUT_LINE;
-      else
-        templateLine = TEMPLATE_REL_DEVIATION_INPUT_LINE;
-
-      const newSensInputLine = templateLine.cloneNode(true);
-
-      if (targetOutputIndex >= numOutputs - 1)
-        this.appendChild(newSensInputLine);
-      else
-        this.insertBefore(newSensInputLine, this.children[targetOutputIndex + 1]);
-    })
-
-  postTableUpdateCleanup("output", updateAfter);
-}
-
-function removeOutput(e, updateAfter = true) {
-
-  // Check that we don't already have too few outputs
-  const numOutputs = getNumOutputs();
-  if (numOutputs <= D_DIM_LIMITS.output.min) {
-    console.error("Attempt to remove output when minimum outputs already reached");
-    return;
-  }
-
-  // Determine which row to remove based on which button was clicked
-  const targetOutputIndex = getTargetIndex(e, numOutputs);
-
-  // Remove the row from the output label table
-  $(".output-label-table tbody")[0].removeChild($(".output-label-row")[targetOutputIndex]);
-
-  // Remove the input line from each cell in the sens table
-  $(".baseline-value-cell, .sample-value-cell, .mean-value-cell, .abs-deviation-value-cell, " +
-    ".rel-deviation-value-cell").each(function () {
-      this.removeChild(this.children[targetOutputIndex]);
-    });
-
-  postTableUpdateCleanup("output", updateAfter);
 }
 
 function updateCanvasShape() {
@@ -770,7 +676,7 @@ function getDataSorting() {
  * Calculate the deviation for each condition
  */
 function calcDeviation() {
-  const numConditions = getNumConditions(), numOutputs = getNumOutputs(), numSamples = getNumSamples();
+  const numConditions = getNumConditions(), numOutputs = 1, numSamples = getNumSamples();
 
   const baselineRow = $(".baseline-row");
   const lBaselineCells = baselineRow.find(".baseline-value-cell");
@@ -864,13 +770,11 @@ function calcDeviation() {
  */
 async function generatePlot() {
 
-  // Ensure deviation is calculated first if we aren't in directInput mode
-  if (!directInput) {
-    calcDeviation();
-  }
+  // Ensure deviation is calculated first
+  calcDeviation();
 
   // Collect info from the settings and determine data based on them
-  const numConditions = getNumConditions(), numOutputs = getNumOutputs();
+  const numConditions = getNumConditions(), numOutputs = 1;
 
   const minOutput = getMinOutput(), maxOutput = getMaxOutput(), outputMidpoint = getOutputMidpoint();
   const bandWidth = getBandWidth();
@@ -1367,12 +1271,6 @@ function fillRandom() {
     lDataCells[k].value = Math.round(val);
   }
 
-  // Make sure the deviation is calculated, even in direct input mode (if not in this mode, it will be calculated when
-  // the plot is generated)
-  if (directInput) {
-    calcDeviation();
-  }
-
   autoUpdating = lastAutoUpdating;
   generateIfUpdating();
 
@@ -1397,7 +1295,7 @@ function fillExample() {
   const lastAutoUpdating = autoUpdating;
   autoUpdating = false;
 
-  setNumDim(OUTPUT, 1), setNumDim(CONDITION, 10), setNumDim(SAMPLE, 1);
+  setNumDim(CONDITION, 10), setNumDim(SAMPLE, 1);
 
   // Set the title and output label
   $("#title-input .ql-editor p").html("<b>Reaction-condition sensitivity analysis for 1,3-cyclization</b>");
@@ -1439,9 +1337,7 @@ function fillExample() {
 
   // Make sure the deviation is calculated, even in direct input mode (if not in this mode, it will be calculated when
   // the plot is generated)
-  if (directInput) {
-    calcDeviation();
-  }
+  calcDeviation();
 
   autoUpdating = lastAutoUpdating;
   if (autoUpdating) {
@@ -1504,9 +1400,7 @@ function enableAutoUpdates() {
 }
 
 function enableToggles() {
-  $("#input-mode-toggle").on("click", toggleInputMode);
   $("#fan-toggle").on("click", toggleChartMode);
-
   $("#auto-update-toggle").on("click", toggleAutoUpdates);
 }
 
@@ -1547,23 +1441,6 @@ function setDeviationPlotMode(e) {
     calcDeviation();
 }
 
-function toggleInputMode(e) {
-  if ($(e.target).is(":checked")) {
-
-    directInput = true;
-    document.documentElement.setAttribute("input-mode", "direct");
-    $(".calc-mode-disabled").attr("disabled", false);
-
-  } else {
-
-    directInput = false;
-    document.documentElement.setAttribute("input-mode", "calc");
-    $(".calc-mode-disabled").attr("disabled", true);
-    generatePlot();
-
-  }
-}
-
 function toggleChartMode(e) {
   if ($(e.target).is(":checked"))
     document.documentElement.setAttribute("chart-mode", "fan");
@@ -1582,16 +1459,15 @@ function initNumDimControls(dim) {
 }
 
 function updateOutputLabelSelection(e) {
-  let targetIndex = getTargetIndex(e, D_DIM_LIMITS.output.max);
   let newValue = this.value;
-  let lOutcomeValueCells = $(".output-label-value-cell");
-  let outcomeInput = $("#ol-" + targetIndex + " .ql-editor p");
+  let outcomeInputCell = $(".output-label-value-cell");
+  let outcomeInput = $("#ol-0 .ql-editor p");
 
   if (newValue != "Other") {
-    lOutcomeValueCells.addClass("hidden");
+    outcomeInputCell.addClass("hidden");
     outcomeInput.html(newValue);
   } else {
-    lOutcomeValueCells.removeClass("hidden");
+    outcomeInputCell.removeClass("hidden");
     outcomeInput.html("");
   }
 }

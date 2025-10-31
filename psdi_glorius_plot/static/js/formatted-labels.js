@@ -59,7 +59,6 @@ export function setQuillEditor(selector, editor) {
 
 export function removeQuillEditor(selector) {
   delete dQuillEditors[selector];
-  $(selector).html("");
 }
 
 export function updateQuillContents(selector, contents) {
