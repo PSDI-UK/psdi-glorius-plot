@@ -75,7 +75,7 @@ function disableQuillToolbar(selector) {
   $(selector).parent().find(".ql-toolbar").removeClass("visible");
 }
 
-export function enableQuillEvents(callback) {
+export function enableQuillEvents(alwaysCallback, outputLabelCallback) {
   // Set all editors to toggle toolbars when selected and auto-update the plot on change
   Object.entries(dQuillEditors).forEach((entry) => {
     const [selector, editor] = entry;
@@ -89,14 +89,12 @@ export function enableQuillEvents(callback) {
     });
 
     editor.off("text-change");
-    editor.on("text-change", callback);
+    editor.on("text-change", alwaysCallback);
 
   });
 
   // Also set the output label editor to update the output label in column headings when changed
-  dQuillEditors["#ol-0"].on("text-change", () => {
-    updateOutputLabel(dQuillEditors["#ol-0"].getSemanticHTML());
-  });
+  dQuillEditors["#ol-0"].on("text-change", outputLabelCallback);
 }
 
 /**

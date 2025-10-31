@@ -339,7 +339,7 @@ function addConditionRow(e, updateAfter = true) {
   }
   $("#cl-" + (targetRowIndex + 1)).html("");
   createQuillEditor("#cl-" + (targetRowIndex + 1), CONDITION_PLACEHOLDER);
-  enableQuillEvents(generateIfUpdating);
+  enableQuillEvents(generateIfUpdating, updateOutputLabelCallback);
 
   // If we skipped updating the plot before, do it now
   if (updateAfter && autoUpdating)
@@ -381,7 +381,7 @@ function removeConditionRow(e, updateAfter = true) {
     setQuillEditor("#cl-" + i, getQuillEditor("#cl-" + (i + 1)))
     removeQuillEditor("#cl-" + (i + 1));
   }
-  enableQuillEvents(() => generateIfUpdating);
+  enableQuillEvents(generateIfUpdating, updateOutputLabelCallback);
 
   // If we skipped updating the plot before, do it now
   if (updateAfter && autoUpdating)
@@ -1615,6 +1615,10 @@ function updateOutputLabel(label) {
   updateMeanColumn();
 }
 
+function updateOutputLabelCallback() {
+  updateOutputLabel(getQuillEditorHTML("#ol-0"));
+}
+
 function updateColourSchemeSelection() {
   let newValue = this.value;
   let customColorInput = $(".color-custom");
@@ -1694,7 +1698,7 @@ function initQuill() {
   $(".condition-input").each((i, e) => {
     createQuillEditor("#cl-" + i, CONDITION_PLACEHOLDER);
   })
-  enableQuillEvents(generateIfUpdating);
+  enableQuillEvents(generateIfUpdating, updateOutputLabelCallback);
 }
 
 $(document).ready(function () {
