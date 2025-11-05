@@ -12,8 +12,6 @@ const QUILL_TOOLBAR = ['bold', 'italic', 'underline', { 'script': 'sub' }, { 'sc
 const MATHJAX_DEFAULT_FONT_SIZE = 16;
 const MATHJAX_BASE_FONT_SCALING = 1.125;
 
-const WEBKIT_FONT_SCALING = 8. / 9.;
-
 const T_WAIT = 100;
 const MAX_ELAPSED = 500;
 

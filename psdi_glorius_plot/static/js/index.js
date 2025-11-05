@@ -17,6 +17,7 @@ const CHART_ID = "glorius-plot", CHART_SELECTOR = `#${CHART_ID}`;
 const DIRTY_FORMS_MESSAGE = "Data currently entered in the form will be lost. Do you want to proceed?";
 
 const LABEL_FONT_FAMILY = "'Fira Sans', sans-serif";
+const WEBKIT_FONT_SCALING = 8. / 9.;
 
 const CONDITION = "condition", SAMPLE = "sample", L_DIMS = [CONDITION, SAMPLE];
 
