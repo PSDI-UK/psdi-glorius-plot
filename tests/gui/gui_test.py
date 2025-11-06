@@ -5,13 +5,14 @@
 import os
 import time
 from multiprocessing import Process
+from typing import Callable
+
+import pytest
 
 import psdi_glorius_plot
-import pytest
 
 # Skip all tests in this module if required packages for GUI testing aren't installed
 try:
-    from psdi_glorius_plot.gui.setup import start_app
     from selenium import webdriver
     from selenium.webdriver import FirefoxOptions
     from selenium.webdriver.common.action_chains import ActionChains
@@ -20,8 +21,11 @@ try:
     from selenium.webdriver.firefox.webdriver import WebDriver
     from selenium.webdriver.remote.errorhandler import MoveTargetOutOfBoundsException
     from selenium.webdriver.support import expected_conditions as EC
+    from selenium.webdriver.support.select import Select
     from selenium.webdriver.support.ui import WebDriverWait
     from webdriver_manager.firefox import GeckoDriverManager
+
+    from psdi_glorius_plot.gui.setup import start_app
 
 except ImportError:
     # We put the importorskip commands here rather than above so that standard imports can be used by static analysis
@@ -33,8 +37,10 @@ except ImportError:
 
 DEFAULT_ORIGIN = "http://127.0.0.1:5000"
 
-# Standard timeout at 10 seconds
-TIMEOUT = 10
+# Timeout for waiting for things, and step of time we'll check at
+TIMEOUT_LONG = 10
+TIMEOUT_SHORT = 1
+TIMESTEP = 0.1
 
 
 origin = os.environ.get("ORIGIN", DEFAULT_ORIGIN)
@@ -85,7 +91,12 @@ def driver():
 
 def wait_for_cover_hidden(root: WebDriver):
     """Wait until the page cover is removed"""
-    WebDriverWait(root, TIMEOUT).until(EC.invisibility_of_element((By.XPATH, "//div[@id='cover']")))
+    WebDriverWait(root, TIMEOUT_LONG).until(EC.invisibility_of_element((By.XPATH, "//div[@id='cover']")))
+
+
+def scroll_element_into_view(driver: WebDriver, e: EC.WebElement):
+    driver.execute_script("arguments[0].scrollIntoView();", e)
+    wait_for_success(lambda: ActionChains(driver).move_to_element(e).perform())
 
 
 def wait_for_element(driver: WebDriver | EC.WebElement,
@@ -97,26 +108,55 @@ def wait_for_element(driver: WebDriver | EC.WebElement,
     if root is None:
         root = driver
 
-    WebDriverWait(root, TIMEOUT).until(EC.element_to_be_clickable((by, xpath)))
+    WebDriverWait(root, TIMEOUT_LONG).until(EC.presence_of_element_located((by, xpath)))
     e = root.find_element(by, xpath)
-
-    # Scroll the element into view
-    def scroll_into_view():
-        driver.execute_script("arguments[0].scrollIntoView();", e)
-        ActionChains(driver).move_to_element(e).perform()
 
     # Some elements might take some time to load into place, so we loop for a bit to give them a chance to do so if we
     # can't immediately do so
     time_elapsed = 0
-    while time_elapsed < TIMEOUT:
+    while time_elapsed < TIMEOUT_LONG:
         try:
-            scroll_into_view()
+            scroll_element_into_view(driver, e)
             break
         except MoveTargetOutOfBoundsException:
-            time_elapsed += 1
-            time.sleep(1)
+            time_elapsed += TIMESTEP
+            time.sleep(TIMESTEP)
+
+    WebDriverWait(root, TIMEOUT_LONG).until(EC.element_to_be_clickable((by, xpath)))
 
     return e
+
+
+async def wait_for_condition(cond: Callable, timeout=TIMEOUT_SHORT) -> bool:
+    """Waits for a condition to be true, return True if it is within the timeout, False otherwise"""
+
+    time_elapsed = 0
+
+    while time_elapsed < timeout:
+        if cond():
+            break
+        time_elapsed += TIMESTEP
+        time.sleep(TIMESTEP)
+
+    else:
+        return False
+
+    return True
+
+
+async def wait_for_success(action: Callable, timeout=TIMEOUT_SHORT):
+    """Waits for an action to be successful, return True if it is within the timeout, False otherwise"""
+
+    time_elapsed = 0
+
+    while time_elapsed < timeout:
+        try:
+            action()
+            break
+        except Exception:
+            time_elapsed += TIMESTEP
+            if time_elapsed >= timeout:
+                raise
 
 
 def test_initial_frontpage(driver: WebDriver):
@@ -126,7 +166,31 @@ def test_initial_frontpage(driver: WebDriver):
     driver.get(f"{origin}/")
     wait_for_cover_hidden(driver)
 
-    # Check that the front page contains the header "Glorius Plot Generator".
+    # Check that the front page contains expected elements
 
-    element = wait_for_element(driver, "//header//h5")
-    assert element.text == "Glorius Plot Generator"
+    # Check page title is present with the correct text
+    assert wait_for_element(driver, "//header//h5").text == "Glorius Plot Generator"
+
+
+def test_outcome_select(driver: WebDriver):
+    """Test that the outcome can be changed to produce desired effects - showing/hiding custom input, updating text
+    of coloumn in table, etc.
+    """
+
+    # Load the home page and wait for the page cover to be removed
+    driver.get(f"{origin}/")
+    wait_for_cover_hidden(driver)
+
+    # Get the select box used for the outcome
+    outcome_select_element = wait_for_element(driver, "//*[@id='os-0']")
+    outcome_select = Select(outcome_select_element)
+
+    # Get the outcome column label we'll be testing at various points
+    outcome_column_label = wait_for_element(driver, "//th[contains(@class,'sample-heading')]")
+
+    # Try selecting spectroscoping yield, and check that the column in the table is updated
+    scroll_element_into_view(driver, outcome_select_element)
+    outcome_select.select_by_value("Spectroscopic Yield (%)")
+
+    scroll_element_into_view(driver, outcome_column_label)
+    wait_for_condition(lambda: outcome_column_label.text == "Spectroscopic Yield (%)")
