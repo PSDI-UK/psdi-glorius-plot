@@ -20,6 +20,7 @@ try:
     from selenium.webdriver.firefox.service import Service as FirefoxService
     from selenium.webdriver.firefox.webdriver import WebDriver
     from selenium.webdriver.remote.errorhandler import MoveTargetOutOfBoundsException
+    from selenium.webdriver.remote.webelement import WebElement
     from selenium.webdriver.support import expected_conditions as EC
     from selenium.webdriver.support.select import Select
     from selenium.webdriver.support.ui import WebDriverWait
@@ -75,7 +76,8 @@ def common_setup():
 def driver():
     """Get a headless Firefox web driver"""
 
-    driver_path = os.environ.get("DRIVER")
+    driver_path = os.environ.get("HOME") + "/.wdm/drivers/geckodriver/linux64/v0.36.0/geckodriver"
+    # driver_path = os.environ.get("DRIVER")
 
     if not driver_path:
         driver_path = GeckoDriverManager().install()
@@ -94,22 +96,23 @@ def wait_for_cover_hidden(root: WebDriver):
     WebDriverWait(root, TIMEOUT_LONG).until(EC.invisibility_of_element((By.XPATH, "//div[@id='cover']")))
 
 
-def scroll_element_into_view(driver: WebDriver, e: EC.WebElement):
-    driver.execute_script("arguments[0].scrollIntoView();", e)
+def scroll_element_into_view(driver: WebDriver, e: WebElement):
+    driver.execute_script("arguments[0].scrollIntoView({behavior: 'instant', block: 'center'});", e)
     wait_for_success(lambda: ActionChains(driver).move_to_element(e).perform())
 
 
-def wait_for_element(driver: WebDriver | EC.WebElement,
+def wait_for_element(driver: WebDriver | WebElement,
                      xpath: str,
-                     root: EC.WebElement | None = None,
-                     by=By.XPATH) -> EC.WebElement:
+                     root: WebElement | None = None,
+                     by=By.XPATH,
+                     wait_for_clickable: bool = True) -> WebElement:
     """Shortcut for boilerplate to wait until a web element is visible"""
 
     if root is None:
         root = driver
 
     WebDriverWait(root, TIMEOUT_LONG).until(EC.presence_of_element_located((by, xpath)))
-    e = root.find_element(by, xpath)
+    e: WebElement = root.find_element(by, xpath)
 
     # Some elements might take some time to load into place, so we loop for a bit to give them a chance to do so if we
     # can't immediately do so
@@ -122,12 +125,13 @@ def wait_for_element(driver: WebDriver | EC.WebElement,
             time_elapsed += TIMESTEP
             time.sleep(TIMESTEP)
 
-    WebDriverWait(root, TIMEOUT_LONG).until(EC.element_to_be_clickable((by, xpath)))
+    if wait_for_clickable:
+        WebDriverWait(root, TIMEOUT_LONG).until(EC.element_to_be_clickable((by, xpath)))
 
     return e
 
 
-async def wait_for_condition(cond: Callable, timeout=TIMEOUT_SHORT) -> bool:
+def wait_for_condition(cond: Callable, timeout=TIMEOUT_SHORT) -> bool:
     """Waits for a condition to be true, return True if it is within the timeout, False otherwise"""
 
     time_elapsed = 0
@@ -144,7 +148,7 @@ async def wait_for_condition(cond: Callable, timeout=TIMEOUT_SHORT) -> bool:
     return True
 
 
-async def wait_for_success(action: Callable, timeout=TIMEOUT_SHORT):
+def wait_for_success(action: Callable, timeout=TIMEOUT_SHORT):
     """Waits for an action to be successful, return True if it is within the timeout, False otherwise"""
 
     time_elapsed = 0
@@ -169,7 +173,7 @@ def test_initial_frontpage(driver: WebDriver):
     # Check that the front page contains expected elements
 
     # Check page title is present with the correct text
-    assert wait_for_element(driver, "//header//h5").text == "Glorius Plot Generator"
+    assert (wait_for_element(driver, "//header//h5")).text == "Glorius Plot Generator"
 
 
 def test_outcome_select(driver: WebDriver):
@@ -189,8 +193,24 @@ def test_outcome_select(driver: WebDriver):
     outcome_column_label = wait_for_element(driver, "//th[contains(@class,'sample-heading')]")
 
     # Try selecting spectroscoping yield, and check that the column in the table is updated
+    TEST_OUTCOME_1 = "Spectroscopic Yield (%)"
+
     scroll_element_into_view(driver, outcome_select_element)
-    wait_for_success(lambda: outcome_select.select_by_value("Spectroscopic Yield (%)"))
+    wait_for_success(lambda: outcome_select.select_by_value(TEST_OUTCOME_1))
 
     scroll_element_into_view(driver, outcome_column_label)
-    assert wait_for_condition(lambda: outcome_column_label.text == "Spectroscopic Yield (%)")
+    assert (wait_for_condition(lambda: outcome_column_label.text == TEST_OUTCOME_1))
+
+    # Try inputting a custom outcome, and check that the column in the table is updated to match
+    TEST_OUTCOME_2 = "Test outcome"
+
+    scroll_element_into_view(driver, outcome_select_element)
+    wait_for_success(lambda: outcome_select.select_by_value("Other"))
+
+    outcome_input_element = wait_for_element(driver,
+                                             "//*[@id='ol-0']//*[contains(@class,'ql-editor')]",
+                                             wait_for_clickable=False)
+    outcome_input_element.send_keys(TEST_OUTCOME_2)
+
+    scroll_element_into_view(driver, outcome_column_label)
+    assert (wait_for_condition(lambda: outcome_column_label.text == TEST_OUTCOME_2))
