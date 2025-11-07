@@ -258,3 +258,47 @@ def test_num_conditions_control(driver: WebDriver):
     # The button we just clicked should be deleted, so we shouldn't be able to click it again
     with pytest.raises(StaleElementReferenceException):
         btn_remove_row_0.click()
+
+
+def _get_num_sample_columns(driver: WebDriver):
+    l_e = driver.find_elements(By.XPATH, "//th[contains(@class,'sample-heading')]")
+    return len(l_e)
+
+
+def _set_num_sample_columns(driver: WebDriver, n: int):
+    col_select_element = wait_for_element(driver, "//select[@id='num-sample']")
+    col_select = Select(col_select_element)
+    wait_for_success(lambda: col_select.select_by_value(str(n)))
+
+
+def test_num_samples_control(driver: WebDriver):
+    """Test that adding/removing/setting sample columns works as expected"""
+
+    # Load the home page and wait for the page cover to be removed
+    driver.get(f"{origin}/")
+    wait_for_cover_hidden(driver)
+
+    # Check that we start with 1 column
+    assert _get_num_sample_columns(driver) == 1
+
+    # Check that the select box for setting a specific number of rows works as expected
+    _set_num_sample_columns(driver, 5)
+    assert _get_num_sample_columns(driver) == 5
+
+    _set_num_sample_columns(driver, 3)
+    assert _get_num_sample_columns(driver) == 3
+
+    # Try clicking buttons to add/remove rows, and check that the number of rows is as expected afterwards
+    btn_add_col_0 = wait_for_element(driver, "//button[@id='add-sb-0']")
+    btn_add_col_0.click()
+    btn_add_col_0.click()
+    btn_add_col_0.click()
+    assert _get_num_sample_columns(driver) == 6
+
+    btn_remove_col_0 = wait_for_element(driver, "//button[@id='remove-sb-0']")
+    btn_remove_col_0.click()
+    assert _get_num_sample_columns(driver) == 5
+
+    # The button we just clicked should be deleted, so we shouldn't be able to click it again
+    with pytest.raises(StaleElementReferenceException):
+        btn_remove_col_0.click()
