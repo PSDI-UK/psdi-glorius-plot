@@ -190,7 +190,7 @@ def test_outcome_select(driver: WebDriver):
 
     # Try selecting spectroscoping yield, and check that the column in the table is updated
     scroll_element_into_view(driver, outcome_select_element)
-    outcome_select.select_by_value("Spectroscopic Yield (%)")
+    wait_for_success(lambda: outcome_select.select_by_value("Spectroscopic Yield (%)"))
 
     scroll_element_into_view(driver, outcome_column_label)
-    wait_for_condition(lambda: outcome_column_label.text == "Spectroscopic Yield (%)")
+    assert wait_for_condition(lambda: outcome_column_label.text == "Spectroscopic Yield (%)")
