@@ -281,14 +281,28 @@ def test_num_samples_control(driver: WebDriver):
     # Check that we start with 1 column
     assert _get_num_sample_columns(driver) == 1
 
-    # Check that the select box for setting a specific number of rows works as expected
+    # Check that the mean column isn't visible when there's only one column
+    assert not driver.find_element(By.XPATH, "//td[contains(@class,'button-mean-cell')]").is_displayed()
+    assert not driver.find_element(By.XPATH, "//th[contains(@class,'mean-heading')]").is_displayed()
+    assert not driver.find_element(By.XPATH, "//td[contains(@class,'baseline-mean-cell')]").is_displayed()
+    assert not any([e.is_displayed() for e in driver.find_elements(
+        By.XPATH, "//td[contains(@class,'mean-value-cell')]")])
+
+    # Check that the select box for setting a specific number of columns works as expected
     _set_num_sample_columns(driver, 5)
     assert _get_num_sample_columns(driver) == 5
+
+    # Check that the mean column is now visible
+    assert driver.find_element(By.XPATH, "//td[contains(@class,'button-mean-cell')]").is_displayed()
+    assert driver.find_element(By.XPATH, "//th[contains(@class,'mean-heading')]").is_displayed()
+    assert driver.find_element(By.XPATH, "//td[contains(@class,'baseline-mean-cell')]").is_displayed()
+    assert all([e.is_displayed() for e in driver.find_elements(
+        By.XPATH, "//td[contains(@class,'mean-value-cell')]")])
 
     _set_num_sample_columns(driver, 3)
     assert _get_num_sample_columns(driver) == 3
 
-    # Try clicking buttons to add/remove rows, and check that the number of rows is as expected afterwards
+    # Try clicking buttons to add/remove rows, and check that the number of columns is as expected afterwards
     btn_add_col_0 = wait_for_element(driver, "//button[@id='add-sb-0']")
     btn_add_col_0.click()
     btn_add_col_0.click()
@@ -302,3 +316,11 @@ def test_num_samples_control(driver: WebDriver):
     # The button we just clicked should be deleted, so we shouldn't be able to click it again
     with pytest.raises(StaleElementReferenceException):
         btn_remove_col_0.click()
+
+    # Check that the mean column disappears when the number of columns is reduced to 1
+    _set_num_sample_columns(driver, 1)
+    assert not driver.find_element(By.XPATH, "//td[contains(@class,'button-mean-cell')]").is_displayed()
+    assert not driver.find_element(By.XPATH, "//th[contains(@class,'mean-heading')]").is_displayed()
+    assert not driver.find_element(By.XPATH, "//td[contains(@class,'baseline-mean-cell')]").is_displayed()
+    assert not any([e.is_displayed() for e in driver.find_elements(
+        By.XPATH, "//td[contains(@class,'mean-value-cell')]")])
