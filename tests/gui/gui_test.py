@@ -19,7 +19,7 @@ try:
     from selenium.webdriver.common.by import By
     from selenium.webdriver.firefox.service import Service as FirefoxService
     from selenium.webdriver.firefox.webdriver import WebDriver
-    from selenium.webdriver.remote.errorhandler import MoveTargetOutOfBoundsException
+    from selenium.webdriver.remote.errorhandler import MoveTargetOutOfBoundsException, StaleElementReferenceException
     from selenium.webdriver.remote.webelement import WebElement
     from selenium.webdriver.support import expected_conditions as EC
     from selenium.webdriver.support.select import Select
@@ -214,3 +214,47 @@ def test_outcome_select(driver: WebDriver):
 
     scroll_element_into_view(driver, outcome_column_label)
     assert (wait_for_condition(lambda: outcome_column_label.text == TEST_OUTCOME_2))
+
+
+def _get_num_condition_rows(driver: WebDriver):
+    l_e = driver.find_elements(By.XPATH, "//tr[contains(@class,'condition-row')]")
+    return len(l_e)
+
+
+def _set_num_condition_rows(driver: WebDriver, n: int):
+    row_select_element = wait_for_element(driver, "//select[@id='num-condition']")
+    row_select = Select(row_select_element)
+    wait_for_success(lambda: row_select.select_by_value(str(n)))
+
+
+def test_num_conditions_control(driver: WebDriver):
+    """Test that adding/removing/setting condition rows works as expected"""
+
+    # Load the home page and wait for the page cover to be removed
+    driver.get(f"{origin}/")
+    wait_for_cover_hidden(driver)
+
+    # Check that we start with 5 rows
+    assert _get_num_condition_rows(driver) == 5
+
+    # Check that the select box for setting a specific number of rows works as expected
+    _set_num_condition_rows(driver, 9)
+    assert _get_num_condition_rows(driver) == 9
+
+    _set_num_condition_rows(driver, 7)
+    assert _get_num_condition_rows(driver) == 7
+
+    # Try clicking buttons to add/remove rows, and check that the number of rows is as expected afterwards
+    btn_add_row_0 = wait_for_element(driver, "//button[@id='add-cb-0']")
+    btn_add_row_0.click()
+    btn_add_row_0.click()
+    btn_add_row_0.click()
+    assert _get_num_condition_rows(driver) == 10
+
+    btn_remove_row_0 = wait_for_element(driver, "//button[@id='remove-cb-0']")
+    btn_remove_row_0.click()
+    assert _get_num_condition_rows(driver) == 9
+
+    # The button we just clicked should be deleted, so we shouldn't be able to click it again
+    with pytest.raises(StaleElementReferenceException):
+        btn_remove_row_0.click()
