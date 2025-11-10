@@ -1332,6 +1332,7 @@ function fillExample() {
 
   // Clear all tooltips after generating, since clicking the button interferes with the normal trigger to clear its
   // tooltip
+  // TODO: Make this a function, and make sure it's used to clear tooltips when any option with a tooltip is clicked
   tooltipList.forEach((tooltip) => {
     tooltip.hide();
   });
