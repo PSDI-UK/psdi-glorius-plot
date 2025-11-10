@@ -14,7 +14,7 @@ import psdi_glorius_plot
 # Skip all tests in this module if required packages for GUI testing aren't installed
 try:
     from selenium import webdriver
-    from selenium.webdriver import FirefoxOptions
+    from selenium.webdriver import FirefoxOptions, Keys
     from selenium.webdriver.common.action_chains import ActionChains
     from selenium.webdriver.common.by import By
     from selenium.webdriver.firefox.service import Service as FirefoxService
@@ -467,3 +467,81 @@ def test_value_to_plot_option(driver: WebDriver):
     _check_dev_outline_presence(driver, "rel", True)
     _check_dev_outline_presence(driver, "abs", False)
     _check_value_outline_presence(driver, False)
+
+
+plot_display_scale = 1
+
+
+def _get_plot_width(driver: WebDriver):
+    plot = driver.find_element(By.XPATH, "//canvas[@id='glorius-plot']")
+    width_input = driver.find_element(By.XPATH, "//input[@id='width-input']")
+    assert wait_for_condition(lambda: int(plot.get_attribute("width")) ==
+                              plot_display_scale*int(float(width_input.get_attribute("value"))))
+    return int(float(width_input.get_attribute("value")))
+
+
+def _set_plot_width(driver: WebDriver, x: float):
+    width_input = wait_for_element(driver, "//input[@id='width-input']")
+    width_input.send_keys(Keys.BACKSPACE*10 + Keys.DELETE*10 + str(x))
+    # Click the plot so that the width input is defocused and an update will be triggered
+    wait_for_element(driver, "//canvas[@id='glorius-plot']").click()
+
+
+def _get_plot_height(driver: WebDriver):
+    plot = driver.find_element(By.XPATH, "//canvas[@id='glorius-plot']")
+    height_input = driver.find_element(By.XPATH, "//input[@id='height-input']")
+    assert wait_for_condition(lambda: int(plot.get_attribute("height")) ==
+                              plot_display_scale*int(float(height_input.get_attribute("value"))))
+    return int(float(height_input.get_attribute("value")))
+
+
+def _set_plot_height(driver: WebDriver, x: float):
+    height_input = wait_for_element(driver, "//input[@id='height-input']")
+    height_input.send_keys(Keys.BACKSPACE*10 + Keys.DELETE*10 + str(x))
+    # Click the plot so that the height input is defocused and an update will be triggered
+    wait_for_element(driver, "//canvas[@id='glorius-plot']").click()
+
+
+def _get_plot_fontsize(driver: WebDriver):
+    fontsize_input: WebElement = driver.find_element(By.XPATH, "//input[@id='font-size-input']")
+    return float(fontsize_input.get_attribute("value"))
+
+
+def _set_plot_fontsize(driver: WebDriver, x: float):
+    fontsize_input = wait_for_element(driver, "//input[@id='font-size-input']")
+    fontsize_input.send_keys(str(x))
+    # Click the plot so that the fontsize input is defocused and an update will be triggered
+    wait_for_element(driver, "//canvas[@id='glorius-plot']").click()
+
+
+def test_plot_sizing(driver: WebDriver):
+    """Test that we can resize the plot properly"""
+
+    # Load the home page and wait for the page cover to be removed
+    driver.get(f"{origin}/")
+    wait_for_cover_hidden(driver)
+
+    init_plot_width = 600
+    init_plot_height = 600
+    init_plot_fontsize = 18
+
+    # Check that the plot has the correct initial dimensions and fontsize
+    assert _get_plot_width(driver) == init_plot_width
+    assert _get_plot_height(driver) == init_plot_height
+    assert _get_plot_fontsize(driver) == init_plot_fontsize
+
+    # By default, the aspect ratio should stay fixed, but the font size won't scale. Confirm that this works
+
+    scale = 2
+    _set_plot_width(driver, init_plot_width*scale)
+
+    assert _get_plot_width(driver) == init_plot_width*scale
+    assert _get_plot_height(driver) == init_plot_height*scale
+    assert _get_plot_fontsize(driver) == init_plot_fontsize
+
+    scale = 0.5
+    _set_plot_height(driver, init_plot_height*scale)
+
+    assert _get_plot_width(driver) == init_plot_width*scale
+    assert _get_plot_height(driver) == init_plot_height*scale
+    assert _get_plot_fontsize(driver) == init_plot_fontsize
