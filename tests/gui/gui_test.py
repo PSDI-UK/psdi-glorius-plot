@@ -4,8 +4,8 @@
 
 import os
 import time
+from collections.abc import Callable
 from multiprocessing import Process
-from typing import Callable
 
 import pytest
 
@@ -324,3 +324,146 @@ def test_num_samples_control(driver: WebDriver):
     assert not driver.find_element(By.XPATH, "//td[contains(@class,'baseline-mean-cell')]").is_displayed()
     assert not any([e.is_displayed() for e in driver.find_elements(
         By.XPATH, "//td[contains(@class,'mean-value-cell')]")])
+
+
+def _check_dev_outline_presence(driver: WebDriver, dev: str, present=True):
+
+    # To keep the asserts giving full info in either case without much code duplication, we use
+    # False = 1-True and True = 1-False to flip booleans if we're looking for the outline to not be present
+    if present:
+        optional_one = 0
+        optional_minus = 1
+    else:
+        optional_one = 1
+        optional_minus = -1
+
+    assert optional_one + optional_minus*("col-selected-top" in
+                                          driver.find_element(By.XPATH,
+                                                              f"//th[contains(@class,'{dev}-deviation-heading')]")
+                                          .get_attribute("class"))
+    assert optional_one + optional_minus*("col-selected" in
+                                          driver.find_element(By.XPATH,
+                                                              f"//td[contains(@class,'baseline-{dev}-deviation-cell')]")
+                                          .get_attribute("class"))
+    assert all(optional_one + optional_minus*("col-selected" in e.get_attribute("class"))
+               for e in driver.find_elements(By.XPATH,
+                                             f"//td[contains(@class,'{dev}-deviation-value-cell')]"))
+    assert optional_one + optional_minus*("col-selected-bottom" in
+                                          driver.find_element(By.XPATH,
+                                                              f"//td[contains(@class,'plot-select-{dev}-cell')]")
+                                          .get_attribute("class"))
+
+
+def _check_value_outline_presence(driver: WebDriver, present=True):
+
+    # To keep the asserts giving full info in either case without much code duplication, we use
+    # False = 1-True and True = 1-False to flip booleans if we're looking for the outline to not be present
+    if present:
+        optional_one = 0
+        optional_minus = 1
+    else:
+        optional_one = 1
+        optional_minus = -1
+
+    if _get_num_sample_columns(driver) == 1:
+        sample_or_mean = "sample"
+        baseline_class = "baseline-value-cell"
+
+        assert optional_one + optional_minus*("col-selected-top" in
+                                              driver.find_element(By.XPATH,
+                                                                  "//td[contains(@class,'sample-button-cell')]")
+                                              .get_attribute("class"))
+        assert optional_one + optional_minus*("col-selected" in
+                                              driver.find_element(By.XPATH, "//th[contains(@class,'sample-heading')]")
+                                              .get_attribute("class"))
+    else:
+        sample_or_mean = "mean"
+        baseline_class = "baseline-mean-cell"
+
+        assert optional_one + optional_minus*("col-selected-top" in
+                                              driver.find_element(By.XPATH, "//th[contains(@class,'mean-heading')]")
+                                              .get_attribute("class"))
+
+    assert optional_one + optional_minus*("col-selected" in
+                                          driver.find_element(By.XPATH,
+                                                              f"//td[contains(@class,'{baseline_class}')]")
+                                          .get_attribute("class"))
+    assert all(optional_one + optional_minus*("col-selected" in e.get_attribute("class")) for e in
+               driver.find_elements(By.XPATH, f"//td[contains(@class,'{sample_or_mean}-value-cell')]"))
+    assert optional_one + optional_minus*("col-selected-bottom" in
+                                          driver.find_element(By.XPATH,
+                                                              "//td[contains(@class,'plot-select-mean-cell')]")
+                                          .get_attribute("class"))
+
+
+def test_value_to_plot_option(driver: WebDriver):
+    """Test that the radio input to select which value to plot works as expected"""
+
+    # Load the home page and wait for the page cover to be removed
+    driver.get(f"{origin}/")
+    wait_for_cover_hidden(driver)
+
+    mean_radio = wait_for_element(driver, "//input[@id='plot-mean']")
+    abs_radio = wait_for_element(driver, "//input[@id='plot-abs']")
+    rel_radio = wait_for_element(driver, "//input[@id='plot-rel']")
+
+    # When the page is first loaded, check that the Deviation (%) column is selected
+    assert not mean_radio.is_selected()
+    assert not abs_radio.is_selected()
+    assert rel_radio.is_selected()
+
+    # Check that the cells in the relative deviation column all have the classes to indicate they're outlined
+    _check_dev_outline_presence(driver, "rel", True)
+
+    # And check that the absolute deviation column is NOT outlined
+    _check_dev_outline_presence(driver, "abs", False)
+
+    # And similarly the value column also shouldn't be outlined
+    _check_value_outline_presence(driver, False)
+
+    # Select the absolute deviation, and check that the chart updates as expected
+    scroll_element_into_view(driver, abs_radio)
+    abs_radio.click()
+    assert not mean_radio.is_selected()
+    assert abs_radio.is_selected()
+    assert not rel_radio.is_selected()
+
+    # The relative deviation should now NOT be selected
+    _check_dev_outline_presence(driver, "rel", False)
+
+    # And the absolute deviation now should be selected
+    _check_dev_outline_presence(driver, "abs", True)
+
+    # And the value column still should not be selected
+    _check_value_outline_presence(driver, False)
+
+    # Now select the value column and do the same checks
+    scroll_element_into_view(driver, mean_radio)
+    mean_radio.click()
+    assert mean_radio.is_selected()
+    assert not abs_radio.is_selected()
+    assert not rel_radio.is_selected()
+
+    _check_dev_outline_presence(driver, "rel", False)
+    _check_dev_outline_presence(driver, "abs", False)
+    _check_value_outline_presence(driver, True)
+
+    # Now let's try adding sample columns, and make sure the outline updates to move to the mean column (the same
+    # function will check the mean column instead now that we have more than one column)
+    _set_num_sample_columns(driver, 2)
+    _check_value_outline_presence(driver, True)
+
+    # And check the other columns are un-outlined as well, just to be sure
+    _check_dev_outline_presence(driver, "rel", False)
+    _check_dev_outline_presence(driver, "abs", False)
+
+    # Finally, select the relative column again and check all is well moving back to it
+    scroll_element_into_view(driver, rel_radio)
+    rel_radio.click()
+    assert not mean_radio.is_selected()
+    assert not abs_radio.is_selected()
+    assert rel_radio.is_selected()
+
+    _check_dev_outline_presence(driver, "rel", True)
+    _check_dev_outline_presence(driver, "abs", False)
+    _check_value_outline_presence(driver, False)
