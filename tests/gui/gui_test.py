@@ -469,14 +469,11 @@ def test_value_to_plot_option(driver: WebDriver):
     _check_value_outline_presence(driver, False)
 
 
-plot_display_scale = 1
-
-
 def _get_plot_width(driver: WebDriver):
     plot = driver.find_element(By.XPATH, "//canvas[@id='glorius-plot']")
     width_input = driver.find_element(By.XPATH, "//input[@id='width-input']")
     assert wait_for_condition(lambda: int(plot.get_attribute("width")) ==
-                              plot_display_scale*int(float(width_input.get_attribute("value"))))
+                              int(float(width_input.get_attribute("value"))))
     return int(float(width_input.get_attribute("value")))
 
 
@@ -491,7 +488,7 @@ def _get_plot_height(driver: WebDriver):
     plot = driver.find_element(By.XPATH, "//canvas[@id='glorius-plot']")
     height_input = driver.find_element(By.XPATH, "//input[@id='height-input']")
     assert wait_for_condition(lambda: int(plot.get_attribute("height")) ==
-                              plot_display_scale*int(float(height_input.get_attribute("value"))))
+                              int(float(height_input.get_attribute("value"))))
     return int(float(height_input.get_attribute("value")))
 
 
@@ -545,3 +542,46 @@ def test_plot_sizing(driver: WebDriver):
     assert _get_plot_width(driver) == init_plot_width*scale
     assert _get_plot_height(driver) == init_plot_height*scale
     assert _get_plot_fontsize(driver) == init_plot_fontsize
+
+    # Reset the plot and check it resets properly
+    reset_plot_dims_button = wait_for_element(driver, "//button[@id='reset-plot-dims']")
+    reset_plot_dims_button.click()
+
+    assert _get_plot_width(driver) == init_plot_width
+    assert _get_plot_height(driver) == init_plot_height
+    assert _get_plot_fontsize(driver) == init_plot_fontsize
+
+    # Now try turning off aspect ratio lock, and test that height doesn't scale with width and vice-versa
+    aspect_ratio_lock_box = wait_for_element(driver, "//input[@id='lock-aspect-ratio']")
+    aspect_ratio_lock_box.click()
+
+    width_scale = 1.5
+    _set_plot_width(driver, init_plot_width*width_scale)
+
+    assert _get_plot_width(driver) == init_plot_width*width_scale
+    assert _get_plot_height(driver) == init_plot_height
+    assert _get_plot_fontsize(driver) == init_plot_fontsize
+
+    height_scale = 0.75
+    _set_plot_height(driver, init_plot_height*height_scale)
+
+    assert _get_plot_width(driver) == init_plot_width*width_scale
+    assert _get_plot_height(driver) == init_plot_height*height_scale
+    assert _get_plot_fontsize(driver) == init_plot_fontsize
+
+    # Now let's test font size scaling. Turn back on aspect ratio lock, turn on font scaling, and reset the plot dims
+
+    scroll_element_into_view(driver, aspect_ratio_lock_box)
+    aspect_ratio_lock_box.click()
+    scale_font_size_box = wait_for_element(driver, "//input[@id='scale-font-size']")
+    scale_font_size_box.click()
+    scroll_element_into_view(driver, reset_plot_dims_button)
+    reset_plot_dims_button.click()
+
+    scale = 2
+    _set_plot_width(driver, init_plot_width*scale)
+    assert _get_plot_fontsize(driver) == init_plot_fontsize*scale
+
+    scale = 0.5
+    _set_plot_height(driver, init_plot_height*scale)
+    assert _get_plot_fontsize(driver) == init_plot_fontsize*scale
