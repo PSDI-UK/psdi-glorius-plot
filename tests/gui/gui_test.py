@@ -43,6 +43,8 @@ TIMEOUT_LONG = 10
 TIMEOUT_SHORT = 1
 TIMESTEP = 0.1
 
+DOWNLOAD_LOCATION = "/tmp"
+EX_PLOT_FILENAME = "glorius_plot.png"
 
 origin = os.environ.get("ORIGIN", DEFAULT_ORIGIN)
 
@@ -83,8 +85,15 @@ def driver():
         driver_path = GeckoDriverManager().install()
         print(f"Gecko driver installed to {driver_path}")
 
+    profile = webdriver.FirefoxProfile()
+    profile.set_preference('browser.download.folderList', 2)
+    profile.set_preference('browser.download.manager.showWhenStarting', False)
+    profile.set_preference('browser.download.dir', DOWNLOAD_LOCATION)
+    profile.set_preference('browser.helperApps.neverAsk.saveToDisk', 'image/png')
+
     opts = FirefoxOptions()
     opts.add_argument("--headless")
+    opts.profile = profile
     ff_driver = webdriver.Firefox(service=FirefoxService(driver_path),
                                   options=opts)
     yield ff_driver
@@ -604,3 +613,24 @@ def test_fan_plot_controls(driver: WebDriver):
         scroll_element_into_view(driver, grid_line_toggle)
     with pytest.raises(MoveTargetOutOfBoundsException):
         scroll_element_into_view(driver, axis_line_toggle)
+
+
+def test_download_plot(driver: WebDriver):
+    """Test that we can download an image of the plot using the provided button"""
+
+    # Load the home page and wait for the page cover to be removed
+    driver.get(f"{origin}/")
+    wait_for_cover_hidden(driver)
+
+    download_button = wait_for_element(driver, "//button[@id='export-image-png']")
+    download_button.click()
+
+    qualified_download_filename = os.path.join(DOWNLOAD_LOCATION, EX_PLOT_FILENAME)
+
+    # Wait until the log file exists, since it's downloaded second
+    time_elapsed = 0
+    while not os.path.isfile(qualified_download_filename):
+        time.sleep(TIMESTEP)
+        time_elapsed += TIMESTEP
+        if time_elapsed > TIMEOUT_SHORT:
+            pytest.fail(f"Download of {qualified_download_filename} and timed out")
