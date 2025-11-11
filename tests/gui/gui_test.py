@@ -585,3 +585,22 @@ def test_plot_sizing(driver: WebDriver):
     scale = 0.5
     _set_plot_height(driver, init_plot_height*scale)
     assert _get_plot_fontsize(driver) == init_plot_fontsize*scale
+
+
+def test_fan_plot_controls(driver: WebDriver):
+    """Test that toggling fan plot mode makes the radar-plot-specific controls disappear"""
+
+    # Load the home page and wait for the page cover to be removed
+    driver.get(f"{origin}/")
+    wait_for_cover_hidden(driver)
+
+    # Check that the radar plot controls are all present initially
+    grid_line_toggle = wait_for_element(driver, "//input[@id='grid-line-toggle']")
+    axis_line_toggle = wait_for_element(driver, "//input[@id='axis-line-toggle']")
+
+    # Toggle fan plot mode, then check the radar-plot-specific elements are no longer present
+    wait_for_element(driver, "//input[@id='fan-toggle']").click()
+    with pytest.raises(MoveTargetOutOfBoundsException):
+        scroll_element_into_view(driver, grid_line_toggle)
+    with pytest.raises(MoveTargetOutOfBoundsException):
+        scroll_element_into_view(driver, axis_line_toggle)
