@@ -618,14 +618,23 @@ def test_fan_plot_controls(driver: WebDriver):
 def test_download_plot(driver: WebDriver):
     """Test that we can download an image of the plot using the provided button"""
 
+    qualified_download_filename = os.path.join(DOWNLOAD_LOCATION, EX_PLOT_FILENAME)
+
+    # If the downloaded file already exists, remove it
+    try:
+        os.remove(qualified_download_filename)
+    except FileNotFoundError:
+        pass
+
     # Load the home page and wait for the page cover to be removed
     driver.get(f"{origin}/")
     wait_for_cover_hidden(driver)
 
+    # Wait a moment after the page loads so the plot can be generated
+    time.sleep(0.3)
+
     download_button = wait_for_element(driver, "//button[@id='export-image-png']")
     download_button.click()
-
-    qualified_download_filename = os.path.join(DOWNLOAD_LOCATION, EX_PLOT_FILENAME)
 
     # Wait until the log file exists, since it's downloaded second
     time_elapsed = 0
@@ -634,3 +643,30 @@ def test_download_plot(driver: WebDriver):
         time_elapsed += TIMESTEP
         if time_elapsed > TIMEOUT_SHORT:
             pytest.fail(f"Download of {qualified_download_filename} and timed out")
+
+    # Note the filesize of the downloaded plot, then delete it
+    empty_plot_filesize = os.path.getsize(qualified_download_filename)
+    os.remove(qualified_download_filename)
+
+    # Now, fill the table with example data, wait for the plot to be re-generated, and download again
+    wait_for_element(driver, "//button[@id='fill-example']").click()
+    assert wait_for_condition(lambda: _get_num_condition_rows(driver) == 10)
+    time.sleep(0.3)
+    scroll_element_into_view(driver, download_button)
+    download_button.click()
+
+    time_elapsed = 0
+    while not os.path.isfile(qualified_download_filename):
+        time.sleep(TIMESTEP)
+        time_elapsed += TIMESTEP
+        if time_elapsed > TIMEOUT_SHORT:
+            pytest.fail(f"Download of {qualified_download_filename} and timed out")
+
+    # Note the filesize of the new downloaded plot, then delete it as well
+    example_plot_filesize = os.path.getsize(qualified_download_filename)
+    os.remove(qualified_download_filename)
+
+    # Check that the file size of the example plot is larger than for the empty plot - due to how PNG enconding works,
+    # a more complicated image will have a larger file size. If this isn't the case, it indicates something is going
+    # wrong with generating the plot
+    assert example_plot_filesize > empty_plot_filesize
