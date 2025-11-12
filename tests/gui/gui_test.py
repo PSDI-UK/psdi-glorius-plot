@@ -43,6 +43,8 @@ TIMEOUT_LONG = 10
 TIMEOUT_SHORT = 1
 TIMESTEP = 0.1
 
+PLOT_GENERATION_TIME = 0.3
+
 DOWNLOAD_LOCATION = "/tmp"
 EX_PLOT_FILENAME = "glorius_plot.png"
 
@@ -618,6 +620,15 @@ def test_fan_plot_controls(driver: WebDriver):
         scroll_element_into_view(driver, axis_line_toggle)
 
 
+def _wait_for_download(filename):
+    time_elapsed = 0
+    while not os.path.isfile(filename):
+        time.sleep(TIMESTEP)
+        time_elapsed += TIMESTEP
+        if time_elapsed > TIMEOUT_SHORT:
+            pytest.fail(f"Download of {filename} and timed out")
+
+
 def test_download_plot(driver: WebDriver):
     """Test that we can download an image of the plot using the provided button"""
 
@@ -634,42 +645,59 @@ def test_download_plot(driver: WebDriver):
     wait_for_cover_hidden(driver)
 
     # Wait a moment after the page loads so the plot can be generated
-    time.sleep(0.3)
+    time.sleep(PLOT_GENERATION_TIME)
+
+    # Turn off auto-updating while we do this
+    wait_for_element(driver, "//input[@id-'auto-update-toggle']").click()
 
     download_button = wait_for_element(driver, "//button[@id='export-image-png']")
     download_button.click()
-
-    # Wait until the log file exists, since it's downloaded second
-    time_elapsed = 0
-    while not os.path.isfile(qualified_download_filename):
-        time.sleep(TIMESTEP)
-        time_elapsed += TIMESTEP
-        if time_elapsed > TIMEOUT_SHORT:
-            pytest.fail(f"Download of {qualified_download_filename} and timed out")
+    _wait_for_download(qualified_download_filename)
 
     # Note the filesize of the downloaded plot, then delete it
     empty_plot_filesize = os.path.getsize(qualified_download_filename)
     os.remove(qualified_download_filename)
 
-    # Now, fill the table with example data, wait for the plot to be re-generated, and download again
-    wait_for_element(driver, "//button[@id='fill-example']").click()
-    assert wait_for_condition(lambda: _get_num_condition_rows(driver) == 10)
-    time.sleep(0.3)
+    # Add labels to plot now, so we can test if they seem to appear on the downloaded plot
+
+    l_label_input_elements = driver.find_elements(By.XPATH,
+                                                  "//*[contains(@class,'condition-input')]" +
+                                                  "//*[contains(@class,'ql-editor')]")
+    for label_input_element in l_label_input_elements:
+        label_input_element.send_keys("Label")
+
+    # Generate it again, using the button to manually re-generate (since auto-updates are turned off)
+    generate_plot_button = wait_for_element(driver, "//input[@id='generate-plot']")
+    generate_plot_button.click()
+    time.sleep(PLOT_GENERATION_TIME)
+
+    # Download it again
     scroll_element_into_view(driver, download_button)
     download_button.click()
-
-    time_elapsed = 0
-    while not os.path.isfile(qualified_download_filename):
-        time.sleep(TIMESTEP)
-        time_elapsed += TIMESTEP
-        if time_elapsed > TIMEOUT_SHORT:
-            pytest.fail(f"Download of {qualified_download_filename} and timed out")
+    _wait_for_download(qualified_download_filename)
 
     # Note the filesize of the new downloaded plot, then delete it as well
-    example_plot_filesize = os.path.getsize(qualified_download_filename)
+    label_plot_filesize = os.path.getsize(qualified_download_filename)
     os.remove(qualified_download_filename)
 
     # Check that the file size of the example plot is larger than for the empty plot - due to how PNG enconding works,
     # a more complicated image will have a larger file size. If this isn't the case, it indicates something is going
     # wrong with generating the plot
-    assert example_plot_filesize > empty_plot_filesize
+    assert label_plot_filesize > empty_plot_filesize
+
+    # Now, fill the table with example data, wait for the plot to be re-generated, and download again
+    wait_for_element(driver, "//button[@id='fill-example']").click()
+    assert wait_for_condition(lambda: _get_num_condition_rows(driver) == 10)
+    time.sleep(PLOT_GENERATION_TIME)
+
+    scroll_element_into_view(driver, download_button)
+    download_button.click()
+    _wait_for_download(qualified_download_filename)
+
+    # Note the filesize of the new downloaded plot, then delete it as well
+    example_plot_filesize = os.path.getsize(qualified_download_filename)
+    os.remove(qualified_download_filename)
+
+    # Check that the file size of the example plot is even larger than the labeled plot, since it's even more
+    # complicated
+    assert example_plot_filesize > label_plot_filesize
