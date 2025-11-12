@@ -648,7 +648,7 @@ def test_download_plot(driver: WebDriver):
     time.sleep(PLOT_GENERATION_TIME)
 
     # Turn off auto-updating while we do this
-    wait_for_element(driver, "//input[@id-'auto-update-toggle']").click()
+    wait_for_element(driver, "//input[@id='auto-update-toggle']").click()
 
     download_button = wait_for_element(driver, "//button[@id='export-image-png']")
     download_button.click()
@@ -667,7 +667,7 @@ def test_download_plot(driver: WebDriver):
         label_input_element.send_keys("Label")
 
     # Generate it again, using the button to manually re-generate (since auto-updates are turned off)
-    generate_plot_button = wait_for_element(driver, "//input[@id='generate-plot']")
+    generate_plot_button = wait_for_element(driver, "//button[@id='generate-plot']")
     generate_plot_button.click()
     time.sleep(PLOT_GENERATION_TIME)
 
@@ -688,6 +688,8 @@ def test_download_plot(driver: WebDriver):
     # Now, fill the table with example data, wait for the plot to be re-generated, and download again
     wait_for_element(driver, "//button[@id='fill-example']").click()
     assert wait_for_condition(lambda: _get_num_condition_rows(driver) == 10)
+    scroll_element_into_view(driver, generate_plot_button)
+    generate_plot_button.click()
     time.sleep(PLOT_GENERATION_TIME)
 
     scroll_element_into_view(driver, download_button)
