@@ -658,6 +658,31 @@ def test_download_plot(driver: WebDriver):
     empty_plot_filesize = os.path.getsize(qualified_download_filename)
     os.remove(qualified_download_filename)
 
+    # Add a title to the plot now, so we can test if they seem to appear on the downloaded plot
+
+    title_input_element = driver.find_element(By.XPATH,
+                                              "//*[@id='title-input']//*[contains(@class,'ql-editor')]")
+    title_input_element.send_keys("Example very very very very very long title")
+
+    # Generate it again, using the button to manually re-generate (since auto-updates are turned off)
+    generate_plot_button = wait_for_element(driver, "//button[@id='generate-plot']")
+    generate_plot_button.click()
+    time.sleep(PLOT_GENERATION_TIME)
+
+    # Download it again
+    scroll_element_into_view(driver, download_button)
+    download_button.click()
+    _wait_for_download(qualified_download_filename)
+
+    # Note the filesize of the new downloaded plot, then delete it as well
+    title_plot_filesize = os.path.getsize(qualified_download_filename)
+    os.remove(qualified_download_filename)
+
+    # Check that the file size of the plot with the title is larger than for the empty plot - due to how PNG enconding
+    # works, a more complicated image will have a larger file size. If this isn't the case, it indicates something is
+    # going wrong with generating the plot
+    assert title_plot_filesize > empty_plot_filesize
+
     # Add labels to plot now, so we can test if they seem to appear on the downloaded plot
 
     l_label_input_elements = driver.find_elements(By.XPATH,
@@ -680,10 +705,8 @@ def test_download_plot(driver: WebDriver):
     label_plot_filesize = os.path.getsize(qualified_download_filename)
     os.remove(qualified_download_filename)
 
-    # Check that the file size of the example plot is larger than for the empty plot - due to how PNG enconding works,
-    # a more complicated image will have a larger file size. If this isn't the case, it indicates something is going
-    # wrong with generating the plot
-    assert label_plot_filesize > empty_plot_filesize
+    # Check that the file size of the plot with the labels is now even larger than just the title
+    assert label_plot_filesize > title_plot_filesize
 
     # Now, fill the table with example data, wait for the plot to be re-generated, and download again
     wait_for_element(driver, "//button[@id='fill-example']").click()
