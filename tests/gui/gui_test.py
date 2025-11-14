@@ -483,6 +483,12 @@ def test_value_to_plot_option(driver: WebDriver):
     _check_value_outline_presence(driver, False)
 
 
+def test_calcs(driver: WebDriver):
+    """Test that values in the plot are calculated properly"""
+    # TODO
+    pass
+
+
 def _get_plot_width(driver: WebDriver):
     plot = driver.find_element(By.XPATH, "//canvas[@id='glorius-plot']")
     width_input = driver.find_element(By.XPATH, "//input[@id='width-input']")
