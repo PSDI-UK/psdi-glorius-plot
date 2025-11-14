@@ -2,6 +2,7 @@
 
 # Selenium test script for PSDI Glorius Plot Generator Service.
 
+import math
 import os
 import time
 from collections.abc import Callable
@@ -16,6 +17,7 @@ try:
     from selenium import webdriver
     from selenium.webdriver import FirefoxOptions, Keys
     from selenium.webdriver.common.action_chains import ActionChains
+    from selenium.webdriver.common.alert import Alert
     from selenium.webdriver.common.by import By
     from selenium.webdriver.firefox.service import Service as FirefoxService
     from selenium.webdriver.firefox.webdriver import WebDriver
@@ -485,8 +487,51 @@ def test_value_to_plot_option(driver: WebDriver):
 
 def test_calcs(driver: WebDriver):
     """Test that values in the plot are calculated properly"""
-    # TODO
-    pass
+
+    # Load the home page and wait for the page cover to be removed
+    driver.get(f"{origin}/")
+    wait_for_cover_hidden(driver)
+
+    # Size the table so we have 10 rows and columns
+    _set_num_condition_rows(driver, 10)
+    _set_num_sample_columns(driver, 10)
+
+    # Fill with random data
+    fill_random_button = wait_for_element(driver, "//button[@id='fill-random']")
+    fill_random_button.click()
+
+    # We should see an alert here warning that entered data will be lost - accept it
+    Alert(driver).accept()
+
+    # Wait till the first baseline element has a non-zero value
+    first_baseline_input = wait_for_element(driver, "//input[contains(@class,'baseline-value')]")
+    assert wait_for_condition(lambda: bool(first_baseline_input.get_attribute("value")))
+
+    # Now, let's test that the mean and deviation values are calculated correctly. Start with the baseline row, which
+    # just has the mean to calculate, which we'll need to calculate the deviation of other rows
+    l_baseline_inputs = driver.find_elements(By.XPATH, "//input[contains(@class,'baseline-value')]")
+    baseline_mean = sum([float(x.get_attribute("value")) for x in l_baseline_inputs])/len(l_baseline_inputs)
+
+    baseline_mean_input = driver.find_element(By.XPATH, "//td[contains(@class, 'baseline-mean-cell')]" +
+                                              "//input[contains(@class,'mean-value')]")
+    assert math.isclose(baseline_mean, float(baseline_mean_input.get_attribute("value")), abs_tol=0.5)
+
+    # Now go through each row and check that it's calculated correctly
+    l_condition_rows = driver.find_elements(By.XPATH, "//tr[contains(@class,'condition-row')]")
+    for condition_row in l_condition_rows:
+        l_sample_inputs = condition_row.find_elements(By.XPATH, "*//input[contains(@class,'sample-value')]")
+        sample_mean = sum([float(x.get_attribute("value")) for x in l_sample_inputs])/len(l_sample_inputs)
+        sample_abs_dev = sample_mean - baseline_mean
+        sample_rel_dev = 100*sample_abs_dev / baseline_mean
+
+        sample_mean_input = condition_row.find_element(By.XPATH, "*//input[contains(@class,'mean-value')]")
+        assert math.isclose(sample_mean, float(sample_mean_input.get_attribute("value")), abs_tol=0.5)
+
+        sample_abs_dev_input = condition_row.find_element(By.XPATH, "*//input[contains(@class,'abs-deviation-value')]")
+        assert math.isclose(sample_abs_dev, float(sample_abs_dev_input.get_attribute("value")), abs_tol=0.5)
+
+        sample_rel_dev_input = condition_row.find_element(By.XPATH, "*//input[contains(@class,'rel-deviation-value')]")
+        assert math.isclose(sample_rel_dev, float(sample_rel_dev_input.get_attribute("value")), abs_tol=0.5)
 
 
 def _get_plot_width(driver: WebDriver):
@@ -522,13 +567,6 @@ def _set_plot_height(driver: WebDriver, x: float):
 def _get_plot_fontsize(driver: WebDriver):
     fontsize_input: WebElement = driver.find_element(By.XPATH, "//input[@id='font-size-input']")
     return float(fontsize_input.get_attribute("value"))
-
-
-def _set_plot_fontsize(driver: WebDriver, x: float):
-    fontsize_input = wait_for_element(driver, "//input[@id='font-size-input']")
-    fontsize_input.send_keys(str(x))
-    # Click the plot so that the fontsize input is defocused and an update will be triggered
-    wait_for_element(driver, "//canvas[@id='glorius-plot']").click()
 
 
 def test_plot_sizing(driver: WebDriver):
