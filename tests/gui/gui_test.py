@@ -116,6 +116,7 @@ def wait_for_cover_hidden(root: WebDriver):
 def scroll_element_into_view(driver: WebDriver, e: WebElement):
     driver.execute_script("arguments[0].scrollIntoView({behavior: 'instant', block: 'center'});", e)
     wait_for_success(lambda: ActionChains(driver).move_to_element(e).perform())
+    return e
 
 
 def wait_for_element(driver: WebDriver | WebElement,
@@ -439,8 +440,7 @@ def test_value_to_plot_option(driver: WebDriver):
     _check_value_outline_presence(driver, False)
 
     # Select the absolute deviation, and check that the chart updates as expected
-    scroll_element_into_view(driver, abs_radio)
-    abs_radio.click()
+    scroll_element_into_view(driver, abs_radio).click()
     assert not mean_radio.is_selected()
     assert abs_radio.is_selected()
     assert not rel_radio.is_selected()
@@ -455,8 +455,7 @@ def test_value_to_plot_option(driver: WebDriver):
     _check_value_outline_presence(driver, False)
 
     # Now select the value column and do the same checks
-    scroll_element_into_view(driver, mean_radio)
-    mean_radio.click()
+    scroll_element_into_view(driver, mean_radio).click()
     assert mean_radio.is_selected()
     assert not abs_radio.is_selected()
     assert not rel_radio.is_selected()
@@ -475,8 +474,7 @@ def test_value_to_plot_option(driver: WebDriver):
     _check_dev_outline_presence(driver, "abs", False)
 
     # Finally, select the relative column again and check all is well moving back to it
-    scroll_element_into_view(driver, rel_radio)
-    rel_radio.click()
+    scroll_element_into_view(driver, rel_radio).click()
     assert not mean_radio.is_selected()
     assert not abs_radio.is_selected()
     assert rel_radio.is_selected()
@@ -630,12 +628,9 @@ def test_plot_sizing(driver: WebDriver):
 
     # Now let's test font size scaling. Turn back on aspect ratio lock, turn on font scaling, and reset the plot dims
 
-    scroll_element_into_view(driver, aspect_ratio_lock_box)
-    aspect_ratio_lock_box.click()
-    scale_font_size_box = wait_for_element(driver, "//input[@id='scale-font-size']")
-    scale_font_size_box.click()
-    scroll_element_into_view(driver, reset_plot_dims_button)
-    reset_plot_dims_button.click()
+    scroll_element_into_view(driver, aspect_ratio_lock_box).click()
+    wait_for_element(driver, "//input[@id='scale-font-size']").click()
+    scroll_element_into_view(driver, reset_plot_dims_button).click()
 
     scale = 2
     _set_plot_width(driver, init_plot_width*scale)
@@ -715,8 +710,7 @@ def test_download_plot(driver: WebDriver):
     time.sleep(PLOT_GENERATION_TIME)
 
     # Download it again
-    scroll_element_into_view(driver, download_button)
-    download_button.click()
+    scroll_element_into_view(driver, download_button).click()
     _wait_for_download(qualified_download_filename)
 
     # Note the filesize of the new downloaded plot, then delete it as well
@@ -742,8 +736,7 @@ def test_download_plot(driver: WebDriver):
     time.sleep(PLOT_GENERATION_TIME)
 
     # Download it again
-    scroll_element_into_view(driver, download_button)
-    download_button.click()
+    scroll_element_into_view(driver, download_button).click()
     _wait_for_download(qualified_download_filename)
 
     # Note the filesize of the new downloaded plot, then delete it as well
@@ -756,12 +749,10 @@ def test_download_plot(driver: WebDriver):
     # Now, fill the table with example data, wait for the plot to be re-generated, and download again
     wait_for_element(driver, "//button[@id='fill-example']").click()
     assert wait_for_condition(lambda: _get_num_condition_rows(driver) == 10)
-    scroll_element_into_view(driver, generate_plot_button)
-    generate_plot_button.click()
+    scroll_element_into_view(driver, generate_plot_button).click()
     time.sleep(PLOT_GENERATION_TIME)
 
-    scroll_element_into_view(driver, download_button)
-    download_button.click()
+    scroll_element_into_view(driver, download_button).click()
     _wait_for_download(qualified_download_filename)
 
     # Note the filesize of the new downloaded plot, then delete it as well
@@ -773,7 +764,7 @@ def test_download_plot(driver: WebDriver):
     assert example_plot_filesize > label_plot_filesize
 
 
-def test_dirty_forms(driver):
+def test_dirty_forms(driver: WebDriver):
     """Run tests that an alert pops up to warn the user before leaving when they've entered data in the form"""
 
     # Load the home page and wait for the page cover to be removed
@@ -785,6 +776,9 @@ def test_dirty_forms(driver):
     first_baseline_input.clear()
     first_baseline_input.send_keys("90")
     first_baseline_input.click()
+
+    # Note: For some reason, the web driver doesn't properly display a dirty forms alert when leaving the page. This
+    # aspect has to be tested manually
 
     # Try inputting random data, and see if an alert pops up
     fill_random_button = wait_for_element(driver, "//button[@id='fill-random']")
@@ -804,8 +798,7 @@ def test_dirty_forms(driver):
     download_button = wait_for_element(driver, "//button[@id='export-image-png']")
     download_button.click()
 
-    scroll_element_into_view(driver, fill_random_button)
-    fill_random_button.click()
+    scroll_element_into_view(driver, fill_random_button).click()
     with pytest.raises(NoAlertPresentException):
         Alert(driver).text
 
@@ -814,10 +807,8 @@ def test_dirty_forms(driver):
     first_baseline_input.send_keys("90")
     first_baseline_input.click()
 
-    scroll_element_into_view(driver, download_button)
-    download_button.click()
+    scroll_element_into_view(driver, download_button).click()
 
-    scroll_element_into_view(driver, fill_example_button)
-    fill_random_button.click()
+    scroll_element_into_view(driver, fill_example_button).click()
     with pytest.raises(NoAlertPresentException):
         Alert(driver).text
