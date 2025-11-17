@@ -15,6 +15,7 @@ import psdi_glorius_plot
 # Skip all tests in this module if required packages for GUI testing aren't installed
 try:
     from selenium import webdriver
+    from selenium.common.exceptions import NoAlertPresentException
     from selenium.webdriver import FirefoxOptions, Keys
     from selenium.webdriver.common.action_chains import ActionChains
     from selenium.webdriver.common.alert import Alert
@@ -770,3 +771,53 @@ def test_download_plot(driver: WebDriver):
     # Check that the file size of the example plot is even larger than the labeled plot, since it's even more
     # complicated
     assert example_plot_filesize > label_plot_filesize
+
+
+def test_dirty_forms(driver):
+    """Run tests that an alert pops up to warn the user before leaving when they've entered data in the form"""
+
+    # Load the home page and wait for the page cover to be removed
+    driver.get(f"{origin}/")
+    wait_for_cover_hidden(driver)
+
+    # Input some data into the form
+    first_baseline_input = wait_for_element(driver, "//input[contains(@class,'baseline-value')]")
+    first_baseline_input.clear()
+    first_baseline_input.send_keys("90")
+    first_baseline_input.click()
+
+    # Try inputting random data, and see if an alert pops up
+    fill_random_button = wait_for_element(driver, "//button[@id='fill-random']")
+    fill_random_button.click()
+    alert = Alert(driver)
+    assert "Do you want to proceed?" in alert.text
+    alert.dismiss()
+
+    # Test with the example data button
+    fill_example_button = wait_for_element(driver, "//button[@id='fill-example']")
+    fill_example_button.click()
+    alert = Alert(driver)
+    assert "Do you want to proceed?" in alert.text
+    alert.dismiss()
+
+    # Now, try downloading the plot, and check that the alert no longer pops up afterwards
+    download_button = wait_for_element(driver, "//button[@id='export-image-png']")
+    download_button.click()
+
+    scroll_element_into_view(driver, fill_random_button)
+    fill_random_button.click()
+    with pytest.raises(NoAlertPresentException):
+        Alert(driver).text
+
+    scroll_element_into_view(driver, first_baseline_input)
+    first_baseline_input.clear()
+    first_baseline_input.send_keys("90")
+    first_baseline_input.click()
+
+    scroll_element_into_view(driver, download_button)
+    download_button.click()
+
+    scroll_element_into_view(driver, fill_example_button)
+    fill_random_button.click()
+    with pytest.raises(NoAlertPresentException):
+        Alert(driver).text
