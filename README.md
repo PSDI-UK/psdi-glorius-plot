@@ -120,12 +120,12 @@ Required for all installations (`pip install .`):
 
 - `Flask`
 
-Required to run unit tests on the backend (`pip install .[test]`):
+Required to run unit tests on the backend (`pip install '.[test]'`):
 
 - `pytest`
 - `coverage`
 
-Required to run unit tests on the web app (`pip install .[gui-test]`):
+Required to run unit tests on the web app (`pip install '.[gui-test]'`):
 
 - (all test requirements listed above)
 - `selenium`
@@ -142,21 +142,21 @@ Enter https://psdi_glorius_plot.psdi.ac.uk/ in a browser. Guidance on usage is g
 To test the app, install the optional testing requirements locally (ideally within a virtual environment) and test with pytest by executing the following commands from this project's directory:
 
 ```bash
-pip install .'[test]'
+pip install '.[test]'
 pytest tests/python
 ```
 
 To test the local version of the web app, install the GUI testing requirements locally (which also include the standard GUI requirements and standard testing requirements), start the server, and test by executing the GUI test script:
 
 ```bash
-pip install .'[gui-test]'
+pip install '.[gui-test]'
 pytest tests/gui
 ```
 
 Both of these sets of tests can also be run together if desired through:
 
 ```bash
-pip install .'[gui-test]'
+pip install '.[gui-test]'
 pytest
 ```
 

@@ -2,6 +2,7 @@
 
 # Selenium test script for PSDI Glorius Plot Generator Service.
 
+import math
 import os
 import time
 from collections.abc import Callable
@@ -14,8 +15,10 @@ import psdi_glorius_plot
 # Skip all tests in this module if required packages for GUI testing aren't installed
 try:
     from selenium import webdriver
+    from selenium.common.exceptions import NoAlertPresentException
     from selenium.webdriver import FirefoxOptions, Keys
     from selenium.webdriver.common.action_chains import ActionChains
+    from selenium.webdriver.common.alert import Alert
     from selenium.webdriver.common.by import By
     from selenium.webdriver.firefox.service import Service as FirefoxService
     from selenium.webdriver.firefox.webdriver import WebDriver
@@ -113,6 +116,7 @@ def wait_for_cover_hidden(root: WebDriver):
 def scroll_element_into_view(driver: WebDriver, e: WebElement):
     driver.execute_script("arguments[0].scrollIntoView({behavior: 'instant', block: 'center'});", e)
     wait_for_success(lambda: ActionChains(driver).move_to_element(e).perform())
+    return e
 
 
 def wait_for_element(driver: WebDriver | WebElement,
@@ -436,8 +440,7 @@ def test_value_to_plot_option(driver: WebDriver):
     _check_value_outline_presence(driver, False)
 
     # Select the absolute deviation, and check that the chart updates as expected
-    scroll_element_into_view(driver, abs_radio)
-    abs_radio.click()
+    scroll_element_into_view(driver, abs_radio).click()
     assert not mean_radio.is_selected()
     assert abs_radio.is_selected()
     assert not rel_radio.is_selected()
@@ -452,8 +455,7 @@ def test_value_to_plot_option(driver: WebDriver):
     _check_value_outline_presence(driver, False)
 
     # Now select the value column and do the same checks
-    scroll_element_into_view(driver, mean_radio)
-    mean_radio.click()
+    scroll_element_into_view(driver, mean_radio).click()
     assert mean_radio.is_selected()
     assert not abs_radio.is_selected()
     assert not rel_radio.is_selected()
@@ -472,8 +474,7 @@ def test_value_to_plot_option(driver: WebDriver):
     _check_dev_outline_presence(driver, "abs", False)
 
     # Finally, select the relative column again and check all is well moving back to it
-    scroll_element_into_view(driver, rel_radio)
-    rel_radio.click()
+    scroll_element_into_view(driver, rel_radio).click()
     assert not mean_radio.is_selected()
     assert not abs_radio.is_selected()
     assert rel_radio.is_selected()
@@ -481,6 +482,55 @@ def test_value_to_plot_option(driver: WebDriver):
     _check_dev_outline_presence(driver, "rel", True)
     _check_dev_outline_presence(driver, "abs", False)
     _check_value_outline_presence(driver, False)
+
+
+def test_calcs(driver: WebDriver):
+    """Test that values in the plot are calculated properly"""
+
+    # Load the home page and wait for the page cover to be removed
+    driver.get(f"{origin}/")
+    wait_for_cover_hidden(driver)
+
+    # Size the table so we have 10 rows and columns
+    _set_num_condition_rows(driver, 10)
+    _set_num_sample_columns(driver, 10)
+
+    # Fill with random data
+    fill_random_button = wait_for_element(driver, "//button[@id='fill-random']")
+    fill_random_button.click()
+
+    # We should see an alert here warning that entered data will be lost - accept it
+    Alert(driver).accept()
+
+    # Wait till the first baseline element has a non-zero value
+    first_baseline_input = wait_for_element(driver, "//input[contains(@class,'baseline-value')]")
+    assert wait_for_condition(lambda: bool(first_baseline_input.get_attribute("value")))
+
+    # Now, let's test that the mean and deviation values are calculated correctly. Start with the baseline row, which
+    # just has the mean to calculate, which we'll need to calculate the deviation of other rows
+    l_baseline_inputs = driver.find_elements(By.XPATH, "//input[contains(@class,'baseline-value')]")
+    baseline_mean = sum([float(x.get_attribute("value")) for x in l_baseline_inputs])/len(l_baseline_inputs)
+
+    baseline_mean_input = driver.find_element(By.XPATH, "//td[contains(@class, 'baseline-mean-cell')]" +
+                                              "//input[contains(@class,'mean-value')]")
+    assert math.isclose(baseline_mean, float(baseline_mean_input.get_attribute("value")), abs_tol=0.5)
+
+    # Now go through each row and check that it's calculated correctly
+    l_condition_rows = driver.find_elements(By.XPATH, "//tr[contains(@class,'condition-row')]")
+    for condition_row in l_condition_rows:
+        l_sample_inputs = condition_row.find_elements(By.XPATH, "*//input[contains(@class,'sample-value')]")
+        sample_mean = sum([float(x.get_attribute("value")) for x in l_sample_inputs])/len(l_sample_inputs)
+        sample_abs_dev = sample_mean - baseline_mean
+        sample_rel_dev = 100*sample_abs_dev / baseline_mean
+
+        sample_mean_input = condition_row.find_element(By.XPATH, "*//input[contains(@class,'mean-value')]")
+        assert math.isclose(sample_mean, float(sample_mean_input.get_attribute("value")), abs_tol=0.5)
+
+        sample_abs_dev_input = condition_row.find_element(By.XPATH, "*//input[contains(@class,'abs-deviation-value')]")
+        assert math.isclose(sample_abs_dev, float(sample_abs_dev_input.get_attribute("value")), abs_tol=0.5)
+
+        sample_rel_dev_input = condition_row.find_element(By.XPATH, "*//input[contains(@class,'rel-deviation-value')]")
+        assert math.isclose(sample_rel_dev, float(sample_rel_dev_input.get_attribute("value")), abs_tol=0.5)
 
 
 def _get_plot_width(driver: WebDriver):
@@ -516,13 +566,6 @@ def _set_plot_height(driver: WebDriver, x: float):
 def _get_plot_fontsize(driver: WebDriver):
     fontsize_input: WebElement = driver.find_element(By.XPATH, "//input[@id='font-size-input']")
     return float(fontsize_input.get_attribute("value"))
-
-
-def _set_plot_fontsize(driver: WebDriver, x: float):
-    fontsize_input = wait_for_element(driver, "//input[@id='font-size-input']")
-    fontsize_input.send_keys(str(x))
-    # Click the plot so that the fontsize input is defocused and an update will be triggered
-    wait_for_element(driver, "//canvas[@id='glorius-plot']").click()
 
 
 def test_plot_sizing(driver: WebDriver):
@@ -585,12 +628,9 @@ def test_plot_sizing(driver: WebDriver):
 
     # Now let's test font size scaling. Turn back on aspect ratio lock, turn on font scaling, and reset the plot dims
 
-    scroll_element_into_view(driver, aspect_ratio_lock_box)
-    aspect_ratio_lock_box.click()
-    scale_font_size_box = wait_for_element(driver, "//input[@id='scale-font-size']")
-    scale_font_size_box.click()
-    scroll_element_into_view(driver, reset_plot_dims_button)
-    reset_plot_dims_button.click()
+    scroll_element_into_view(driver, aspect_ratio_lock_box).click()
+    wait_for_element(driver, "//input[@id='scale-font-size']").click()
+    scroll_element_into_view(driver, reset_plot_dims_button).click()
 
     scale = 2
     _set_plot_width(driver, init_plot_width*scale)
@@ -658,6 +698,30 @@ def test_download_plot(driver: WebDriver):
     empty_plot_filesize = os.path.getsize(qualified_download_filename)
     os.remove(qualified_download_filename)
 
+    # Add a title to the plot now, so we can test if they seem to appear on the downloaded plot
+
+    title_input_element = driver.find_element(By.XPATH,
+                                              "//*[@id='title-input']//*[contains(@class,'ql-editor')]")
+    title_input_element.send_keys("Example very very very very very long title")
+
+    # Generate it again, using the button to manually re-generate (since auto-updates are turned off)
+    generate_plot_button = wait_for_element(driver, "//button[@id='generate-plot']")
+    generate_plot_button.click()
+    time.sleep(PLOT_GENERATION_TIME)
+
+    # Download it again
+    scroll_element_into_view(driver, download_button).click()
+    _wait_for_download(qualified_download_filename)
+
+    # Note the filesize of the new downloaded plot, then delete it as well
+    title_plot_filesize = os.path.getsize(qualified_download_filename)
+    os.remove(qualified_download_filename)
+
+    # Check that the file size of the plot with the title is larger than for the empty plot - due to how PNG enconding
+    # works, a more complicated image will have a larger file size. If this isn't the case, it indicates something is
+    # going wrong with generating the plot
+    assert title_plot_filesize > empty_plot_filesize
+
     # Add labels to plot now, so we can test if they seem to appear on the downloaded plot
 
     l_label_input_elements = driver.find_elements(By.XPATH,
@@ -672,28 +736,23 @@ def test_download_plot(driver: WebDriver):
     time.sleep(PLOT_GENERATION_TIME)
 
     # Download it again
-    scroll_element_into_view(driver, download_button)
-    download_button.click()
+    scroll_element_into_view(driver, download_button).click()
     _wait_for_download(qualified_download_filename)
 
     # Note the filesize of the new downloaded plot, then delete it as well
     label_plot_filesize = os.path.getsize(qualified_download_filename)
     os.remove(qualified_download_filename)
 
-    # Check that the file size of the example plot is larger than for the empty plot - due to how PNG enconding works,
-    # a more complicated image will have a larger file size. If this isn't the case, it indicates something is going
-    # wrong with generating the plot
-    assert label_plot_filesize > empty_plot_filesize
+    # Check that the file size of the plot with the labels is now even larger than just the title
+    assert label_plot_filesize > title_plot_filesize
 
     # Now, fill the table with example data, wait for the plot to be re-generated, and download again
     wait_for_element(driver, "//button[@id='fill-example']").click()
     assert wait_for_condition(lambda: _get_num_condition_rows(driver) == 10)
-    scroll_element_into_view(driver, generate_plot_button)
-    generate_plot_button.click()
+    scroll_element_into_view(driver, generate_plot_button).click()
     time.sleep(PLOT_GENERATION_TIME)
 
-    scroll_element_into_view(driver, download_button)
-    download_button.click()
+    scroll_element_into_view(driver, download_button).click()
     _wait_for_download(qualified_download_filename)
 
     # Note the filesize of the new downloaded plot, then delete it as well
@@ -703,3 +762,53 @@ def test_download_plot(driver: WebDriver):
     # Check that the file size of the example plot is even larger than the labeled plot, since it's even more
     # complicated
     assert example_plot_filesize > label_plot_filesize
+
+
+def test_dirty_forms(driver: WebDriver):
+    """Run tests that an alert pops up to warn the user before leaving when they've entered data in the form"""
+
+    # Load the home page and wait for the page cover to be removed
+    driver.get(f"{origin}/")
+    wait_for_cover_hidden(driver)
+
+    # Input some data into the form
+    first_baseline_input = wait_for_element(driver, "//input[contains(@class,'baseline-value')]")
+    first_baseline_input.clear()
+    first_baseline_input.send_keys("90")
+    first_baseline_input.click()
+
+    # Note: For some reason, the web driver doesn't properly display a dirty forms alert when leaving the page. This
+    # aspect has to be tested manually
+
+    # Try inputting random data, and see if an alert pops up
+    fill_random_button = wait_for_element(driver, "//button[@id='fill-random']")
+    fill_random_button.click()
+    alert = Alert(driver)
+    assert "Do you want to proceed?" in alert.text
+    alert.dismiss()
+
+    # Test with the example data button
+    fill_example_button = wait_for_element(driver, "//button[@id='fill-example']")
+    fill_example_button.click()
+    alert = Alert(driver)
+    assert "Do you want to proceed?" in alert.text
+    alert.dismiss()
+
+    # Now, try downloading the plot, and check that the alert no longer pops up afterwards
+    download_button = wait_for_element(driver, "//button[@id='export-image-png']")
+    download_button.click()
+
+    scroll_element_into_view(driver, fill_random_button).click()
+    with pytest.raises(NoAlertPresentException):
+        Alert(driver).text
+
+    scroll_element_into_view(driver, first_baseline_input)
+    first_baseline_input.clear()
+    first_baseline_input.send_keys("90")
+    first_baseline_input.click()
+
+    scroll_element_into_view(driver, download_button).click()
+
+    scroll_element_into_view(driver, fill_example_button).click()
+    with pytest.raises(NoAlertPresentException):
+        Alert(driver).text
