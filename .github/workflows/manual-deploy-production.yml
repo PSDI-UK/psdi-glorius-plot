@@ -35,7 +35,7 @@ jobs:
     outputs:
       tag: ${{ steps.get-tag.outputs.TARGET_TAG }}
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
       - name: Get latest tag in the relase branch
@@ -51,7 +51,7 @@ jobs:
     runs-on: psdi-glorius-plot-runners
 
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
           persist-credentials: false

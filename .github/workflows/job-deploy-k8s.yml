@@ -20,7 +20,7 @@ jobs:
     # run on our self hosted github runners enabling access to STFC infrastructure
     runs-on: psdi-glorius-plot-runners
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
 
       - name: Apply secrets to deployment patch
         uses: nowactions/envsubst@v1
