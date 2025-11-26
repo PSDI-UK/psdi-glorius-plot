@@ -1210,16 +1210,17 @@ async function generatePlot() {
   // this is left-aligned and we need to make sure the label is close to the box
   let legendLeftOffset, legendTopOffset;
   const legendHitBox = radarChart.legend.legendHitBoxes[0];
-  // TODO: Fix bug here if legendHitBox is undefined
-  if (getWebKitMode()) {
-    legendLeftOffset = 1.5 * alignmentFontSize - 0.0325 * legendHitBox.width;
-    legendTopOffset = 0.05 * alignmentFontSize;
-  } else {
-    legendLeftOffset = 1.5 * fontSize;
-    legendTopOffset = 0;
+  if (legendHitBox) {
+    if (getWebKitMode()) {
+      legendLeftOffset = 1.5 * alignmentFontSize - 0.0325 * legendHitBox.width;
+      legendTopOffset = 0.05 * alignmentFontSize;
+    } else {
+      legendLeftOffset = 1.5 * fontSize;
+      legendTopOffset = 0;
+    }
+    drawFormatted(ctx, getOutputLabel(),
+      legendHitBox.left + legendLeftOffset, legendHitBox.top + legendTopOffset, fontSize, "left");
   }
-  drawFormatted(ctx, getOutputLabel(),
-    legendHitBox.left + legendLeftOffset, legendHitBox.top + legendTopOffset, fontSize, "left");
 
   const lPointLabelItems = radarChart.scales.r._pointLabelItems;
   for (let i = 0; i < lConditionData.length; ++i) {
