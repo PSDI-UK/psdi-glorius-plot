@@ -1210,6 +1210,7 @@ async function generatePlot() {
   // this is left-aligned and we need to make sure the label is close to the box
   let legendLeftOffset, legendTopOffset;
   const legendHitBox = radarChart.legend.legendHitBoxes[0];
+  // TODO: Fix bug here if legendHitBox is undefined
   if (getWebKitMode()) {
     legendLeftOffset = 1.5 * alignmentFontSize - 0.0325 * legendHitBox.width;
     legendTopOffset = 0.05 * alignmentFontSize;
