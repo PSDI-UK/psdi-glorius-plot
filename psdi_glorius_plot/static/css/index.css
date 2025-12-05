@@ -387,6 +387,10 @@ details summary:active {
 /* Style the popup tooltips */
 .tooltip {
   --bs-tooltip-opacity: 1;
+  max-width: 17.5rem !important;
+}
+.tooltip-inner {
+  max-width: 17.5rem !important;
 }
 
 .tooltip-on-light {
