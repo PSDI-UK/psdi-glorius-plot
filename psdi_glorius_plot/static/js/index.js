@@ -10,6 +10,7 @@ import { clamp, disableButton, enableButton, getWebKitMode } from "./utility.js"
 import {
   addQuillEditor as createQuillEditor, getQuillEditor, getQuillEditorHTML, setQuillEditor, removeQuillEditor,
   updateQuillContents, enableQuillEvents, cleanTags, stripTags, waitForMathJax, drawFormatted,
+  incrementRenderBatch,
 } from "./formatted-labels.js"
 
 const CHART_ID = "glorius-plot", CHART_SELECTOR = `#${CHART_ID}`;
@@ -91,16 +92,6 @@ const BORDER_WIDTH = 4, L_BORDER_DASHES = [[], [6, 6], [4, 4], [2, 2], [1, 1]];
 const BASELINE_WIDTH = 4, BASELINE_COLOR = "#FFFFFF";
 const DATA_BG_COLOR = [COLOR_TRANSPARENT];
 const GRID_WIDTH = 1, GRID_COLOR = "#00000080";
-
-// When the script is initially loaded, store a copy of a heading element and cell elements that we'll later use
-// as templates to add new rows
-
-const TEMPLATE_OUTPUT_LABEL_ROW = $(".output-label-row")[0].cloneNode(true);
-const TEMPLATE_BASELINE_INPUT_LINE = $(".baseline-input-line")[0].cloneNode(true);
-const TEMPLATE_SAMPLE_INPUT_LINE = $(".sample-input-line")[0].cloneNode(true);
-const TEMPLATE_MEAN_INPUT_LINE = $(".mean-input-line")[0].cloneNode(true);
-const TEMPLATE_ABS_DEVIATION_INPUT_LINE = $(".abs-deviation-input-line")[0].cloneNode(true);
-const TEMPLATE_REL_DEVIATION_INPUT_LINE = $(".rel-deviation-input-line")[0].cloneNode(true);
 
 // Globals
 let tooltipList;
@@ -791,6 +782,9 @@ function calcDeviation() {
  */
 async function generatePlot() {
 
+  // Increment the render batch, so text from previous renders won't load, and store the value of the previous batch
+  let renderBatch = incrementRenderBatch();
+
   // Ensure deviation is calculated first
   calcDeviation();
 
@@ -1228,7 +1222,7 @@ async function generatePlot() {
   const titleBlock = radarChart.titleBlock;
   drawFormatted(ctx, cleanTags(titleHTML),
     (titleBlock.left + titleBlock.right) / 2, titleBlock.top + titleBlock.options.padding + 0.125 * labelFontSize,
-    labelFontSize, "center");
+    labelFontSize, "center", renderBatch);
 
   // Font sizing ends up being different in WebKit-based browsers, so we need to use different alignment here since
   // this is left-aligned and we need to make sure the label is close to the box
@@ -1243,7 +1237,7 @@ async function generatePlot() {
       legendTopOffset = 0;
     }
     drawFormatted(ctx, getOutputLabel(),
-      legendHitBox.left + legendLeftOffset, legendHitBox.top + legendTopOffset, labelFontSize, "left");
+      legendHitBox.left + legendLeftOffset, legendHitBox.top + legendTopOffset, labelFontSize, "left", renderBatch);
   }
 
   const lPointLabelItems = radarChart.scales.r._pointLabelItems;
@@ -1251,7 +1245,8 @@ async function generatePlot() {
     const conditionData = lConditionData[i];
     const labelData = lPointLabelItems[conditionData.displayIndex];
     drawFormatted(ctx, conditionData.labelHTML,
-      (labelData.left + labelData.right) / 2, labelData.y + 0.125 * labelFontSize, labelFontSize, "center");
+      (labelData.left + labelData.right) / 2, labelData.y + 0.125 * labelFontSize, labelFontSize, "center",
+      renderBatch);
   }
 }
 
