@@ -104,9 +104,10 @@ const TEMPLATE_REL_DEVIATION_INPUT_LINE = $(".rel-deviation-input-line")[0].clon
 
 // Globals
 let tooltipList;
-let autoUpdating = false, directInput = false, radarChart = null;
-let lastAspectRatio, lastFontSizeWidthRatio, lastFontSizeHeightRatio;
-let initWidth, initHeight, initFontSize;
+let autoUpdating = false, radarChart = null;
+let lastAspectRatio, lastLabelFontSizeWidthRatio, lastLabelFontSizeHeightRatio,
+  lastAxisFontSizeWidthRatio, lastAxisFontSizeHeightRatio;
+let initWidth, initHeight, initLabelFontSize, initAxisFontSize;
 
 /**
  * A ChartJS plugin which allows a custom background color for the plot
@@ -464,10 +465,13 @@ function updateWidth() {
     lastAspectRatio = getAspectRatio();
 
   if (getFontSizeScaleLock()) {
-    $("#font-size-input").val(getWidth() * lastFontSizeWidthRatio);
-    lastFontSizeHeightRatio = getFontSizeHeightRatio();
+    $("#label-font-size-input").val(getWidth() * lastLabelFontSizeWidthRatio);
+    lastLabelFontSizeHeightRatio = getLabelFontSizeHeightRatio();
+    $("#axis-font-size-input").val(getWidth() * lastAxisFontSizeWidthRatio);
+    lastAxisFontSizeHeightRatio = getAxisFontSizeHeightRatio();
   } else {
-    lastFontSizeWidthRatio = getFontSizeWidthRatio();
+    lastLabelFontSizeWidthRatio = getLabelFontSizeWidthRatio();
+    lastAxisFontSizeWidthRatio = getAxisFontSizeWidthRatio();
   }
 
   if (autoUpdating)
@@ -486,10 +490,13 @@ function updateHeight() {
     lastAspectRatio = getAspectRatio();
 
   if (getFontSizeScaleLock()) {
-    $("#font-size-input").val(getHeight() * lastFontSizeHeightRatio);
-    lastFontSizeWidthRatio = getFontSizeWidthRatio();
+    $("#label-font-size-input").val(getHeight() * lastLabelFontSizeHeightRatio);
+    lastLabelFontSizeWidthRatio = getLabelFontSizeWidthRatio();
+    $("#axis-font-size-input").val(getHeight() * lastAxisFontSizeHeightRatio);
+    lastAxisFontSizeWidthRatio = getAxisFontSizeWidthRatio();
   } else {
-    lastFontSizeHeightRatio = getFontSizeHeightRatio();
+    lastLabelFontSizeHeightRatio = getLabelFontSizeHeightRatio();
+    lastAxisFontSizeHeightRatio = getAxisFontSizeHeightRatio();
   }
 
   if (autoUpdating)
@@ -500,8 +507,8 @@ function updateHeight() {
  * Called when the font size is updated to update the font size scales
  */
 function updateFontSize() {
-  lastFontSizeWidthRatio = getFontSizeWidthRatio();
-  lastFontSizeHeightRatio = getFontSizeHeightRatio();
+  lastLabelFontSizeWidthRatio = getLabelFontSizeWidthRatio();
+  lastLabelFontSizeHeightRatio = getLabelFontSizeHeightRatio();
 }
 
 /**
@@ -510,7 +517,8 @@ function updateFontSize() {
 function resetPlotDims() {
   $("#width-input").val(initWidth);
   $("#height-input").val(initHeight);
-  $("#font-size-input").val(initFontSize);
+  $("#label-font-size-input").val(initLabelFontSize);
+  $("#axis-font-size-input").val(initAxisFontSize);
 
   lastAspectRatio = getAspectRatio();
   updateFontSize();
@@ -584,8 +592,12 @@ function getHeight() {
   return +$("#height-input").val();
 }
 
-function getFontSize() {
-  return +$("#font-size-input").val();
+function getLabelFontSize() {
+  return +$("#label-font-size-input").val();
+}
+
+function getAxisFontSize() {
+  return +$("#axis-font-size-input").val();
 }
 
 function getAspectRatio() {
@@ -596,12 +608,20 @@ function getAspectRatioLock() {
   return $("#lock-aspect-ratio").is(":checked");
 }
 
-function getFontSizeWidthRatio() {
-  return getFontSize() / getWidth();
+function getLabelFontSizeWidthRatio() {
+  return getLabelFontSize() / getWidth();
 }
 
-function getFontSizeHeightRatio() {
-  return getFontSize() / getHeight();
+function getLabelFontSizeHeightRatio() {
+  return getLabelFontSize() / getHeight();
+}
+
+function getAxisFontSizeWidthRatio() {
+  return getAxisFontSize() / getWidth();
+}
+
+function getAxisFontSizeHeightRatio() {
+  return getAxisFontSize() / getHeight();
 }
 
 function getFontSizeScaleLock() {
@@ -1096,8 +1116,8 @@ async function generatePlot() {
 
   // Use the user's desired font size for labels to get ideal positioning. Since WebKit displays it larger for some
   // reason, we apply a scaling factor if a WebKit browser is being used
-  const fontSize = getFontSize();
-  let alignmentFontSize = fontSize;
+  const labelFontSize = getLabelFontSize();
+  let alignmentFontSize = labelFontSize;
   if (getWebKitMode())
     alignmentFontSize *= WEBKIT_FONT_SCALING;
 
@@ -1120,6 +1140,10 @@ async function generatePlot() {
     ticks: {
       stepSize: bandWidth,
       z: 2,
+      font: {
+        family: LABEL_FONT_FAMILY,
+        size: getAxisFontSize()
+      }
     }
   };
 
@@ -1203,8 +1227,8 @@ async function generatePlot() {
 
   const titleBlock = radarChart.titleBlock;
   drawFormatted(ctx, cleanTags(titleHTML),
-    (titleBlock.left + titleBlock.right) / 2, titleBlock.top + titleBlock.options.padding + 0.125 * fontSize,
-    fontSize, "center");
+    (titleBlock.left + titleBlock.right) / 2, titleBlock.top + titleBlock.options.padding + 0.125 * labelFontSize,
+    labelFontSize, "center");
 
   // Font sizing ends up being different in WebKit-based browsers, so we need to use different alignment here since
   // this is left-aligned and we need to make sure the label is close to the box
@@ -1215,11 +1239,11 @@ async function generatePlot() {
       legendLeftOffset = 1.5 * alignmentFontSize - 0.0325 * legendHitBox.width;
       legendTopOffset = 0.05 * alignmentFontSize;
     } else {
-      legendLeftOffset = 1.5 * fontSize;
+      legendLeftOffset = 1.5 * labelFontSize;
       legendTopOffset = 0;
     }
     drawFormatted(ctx, getOutputLabel(),
-      legendHitBox.left + legendLeftOffset, legendHitBox.top + legendTopOffset, fontSize, "left");
+      legendHitBox.left + legendLeftOffset, legendHitBox.top + legendTopOffset, labelFontSize, "left");
   }
 
   const lPointLabelItems = radarChart.scales.r._pointLabelItems;
@@ -1227,7 +1251,7 @@ async function generatePlot() {
     const conditionData = lConditionData[i];
     const labelData = lPointLabelItems[conditionData.displayIndex];
     drawFormatted(ctx, conditionData.labelHTML,
-      (labelData.left + labelData.right) / 2, labelData.y + 0.125 * fontSize, fontSize, "center");
+      (labelData.left + labelData.right) / 2, labelData.y + 0.125 * labelFontSize, labelFontSize, "center");
   }
 }
 
@@ -1376,7 +1400,7 @@ function exportImage(format) {
 function enableCanvasUpdate() {
   $("#width-input").on("change", updateWidth);
   $("#height-input").on("change", updateHeight);
-  $("#font-size-input").on("change", updateFontSize);
+  $("#label-font-size-input").on("change", updateFontSize);
 }
 
 function enableDeviationCalc() {
@@ -1559,9 +1583,13 @@ function toggleAutoUpdates(e) {
  */
 function initGlobals() {
   lastAspectRatio = getAspectRatio();
-  lastFontSizeWidthRatio = getFontSizeWidthRatio(), lastFontSizeHeightRatio = getFontSizeHeightRatio();
+  lastLabelFontSizeWidthRatio = getLabelFontSizeWidthRatio();
+  lastLabelFontSizeHeightRatio = getLabelFontSizeHeightRatio();
+  lastAxisFontSizeWidthRatio = getAxisFontSizeWidthRatio();
+  lastAxisFontSizeHeightRatio = getAxisFontSizeHeightRatio();
 
-  initWidth = getWidth(), initHeight = getHeight(), initFontSize = getFontSize();
+  initWidth = getWidth(), initHeight = getHeight();
+  initLabelFontSize = getLabelFontSize(), initAxisFontSize = getAxisFontSize();
 }
 
 /**

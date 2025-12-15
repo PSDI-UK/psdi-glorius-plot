@@ -564,7 +564,7 @@ def _set_plot_height(driver: WebDriver, x: float):
 
 
 def _get_plot_fontsize(driver: WebDriver):
-    fontsize_input: WebElement = driver.find_element(By.XPATH, "//input[@id='font-size-input']")
+    fontsize_input: WebElement = driver.find_element(By.XPATH, "//input[@id='label-font-size-input']")
     return float(fontsize_input.get_attribute("value"))
 
 
