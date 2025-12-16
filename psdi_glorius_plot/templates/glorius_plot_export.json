@@ -7,6 +7,7 @@
     "plot-width": 600,
     "plot-height": 600,
     "label-font-size": 18,
+    "axis-font-size": 16,
     "min-output": -100,
     "max-output": 50,
     "band-width": 25,
@@ -16,7 +17,7 @@
     "color-scheme": "colourblind",
     "min-color": "#F05200",
     "max-color": "#0093F5",
-    "data-arrangement": "Ascending",
+    "data-arrangement": 1,
     "baseline-samples": [
         58
     ],

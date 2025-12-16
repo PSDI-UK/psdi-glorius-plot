@@ -14,6 +14,8 @@ import {
   incrementRenderBatch,
 } from "./formatted-labels.js"
 
+const VERSION = "0.1";
+
 const CHART_ID = "glorius-plot", CHART_SELECTOR = `#${CHART_ID}`;
 
 const DIRTY_FORMS_MESSAGE = "Data currently entered in the form will be lost. Do you want to proceed?";
@@ -522,10 +524,14 @@ function resetPlotDims() {
 // Functions to get various options set by the user
 
 function getTitle() {
-  return getQuillEditor("#title-input").getSemanticHTML();
+  return getQuillEditorHTML("#title-input");
 }
 
-function getOutputLabel(j = 0) {
+function getOutputLabel() {
+  return getQuillEditorHTML("#ol-0");
+}
+
+function getFullOutputLabel() {
 
   // Get the deviation plot mode, and check in case it's mean with only one sample. In that case, use different text
   // for it
@@ -536,7 +542,7 @@ function getOutputLabel(j = 0) {
   const dDevPlotModeInfo = D_DEV_PLOT_MODE_INFO[devPlotMode];
 
   // Get the cleaned output label
-  let outputLabel = getQuillEditorHTML("#ol-0");
+  let outputLabel = getOutputLabel();
   outputLabel = cleanTags(outputLabel);
 
   // Strip appropriate strings from the beginning and end of the output label
@@ -553,14 +559,14 @@ function getOutputLabel(j = 0) {
   return outputLabel;
 }
 
-function getConditionLabelHTML(i) {
+function getConditionLabel(i) {
   return getQuillEditorHTML("#cl-" + i);
 }
 
-function getLConditionLabelsHTML() {
+function getLConditionLabels() {
   const lCondtionLabelsHTML = [];
   $(".condition-input").each((i, e) => {
-    lCondtionLabelsHTML.push(getConditionLabelHTML(i));
+    lCondtionLabelsHTML.push(getConditionLabel(i));
   })
   return lCondtionLabelsHTML;
 }
@@ -637,7 +643,6 @@ function getMaxOutput() {
 }
 
 function getOutputMidpoint() {
-  // TODO: Update to depend on which column is selected to plot
   if (getDevPlotMode() != "mean")
     return 0;
   return +($(".baseline-row").find(".mean-value").eq(0).val());
@@ -683,6 +688,81 @@ function getShowAxisLines() {
  */
 function getDataSorting() {
   return +($("#sort-option").find(":selected").val());
+}
+
+/**
+ * Get an object listing all the user preferences, which can be exported to save them
+ * @param {boolean} [includeTable=false] 
+ * @returns 
+ */
+function getUserPreferences(includeTable = false) {
+  let prefs = {
+    "version": VERSION,
+    "title": getTitle(),
+    "outcome-value": $("#os-0").val(),
+    "outcome-text": getOutputLabel(),
+    "value-to-plot": getDevPlotMode(),
+    "plot-width": getWidth(),
+    "plot-height": getHeight(),
+    "label-font-size": getLabelFontSize(),
+    "axis-font-size": getAxisFontSize(),
+    "min-output": getMinOutput(),
+    "max-output": getMaxOutput(),
+    "band-width": getBandWidth(),
+    "fan-display": getFanMode(),
+    "show-grid-lines": getShowGridLines(),
+    "show-axis-lines": getShowAxisLines(),
+    "color-scheme": $("#color-select").val(),
+    "min-color": getMinColor(),
+    "max-color": etMaxColor(),
+    "data-arrangement": getDataSorting()
+  };
+  if (includeTable) {
+    const numConditions = getNumConditions(), numSamples = getNumSamples();
+    const baselineRow = $(".baseline-row");
+    const lBaselineCells = baselineRow.find(".baseline-value-cell");
+    const lBaselineSamples = [];
+
+    for (let k = 0; k < numSamples; k++) {
+      const baselineSampleVal = lBaselineCells.eq(k).find(".baseline-value").val();
+      if (baselineSampleVal != "") {
+        lBaselineSamples = +baselineSampleVal;
+      } else {
+        lBaselineSamples = "";
+      }
+    }
+
+    prefs["baseline-samples"] = lBaselineSamples;
+
+    prefs["condition-labels"] = getLConditionLabels();
+
+    const lConditionRows = $(".condition-row");
+    const llConditionSamples = [];
+
+    for (let i = 0; i < numConditions; i++) {
+
+      const conditionRow = lConditionRows.eq(i);
+      const lConditionCells = conditionRow.find(".sample-value-cell");
+      const lConditionSamples = [];
+      llConditionSamples.push(lConditionSamples);
+
+      for (let k = 0; k < numSamples; k++) {
+        for (let j = 0; j < numOutputs; j++) {
+          const conditionSampleVal = lConditionCells.eq(k).find(".sample-value").eq(j).val();
+          if (conditionSampleVal != "") {
+            llConditionSamples = +conditionSampleVal;
+          } else {
+            llConditionSamples = "";
+          }
+        }
+      }
+
+    }
+
+    prefs["condition-samples"] = lBaselineSamples;
+
+  }
+  return prefs;
 }
 
 /**
@@ -936,14 +1016,14 @@ async function generatePlot() {
     }
   }
 
-  const lConditionLabels = getLConditionLabelsHTML();
+  const lConditionLabels = getLConditionLabels();
 
   // Make a fake dataset to add the label to the legend for each output
   const devPlotMode = getDevPlotMode();
 
   for (let j = 0; j < numOutputs; ++j) {
 
-    lOutputLabels.push(stripTags(getOutputLabel(j)));
+    lOutputLabels.push(stripTags(getFullOutputLabel()));
 
     let lInvisibleData = [];
     let numInvisiblePoints = numConditions;
@@ -1237,7 +1317,7 @@ async function generatePlot() {
       legendLeftOffset = 1.5 * labelFontSize;
       legendTopOffset = 0;
     }
-    drawFormatted(ctx, getOutputLabel(),
+    drawFormatted(ctx, getFullOutputLabel(),
       legendHitBox.left + legendLeftOffset, legendHitBox.top + legendTopOffset, labelFontSize, "left", renderBatch);
   }
 
