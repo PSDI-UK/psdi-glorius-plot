@@ -13,8 +13,8 @@
     "fan-display": false,
     "show-grid-lines": true,
     "show-axis-lines": true,
-    "color-scheme": "classic",
-    "min-color": "#FF8080",
-    "max-color": "#20A020",
+    "color-scheme": "colourblind",
+    "min-color": "#F05200",
+    "max-color": "#0093F5",
     "data-arrangement": "Ascending"
 }
