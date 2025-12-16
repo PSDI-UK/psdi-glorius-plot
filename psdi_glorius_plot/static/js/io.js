@@ -19,3 +19,13 @@ export function exportImage(format) {
 
   }, "image/" + format);
 }
+
+/**
+ * Save an object as a stringified JSON
+ * @param {Object} obj 
+ * @param {string} filename 
+ */
+export function saveObject(obj, filename) {
+  var blob = new Blob([JSON.stringify(obj)], { type: "text/plain;charset=utf-8" });
+  saveAs(blob, filename);
+}
