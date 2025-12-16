@@ -6,6 +6,7 @@
 
 import { initDirtyForms, cleanDirtyForms, checkIsDirty } from "./dirty-forms.js";
 import { mixHexes } from "./color-mixing.js"
+import { exportImage } from "./io.js"
 import { clamp, disableButton, enableButton, getWebKitMode } from "./utility.js"
 import {
   addQuillEditor as createQuillEditor, getQuillEditor, getQuillEditorHTML, setQuillEditor, removeQuillEditor,
@@ -1369,27 +1370,6 @@ function fillExample() {
 
   // Set the current state of the form as "clean"
   cleanDirtyForms();
-}
-
-
-/**
- * Export the chart in the desired format
- * @param {string} format 
- */
-function exportImage(format) {
-
-  // Set the form as clean the user downloads the image
-  cleanDirtyForms();
-
-  $(CHART_SELECTOR)[0].toBlob((blob) => {
-    let objectURL = URL.createObjectURL(blob);
-
-    let link = document.createElement('a');
-    link.href = objectURL;
-    link.download = "glorius_plot." + format;
-    link.click();
-
-  }, "image/" + format);
 }
 
 function enableCanvasUpdate() {
