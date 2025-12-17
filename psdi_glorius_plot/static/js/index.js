@@ -10,7 +10,7 @@ import { exportImage, saveObject } from "./io.js"
 import { clamp, disableButton, enableButton, getWebKitMode } from "./utility.js"
 import {
   addQuillEditor as createQuillEditor, getQuillEditor, getQuillEditorHTML, setQuillEditor, removeQuillEditor,
-  updateQuillContents, enableQuillEvents, cleanTags, stripTags, waitForMathJax, drawFormatted,
+  updateQuillContents, enableQuillEvents, stripTags, waitForMathJax, drawFormatted,
   incrementRenderBatch,
 } from "./formatted-labels.js"
 
@@ -543,7 +543,6 @@ function getFullOutputLabel() {
 
   // Get the cleaned output label
   let outputLabel = getOutputLabel();
-  outputLabel = cleanTags(outputLabel);
 
   // Strip appropriate strings from the beginning and end of the output label
   if (dDevPlotModeInfo.stripEnd != null && (outputLabel.endsWith(dDevPlotModeInfo.stripEnd))) {
@@ -695,8 +694,8 @@ function getDataSorting() {
  * @param {boolean} [includeTable=false] 
  * @returns 
  */
-function getUserPreferences() {
-  let prefs = {
+function getPlotData() {
+  let data = {
     "version": VERSION,
     "title": getTitle(),
     "outcome-value": $("#os-0").val(),
@@ -731,9 +730,9 @@ function getUserPreferences() {
     }
   }
 
-  prefs["baseline-samples"] = lBaselineSamples;
+  data["baseline-samples"] = lBaselineSamples;
 
-  prefs["condition-labels"] = getLConditionLabels();
+  data["condition-labels"] = getLConditionLabels();
 
   const lConditionRows = $(".condition-row");
   const llConditionSamples = [];
@@ -756,9 +755,9 @@ function getUserPreferences() {
 
   }
 
-  prefs["condition-samples"] = lBaselineSamples;
+  data["condition-samples"] = llConditionSamples;
 
-  return prefs;
+  return data;
 }
 
 /**
@@ -1065,7 +1064,7 @@ async function generatePlot() {
     }
     lConditionData.push({
       label: stripTags(lConditionLabels[i]),
-      labelHTML: cleanTags(lConditionLabels[i]),
+      labelHTML: lConditionLabels[i],
       data: lSingleConditionData,
       displayIndex: i
     })
@@ -1297,7 +1296,7 @@ async function generatePlot() {
   const ctx = radarChart.ctx;
 
   const titleBlock = radarChart.titleBlock;
-  drawFormatted(ctx, cleanTags(titleHTML),
+  drawFormatted(ctx, titleHTML,
     (titleBlock.left + titleBlock.right) / 2, titleBlock.top + titleBlock.options.padding + 0.125 * labelFontSize,
     labelFontSize, "center", renderBatch);
 
@@ -1491,7 +1490,7 @@ function enableButtons() {
 
   $("#export-image-png").on("click", () => exportImage("png"));
 
-  $("#save-data").on("click", () => saveObject(getUserPreferences(), "glorius_plot_data.json"));
+  $("#save-data").on("click", () => saveObject(getPlotData(), "glorius_plot_data.json"));
 
   $("#reset-plot-dims").on("click", resetPlotDims);
 
@@ -1556,8 +1555,6 @@ function updateOutputLabelSelection(e) {
 function updateOutputLabel(label) {
   let lOutputHeadings = $(".sample-heading");
   let numSamples = getNumSamples();
-
-  label = cleanTags(label);
 
   // If only one output, don't number it
   if (numSamples == 1) {
