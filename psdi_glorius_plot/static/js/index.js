@@ -521,14 +521,30 @@ function resetPlotDims() {
 }
 
 
-// Functions to get various options set by the user
+// Functions to get various options set by the user, and set them by code
 
 function getTitle() {
   return getQuillEditorHTML("#title-input");
 }
 
+function setTitle(val) {
+  return updateQuillContents("#title-input", val);
+}
+
+function getOutcomeValue() {
+  return $("#os-0").val();
+}
+
+function setOutcomeValue(val) {
+  $("#os-0").val(val);
+}
+
 function getOutputLabel() {
   return getQuillEditorHTML("#ol-0");
+}
+
+function setOutputLabel(val) {
+  updateQuillContents("#ol-0", val);
 }
 
 function getFullOutputLabel() {
@@ -562,12 +578,22 @@ function getConditionLabel(i) {
   return getQuillEditorHTML("#cl-" + i);
 }
 
+function setConditionLabel(i, val) {
+  updateQuillContents("#cl-" + i, val);
+}
+
 function getLConditionLabels() {
   const lCondtionLabelsHTML = [];
   $(".condition-input").each((i, e) => {
     lCondtionLabelsHTML.push(getConditionLabel(i));
   })
   return lCondtionLabelsHTML;
+}
+
+function setLConditionLabels(lVals) {
+  for (let i = 0; i < lVals.length; ++i) {
+    setConditionLabel(i, lVals[i]);
+  }
 }
 
 function getDevPlotMode() {
@@ -653,6 +679,10 @@ function getBandWidth() {
   return bandWidth;
 }
 
+function getColourScheme() {
+  return $("#color-select").val();
+}
+
 function getMinColor() {
   return $("#min-color-input").val();
 }
@@ -698,7 +728,7 @@ function getPlotData() {
   let data = {
     "version": VERSION,
     "title": getTitle(),
-    "outcome-value": $("#os-0").val(),
+    "outcome-value": getOutcomeValue(),
     "outcome-text": getOutputLabel(),
     "value-to-plot": getDevPlotMode(),
     "plot-width": getWidth(),
@@ -711,7 +741,7 @@ function getPlotData() {
     "fan-display": getFanMode(),
     "show-grid-lines": getShowGridLines(),
     "show-axis-lines": getShowAxisLines(),
-    "color-scheme": $("#color-select").val(),
+    "color-scheme": getColourScheme(),
     "min-color": getMinColor(),
     "max-color": getMaxColor(),
     "data-arrangement": getDataSorting()
@@ -773,7 +803,31 @@ function checkPlotDataFile(event) {
 
 async function loadPlotData() {
   loadObject($("#load-data-file")[0].files[0], (data) => {
-    alert(data);
+    // Temporarily disable auto-updating the plot if it's enabled
+    const lastAutoUpdating = autoUpdating;
+    autoUpdating = false;
+
+    setTitle(data["title"]);
+    setOutcomeValue(data["outcome-value"]);
+    setOutputLabel(data["outcome-text"]);
+    setDevPlotMode(data["value-to-plot"]);
+    setWidth(data["plot-width"]);
+    setHeight(data["plot-height"]);
+    setLabelFontSize(data["label-font-size"]);
+    setAxisFontSize(data["axis-font-size"]);
+    setMinOutput(data["min-output"]);
+    setMaxOutput(data["max-output"]);
+    setBandWidth(data["band-width"]);
+    setFanMode(data["fan-display"]);
+    setShowGridLines(data["show-grid-lines"]);
+    setShowAxisLines(data["show-axis-lines"]);
+    setColourScheme(data["color-scheme"]);
+    setMinColor(data["min-color"]);
+    setMaxColor(data["max-color"]);
+    setDataSorting(data["data-arrangement"]);
+    setLConditionLabels(data["condition-labels"]);
+
+    autoUpdating = lastAutoUpdating;
   })
 }
 
