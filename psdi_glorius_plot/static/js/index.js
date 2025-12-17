@@ -6,7 +6,7 @@
 
 import { initDirtyForms, cleanDirtyForms, checkIsDirty } from "./dirty-forms.js";
 import { mixHexes } from "./color-mixing.js"
-import { exportImage } from "./io.js"
+import { exportImage, saveObject } from "./io.js"
 import { clamp, disableButton, enableButton, getWebKitMode } from "./utility.js"
 import {
   addQuillEditor as createQuillEditor, getQuillEditor, getQuillEditorHTML, setQuillEditor, removeQuillEditor,
@@ -695,7 +695,7 @@ function getDataSorting() {
  * @param {boolean} [includeTable=false] 
  * @returns 
  */
-function getUserPreferences(includeTable = false) {
+function getUserPreferences() {
   let prefs = {
     "version": VERSION,
     "title": getTitle(),
@@ -714,54 +714,50 @@ function getUserPreferences(includeTable = false) {
     "show-axis-lines": getShowAxisLines(),
     "color-scheme": $("#color-select").val(),
     "min-color": getMinColor(),
-    "max-color": etMaxColor(),
+    "max-color": getMaxColor(),
     "data-arrangement": getDataSorting()
   };
-  if (includeTable) {
-    const numConditions = getNumConditions(), numSamples = getNumSamples();
-    const baselineRow = $(".baseline-row");
-    const lBaselineCells = baselineRow.find(".baseline-value-cell");
-    const lBaselineSamples = [];
+  const numConditions = getNumConditions(), numSamples = getNumSamples();
+  const baselineRow = $(".baseline-row");
+  const lBaselineCells = baselineRow.find(".baseline-value-cell");
+  const lBaselineSamples = [];
+
+  for (let k = 0; k < numSamples; k++) {
+    const baselineSampleVal = lBaselineCells.eq(k).find(".baseline-value").val();
+    if (baselineSampleVal != "") {
+      lBaselineSamples.push(+baselineSampleVal);
+    } else {
+      lBaselineSamples.push("");
+    }
+  }
+
+  prefs["baseline-samples"] = lBaselineSamples;
+
+  prefs["condition-labels"] = getLConditionLabels();
+
+  const lConditionRows = $(".condition-row");
+  const llConditionSamples = [];
+
+  for (let i = 0; i < numConditions; i++) {
+
+    const conditionRow = lConditionRows.eq(i);
+    const lConditionCells = conditionRow.find(".sample-value-cell");
+    const lConditionSamples = [];
+    llConditionSamples.push(lConditionSamples);
 
     for (let k = 0; k < numSamples; k++) {
-      const baselineSampleVal = lBaselineCells.eq(k).find(".baseline-value").val();
-      if (baselineSampleVal != "") {
-        lBaselineSamples = +baselineSampleVal;
+      const conditionSampleVal = lConditionCells.eq(k).find(".sample-value").val();
+      if (conditionSampleVal != "") {
+        lConditionSamples.push(+conditionSampleVal);
       } else {
-        lBaselineSamples = "";
+        lConditionSamples.push("");
       }
     }
-
-    prefs["baseline-samples"] = lBaselineSamples;
-
-    prefs["condition-labels"] = getLConditionLabels();
-
-    const lConditionRows = $(".condition-row");
-    const llConditionSamples = [];
-
-    for (let i = 0; i < numConditions; i++) {
-
-      const conditionRow = lConditionRows.eq(i);
-      const lConditionCells = conditionRow.find(".sample-value-cell");
-      const lConditionSamples = [];
-      llConditionSamples.push(lConditionSamples);
-
-      for (let k = 0; k < numSamples; k++) {
-        for (let j = 0; j < numOutputs; j++) {
-          const conditionSampleVal = lConditionCells.eq(k).find(".sample-value").eq(j).val();
-          if (conditionSampleVal != "") {
-            llConditionSamples = +conditionSampleVal;
-          } else {
-            llConditionSamples = "";
-          }
-        }
-      }
-
-    }
-
-    prefs["condition-samples"] = lBaselineSamples;
 
   }
+
+  prefs["condition-samples"] = lBaselineSamples;
+
   return prefs;
 }
 
@@ -1494,6 +1490,8 @@ function enableButtons() {
   $("#generate-plot").on("click", generatePlot);
 
   $("#export-image-png").on("click", () => exportImage("png"));
+
+  $("#save-data").on("click", () => saveObject(getUserPreferences(), "glorius_plot_data.json"));
 
   $("#reset-plot-dims").on("click", resetPlotDims);
 
