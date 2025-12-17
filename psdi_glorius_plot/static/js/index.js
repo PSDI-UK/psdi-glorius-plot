@@ -6,7 +6,7 @@
 
 import { initDirtyForms, cleanDirtyForms, checkIsDirty } from "./dirty-forms.js";
 import { mixHexes } from "./color-mixing.js"
-import { exportImage, saveObject } from "./io.js"
+import { exportImage, loadObject, saveObject } from "./io.js"
 import { clamp, disableButton, enableButton, getWebKitMode } from "./utility.js"
 import {
   addQuillEditor as createQuillEditor, getQuillEditor, getQuillEditorHTML, setQuillEditor, removeQuillEditor,
@@ -760,6 +760,23 @@ function getPlotData() {
   return data;
 }
 
+function checkPlotDataFile(event) {
+  let lFiles = this.files;
+  if (lFiles.length > 0) {
+    $("#load-data").removeClass("init-disabled")
+    $("#load-data").prop({ disabled: false });
+  } else {
+    $("#load-data").addClass("init-disabled");
+    $("#load-data").prop({ disabled: true });
+  }
+}
+
+async function loadPlotData() {
+  loadObject($("#load-data-file")[0].files[0], (data) => {
+    alert(data);
+  })
+}
+
 /**
  * Calculate the deviation for each condition
  */
@@ -1491,6 +1508,8 @@ function enableButtons() {
   $("#export-image-png").on("click", () => exportImage("png"));
 
   $("#save-data").on("click", () => saveObject(getPlotData(), "glorius_plot_data.json"));
+  $("#load-data").on("click", loadPlotData);
+  $("#load-data-file").on("change", checkPlotDataFile);
 
   $("#reset-plot-dims").on("click", resetPlotDims);
 

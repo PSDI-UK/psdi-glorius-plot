@@ -32,3 +32,16 @@ export function saveObject(obj, filename) {
   link.click();
   URL.revokeObjectURL(link.href);
 }
+
+export async function loadObject(file, callbackSuccess, callbackError = (e) => alert(e.target.error.name)) {
+  let reader = new FileReader();
+
+  reader.onload = (e) => {
+    const data = JSON.parse(e.target.result);
+    callbackSuccess(data);
+  };
+
+  reader.onerror = callbackError;
+
+  reader.readAsText(file);
+}
