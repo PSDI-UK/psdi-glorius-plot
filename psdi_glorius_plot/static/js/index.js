@@ -297,9 +297,11 @@ function addConditionRow(e, updateAfter = true) {
   if (updateAfter) {
     // Temporarily disable auto-updating the plot if it's enabled
     const lastAutoUpdating = autoUpdating;
-    autoUpdating = false;
+    if (autoUpdating)
+      disableAutoUpdates();
     postTableUpdateCleanup("condition", updateAfter);
-    autoUpdating = lastAutoUpdating;
+    if (lastAutoUpdating)
+      enableAutoUpdates();
   }
   else {
     // We need to at least relabel the elements so we can clean up Quill editors
@@ -341,9 +343,11 @@ function removeConditionRow(e, updateAfter = true) {
   if (updateAfter) {
     // Temporarily disable auto-updating the plot if it's enabled
     const lastAutoUpdating = autoUpdating;
-    autoUpdating = false;
+    if (autoUpdating)
+      disableAutoUpdates();
     postTableUpdateCleanup("condition", updateAfter);
-    autoUpdating = lastAutoUpdating;
+    if (lastAutoUpdating)
+      enableAutoUpdates();
   }
   else {
     // We need to at least relabel the elements so we can clean up Quill editors
@@ -878,9 +882,19 @@ function checkPlotDataFile(event) {
 }
 
 async function loadPlotData() {
+
+  // Check if the form is currently dirty, and check with the user before filling if so
+  if (checkIsDirty()) {
+    if (!confirm(DIRTY_FORMS_MESSAGE)) {
+      return;
+    }
+  }
+
   loadObject($("#load-data-file")[0].files[0], (data) => {
     // Temporarily disable auto-updating the plot if it's enabled
     const lastAutoUpdating = autoUpdating;
+    if (autoUpdating)
+      disableAutoUpdates();
     autoUpdating = false;
 
     setTitle(data["title"]);
@@ -931,8 +945,8 @@ async function loadPlotData() {
 
     }
 
-    autoUpdating = lastAutoUpdating;
-    generateIfUpdating();
+    if (lastAutoUpdating)
+      enableAutoUpdates();
   })
 }
 
@@ -1524,7 +1538,8 @@ function fillRandom() {
 
   // Suppress autoUpdating until the end
   const lastAutoUpdating = autoUpdating;
-  autoUpdating = false;
+  if (autoUpdating)
+    disableAutoUpdates();
 
   // Fill the condition labels
   for (let i = 0; i < getNumConditions(); ++i) {
@@ -1545,8 +1560,8 @@ function fillRandom() {
     lDataCells[k].value = Math.round(val);
   }
 
-  autoUpdating = lastAutoUpdating;
-  generateIfUpdating();
+  if (lastAutoUpdating)
+    enableAutoUpdates();
 
   // Set the current state of the form as "clean"
   cleanDirtyForms();
@@ -1567,7 +1582,8 @@ function fillExample() {
 
   // Suppress autoUpdating until the end
   const lastAutoUpdating = autoUpdating;
-  autoUpdating = false;
+  if (autoUpdating)
+    disableAutoUpdates();
 
   setNumDim(CONDITION, 10), setNumDim(SAMPLE, 1);
 
@@ -1614,10 +1630,8 @@ function fillExample() {
   // the plot is generated)
   calcDeviation();
 
-  autoUpdating = lastAutoUpdating;
-  if (autoUpdating) {
+  if (lastAutoUpdating)
     enableAutoUpdates();
-  }
 
   // Set the current state of the form as "clean"
   cleanDirtyForms();
