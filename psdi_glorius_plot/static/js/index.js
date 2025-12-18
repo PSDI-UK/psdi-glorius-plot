@@ -607,20 +607,47 @@ function getDevPlotMode() {
   return rVal;
 }
 
+function setDevPlotMode(val) {
+  const lPlotSelectRadio = $("input.plot-select");
+  lPlotSelectRadio.each(function () {
+    const oThis = $(this);
+    if (oThis.val() == val)
+      oThis.prop("checked", true);
+    else
+      oThis.prop("checked", false);
+  });
+}
+
 function getWidth() {
   return +$("#width-input").val();
+}
+
+function setWidth(val) {
+  $("#width-input").val(val);
 }
 
 function getHeight() {
   return +$("#height-input").val();
 }
 
+function setHeight(val) {
+  $("#height-input").val(val);
+}
+
 function getLabelFontSize() {
   return +$("#label-font-size-input").val();
 }
 
+function setLabelFontSize(val) {
+  $("#label-font-size-input").val(val);
+}
+
 function getAxisFontSize() {
   return +$("#axis-font-size-input").val();
+}
+
+function setAxisFontSize(val) {
+  $("#axis-font-size-input").val(val);
 }
 
 function getAspectRatio() {
@@ -629,6 +656,10 @@ function getAspectRatio() {
 
 function getAspectRatioLock() {
   return $("#lock-aspect-ratio").is(":checked");
+}
+
+function setAspectRatioLock(val) {
+  $("#lock-aspect-ratio").prop("checked", val);
 }
 
 function getLabelFontSizeWidthRatio() {
@@ -651,6 +682,10 @@ function getFontSizeScaleLock() {
   return $("#scale-font-size").is(":checked");
 }
 
+function setFontSizeScaleLock(val) {
+  $("#scale-font-size").prop("checked", val);
+}
+
 function getMinOutput() {
   if (getDevPlotMode() == "mean")
     return 0;
@@ -659,12 +694,20 @@ function getMinOutput() {
   return minOutput;
 }
 
+function setMinOutput(val) {
+  $("#min-output-input").val(val);
+}
+
 function getMaxOutput() {
   if (getDevPlotMode() == "mean")
     return 100;
   let maxOutput = $("#max-output-input").val();
   maxOutput = clamp(maxOutput, 1, 1000);
   return maxOutput;
+}
+
+function setMaxOutput(val) {
+  $("#max-output-input").val(val);
 }
 
 function getOutputMidpoint() {
@@ -679,26 +722,48 @@ function getBandWidth() {
   return bandWidth;
 }
 
+function setBandWidth(val) {
+  $("#band-width-input").val(val);
+}
+
 function getColourScheme() {
   return $("#color-select").val();
+}
+
+function setColourScheme(val) {
+  $("#color-select").val(val);
 }
 
 function getMinColor() {
   return $("#min-color-input").val();
 }
 
+function setMinColor(val) {
+  $("#min-color-input").val(val);
+}
+
 function getMaxColor() {
   return $("#max-color-input").val();
+}
+
+function setMaxColor(val) {
+  $("#max-color-input").val(val);
 }
 
 function getFanMode() {
   return $("#fan-toggle").is(":checked");
 }
 
+function setFanMode(val) {
+  $("#fan-toggle").prop("checked", val);
+}
+
+// TODO: Deprecate
 function getTipSize() {
   return +$("#fan-tip-size").val();
 }
 
+// TODO: Deprecate
 function getBarSeparation() {
   return +$("#fan-bar-separation").val();
 }
@@ -707,8 +772,16 @@ function getShowGridLines() {
   return $("#grid-line-toggle").is(":checked");
 }
 
+function setShowGridLines(val) {
+  $("#grid-line-toggle").prop("checked", val);
+}
+
 function getShowAxisLines() {
   return $("#axis-line-toggle").is(":checked");
+}
+
+function setShowAxisLines(val) {
+  $("#axis-line-toggle").prop("checked", val);
 }
 
 /**
@@ -717,6 +790,10 @@ function getShowAxisLines() {
  */
 function getDataSorting() {
   return +($("#sort-option").find(":selected").val());
+}
+
+function setDataSorting(val) {
+  $("#sort-option").val(val);
 }
 
 /**
