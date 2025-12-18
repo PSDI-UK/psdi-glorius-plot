@@ -824,8 +824,7 @@ function getPlotData() {
     "data-arrangement": getDataSorting()
   };
   const numConditions = getNumConditions(), numSamples = getNumSamples();
-  const baselineRow = $(".baseline-row");
-  const lBaselineCells = baselineRow.find(".baseline-value-cell");
+  const lBaselineCells = $(".baseline-row").find(".baseline-value-cell");
   const lBaselineSamples = [];
 
   for (let k = 0; k < numSamples; k++) {
@@ -902,9 +901,38 @@ async function loadPlotData() {
     setMinColor(data["min-color"]);
     setMaxColor(data["max-color"]);
     setDataSorting(data["data-arrangement"]);
-    setLConditionLabels(data["condition-labels"]);
+
+    const llSamples = data["condition-samples"];
+    const numConditions = llSamples.length;
+    const numSamples = llSamples[0].length;
+    setNumDim(CONDITION, numConditions);
+    setNumDim(SAMPLE, numSamples);
+
+    const lConditionLabels = data["condition-labels"]
+    setLConditionLabels(lConditionLabels);
+
+    const lBaselineSamples = data["baseline-samples"];
+    const lBaselineCells = $(".baseline-row").find(".baseline-value-cell");
+
+    for (let k = 0; k < numSamples; k++) {
+      lBaselineCells.eq(k).find(".baseline-value").val(lBaselineSamples[k]);
+    }
+
+    const lConditionRows = $(".condition-row");
+
+    for (let i = 0; i < numConditions; i++) {
+
+      const conditionRow = lConditionRows.eq(i);
+      const lConditionCells = conditionRow.find(".sample-value-cell");
+
+      for (let k = 0; k < numSamples; k++) {
+        lConditionCells.eq(k).find(".sample-value").val(llSamples[i][k]);
+      }
+
+    }
 
     autoUpdating = lastAutoUpdating;
+    generateIfUpdating();
   })
 }
 
