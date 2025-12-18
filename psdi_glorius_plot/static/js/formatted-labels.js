@@ -48,12 +48,12 @@ export function getQuillEditor(selector) {
   return dQuillEditors[selector];
 }
 
-export function getQuillEditorHTML(selector) {
-  return getQuillEditor(selector).getSemanticHTML();
-}
-
 export function setQuillEditor(selector, editor) {
   dQuillEditors[selector] = editor;
+}
+
+export function getQuillEditorHTML(selector) {
+  return cleanTags(getQuillEditor(selector).getSemanticHTML());
 }
 
 export function removeQuillEditor(selector) {

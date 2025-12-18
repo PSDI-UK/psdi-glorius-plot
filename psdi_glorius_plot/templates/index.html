@@ -477,13 +477,24 @@
 
 <canvas id="glorius-plot" class="white-bg"></canvas>
 
-<div id="export-buttons">
-  <button type="button" id="export-image-png">Download Plot as PNG</button>
-</div>
+<table id="export-image-buttons">
+  <tr>
+    <td>
+      <button type="button" id="export-image-png">Download Plot as PNG</button>
+    </td>
+  </tr>
+</table>
+<table id="save-load-data-buttons">
+  <tr>
+    <td><button type="button" id="save-data">Save Data</button></td>
+    <td><button type="button" id="load-data" class="init-disabled" disabled>Load Data</button></td>
+    <td><input type="file" name="load-data-file" id="load-data-file" accept=".json"></td>
+  </tr>
+</table>
 
 <br>
 
-<div id="plot-options">
+<form id="plot-options">
   <table id="plot-size-options" class="label-table">
     <tr>
       <td>
@@ -588,5 +599,5 @@
       <option value="0">As entered</option>
     </select>
   </p>
-</div>
+</form>
 {% endblock %}

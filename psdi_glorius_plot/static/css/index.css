@@ -124,8 +124,17 @@ button.fix-size-small {
   padding: 0;
 }
 
-tr td:first-child button,
-#export-buttons button:first-child {
+/* Buttons that are initially disabled */
+button.init-disabled {
+  background-color: var(--psdi-bg-color-secondary);
+  color           : gray
+}
+
+button.init-disabled:hover {
+  cursor: default;
+}
+
+tr td:first-child button {
   margin-left: 0;
 }
 
