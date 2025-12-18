@@ -947,6 +947,8 @@ async function loadPlotData() {
 
     if (lastAutoUpdating)
       enableAutoUpdates();
+
+    cleanDirtyForms();
   })
 }
 
