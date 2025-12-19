@@ -849,6 +849,12 @@ def test_save_load_data(driver: WebDriver):
 
     qualified_save_filename = os.path.join(DOWNLOAD_LOCATION, SAVE_FILENAME)
 
+    # If the save file already exists, remove it
+    try:
+        os.remove(qualified_save_filename)
+    except FileNotFoundError:
+        pass
+
     # Load the home page and wait for the page cover to be removed
     driver.get(f"{origin}/")
     wait_for_cover_hidden(driver)
@@ -909,7 +915,8 @@ def test_save_load_data(driver: WebDriver):
     _set_label_fontsize(driver, TEST_LABEL_FONTSIZE)
     _set_axis_fontsize(driver, TEST_AXIS_FONTSIZE)
 
-    wait_for_element(driver, "//input[@id='fan-toggle']").click()
+    fan_toggle = wait_for_element(driver, "//input[@id='fan-toggle']")
+    fan_toggle.click()
 
     # Now save the plot
     save_button = wait_for_element(driver, "//button[@id='save-data']")
@@ -931,3 +938,29 @@ def test_save_load_data(driver: WebDriver):
     load_button = wait_for_element(driver, "//button[@id='load-data']")
     load_button.click()
     time.sleep(PLOT_GENERATION_TIME)
+
+    # Check that all data we entered before has now been reloaded
+    assert outcome_select_element.get_attribute("value") == TEST_OUTCOME
+    assert _get_num_condition_rows(driver) == TEST_NUM_CONDITION_ROWS
+    assert _get_num_sample_columns(driver) == TEST_NUM_SAMPLE_ROWS
+    assert abs_radio.get_attribute("checked") == 'true'
+
+    l_baseline_inputs = driver.find_elements(By.XPATH, "//input[contains(@class,'baseline-value')]")
+    for i, x in enumerate(l_baseline_inputs):
+        assert int(x.get_attribute("value")) == l_baseline_samples[i]
+
+    for i in range(TEST_NUM_CONDITION_ROWS):
+        id = f"cl-{i}"
+        e = driver.find_element(By.XPATH, f"*//*[@id='{id}']/*[contains(@class,'ql-editor')]/p")
+        assert l_condition_labels[i] == e.get_property('innerHTML')
+
+    l_condition_inputs = driver.find_elements(By.XPATH, "*//input[contains(@class,'sample-value')]")
+    for i, x in enumerate(l_condition_inputs):
+        assert int(x.get_attribute("value")) == l_condition_samples[i]
+
+    assert _get_plot_width(driver) == TEST_WIDTH
+    assert _get_plot_height(driver) == TEST_HEIGHT
+    assert _get_label_fontsize(driver) == TEST_LABEL_FONTSIZE
+    assert _get_axis_fontsize(driver) == TEST_AXIS_FONTSIZE
+
+    assert fan_toggle.get_attribute("checked") == 'true'
