@@ -507,6 +507,8 @@ function updateHeight() {
 function updateFontSize() {
   lastLabelFontSizeWidthRatio = getLabelFontSizeWidthRatio();
   lastLabelFontSizeHeightRatio = getLabelFontSizeHeightRatio();
+  lastAxisFontSizeWidthRatio = getAxisFontSizeWidthRatio();
+  lastAxisFontSizeHeightRatio = getAxisFontSizeHeightRatio();
 }
 
 /**
