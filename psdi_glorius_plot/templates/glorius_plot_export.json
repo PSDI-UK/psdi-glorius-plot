@@ -1,0 +1,68 @@
+{
+    "version": "0.1",
+    "title": "<strong>Reaction-condition sensitivity analysis for 1,3-cyclization</strong>",
+    "outcome-value": "Isolated Yield (%)",
+    "outcome-text": "Isolated Yield (%)",
+    "value-to-plot": "relative",
+    "plot-width": 600,
+    "plot-height": 600,
+    "label-font-size": 18,
+    "axis-font-size": 16,
+    "min-output": -100,
+    "max-output": 50,
+    "band-width": 25,
+    "fan-display": false,
+    "show-grid-lines": true,
+    "show-axis-lines": true,
+    "color-scheme": "colourblind",
+    "min-color": "#F05200",
+    "max-color": "#0093F5",
+    "data-arrangement": 1,
+    "baseline-samples": [
+        58
+    ],
+    "condition-labels": [
+        "High <em>c</em>",
+        "Low <em>c</em>",
+        "H<sub>2</sub>O",
+        "Low O<sub>2</sub>",
+        "High O<sub>2</sub>",
+        "Low <em>T</em>",
+        "High <em>T</em>",
+        "Low <em>I</em>",
+        "High <em>I</em>",
+        "Big Scale"
+    ],
+    "condition-samples": [
+        [
+            48
+        ],
+        [
+            20
+        ],
+        [
+            26
+        ],
+        [
+            49
+        ],
+        [
+            14
+        ],
+        [
+            47
+        ],
+        [
+            40
+        ],
+        [
+            46
+        ],
+        [
+            13
+        ],
+        [
+            50
+        ]
+    ]
+}

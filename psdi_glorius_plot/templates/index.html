@@ -12,16 +12,16 @@
 <div class="secondary mathjax_ignore">
   <div class="max-width-box">
     <p>
-      This web tool enables users to visualise the sensitivity of a given chemical transformation to user-defined
+      This service enables users to visualise the sensitivity of a given chemical transformation to user-defined
       reaction conditions. The output plots are closely based on an
       <a href="https://onlinelibrary.wiley.com/doi/10.1002/anie.201901935" target="_blank">original concept from the
         Glorius research group</a>.
     </p>
     <p>
-      This tool is still a work in progress, and feedback is very welcome, whether feature requests, bug reports, or
-      even highlighting a feature you find particularly useful so we know not to remove it when streamlining the tool.
-      To provide feedback, click the “Provide Feedback” link on the right side of the header, which will open up a form
-      to submit it.
+      This service is still a work in progress, and feedback is very welcome, whether feature requests, bug reports, or
+      even highlighting a feature you find particularly useful so we know not to remove it when streamlining the
+      service. To provide feedback, click the “Provide Feedback” link on the right side of the header, which will open
+      up a form to submit it.
     </p>
     <div class="multicol-container">
       <div class="multicol-cell">
@@ -103,7 +103,7 @@
 
 <form class="sens-form">
 
-  <table class="title-table">
+  <table class="title-table label-table">
     <tr class="title-row">
       <td class="title-label-cell">
         <label for="title-input" id="title-label">Title:</label>
@@ -117,7 +117,7 @@
 
   </table>
 
-  <table class="output-label-table">
+  <table class="output-label-table label-table">
     <tr class="output-label-row">
       <td class="output-label-cell">
         <label for="os-0" class="output-label">Outcome:</label>
@@ -139,7 +139,7 @@
       </td>
     </tr>
   </table>
-  <table id="table-options">
+  <table id="table-options label-table">
     <tr>
       <td>
         <label for="num-condition">Test conditions: </label>
@@ -471,37 +471,83 @@
   <button type="button" id="fill-random">Fill with random data</button>
   <button type="button" id="fill-example" class="mouseover-tooltip" data-bs-toggle="tooltip"
     data-bs-custom-class="tooltip-on-light" data-bs-placement="top" title="This fills the table with an example 
-    dataset sourced from Zhang 𝘦𝘵 𝘢𝘭. (2024), “Solvent-Dependent Divergent Cyclization of Bicyclo[1.1.0]butanes”, Table 
-    S9">Fill with example data</button>
+    dataset sourced from Table S9 of Zhang 𝘦𝘵 𝘢𝘭. (2024), “Solvent-Dependent Divergent Cyclization of
+    Bicyclo[1.1.0]butanes”, https://doi.org/10.1002/anie.202418239">Fill with example data</button>
 </form>
 
 <canvas id="glorius-plot" class="white-bg"></canvas>
 
-<div id="export-buttons">
-  <button type="button" id="export-image-png">Download Plot as PNG</button>
-</div>
+<table id="export-image-buttons">
+  <tr>
+    <td>
+      <button type="button" id="export-image-png">Download Plot as PNG</button>
+    </td>
+  </tr>
+</table>
+<table id="save-load-data-buttons">
+  <tr>
+    <td><button type="button" id="save-data">Save Data</button></td>
+    <td><button type="button" id="load-data" class="init-disabled" disabled>Load Data</button></td>
+    <td><input type="file" name="load-data-file" id="load-data-file" accept=".json"></td>
+  </tr>
+</table>
 
 <br>
 
-<div id="plot-options">
-  <p>
-    <label for="width-input">Plot width in pixels: </label>
-    <input type="number" step="50" value="600" min="200" max="4000" name="width-input" id="width-input"
-      class="trigger-chart-update">
-    <label for="height-input">Plot height in pixels: </label>
-    <input type="number" step="50" value="600" min="200" max="4000" name="height-input" id="height-input"
-      class="trigger-chart-update">
-    <label for="font-size-input">Label font size: </label>
-    <input type="number" name="font-size-input" id="font-size-input" class="trigger-chart-update" min="2" max="64"
-      value="18">
-    <br>
-    <input type="checkbox" name="lock-aspect-ratio" id="lock-aspect-ratio" checked>
-    <label for="lock-aspect-ratio"> Lock aspect ratio</label>
-    <input type="checkbox" name="scale-font-size" id="scale-font-size">
-    <label for="scale-font-size"> Scale font size with plot size</label>
-    <br>
-    <button type="button" id="reset-plot-dims" class="trigger-chart-update">Reset Size and Shape</button>
-  </p>
+<form id="plot-options">
+  <table id="plot-size-options" class="label-table">
+    <tr>
+      <td>
+        <label for="width-input" class="align-right">Plot width in pixels: </label>
+      </td>
+      <td>
+        <input type="number" step="50" value="600" min="200" max="4000" name="width-input" id="width-input"
+          class="trigger-chart-update">
+      </td>
+      <td>
+        <label for="label-font-size-input" class="align-right">Condition label font size: </label>
+      </td>
+      <td>
+        <input type="number" name="label-font-size-input" id="label-font-size-input" class="trigger-chart-update"
+          min="2" max="64" value="18">
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <label for="height-input" class="align-right">Plot height in pixels: </label>
+      </td>
+      <td>
+        <input type="number" step="50" value="600" min="200" max="4000" name="height-input" id="height-input"
+          class="trigger-chart-update">
+      </td>
+      <td>
+        <label for="axis-font-size-input" class="align-right">Axis label font size: </label>
+      </td>
+      <td>
+        <input type="number" name="axis-font-size-input" id="axis-font-size-input" class="trigger-chart-update" min="2"
+          max="64" value="16">
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <label for="lock-aspect-ratio" class="align-right">Lock aspect ratio:</label>
+      </td>
+      <td>
+        <input type="checkbox" name="lock-aspect-ratio" id="lock-aspect-ratio" checked>
+      </td>
+      <td>
+        <label for="scale-font-size" class="align-right">Scale font size with plot size:</label>
+      </td>
+      <td>
+        <input type="checkbox" name="scale-font-size" id="scale-font-size">
+      </td>
+    </tr>
+  </table>
+  <button type="button" id="reset-plot-dims" class="trigger-chart-update">Reset Size and Shape</button>
+
+  <br>
+  <br>
+
   <p>
     <label for="min-output-input" class="non-none-dev-mode-only">Minimum output: </label>
     <input type="number" step="any" value="-100" name="min-output-input" id="min-output-input"
@@ -533,17 +579,17 @@
   <p>
     <label for="color-select">Colour scheme: </label>
     <select name="color-select" id="color-select">
-      <option value="classic" selected>Classic</option>
-      <option value="colourblind">Colourblind-friendly</option>
+      <option value="colourblind" selected>Colourblind-friendly</option>
+      <option value="classic">Classic</option>
       <option value="greyscale">Greyscale</option>
       <option value="custom">Custom</option>
     </select>
   </p>
   <p class="color-custom hidden">
     <label for="min-color-input">Color at lowest output: </label>
-    <input type="color" value="#FF8080" name="min-color-input" id="min-color-input" class="trigger-chart-update">
+    <input type="color" value="#F05200" name="min-color-input" id="min-color-input" class="trigger-chart-update">
     <label for="max-color-input"> Color at highest output: </label>
-    <input type="color" value="#20A020" name="max-color-input" id="max-color-input" class="trigger-chart-update">
+    <input type="color" value="#0093F5" name="max-color-input" id="max-color-input" class="trigger-chart-update">
   </p>
   <p>
     <label for="sort-option">Data arrangement: </label>
@@ -553,5 +599,5 @@
       <option value="0">As entered</option>
     </select>
   </p>
-</div>
+</form>
 {% endblock %}

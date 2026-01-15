@@ -6,11 +6,15 @@
 
 import { initDirtyForms, cleanDirtyForms, checkIsDirty } from "./dirty-forms.js";
 import { mixHexes } from "./color-mixing.js"
+import { exportImage, loadObject, saveObject } from "./io.js"
 import { clamp, disableButton, enableButton, getWebKitMode } from "./utility.js"
 import {
   addQuillEditor as createQuillEditor, getQuillEditor, getQuillEditorHTML, setQuillEditor, removeQuillEditor,
-  updateQuillContents, enableQuillEvents, cleanTags, stripTags, waitForMathJax, drawFormatted,
+  updateQuillContents, enableQuillEvents, stripTags, waitForMathJax, drawFormatted,
+  incrementRenderBatch,
 } from "./formatted-labels.js"
+
+const VERSION = "0.1";
 
 const CHART_ID = "glorius-plot", CHART_SELECTOR = `#${CHART_ID}`;
 
@@ -92,21 +96,12 @@ const BASELINE_WIDTH = 4, BASELINE_COLOR = "#FFFFFF";
 const DATA_BG_COLOR = [COLOR_TRANSPARENT];
 const GRID_WIDTH = 1, GRID_COLOR = "#00000080";
 
-// When the script is initially loaded, store a copy of a heading element and cell elements that we'll later use
-// as templates to add new rows
-
-const TEMPLATE_OUTPUT_LABEL_ROW = $(".output-label-row")[0].cloneNode(true);
-const TEMPLATE_BASELINE_INPUT_LINE = $(".baseline-input-line")[0].cloneNode(true);
-const TEMPLATE_SAMPLE_INPUT_LINE = $(".sample-input-line")[0].cloneNode(true);
-const TEMPLATE_MEAN_INPUT_LINE = $(".mean-input-line")[0].cloneNode(true);
-const TEMPLATE_ABS_DEVIATION_INPUT_LINE = $(".abs-deviation-input-line")[0].cloneNode(true);
-const TEMPLATE_REL_DEVIATION_INPUT_LINE = $(".rel-deviation-input-line")[0].cloneNode(true);
-
 // Globals
 let tooltipList;
-let autoUpdating = false, directInput = false, radarChart = null;
-let lastAspectRatio, lastFontSizeWidthRatio, lastFontSizeHeightRatio;
-let initWidth, initHeight, initFontSize;
+let autoUpdating = false, radarChart = null;
+let lastAspectRatio, lastLabelFontSizeWidthRatio, lastLabelFontSizeHeightRatio,
+  lastAxisFontSizeWidthRatio, lastAxisFontSizeHeightRatio;
+let initWidth, initHeight, initLabelFontSize, initAxisFontSize;
 
 /**
  * A ChartJS plugin which allows a custom background color for the plot
@@ -302,9 +297,11 @@ function addConditionRow(e, updateAfter = true) {
   if (updateAfter) {
     // Temporarily disable auto-updating the plot if it's enabled
     const lastAutoUpdating = autoUpdating;
-    autoUpdating = false;
+    if (autoUpdating)
+      disableAutoUpdates();
     postTableUpdateCleanup("condition", updateAfter);
-    autoUpdating = lastAutoUpdating;
+    if (lastAutoUpdating)
+      enableAutoUpdates();
   }
   else {
     // We need to at least relabel the elements so we can clean up Quill editors
@@ -346,9 +343,11 @@ function removeConditionRow(e, updateAfter = true) {
   if (updateAfter) {
     // Temporarily disable auto-updating the plot if it's enabled
     const lastAutoUpdating = autoUpdating;
-    autoUpdating = false;
+    if (autoUpdating)
+      disableAutoUpdates();
     postTableUpdateCleanup("condition", updateAfter);
-    autoUpdating = lastAutoUpdating;
+    if (lastAutoUpdating)
+      enableAutoUpdates();
   }
   else {
     // We need to at least relabel the elements so we can clean up Quill editors
@@ -464,10 +463,13 @@ function updateWidth() {
     lastAspectRatio = getAspectRatio();
 
   if (getFontSizeScaleLock()) {
-    $("#font-size-input").val(getWidth() * lastFontSizeWidthRatio);
-    lastFontSizeHeightRatio = getFontSizeHeightRatio();
+    $("#label-font-size-input").val(getWidth() * lastLabelFontSizeWidthRatio);
+    lastLabelFontSizeHeightRatio = getLabelFontSizeHeightRatio();
+    $("#axis-font-size-input").val(getWidth() * lastAxisFontSizeWidthRatio);
+    lastAxisFontSizeHeightRatio = getAxisFontSizeHeightRatio();
   } else {
-    lastFontSizeWidthRatio = getFontSizeWidthRatio();
+    lastLabelFontSizeWidthRatio = getLabelFontSizeWidthRatio();
+    lastAxisFontSizeWidthRatio = getAxisFontSizeWidthRatio();
   }
 
   if (autoUpdating)
@@ -486,10 +488,13 @@ function updateHeight() {
     lastAspectRatio = getAspectRatio();
 
   if (getFontSizeScaleLock()) {
-    $("#font-size-input").val(getHeight() * lastFontSizeHeightRatio);
-    lastFontSizeWidthRatio = getFontSizeWidthRatio();
+    $("#label-font-size-input").val(getHeight() * lastLabelFontSizeHeightRatio);
+    lastLabelFontSizeWidthRatio = getLabelFontSizeWidthRatio();
+    $("#axis-font-size-input").val(getHeight() * lastAxisFontSizeHeightRatio);
+    lastAxisFontSizeWidthRatio = getAxisFontSizeWidthRatio();
   } else {
-    lastFontSizeHeightRatio = getFontSizeHeightRatio();
+    lastLabelFontSizeHeightRatio = getLabelFontSizeHeightRatio();
+    lastAxisFontSizeHeightRatio = getAxisFontSizeHeightRatio();
   }
 
   if (autoUpdating)
@@ -500,8 +505,10 @@ function updateHeight() {
  * Called when the font size is updated to update the font size scales
  */
 function updateFontSize() {
-  lastFontSizeWidthRatio = getFontSizeWidthRatio();
-  lastFontSizeHeightRatio = getFontSizeHeightRatio();
+  lastLabelFontSizeWidthRatio = getLabelFontSizeWidthRatio();
+  lastLabelFontSizeHeightRatio = getLabelFontSizeHeightRatio();
+  lastAxisFontSizeWidthRatio = getAxisFontSizeWidthRatio();
+  lastAxisFontSizeHeightRatio = getAxisFontSizeHeightRatio();
 }
 
 /**
@@ -510,7 +517,8 @@ function updateFontSize() {
 function resetPlotDims() {
   $("#width-input").val(initWidth);
   $("#height-input").val(initHeight);
-  $("#font-size-input").val(initFontSize);
+  $("#label-font-size-input").val(initLabelFontSize);
+  $("#axis-font-size-input").val(initAxisFontSize);
 
   lastAspectRatio = getAspectRatio();
   updateFontSize();
@@ -519,13 +527,33 @@ function resetPlotDims() {
 }
 
 
-// Functions to get various options set by the user
+// Functions to get various options set by the user, and set them by code
 
 function getTitle() {
-  return getQuillEditor("#title-input").getSemanticHTML();
+  return getQuillEditorHTML("#title-input");
 }
 
-function getOutputLabel(j = 0) {
+function setTitle(val) {
+  return updateQuillContents("#title-input", val);
+}
+
+function getOutcomeValue() {
+  return $("#os-0").val();
+}
+
+function setOutcomeValue(val) {
+  $("#os-0").val(val);
+}
+
+function getOutputLabel() {
+  return getQuillEditorHTML("#ol-0");
+}
+
+function setOutputLabel(val) {
+  updateQuillContents("#ol-0", val);
+}
+
+function getFullOutputLabel() {
 
   // Get the deviation plot mode, and check in case it's mean with only one sample. In that case, use different text
   // for it
@@ -536,8 +564,7 @@ function getOutputLabel(j = 0) {
   const dDevPlotModeInfo = D_DEV_PLOT_MODE_INFO[devPlotMode];
 
   // Get the cleaned output label
-  let outputLabel = getQuillEditorHTML("#ol-0");
-  outputLabel = cleanTags(outputLabel);
+  let outputLabel = getOutputLabel();
 
   // Strip appropriate strings from the beginning and end of the output label
   if (dDevPlotModeInfo.stripEnd != null && (outputLabel.endsWith(dDevPlotModeInfo.stripEnd))) {
@@ -553,16 +580,26 @@ function getOutputLabel(j = 0) {
   return outputLabel;
 }
 
-function getConditionLabelHTML(i) {
+function getConditionLabel(i) {
   return getQuillEditorHTML("#cl-" + i);
 }
 
-function getLConditionLabelsHTML() {
+function setConditionLabel(i, val) {
+  updateQuillContents("#cl-" + i, val);
+}
+
+function getLConditionLabels() {
   const lCondtionLabelsHTML = [];
   $(".condition-input").each((i, e) => {
-    lCondtionLabelsHTML.push(getConditionLabelHTML(i));
+    lCondtionLabelsHTML.push(getConditionLabel(i));
   })
   return lCondtionLabelsHTML;
+}
+
+function setLConditionLabels(lVals) {
+  for (let i = 0; i < lVals.length; ++i) {
+    setConditionLabel(i, lVals[i]);
+  }
 }
 
 function getDevPlotMode() {
@@ -576,16 +613,47 @@ function getDevPlotMode() {
   return rVal;
 }
 
+function setDevPlotMode(val) {
+  const lPlotSelectRadio = $("input.plot-select");
+  lPlotSelectRadio.each(function () {
+    const oThis = $(this);
+    if (oThis.val() == val)
+      oThis.prop("checked", true);
+    else
+      oThis.prop("checked", false);
+  });
+}
+
 function getWidth() {
   return +$("#width-input").val();
+}
+
+function setWidth(val) {
+  $("#width-input").val(val);
 }
 
 function getHeight() {
   return +$("#height-input").val();
 }
 
-function getFontSize() {
-  return +$("#font-size-input").val();
+function setHeight(val) {
+  $("#height-input").val(val);
+}
+
+function getLabelFontSize() {
+  return +$("#label-font-size-input").val();
+}
+
+function setLabelFontSize(val) {
+  $("#label-font-size-input").val(val);
+}
+
+function getAxisFontSize() {
+  return +$("#axis-font-size-input").val();
+}
+
+function setAxisFontSize(val) {
+  $("#axis-font-size-input").val(val);
 }
 
 function getAspectRatio() {
@@ -596,16 +664,32 @@ function getAspectRatioLock() {
   return $("#lock-aspect-ratio").is(":checked");
 }
 
-function getFontSizeWidthRatio() {
-  return getFontSize() / getWidth();
+function setAspectRatioLock(val) {
+  $("#lock-aspect-ratio").prop("checked", val);
 }
 
-function getFontSizeHeightRatio() {
-  return getFontSize() / getHeight();
+function getLabelFontSizeWidthRatio() {
+  return getLabelFontSize() / getWidth();
+}
+
+function getLabelFontSizeHeightRatio() {
+  return getLabelFontSize() / getHeight();
+}
+
+function getAxisFontSizeWidthRatio() {
+  return getAxisFontSize() / getWidth();
+}
+
+function getAxisFontSizeHeightRatio() {
+  return getAxisFontSize() / getHeight();
 }
 
 function getFontSizeScaleLock() {
   return $("#scale-font-size").is(":checked");
+}
+
+function setFontSizeScaleLock(val) {
+  $("#scale-font-size").prop("checked", val);
 }
 
 function getMinOutput() {
@@ -616,6 +700,10 @@ function getMinOutput() {
   return minOutput;
 }
 
+function setMinOutput(val) {
+  $("#min-output-input").val(val);
+}
+
 function getMaxOutput() {
   if (getDevPlotMode() == "mean")
     return 100;
@@ -624,8 +712,11 @@ function getMaxOutput() {
   return maxOutput;
 }
 
+function setMaxOutput(val) {
+  $("#max-output-input").val(val);
+}
+
 function getOutputMidpoint() {
-  // TODO: Update to depend on which column is selected to plot
   if (getDevPlotMode() != "mean")
     return 0;
   return +($(".baseline-row").find(".mean-value").eq(0).val());
@@ -637,22 +728,48 @@ function getBandWidth() {
   return bandWidth;
 }
 
+function setBandWidth(val) {
+  $("#band-width-input").val(val);
+}
+
+function getColourScheme() {
+  return $("#color-select").val();
+}
+
+function setColourScheme(val) {
+  $("#color-select").val(val);
+}
+
 function getMinColor() {
   return $("#min-color-input").val();
+}
+
+function setMinColor(val) {
+  $("#min-color-input").val(val);
 }
 
 function getMaxColor() {
   return $("#max-color-input").val();
 }
 
+function setMaxColor(val) {
+  $("#max-color-input").val(val);
+}
+
 function getFanMode() {
   return $("#fan-toggle").is(":checked");
 }
 
+function setFanMode(val) {
+  $("#fan-toggle").prop("checked", val);
+}
+
+// TODO: Deprecate
 function getTipSize() {
   return +$("#fan-tip-size").val();
 }
 
+// TODO: Deprecate
 function getBarSeparation() {
   return +$("#fan-bar-separation").val();
 }
@@ -661,8 +778,16 @@ function getShowGridLines() {
   return $("#grid-line-toggle").is(":checked");
 }
 
+function setShowGridLines(val) {
+  $("#grid-line-toggle").prop("checked", val);
+}
+
 function getShowAxisLines() {
   return $("#axis-line-toggle").is(":checked");
+}
+
+function setShowAxisLines(val) {
+  $("#axis-line-toggle").prop("checked", val);
 }
 
 /**
@@ -671,6 +796,162 @@ function getShowAxisLines() {
  */
 function getDataSorting() {
   return +($("#sort-option").find(":selected").val());
+}
+
+function setDataSorting(val) {
+  $("#sort-option").val(val);
+}
+
+/**
+ * Get an object listing all the user preferences, which can be exported to save them
+ * @param {boolean} [includeTable=false] 
+ * @returns 
+ */
+function getPlotData() {
+  let data = {
+    "version": VERSION,
+    "title": getTitle(),
+    "outcome-value": getOutcomeValue(),
+    "outcome-text": getOutputLabel(),
+    "value-to-plot": getDevPlotMode(),
+    "plot-width": getWidth(),
+    "plot-height": getHeight(),
+    "label-font-size": getLabelFontSize(),
+    "axis-font-size": getAxisFontSize(),
+    "min-output": getMinOutput(),
+    "max-output": getMaxOutput(),
+    "band-width": getBandWidth(),
+    "fan-display": getFanMode(),
+    "show-grid-lines": getShowGridLines(),
+    "show-axis-lines": getShowAxisLines(),
+    "color-scheme": getColourScheme(),
+    "min-color": getMinColor(),
+    "max-color": getMaxColor(),
+    "data-arrangement": getDataSorting()
+  };
+  const numConditions = getNumConditions(), numSamples = getNumSamples();
+  const lBaselineCells = $(".baseline-row").find(".baseline-value-cell");
+  const lBaselineSamples = [];
+
+  for (let k = 0; k < numSamples; k++) {
+    const baselineSampleVal = lBaselineCells.eq(k).find(".baseline-value").val();
+    if (baselineSampleVal != "") {
+      lBaselineSamples.push(+baselineSampleVal);
+    } else {
+      lBaselineSamples.push("");
+    }
+  }
+
+  data["baseline-samples"] = lBaselineSamples;
+
+  data["condition-labels"] = getLConditionLabels();
+
+  const lConditionRows = $(".condition-row");
+  const llConditionSamples = [];
+
+  for (let i = 0; i < numConditions; i++) {
+
+    const conditionRow = lConditionRows.eq(i);
+    const lConditionCells = conditionRow.find(".sample-value-cell");
+    const lConditionSamples = [];
+    llConditionSamples.push(lConditionSamples);
+
+    for (let k = 0; k < numSamples; k++) {
+      const conditionSampleVal = lConditionCells.eq(k).find(".sample-value").val();
+      if (conditionSampleVal != "") {
+        lConditionSamples.push(+conditionSampleVal);
+      } else {
+        lConditionSamples.push("");
+      }
+    }
+
+  }
+
+  data["condition-samples"] = llConditionSamples;
+
+  return data;
+}
+
+function checkPlotDataFile(event) {
+  let lFiles = this.files;
+  if (lFiles.length > 0) {
+    $("#load-data").removeClass("init-disabled")
+    $("#load-data").prop({ disabled: false });
+  } else {
+    $("#load-data").addClass("init-disabled");
+    $("#load-data").prop({ disabled: true });
+  }
+}
+
+async function loadPlotData() {
+
+  // Check if the form is currently dirty, and check with the user before filling if so
+  if (checkIsDirty()) {
+    if (!confirm(DIRTY_FORMS_MESSAGE)) {
+      return;
+    }
+  }
+
+  loadObject($("#load-data-file")[0].files[0], (data) => {
+    // Temporarily disable auto-updating the plot if it's enabled
+    const lastAutoUpdating = autoUpdating;
+    if (autoUpdating)
+      disableAutoUpdates();
+    autoUpdating = false;
+
+    setTitle(data["title"]);
+    setOutcomeValue(data["outcome-value"]);
+    setOutputLabel(data["outcome-text"]);
+    setDevPlotMode(data["value-to-plot"]);
+    setWidth(data["plot-width"]);
+    setHeight(data["plot-height"]);
+    setLabelFontSize(data["label-font-size"]);
+    setAxisFontSize(data["axis-font-size"]);
+    setMinOutput(data["min-output"]);
+    setMaxOutput(data["max-output"]);
+    setBandWidth(data["band-width"]);
+    setFanMode(data["fan-display"]);
+    setShowGridLines(data["show-grid-lines"]);
+    setShowAxisLines(data["show-axis-lines"]);
+    setColourScheme(data["color-scheme"]);
+    setMinColor(data["min-color"]);
+    setMaxColor(data["max-color"]);
+    setDataSorting(data["data-arrangement"]);
+
+    const llSamples = data["condition-samples"];
+    const numConditions = llSamples.length;
+    const numSamples = llSamples[0].length;
+    setNumDim(CONDITION, numConditions);
+    setNumDim(SAMPLE, numSamples);
+
+    const lConditionLabels = data["condition-labels"]
+    setLConditionLabels(lConditionLabels);
+
+    const lBaselineSamples = data["baseline-samples"];
+    const lBaselineCells = $(".baseline-row").find(".baseline-value-cell");
+
+    for (let k = 0; k < numSamples; k++) {
+      lBaselineCells.eq(k).find(".baseline-value").val(lBaselineSamples[k]);
+    }
+
+    const lConditionRows = $(".condition-row");
+
+    for (let i = 0; i < numConditions; i++) {
+
+      const conditionRow = lConditionRows.eq(i);
+      const lConditionCells = conditionRow.find(".sample-value-cell");
+
+      for (let k = 0; k < numSamples; k++) {
+        lConditionCells.eq(k).find(".sample-value").val(llSamples[i][k]);
+      }
+
+    }
+
+    if (lastAutoUpdating)
+      enableAutoUpdates();
+
+    cleanDirtyForms();
+  })
 }
 
 /**
@@ -770,6 +1051,9 @@ function calcDeviation() {
  * Generate the plot using all the provided data
  */
 async function generatePlot() {
+
+  // Increment the render batch, so text from previous renders won't load, and store the value of the previous batch
+  let renderBatch = incrementRenderBatch();
 
   // Ensure deviation is calculated first
   calcDeviation();
@@ -921,14 +1205,14 @@ async function generatePlot() {
     }
   }
 
-  const lConditionLabels = getLConditionLabelsHTML();
+  const lConditionLabels = getLConditionLabels();
 
   // Make a fake dataset to add the label to the legend for each output
   const devPlotMode = getDevPlotMode();
 
   for (let j = 0; j < numOutputs; ++j) {
 
-    lOutputLabels.push(stripTags(getOutputLabel(j)));
+    lOutputLabels.push(stripTags(getFullOutputLabel()));
 
     let lInvisibleData = [];
     let numInvisiblePoints = numConditions;
@@ -974,7 +1258,7 @@ async function generatePlot() {
     }
     lConditionData.push({
       label: stripTags(lConditionLabels[i]),
-      labelHTML: cleanTags(lConditionLabels[i]),
+      labelHTML: lConditionLabels[i],
       data: lSingleConditionData,
       displayIndex: i
     })
@@ -1096,8 +1380,8 @@ async function generatePlot() {
 
   // Use the user's desired font size for labels to get ideal positioning. Since WebKit displays it larger for some
   // reason, we apply a scaling factor if a WebKit browser is being used
-  const fontSize = getFontSize();
-  let alignmentFontSize = fontSize;
+  const labelFontSize = getLabelFontSize();
+  let alignmentFontSize = labelFontSize;
   if (getWebKitMode())
     alignmentFontSize *= WEBKIT_FONT_SCALING;
 
@@ -1120,6 +1404,10 @@ async function generatePlot() {
     ticks: {
       stepSize: bandWidth,
       z: 2,
+      font: {
+        family: LABEL_FONT_FAMILY,
+        size: getAxisFontSize()
+      }
     }
   };
 
@@ -1202,31 +1490,33 @@ async function generatePlot() {
   const ctx = radarChart.ctx;
 
   const titleBlock = radarChart.titleBlock;
-  drawFormatted(ctx, cleanTags(titleHTML),
-    (titleBlock.left + titleBlock.right) / 2, titleBlock.top + titleBlock.options.padding + 0.125 * fontSize,
-    fontSize, "center");
+  drawFormatted(ctx, titleHTML,
+    (titleBlock.left + titleBlock.right) / 2, titleBlock.top + titleBlock.options.padding + 0.125 * labelFontSize,
+    labelFontSize, "center", renderBatch);
 
   // Font sizing ends up being different in WebKit-based browsers, so we need to use different alignment here since
   // this is left-aligned and we need to make sure the label is close to the box
   let legendLeftOffset, legendTopOffset;
   const legendHitBox = radarChart.legend.legendHitBoxes[0];
-  // TODO: Fix bug here if legendHitBox is undefined
-  if (getWebKitMode()) {
-    legendLeftOffset = 1.5 * alignmentFontSize - 0.0325 * legendHitBox.width;
-    legendTopOffset = 0.05 * alignmentFontSize;
-  } else {
-    legendLeftOffset = 1.5 * fontSize;
-    legendTopOffset = 0;
+  if (legendHitBox) {
+    if (getWebKitMode()) {
+      legendLeftOffset = 1.5 * alignmentFontSize - 0.0325 * legendHitBox.width;
+      legendTopOffset = 0.05 * alignmentFontSize;
+    } else {
+      legendLeftOffset = 1.5 * labelFontSize;
+      legendTopOffset = 0;
+    }
+    drawFormatted(ctx, getFullOutputLabel(),
+      legendHitBox.left + legendLeftOffset, legendHitBox.top + legendTopOffset, labelFontSize, "left", renderBatch);
   }
-  drawFormatted(ctx, getOutputLabel(),
-    legendHitBox.left + legendLeftOffset, legendHitBox.top + legendTopOffset, fontSize, "left");
 
   const lPointLabelItems = radarChart.scales.r._pointLabelItems;
   for (let i = 0; i < lConditionData.length; ++i) {
     const conditionData = lConditionData[i];
     const labelData = lPointLabelItems[conditionData.displayIndex];
     drawFormatted(ctx, conditionData.labelHTML,
-      (labelData.left + labelData.right) / 2, labelData.y + 0.125 * fontSize, fontSize, "center");
+      (labelData.left + labelData.right) / 2, labelData.y + 0.125 * labelFontSize, labelFontSize, "center",
+      renderBatch);
   }
 }
 
@@ -1252,7 +1542,8 @@ function fillRandom() {
 
   // Suppress autoUpdating until the end
   const lastAutoUpdating = autoUpdating;
-  autoUpdating = false;
+  if (autoUpdating)
+    disableAutoUpdates();
 
   // Fill the condition labels
   for (let i = 0; i < getNumConditions(); ++i) {
@@ -1273,8 +1564,8 @@ function fillRandom() {
     lDataCells[k].value = Math.round(val);
   }
 
-  autoUpdating = lastAutoUpdating;
-  generateIfUpdating();
+  if (lastAutoUpdating)
+    enableAutoUpdates();
 
   // Set the current state of the form as "clean"
   cleanDirtyForms();
@@ -1295,7 +1586,8 @@ function fillExample() {
 
   // Suppress autoUpdating until the end
   const lastAutoUpdating = autoUpdating;
-  autoUpdating = false;
+  if (autoUpdating)
+    disableAutoUpdates();
 
   setNumDim(CONDITION, 10), setNumDim(SAMPLE, 1);
 
@@ -1342,40 +1634,17 @@ function fillExample() {
   // the plot is generated)
   calcDeviation();
 
-  autoUpdating = lastAutoUpdating;
-  if (autoUpdating) {
+  if (lastAutoUpdating)
     enableAutoUpdates();
-  }
 
   // Set the current state of the form as "clean"
   cleanDirtyForms();
 }
 
-
-/**
- * Export the chart in the desired format
- * @param {string} format 
- */
-function exportImage(format) {
-
-  // Set the form as clean the user downloads the image
-  cleanDirtyForms();
-
-  $(CHART_SELECTOR)[0].toBlob((blob) => {
-    let objectURL = URL.createObjectURL(blob);
-
-    let link = document.createElement('a');
-    link.href = objectURL;
-    link.download = "glorius_plot." + format;
-    link.click();
-
-  }, "image/" + format);
-}
-
 function enableCanvasUpdate() {
   $("#width-input").on("change", updateWidth);
   $("#height-input").on("change", updateHeight);
-  $("#font-size-input").on("change", updateFontSize);
+  $("#label-font-size-input").on("change", updateFontSize);
 }
 
 function enableDeviationCalc() {
@@ -1414,6 +1683,10 @@ function enableButtons() {
   $("#generate-plot").on("click", generatePlot);
 
   $("#export-image-png").on("click", () => exportImage("png"));
+
+  $("#save-data").on("click", () => saveObject(getPlotData(), "glorius_plot_data.json"));
+  $("#load-data").on("click", loadPlotData);
+  $("#load-data-file").on("change", checkPlotDataFile);
 
   $("#reset-plot-dims").on("click", resetPlotDims);
 
@@ -1478,8 +1751,6 @@ function updateOutputLabelSelection(e) {
 function updateOutputLabel(label) {
   let lOutputHeadings = $(".sample-heading");
   let numSamples = getNumSamples();
-
-  label = cleanTags(label);
 
   // If only one output, don't number it
   if (numSamples == 1) {
@@ -1558,9 +1829,13 @@ function toggleAutoUpdates(e) {
  */
 function initGlobals() {
   lastAspectRatio = getAspectRatio();
-  lastFontSizeWidthRatio = getFontSizeWidthRatio(), lastFontSizeHeightRatio = getFontSizeHeightRatio();
+  lastLabelFontSizeWidthRatio = getLabelFontSizeWidthRatio();
+  lastLabelFontSizeHeightRatio = getLabelFontSizeHeightRatio();
+  lastAxisFontSizeWidthRatio = getAxisFontSizeWidthRatio();
+  lastAxisFontSizeHeightRatio = getAxisFontSizeHeightRatio();
 
-  initWidth = getWidth(), initHeight = getHeight(), initFontSize = getFontSize();
+  initWidth = getWidth(), initHeight = getHeight();
+  initLabelFontSize = getLabelFontSize(), initAxisFontSize = getAxisFontSize();
 }
 
 /**

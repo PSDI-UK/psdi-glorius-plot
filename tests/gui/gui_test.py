@@ -51,6 +51,8 @@ PLOT_GENERATION_TIME = 0.3
 DOWNLOAD_LOCATION = "/tmp"
 EX_PLOT_FILENAME = "glorius_plot.png"
 
+SAVE_FILENAME = "glorius_plot_data.json"
+
 origin = os.environ.get("ORIGIN", DEFAULT_ORIGIN)
 
 
@@ -543,7 +545,7 @@ def _get_plot_width(driver: WebDriver):
 
 def _set_plot_width(driver: WebDriver, x: float):
     width_input = wait_for_element(driver, "//input[@id='width-input']")
-    width_input.send_keys(Keys.BACKSPACE*10 + Keys.DELETE*10 + str(x))
+    width_input.send_keys(Keys.BACKSPACE*20 + Keys.DELETE*20 + str(x))
     # Click the plot so that the width input is defocused and an update will be triggered
     wait_for_element(driver, "//canvas[@id='glorius-plot']").click()
 
@@ -558,14 +560,33 @@ def _get_plot_height(driver: WebDriver):
 
 def _set_plot_height(driver: WebDriver, x: float):
     height_input = wait_for_element(driver, "//input[@id='height-input']")
-    height_input.send_keys(Keys.BACKSPACE*10 + Keys.DELETE*10 + str(x))
+    height_input.send_keys(Keys.BACKSPACE*20 + Keys.DELETE*20 + str(x))
     # Click the plot so that the height input is defocused and an update will be triggered
     wait_for_element(driver, "//canvas[@id='glorius-plot']").click()
 
 
-def _get_plot_fontsize(driver: WebDriver):
-    fontsize_input: WebElement = driver.find_element(By.XPATH, "//input[@id='font-size-input']")
-    return float(fontsize_input.get_attribute("value"))
+def _get_label_fontsize(driver: WebDriver):
+    label_fontsize_input: WebElement = driver.find_element(By.XPATH, "//input[@id='label-font-size-input']")
+    return float(label_fontsize_input.get_attribute("value"))
+
+
+def _set_label_fontsize(driver: WebDriver, x: float):
+    label_fontsize_input: WebElement = driver.find_element(By.XPATH, "//input[@id='label-font-size-input']")
+    label_fontsize_input.send_keys(Keys.BACKSPACE*20 + Keys.DELETE*20 + str(x))
+    # Click the plot so that the fontsize input is defocused and an update will be triggered
+    wait_for_element(driver, "//canvas[@id='glorius-plot']").click()
+
+
+def _get_axis_fontsize(driver: WebDriver):
+    axis_fontsize_input: WebElement = driver.find_element(By.XPATH, "//input[@id='axis-font-size-input']")
+    return float(axis_fontsize_input.get_attribute("value"))
+
+
+def _set_axis_fontsize(driver: WebDriver, x: float):
+    axis_fontsize_input: WebElement = driver.find_element(By.XPATH, "//input[@id='axis-font-size-input']")
+    axis_fontsize_input.send_keys(Keys.BACKSPACE*20 + Keys.DELETE*20 + str(x))
+    # Click the plot so that the fontsize input is defocused and an update will be triggered
+    wait_for_element(driver, "//canvas[@id='glorius-plot']").click()
 
 
 def test_plot_sizing(driver: WebDriver):
@@ -577,12 +598,14 @@ def test_plot_sizing(driver: WebDriver):
 
     init_plot_width = 600
     init_plot_height = 600
-    init_plot_fontsize = 18
+    init_label_fontsize = 18
+    init_axis_fontsize = 16
 
     # Check that the plot has the correct initial dimensions and fontsize
     assert _get_plot_width(driver) == init_plot_width
     assert _get_plot_height(driver) == init_plot_height
-    assert _get_plot_fontsize(driver) == init_plot_fontsize
+    assert _get_label_fontsize(driver) == init_label_fontsize
+    assert _get_axis_fontsize(driver) == init_axis_fontsize
 
     # By default, the aspect ratio should stay fixed, but the font size won't scale. Confirm that this works
 
@@ -591,14 +614,16 @@ def test_plot_sizing(driver: WebDriver):
 
     assert _get_plot_width(driver) == init_plot_width*scale
     assert _get_plot_height(driver) == init_plot_height*scale
-    assert _get_plot_fontsize(driver) == init_plot_fontsize
+    assert _get_label_fontsize(driver) == init_label_fontsize
+    assert _get_axis_fontsize(driver) == init_axis_fontsize
 
     scale = 0.5
     _set_plot_height(driver, init_plot_height*scale)
 
     assert _get_plot_width(driver) == init_plot_width*scale
     assert _get_plot_height(driver) == init_plot_height*scale
-    assert _get_plot_fontsize(driver) == init_plot_fontsize
+    assert _get_label_fontsize(driver) == init_label_fontsize
+    assert _get_axis_fontsize(driver) == init_axis_fontsize
 
     # Reset the plot and check it resets properly
     reset_plot_dims_button = wait_for_element(driver, "//button[@id='reset-plot-dims']")
@@ -606,7 +631,8 @@ def test_plot_sizing(driver: WebDriver):
 
     assert _get_plot_width(driver) == init_plot_width
     assert _get_plot_height(driver) == init_plot_height
-    assert _get_plot_fontsize(driver) == init_plot_fontsize
+    assert _get_label_fontsize(driver) == init_label_fontsize
+    assert _get_axis_fontsize(driver) == init_axis_fontsize
 
     # Now try turning off aspect ratio lock, and test that height doesn't scale with width and vice-versa
     aspect_ratio_lock_box = wait_for_element(driver, "//input[@id='lock-aspect-ratio']")
@@ -617,14 +643,16 @@ def test_plot_sizing(driver: WebDriver):
 
     assert _get_plot_width(driver) == init_plot_width*width_scale
     assert _get_plot_height(driver) == init_plot_height
-    assert _get_plot_fontsize(driver) == init_plot_fontsize
+    assert _get_label_fontsize(driver) == init_label_fontsize
+    assert _get_axis_fontsize(driver) == init_axis_fontsize
 
     height_scale = 0.75
     _set_plot_height(driver, init_plot_height*height_scale)
 
     assert _get_plot_width(driver) == init_plot_width*width_scale
     assert _get_plot_height(driver) == init_plot_height*height_scale
-    assert _get_plot_fontsize(driver) == init_plot_fontsize
+    assert _get_label_fontsize(driver) == init_label_fontsize
+    assert _get_axis_fontsize(driver) == init_axis_fontsize
 
     # Now let's test font size scaling. Turn back on aspect ratio lock, turn on font scaling, and reset the plot dims
 
@@ -634,11 +662,13 @@ def test_plot_sizing(driver: WebDriver):
 
     scale = 2
     _set_plot_width(driver, init_plot_width*scale)
-    assert _get_plot_fontsize(driver) == init_plot_fontsize*scale
+    assert _get_label_fontsize(driver) == init_label_fontsize*scale
+    assert _get_axis_fontsize(driver) == init_axis_fontsize*scale
 
     scale = 0.5
     _set_plot_height(driver, init_plot_height*scale)
-    assert _get_plot_fontsize(driver) == init_plot_fontsize*scale
+    assert _get_label_fontsize(driver) == init_label_fontsize*scale
+    assert _get_axis_fontsize(driver) == init_axis_fontsize*scale
 
 
 def test_fan_plot_controls(driver: WebDriver):
@@ -812,3 +842,125 @@ def test_dirty_forms(driver: WebDriver):
     scroll_element_into_view(driver, fill_example_button).click()
     with pytest.raises(NoAlertPresentException):
         Alert(driver).text
+
+
+def test_save_load_data(driver: WebDriver):
+    """Test that we can save and load data entered in the plot"""
+
+    qualified_save_filename = os.path.join(DOWNLOAD_LOCATION, SAVE_FILENAME)
+
+    # If the save file already exists, remove it
+    try:
+        os.remove(qualified_save_filename)
+    except FileNotFoundError:
+        pass
+
+    # Load the home page and wait for the page cover to be removed
+    driver.get(f"{origin}/")
+    wait_for_cover_hidden(driver)
+
+    # We want to change pretty much every aspect of the plot away from details, then test
+    # that all those changes persist when saved and later reloaded
+
+    # Get the select box used for the outcome
+    outcome_select_element = wait_for_element(driver, "//*[@id='os-0']")
+    outcome_select = Select(outcome_select_element)
+
+    TEST_OUTCOME = "Spectroscopic Yield (%)"
+    scroll_element_into_view(driver, outcome_select_element)
+    wait_for_success(lambda: outcome_select.select_by_value(TEST_OUTCOME))
+
+    TEST_NUM_CONDITION_ROWS = 7
+    _set_num_condition_rows(driver, TEST_NUM_CONDITION_ROWS)
+
+    TEST_NUM_SAMPLE_ROWS = 5
+    _set_num_sample_columns(driver, TEST_NUM_SAMPLE_ROWS)
+
+    abs_radio = wait_for_element(driver, "//input[@id='plot-abs']")
+    scroll_element_into_view(driver, abs_radio).click()
+
+    # Fill with random data
+    fill_random_button = wait_for_element(driver, "//button[@id='fill-random']")
+    fill_random_button.click()
+
+    # We should see an alert here warning that entered data will be lost - accept it
+    Alert(driver).accept()
+
+    # Wait till the first baseline element has a non-zero value
+    first_baseline_input = wait_for_element(driver, "//input[contains(@class,'baseline-value')]")
+    assert wait_for_condition(lambda: bool(first_baseline_input.get_attribute("value")))
+
+    # Record the baseline and sample values
+    l_baseline_inputs = driver.find_elements(By.XPATH, "//input[contains(@class,'baseline-value')]")
+    l_baseline_samples = [int(x.get_attribute("value")) for x in l_baseline_inputs]
+
+    l_condition_labels = [None] * TEST_NUM_CONDITION_ROWS
+    for i in range(TEST_NUM_CONDITION_ROWS):
+        id = f"cl-{i}"
+        e = driver.find_element(By.XPATH, f"*//*[@id='{id}']/*[contains(@class,'ql-editor')]/p")
+        l_condition_labels[i] = e.get_property('innerHTML')
+
+    l_condition_inputs = driver.find_elements(By.XPATH, "*//input[contains(@class,'sample-value')]")
+    l_condition_samples = [int(x.get_attribute("value")) for x in l_condition_inputs]
+
+    aspect_ratio_lock_box = wait_for_element(driver, "//input[@id='lock-aspect-ratio']")
+    aspect_ratio_lock_box.click()
+
+    TEST_WIDTH = 800
+    TEST_HEIGHT = 700
+    TEST_LABEL_FONTSIZE = 20
+    TEST_AXIS_FONTSIZE = 17
+    _set_plot_width(driver, TEST_WIDTH)
+    _set_plot_height(driver, TEST_HEIGHT)
+    _set_label_fontsize(driver, TEST_LABEL_FONTSIZE)
+    _set_axis_fontsize(driver, TEST_AXIS_FONTSIZE)
+
+    fan_toggle = wait_for_element(driver, "//input[@id='fan-toggle']")
+    fan_toggle.click()
+
+    # Now save the plot
+    save_button = wait_for_element(driver, "//button[@id='save-data']")
+    save_button.click()
+    _wait_for_download(qualified_save_filename)
+
+    # Overwrite the data by filling with example data
+    fill_example_button = wait_for_element(driver, "//button[@id='fill-example']")
+    fill_example_button.click()
+    alert = Alert(driver)
+    assert "Do you want to proceed?" in alert.text
+    alert.accept()
+
+    # Wait a moment for the example data to be filled
+    time.sleep(PLOT_GENERATION_TIME)
+
+    # Now load the saved data
+    wait_for_element(driver, "//input[@id='load-data-file']").send_keys(qualified_save_filename)
+    load_button = wait_for_element(driver, "//button[@id='load-data']")
+    load_button.click()
+    time.sleep(PLOT_GENERATION_TIME)
+
+    # Check that all data we entered before has now been reloaded
+    assert outcome_select_element.get_attribute("value") == TEST_OUTCOME
+    assert _get_num_condition_rows(driver) == TEST_NUM_CONDITION_ROWS
+    assert _get_num_sample_columns(driver) == TEST_NUM_SAMPLE_ROWS
+    assert abs_radio.get_attribute("checked") == 'true'
+
+    l_baseline_inputs = driver.find_elements(By.XPATH, "//input[contains(@class,'baseline-value')]")
+    for i, x in enumerate(l_baseline_inputs):
+        assert int(x.get_attribute("value")) == l_baseline_samples[i]
+
+    for i in range(TEST_NUM_CONDITION_ROWS):
+        id = f"cl-{i}"
+        e = driver.find_element(By.XPATH, f"*//*[@id='{id}']/*[contains(@class,'ql-editor')]/p")
+        assert l_condition_labels[i] == e.get_property('innerHTML')
+
+    l_condition_inputs = driver.find_elements(By.XPATH, "*//input[contains(@class,'sample-value')]")
+    for i, x in enumerate(l_condition_inputs):
+        assert int(x.get_attribute("value")) == l_condition_samples[i]
+
+    assert _get_plot_width(driver) == TEST_WIDTH
+    assert _get_plot_height(driver) == TEST_HEIGHT
+    assert _get_label_fontsize(driver) == TEST_LABEL_FONTSIZE
+    assert _get_axis_fontsize(driver) == TEST_AXIS_FONTSIZE
+
+    assert fan_toggle.get_attribute("checked") == 'true'

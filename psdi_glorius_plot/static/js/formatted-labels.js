@@ -18,6 +18,7 @@ const MAX_ELAPSED = 500;
 // Non-constant globals
 
 let compatibilityMode = "unknown";
+let currentRenderBatch = 0;
 
 const dQuillEditors = {};
 
@@ -47,12 +48,12 @@ export function getQuillEditor(selector) {
   return dQuillEditors[selector];
 }
 
-export function getQuillEditorHTML(selector) {
-  return getQuillEditor(selector).getSemanticHTML();
-}
-
 export function setQuillEditor(selector, editor) {
   dQuillEditors[selector] = editor;
+}
+
+export function getQuillEditorHTML(selector) {
+  return cleanTags(getQuillEditor(selector).getSemanticHTML());
 }
 
 export function removeQuillEditor(selector) {
@@ -144,7 +145,11 @@ export function stripTags(s) {
     .replaceAll("<sup>", "").replaceAll("</sup>", "");
 }
 
-export async function drawFormatted(ctx, labelHTML, x, y, fontSize, hAlign) {
+export function incrementRenderBatch() {
+  return ++currentRenderBatch;
+}
+
+export async function drawFormatted(ctx, labelHTML, x, y, fontSize, hAlign, renderBatch) {
   if (labelHTML == "")
     return;
 
@@ -179,7 +184,7 @@ export async function drawFormatted(ctx, labelHTML, x, y, fontSize, hAlign) {
     }
   }
 
-  drawMathJaxSVG(ctx, svgHTML, x, y, fontSize, hAlign);
+  drawMathJaxSVG(ctx, svgHTML, x, y, fontSize, hAlign, renderBatch);
 }
 
 function getAsTex(s) {
@@ -216,19 +221,25 @@ function getAsTex(s) {
   return s;
 }
 
-async function drawMathJaxSVG(ctx, svgHTML, x = 0, y = 0, fontsize = 16, hAlign = "left") {
+async function drawMathJaxSVG(ctx, svgHTML, x = 0, y = 0, fontsize = 16, hAlign = "left", renderBatch) {
   let DOMURL = window.URL || window.webkitURL || window;
   let img1 = new Image();
   let svg = new Blob([svgHTML], { type: 'image/svg+xml' });
   let url = DOMURL.createObjectURL(svg);
   let scale = MATHJAX_BASE_FONT_SCALING * fontsize / MATHJAX_DEFAULT_FONT_SIZE;
+
+  // Keep track of the render batch where this was triggered, and only draw it if it's loaded in the same batch
+  img1.renderBatch = renderBatch;
+
   img1.onload = function () {
-    let w = img1.naturalWidth * scale;
-    let h = img1.naturalHeight * scale;
-    let finalX = x;
-    if (hAlign == "center")
-      finalX -= w / 2;
-    ctx.drawImage(img1, finalX, y, w, h);
+    if (img1.renderBatch == currentRenderBatch) {
+      let w = img1.naturalWidth * scale;
+      let h = img1.naturalHeight * scale;
+      let finalX = x;
+      if (hAlign == "center")
+        finalX -= w / 2;
+      ctx.drawImage(img1, finalX, y, w, h);
+    }
     DOMURL.revokeObjectURL(url);
   }
   img1.src = url;

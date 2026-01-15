@@ -97,7 +97,8 @@ tr.direct-mode-only {
 /* Customisation of input boxes */
 input.mean-value,
 input.abs-deviation-value,
-input.rel-deviation-value {
+input.rel-deviation-value,
+.align-right {
   text-align: right;
 }
 
@@ -123,8 +124,17 @@ button.fix-size-small {
   padding: 0;
 }
 
-tr td:first-child button,
-#export-buttons button:first-child {
+/* Buttons that are initially disabled */
+button.init-disabled {
+  background-color: var(--psdi-bg-color-secondary);
+  color           : gray
+}
+
+button.init-disabled:hover {
+  cursor: default;
+}
+
+tr td:first-child button {
   margin-left: 0;
 }
 
@@ -138,10 +148,19 @@ tr td:first-child button,
 }
 
 /* Style the title and output label tables */
+
+.label-table td:has(label) {
+  text-align   : right;
+  padding-right: 0.75rem;
+}
+
+.label-table td:not(:has(label)) {
+  text-align: left;
+}
+
 .output-label,
 #title-label {
-  font-weight  : bold;
-  padding-right: 0.5rem;
+  font-weight: bold;
 }
 
 #title-input {
@@ -387,6 +406,11 @@ details summary:active {
 /* Style the popup tooltips */
 .tooltip {
   --bs-tooltip-opacity: 1;
+  max-width           : 17.5rem !important;
+}
+
+.tooltip-inner {
+  max-width: 17.5rem !important;
 }
 
 .tooltip-on-light {
