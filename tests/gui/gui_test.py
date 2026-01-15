@@ -696,7 +696,7 @@ def _wait_for_download(filename):
         time.sleep(TIMESTEP)
         time_elapsed += TIMESTEP
         if time_elapsed > TIMEOUT_SHORT:
-            pytest.fail(f"Download of {filename} and timed out")
+            pytest.fail(f"Download of {filename} timed out")
 
 
 def test_download_plot(driver: WebDriver):
