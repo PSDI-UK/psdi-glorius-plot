@@ -1682,7 +1682,7 @@ function enableButtons() {
 
   $("#generate-plot").on("click", generatePlot);
 
-  $("#export-image-png").on("click", () => exportImage("png"));
+  $("#export-image-png").on("click", () => exportImage(CHART_SELECTOR, "png"));
 
   $("#save-data").on("click", () => saveObject(getPlotData(), "glorius_plot_data.json"));
   $("#load-data").on("click", loadPlotData);
