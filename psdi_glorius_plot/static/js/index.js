@@ -867,7 +867,7 @@ function navigateNextRow(e) {
 
     // Find the descendent of this cell that we want to focus, if it exists
     const eToFocus = newCell.find("input, .ql-editor");
-    if (eToFocus.length >= 1) {
+    if (eToFocus.length >= 1 && eToFocus.attr("disabled") != "disabled" && eToFocus.attr("type") != "radio") {
       foundInput = true;
       eToFocus[0].focus();
 
