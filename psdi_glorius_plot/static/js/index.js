@@ -868,9 +868,16 @@ function navigateNextRow(e) {
     // Find the descendent of this cell that we want to focus, if it exists
     const eToFocus = newCell.find("input, .ql-editor");
     if (eToFocus.length >= 1) {
-      eToFocus[0].focus();
-      eToFocus[0].select();
       foundInput = true;
+      eToFocus[0].focus();
+
+      // Select all contents in the input, using the Quill API if necessary
+      if (eToFocus[0].select) {
+        eToFocus[0].select();
+      } else {
+        const quill = getQuillEditor("#" + eToFocus.parent().attr("id"));
+        quill.setSelection(0, quill.getLength());
+      }
     }
   }
 
