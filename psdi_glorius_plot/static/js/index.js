@@ -213,6 +213,7 @@ function postTableUpdateCleanup(dim, updateAfter) {
     relabelDim(dim);
     updateMeanColumn();
     updatePlotSelect();
+    enableNavigation();
 
     // Also update the plot if desired - we call enableAutoUpdates here to make sure any new inputs have proper triggers
     // set up. This will also then call generatePlot
@@ -800,6 +801,16 @@ function getDataSorting() {
 
 function setDataSorting(val) {
   $("#sort-option").val(val);
+}
+
+/**
+ * When the user presses the Enter key while inputting data, navigate to the next row
+ * @param {Object} e The triggering event
+ */
+function navigateNextRow(e) {
+  // TODO
+  console.log("navigateNextRow triggered with event " + e);
+  const currentCell = e.delegateTarget;
 }
 
 /**
@@ -1689,7 +1700,14 @@ function enableButtons() {
   $("#load-data-file").on("change", checkPlotDataFile);
 
   $("#reset-plot-dims").on("click", resetPlotDims);
+}
 
+function enableNavigation() {
+  $("td.condition-label-cell, td.sample-value-cell").off("keyup");
+  $("td.condition-label-cell, td.sample-value-cell").on("keyup", "input, div.ql-editor", (e) => {
+    if (e.code === "Enter")
+      navigateNextRow(e);
+  });
 }
 
 function enableOnChangeTriggers() {
@@ -1862,7 +1880,7 @@ $(document).ready(function () {
   initTooltips(), initGlobals(), initQuill();
 
   L_DIMS.forEach(dim => initNumDimControls(dim));
-  enableOnChangeTriggers(), enableToggles(), enableButtons();
+  enableOnChangeTriggers(), enableToggles(), enableButtons(), enableNavigation();
 
   enableDeviationCalc(), enableAutoUpdates(), enableCanvasUpdate();
 });
