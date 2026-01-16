@@ -33,7 +33,15 @@ export function addQuillEditor(selector, placeholder = "", toolbar = QUILL_TOOLB
           enter: {
             key: [13, "enter", "Enter"],
             handler: () => {
+              // Need to return false here so we don't insert a newline
               return false;
+            }
+          },
+          tab: {
+            key: [9, "tab", "Tab"],
+            handler: () => {
+              // And in the case of tab, we need to return true to restore default tab behaviour
+              return true;
             }
           }
         }

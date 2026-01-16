@@ -807,7 +807,7 @@ function setDataSorting(val) {
  * When the user presses the Enter key while inputting data, navigate to the next row
  * @param {Object} e The triggering event
  */
-function navigateNextRow(e) {
+function navigateCell(e) {
   const currentCell = $(e.delegateTarget);
 
   // Get the parent row and table. Strictly, we shouldn't need to filter on the selector, but it will help us catch if
@@ -843,20 +843,27 @@ function navigateNextRow(e) {
     }
   }
 
-  const advanceTab = function () {
-    ++newRowIndex;
-    // Check if we're in the last row. If so, loop around to the top row, but next cell. If in the final cell as well,
-    // loop around to the first cell
-    if (newRowIndex > numRows) {
-      newRowIndex = 0;
-      ++newCellIndex;
-      if (newCellIndex > numCells) {
-        newCellIndex = 0;
+  const reverseEnter = function () {
+    --newRowIndex;
+    if (newRowIndex < 0) {
+      newRowIndex = numRows - 1;
+      --newCellIndex;
+      if (newCellIndex < 0) {
+        newCellIndex = numCells - 1;
       }
     }
   }
 
-  let advance = advanceEnter;
+  const noAdvance = function () { }
+
+  // Determine which way to advance based on the key pressed
+  let advance = noAdvance;
+  if (e.code == "Enter") {
+    if (e.shiftKey)
+      advance = reverseEnter;
+    else
+      advance = advanceEnter;
+  }
 
   // Advance through the table in the desired direction until we get to a valid input cell
   let foundInput = false;
@@ -1775,9 +1782,9 @@ function enableButtons() {
 function enableNavigation() {
   $("td.condition-label-cell, td.baseline-value-cell, td.sample-value-cell").off("keyup");
   $("td.condition-label-cell, td.baseline-value-cell, td.sample-value-cell").on("keyup", "input, .ql-editor", (e) => {
-    if (e.code === "Enter") {
+    if (e.code === "Enter" || e.code === "Tab") {
       e.preventDefault();
-      navigateNextRow(e);
+      navigateCell(e);
     }
   });
 }
