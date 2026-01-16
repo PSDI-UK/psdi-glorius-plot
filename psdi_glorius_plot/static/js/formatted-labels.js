@@ -28,6 +28,16 @@ const dQuillEditors = {};
 export function addQuillEditor(selector, placeholder = "", toolbar = QUILL_TOOLBAR) {
   const editor = new Quill(selector, {
     modules: {
+      keyboard: {
+        bindings: {
+          enter: {
+            key: [13, "enter", "Enter"],
+            handler: () => {
+              return false;
+            }
+          }
+        }
+      },
       toolbar: toolbar
     },
     placeholder: placeholder,

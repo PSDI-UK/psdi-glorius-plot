@@ -808,7 +808,6 @@ function setDataSorting(val) {
  * @param {Object} e The triggering event
  */
 function navigateNextRow(e) {
-  console.log("navigateNextRow triggered with event " + e);
   const currentCell = $(e.delegateTarget);
 
   // Get the parent row and table. Strictly, we shouldn't need to filter on the selector, but it will help us catch if
@@ -824,28 +823,56 @@ function navigateNextRow(e) {
   const cellIndex = $.inArray(currentCell[0], currentRow.children("td"));
   let newCellIndex = cellIndex;
   const rowIndex = $.inArray(currentRow[0], parentTable.children("tr"));
-  let newRowIndex = rowIndex + 1;
+  let newRowIndex = rowIndex;
 
   const lRows = parentTable.children("tr");
 
-  // Check if we're in the last row. If so, loop around to the top row, but next cell. If in the final cell as well,
-  // loop around to the first cell
-  if (newRowIndex > lRows.length) {
-    newRowIndex = 0;
-    ++newCellIndex;
+  const numRows = lRows.length;
+  const numCells = currentRow.children("td").length;
+
+  const advanceEnter = function () {
+    ++newRowIndex;
+    // Check if we're in the last row. If so, loop around to the top row, but next cell. If in the final cell as well,
+    // loop around to the first cell
+    if (newRowIndex > numRows) {
+      newRowIndex = 0;
+      ++newCellIndex;
+      if (newCellIndex > numCells) {
+        newCellIndex = 0;
+      }
+    }
   }
 
-  const newRow = lRows.eq(newRowIndex);
-  const lCells = newRow.children("td");
-  if (newCellIndex > lCells.length) {
-    newCellIndex = 0;
+  const advanceTab = function () {
+    ++newRowIndex;
+    // Check if we're in the last row. If so, loop around to the top row, but next cell. If in the final cell as well,
+    // loop around to the first cell
+    if (newRowIndex > numRows) {
+      newRowIndex = 0;
+      ++newCellIndex;
+      if (newCellIndex > numCells) {
+        newCellIndex = 0;
+      }
+    }
   }
 
-  const newCell = lCells.eq(newCellIndex);
+  let advance = advanceEnter;
 
-  // Find the descendent of this cell that we want to focus
-  const eToFocus = newCell.find("input, .ql-editor");
-  eToFocus[0].focus();
+  // Advance through the table in the desired direction until we get to a valid input cell
+  let foundInput = false;
+  while (!foundInput) {
+    advance();
+    const newRow = lRows.eq(newRowIndex);
+    const newCell = newRow.children("td").eq(newCellIndex);
+
+    // Find the descendent of this cell that we want to focus, if it exists
+    const eToFocus = newCell.find("input, .ql-editor");
+    if (eToFocus.length >= 1) {
+      eToFocus[0].focus();
+      eToFocus[0].select();
+      foundInput = true;
+    }
+  }
 
 }
 
@@ -1739,8 +1766,8 @@ function enableButtons() {
 }
 
 function enableNavigation() {
-  $("td.condition-label-cell, td.sample-value-cell").off("keyup");
-  $("td.condition-label-cell, td.sample-value-cell").on("keyup", "input, .ql-editor", (e) => {
+  $("td.condition-label-cell, td.baseline-value-cell, td.sample-value-cell").off("keyup");
+  $("td.condition-label-cell, td.baseline-value-cell, td.sample-value-cell").on("keyup", "input, .ql-editor", (e) => {
     if (e.code === "Enter") {
       e.preventDefault();
       navigateNextRow(e);
