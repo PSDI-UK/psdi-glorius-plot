@@ -808,9 +808,41 @@ function setDataSorting(val) {
  * @param {Object} e The triggering event
  */
 function navigateNextRow(e) {
-  // TODO
   console.log("navigateNextRow triggered with event " + e);
-  const currentCell = e.delegateTarget;
+  const currentCell = $(e.delegateTarget);
+
+  // Get the parent row and table. Strictly, we shouldn't need to filter on the selector, but it will help us catch if
+  // something goes wrong here, rather than the error happening somewhere later
+  const currentRow = currentCell.parent("tr");
+  if (currentRow.length != 1)
+    return console.error("navigateNextRow method called on an element whose parent isn't a table row");
+  const parentTable = currentRow.parent("tbody");
+  if (parentTable.length != 1)
+    return console.error("navigateNextRow method called in a row whose parent isn't a tbody element");
+
+  // Determine where we are in the table and where we want to be
+  const cellIndex = jQuery.inArray(currentCell, currentRow);
+  let newCellIndex = cellIndex;
+  const rowIndex = jQuery.inArray(currentRow, parentTable);
+  let newRowIndex = rowIndex + 1;
+
+  const lRows = parentTable.children("tr");
+
+  // Check if we're in the last row. If so, loop around to the top row, but next cell. If in the final cell as well,
+  // loop around to the first cell
+  if (newRowIndex > lRows.length) {
+    newRowIndex = 0;
+    ++newCellIndex;
+  }
+
+  const newRow = lRows.eq(newRowIndex);
+  const lCells = newRow.children("td");
+  if (newCellIndex > lCells.length) {
+    newCellIndex = 0;
+  }
+
+  const newCell = lCells.eq(newCellIndex);
+
 }
 
 /**
