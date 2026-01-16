@@ -821,9 +821,9 @@ function navigateNextRow(e) {
     return console.error("navigateNextRow method called in a row whose parent isn't a tbody element");
 
   // Determine where we are in the table and where we want to be
-  const cellIndex = jQuery.inArray(currentCell, currentRow);
+  const cellIndex = $.inArray(currentCell[0], currentRow.children("td"));
   let newCellIndex = cellIndex;
-  const rowIndex = jQuery.inArray(currentRow, parentTable);
+  const rowIndex = $.inArray(currentRow[0], parentTable.children("tr"));
   let newRowIndex = rowIndex + 1;
 
   const lRows = parentTable.children("tr");
@@ -842,6 +842,10 @@ function navigateNextRow(e) {
   }
 
   const newCell = lCells.eq(newCellIndex);
+
+  // Find the descendent of this cell that we want to focus
+  const eToFocus = newCell.find("input, .ql-editor");
+  eToFocus[0].focus();
 
 }
 
@@ -1736,9 +1740,11 @@ function enableButtons() {
 
 function enableNavigation() {
   $("td.condition-label-cell, td.sample-value-cell").off("keyup");
-  $("td.condition-label-cell, td.sample-value-cell").on("keyup", "input, div.ql-editor", (e) => {
-    if (e.code === "Enter")
+  $("td.condition-label-cell, td.sample-value-cell").on("keyup", "input, .ql-editor", (e) => {
+    if (e.code === "Enter") {
+      e.preventDefault();
       navigateNextRow(e);
+    }
   });
 }
 
