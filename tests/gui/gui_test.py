@@ -992,27 +992,52 @@ def test_table_navigation(driver: WebDriver):
     l_table_rows = table_element.find_elements(By.XPATH, "*//tr[contains(@class,'condition-row')]")
     for i in range(TEST_NUM_CONDITION_ROWS):
         row = l_table_rows[i]
-        l_condition_label_inputs[i] = row.find_element(By.XPATH, "//td[contains(@class,'condition-label-cell')]" +
+        l_condition_label_inputs[i] = row.find_element(By.XPATH, ".//td[contains(@class,'condition-label-cell')]" +
                                                                  "//*[contains(@class,'ql-editor')]")
-        ll_value_inputs[i] = row.find_elements(By.XPATH, "//td[contains(@class,'sample-value-cell')]//input")
+        ll_value_inputs[i] = row.find_elements(By.XPATH, ".//td[contains(@class,'sample-value-cell')]//input")
 
     # Select the first baseline input, and check that we can tab through to the other element and back
     scroll_element_into_view(driver, l_baseline_inputs[0])
     l_baseline_inputs[0].click()
     assert l_baseline_inputs[0] == driver.switch_to.active_element
 
-    ActionChains(driver).send_keys(Keys.TAB).perform()
+    ActionChains(driver).send_keys_to_element(driver.switch_to.active_element, Keys.TAB).perform()
     assert l_baseline_inputs[1] == driver.switch_to.active_element
 
-    ActionChains(driver).key_down(Keys.SHIFT).send_keys(Keys.TAB).key_up(Keys.SHIFT).perform()
+    ActionChains(driver).key_down(Keys.SHIFT).send_keys_to_element(driver.switch_to.active_element,
+                                                                   Keys.TAB).key_up(Keys.SHIFT).perform()
     assert l_baseline_inputs[0] == driver.switch_to.active_element
 
     # Tab to the next line, and check that the first condition label input is selected, then the value input, and back
-    ActionChains(driver).send_keys(Keys.TAB*2).perform()
+    ActionChains(driver).send_keys_to_element(driver.switch_to.active_element, Keys.TAB*TEST_NUM_SAMPLE_COLS).perform()
     assert l_condition_label_inputs[0] == driver.switch_to.active_element
 
-    ActionChains(driver).send_keys(Keys.TAB).perform()
+    ActionChains(driver).send_keys_to_element(driver.switch_to.active_element, Keys.TAB).perform()
     assert ll_value_inputs[0][0] == driver.switch_to.active_element
 
-    ActionChains(driver).key_down(Keys.SHIFT).send_keys(Keys.TAB).key_up(Keys.SHIFT).perform()
+    ActionChains(driver).key_down(Keys.SHIFT).send_keys_to_element(driver.switch_to.active_element,
+                                                                   Keys.TAB).key_up(Keys.SHIFT).perform()
     assert l_condition_label_inputs[0] == driver.switch_to.active_element
+
+    # TODO: There seems to be a bug in Selenium that send_keys and key_up events don't trigger JQuery's on("key_up")
+    # events, as far as I can tell. This needs further investigation
+
+    # # Now try navigating with Enter and Shift+Enter
+    # ActionChains(driver).send_keys_to_element(driver.switch_to.active_element, Keys.ENTER).perform()
+    # assert l_condition_label_inputs[1] == driver.switch_to.active_element
+
+    # ActionChains(driver).key_down(Keys.SHIFT).send_keys_to_element(driver.switch_to.active_element,
+    #                                                                Keys.ENTER).key_up(Keys.SHIFT).perform()
+    # assert l_condition_label_inputs[0] == driver.switch_to.active_element
+
+    # # And try navigating to the next column and back
+    # ActionChains(driver).send_keys_to_element(driver.switch_to.active_element,
+    #                                           Keys.ENTER*TEST_NUM_CONDITION_ROWS).perform()
+    # assert l_baseline_inputs[0] == driver.switch_to.active_element
+
+    # ActionChains(driver).send_keys_to_element(driver.switch_to.active_element, Keys.ENTER).perform()
+    # assert ll_value_inputs[0][0] == driver.switch_to.active_element
+
+    # ActionChains(driver).key_down(Keys.SHIFT).send_keys_to_element(driver.switch_to.active_element,
+    #                                                                Keys.ENTER*2).key_up(Keys.SHIFT).perform()
+    # assert l_condition_label_inputs[-1] == driver.switch_to.active_element
