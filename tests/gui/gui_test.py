@@ -873,8 +873,8 @@ def test_save_load_data(driver: WebDriver):
     TEST_NUM_CONDITION_ROWS = 7
     _set_num_condition_rows(driver, TEST_NUM_CONDITION_ROWS)
 
-    TEST_NUM_SAMPLE_ROWS = 5
-    _set_num_sample_columns(driver, TEST_NUM_SAMPLE_ROWS)
+    TEST_NUM_SAMPLE_COLS = 5
+    _set_num_sample_columns(driver, TEST_NUM_SAMPLE_COLS)
 
     abs_radio = wait_for_element(driver, "//input[@id='plot-abs']")
     scroll_element_into_view(driver, abs_radio).click()
@@ -942,7 +942,7 @@ def test_save_load_data(driver: WebDriver):
     # Check that all data we entered before has now been reloaded
     assert outcome_select_element.get_attribute("value") == TEST_OUTCOME
     assert _get_num_condition_rows(driver) == TEST_NUM_CONDITION_ROWS
-    assert _get_num_sample_columns(driver) == TEST_NUM_SAMPLE_ROWS
+    assert _get_num_sample_columns(driver) == TEST_NUM_SAMPLE_COLS
     assert abs_radio.get_attribute("checked") == 'true'
 
     l_baseline_inputs = driver.find_elements(By.XPATH, "//input[contains(@class,'baseline-value')]")
@@ -964,3 +964,55 @@ def test_save_load_data(driver: WebDriver):
     assert _get_axis_fontsize(driver) == TEST_AXIS_FONTSIZE
 
     assert fan_toggle.get_attribute("checked") == 'true'
+
+
+def test_table_navigation(driver: WebDriver):
+    """Test that the table can be navigated as expected with tab and enter"""
+
+    # Load the home page and wait for the page cover to be removed
+    driver.get(f"{origin}/")
+    wait_for_cover_hidden(driver)
+
+    # Start by setting up the number of rows and columns, then filling with random data
+    TEST_NUM_CONDITION_ROWS = 3
+    _set_num_condition_rows(driver, TEST_NUM_CONDITION_ROWS)
+    TEST_NUM_SAMPLE_COLS = 2
+    _set_num_sample_columns(driver, TEST_NUM_SAMPLE_COLS)
+    fill_random_button = wait_for_element(driver, "//button[@id='fill-random']")
+    fill_random_button.click()
+
+    # We should see an alert here warning that entered data will be lost - accept it
+    Alert(driver).accept()
+
+    # Fill up arrays with references to each of the input elements in the table
+    l_baseline_inputs: list[WebElement] = driver.find_elements(By.XPATH, "//input[contains(@class,'baseline-value')]")
+    l_condition_label_inputs: list[WebElement] = [None] * TEST_NUM_CONDITION_ROWS
+    ll_value_inputs: list[list[WebElement]] = [None] * TEST_NUM_CONDITION_ROWS
+    table_element: WebElement = wait_for_element(driver, "*//table[contains(@class,'sensitivity-table')]")
+    l_table_rows = table_element.find_elements(By.XPATH, "*//tr[contains(@class,'condition-row')]")
+    for i in range(TEST_NUM_CONDITION_ROWS):
+        row = l_table_rows[i]
+        l_condition_label_inputs[i] = row.find_element(By.XPATH, "//td[contains(@class,'condition-label-cell')]" +
+                                                                 "//*[contains(@class,'ql-editor')]")
+        ll_value_inputs[i] = row.find_elements(By.XPATH, "//td[contains(@class,'sample-value-cell')]//input")
+
+    # Select the first baseline input, and check that we can tab through to the other element and back
+    scroll_element_into_view(driver, l_baseline_inputs[0])
+    l_baseline_inputs[0].click()
+    assert l_baseline_inputs[0] == driver.switch_to.active_element
+
+    ActionChains(driver).send_keys(Keys.TAB).perform()
+    assert l_baseline_inputs[1] == driver.switch_to.active_element
+
+    ActionChains(driver).key_down(Keys.SHIFT).send_keys(Keys.TAB).key_up(Keys.SHIFT).perform()
+    assert l_baseline_inputs[0] == driver.switch_to.active_element
+
+    # Tab to the next line, and check that the first condition label input is selected, then the value input, and back
+    ActionChains(driver).send_keys(Keys.TAB*2).perform()
+    assert l_condition_label_inputs[0] == driver.switch_to.active_element
+
+    ActionChains(driver).send_keys(Keys.TAB).perform()
+    assert ll_value_inputs[0][0] == driver.switch_to.active_element
+
+    ActionChains(driver).key_down(Keys.SHIFT).send_keys(Keys.TAB).key_up(Keys.SHIFT).perform()
+    assert l_condition_label_inputs[0] == driver.switch_to.active_element
