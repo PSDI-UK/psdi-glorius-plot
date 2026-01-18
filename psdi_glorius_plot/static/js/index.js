@@ -814,10 +814,10 @@ function navigateCell(e) {
   // something goes wrong here, rather than the error happening somewhere later
   const currentRow = currentCell.parent("tr");
   if (currentRow.length != 1)
-    return console.error("navigateNextRow method called on an element whose parent isn't a table row");
+    return console.error("navigateCell method called on an element whose parent isn't a table row");
   const parentTable = currentRow.parent("tbody");
   if (parentTable.length != 1)
-    return console.error("navigateNextRow method called in a row whose parent isn't a tbody element");
+    return console.error("navigateCell method called in a row whose parent isn't a tbody element");
 
   // Determine where we are in the table and where we want to be
   const cellIndex = $.inArray(currentCell[0], currentRow.children("td"));
