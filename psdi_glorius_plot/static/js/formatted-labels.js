@@ -37,6 +37,14 @@ export function addQuillEditor(selector, placeholder = "", toolbar = QUILL_TOOLB
               return false;
             }
           },
+          "shift enter": {
+            key: [13, "enter", "Enter"],
+            shiftKey: true,
+            handler: () => {
+              // Need to return false here so we don't insert a newline
+              return false;
+            }
+          },
           tab: {
             key: [9, "tab", "Tab"],
             handler: () => {
