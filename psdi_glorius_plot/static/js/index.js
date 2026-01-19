@@ -529,6 +529,14 @@ function resetPlotDims() {
   generateIfUpdating();
 }
 
+/**
+ * Clear any tooltips currently present on the page
+ */
+function clearTooltips() {
+  tooltipList.forEach((tooltip) => {
+    tooltip.hide();
+  });
+}
 
 // Functions to get various options set by the user, and set them by code
 
@@ -1703,10 +1711,7 @@ function fillExample() {
 
   // Clear all tooltips after generating, since clicking the button interferes with the normal trigger to clear its
   // tooltip
-  // TODO: Make this a function, and make sure it's used to clear tooltips when any option with a tooltip is clicked
-  tooltipList.forEach((tooltip) => {
-    tooltip.hide();
-  });
+  clearTooltips();
 
   // Make sure the deviation is calculated, even in direct input mode (if not in this mode, it will be calculated when
   // the plot is generated)
