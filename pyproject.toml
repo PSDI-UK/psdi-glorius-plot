@@ -8,7 +8,7 @@ authors = [
   # Add your name and email here
   { name = "Bryan Gillis", email = "7204836+brgillis@users.noreply.github.com" },
 ]
-description = "TODO: Project Description"
+description = "Flask-hosted web app to generate a Glorius-style radar plot of reaction sensitivity for the user."
 readme = "README.md"
 # List keywords relevant to your project here. There's no official list, so include ones you think are relevant and will
 # help find your project in searches, e.g. ["chemistry", "PSDI"]

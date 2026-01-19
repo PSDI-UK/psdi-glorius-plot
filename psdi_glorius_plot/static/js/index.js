@@ -95,6 +95,8 @@ const BORDER_WIDTH = 4, L_BORDER_DASHES = [[], [6, 6], [4, 4], [2, 2], [1, 1]];
 const BASELINE_WIDTH = 4, BASELINE_COLOR = "#FFFFFF";
 const DATA_BG_COLOR = [COLOR_TRANSPARENT];
 const GRID_WIDTH = 1, GRID_COLOR = "#00000080";
+const TIP_SIZE = 3, BASE_SEPARATION = 3;
+const BAR_SIZE = 2 * (TIP_SIZE + BASE_SEPARATION + 1);
 
 // Globals
 let tooltipList;
@@ -527,6 +529,14 @@ function resetPlotDims() {
   generateIfUpdating();
 }
 
+/**
+ * Clear any tooltips currently present on the page
+ */
+function clearTooltips() {
+  tooltipList.forEach((tooltip) => {
+    tooltip.hide();
+  });
+}
 
 // Functions to get various options set by the user, and set them by code
 
@@ -763,16 +773,6 @@ function getFanMode() {
 
 function setFanMode(val) {
   $("#fan-toggle").prop("checked", val);
-}
-
-// TODO: Deprecate
-function getTipSize() {
-  return +$("#fan-tip-size").val();
-}
-
-// TODO: Deprecate
-function getBarSeparation() {
-  return +$("#fan-bar-separation").val();
 }
 
 function getShowGridLines() {
@@ -1158,9 +1158,7 @@ async function generatePlot() {
 
   const minColor = getMinColor(), maxColor = getMaxColor();
 
-  const tipSize = getTipSize(), baseSeparation = getBarSeparation();
-  const barSize = 2 * (tipSize + baseSeparation + 1);
-  const numAnglePoints = numConditions * barSize;
+  const numAnglePoints = numConditions * BAR_SIZE;
 
   // Create data we'll plot in the chart
   const llData = [];
@@ -1380,7 +1378,7 @@ async function generatePlot() {
       for (let j = 0; j < numOutputs; ++j) {
 
         const lData = llData[1 + numBgColors + numAxisLines + i + j * numConditions + numOutputs];
-        const tipCenter = barSize * (i + 0.5 + 0.5 * j / numOutputs);
+        const tipCenter = BAR_SIZE * (i + 0.5 + 0.5 * j / numOutputs);
 
         for (let l = 0; l < numAnglePoints; ++l) {
           if (j == 0 && l == tipCenter) {
@@ -1394,11 +1392,11 @@ async function generatePlot() {
             tipDistance = numAnglePoints - tipDistance;
 
           // Set the point value based on the distance from the tip center
-          if (tipDistance <= tipSize)
+          if (tipDistance <= TIP_SIZE)
             lData.push(clamp(conditionData.data[j], minOutput, maxOutput));
-          else if (tipDistance <= tipSize + 1)
+          else if (tipDistance <= TIP_SIZE + 1)
             lData.push(outputMidpoint);
-          else if (j == 0 && tipDistance <= tipSize + baseSeparation + 1)
+          else if (j == 0 && tipDistance <= TIP_SIZE + BASE_SEPARATION + 1)
             lData.push(outputMidpoint);
           else
             lData.push(null);
@@ -1713,10 +1711,7 @@ function fillExample() {
 
   // Clear all tooltips after generating, since clicking the button interferes with the normal trigger to clear its
   // tooltip
-  // TODO: Make this a function, and make sure it's used to clear tooltips when any option with a tooltip is clicked
-  tooltipList.forEach((tooltip) => {
-    tooltip.hide();
-  });
+  clearTooltips();
 
   // Make sure the deviation is calculated, even in direct input mode (if not in this mode, it will be calculated when
   // the plot is generated)

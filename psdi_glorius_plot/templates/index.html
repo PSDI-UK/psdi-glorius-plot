@@ -234,10 +234,8 @@
 
     <tr class="condition-row">
       <td class="condition-button-cell">
-        <!-- TODO: Buttons like these should have their IDs changed to "remove/add-cb-N" (not rb) when it's safe to do
-         so without risking breaking production -->
-        <button type="button" id="remove-rb-0" tabindex="-1" class="remove-condition disabled fix-size-small">-</button>
-        <button type="button" id="add-rb-0" tabindex="-1" class="add-condition fix-size-small">+</button>
+        <button type="button" id="remove-cb-0" tabindex="-1" class="remove-condition disabled fix-size-small">-</button>
+        <button type="button" id="add-cb-0" tabindex="-1" class="add-condition fix-size-small">+</button>
       </td>
       <td class="condition-label-cell">
         <div class="condition-label-container">
@@ -276,8 +274,8 @@
 
     <tr class="condition-row">
       <td class="condition-button-cell">
-        <button type="button" id="remove-rb-1" tabindex="-1" class="remove-condition disabled fix-size-small">-</button>
-        <button type="button" id="add-rb-1" tabindex="-1" class="add-condition fix-size-small">+</button>
+        <button type="button" id="remove-cb-1" tabindex="-1" class="remove-condition disabled fix-size-small">-</button>
+        <button type="button" id="add-cb-1" tabindex="-1" class="add-condition fix-size-small">+</button>
       </td>
       <td class="condition-label-cell">
         <div class="condition-label-container">
@@ -316,8 +314,8 @@
 
     <tr class="condition-row">
       <td class="condition-button-cell">
-        <button type="button" id="remove-rb-2" tabindex="-1" class="remove-condition disabled fix-size-small">-</button>
-        <button type="button" id="add-rb-2" tabindex="-1" class="add-condition fix-size-small">+</button>
+        <button type="button" id="remove-cb-2" tabindex="-1" class="remove-condition disabled fix-size-small">-</button>
+        <button type="button" id="add-cb-2" tabindex="-1" class="add-condition fix-size-small">+</button>
       </td>
       <td class="condition-label-cell">
         <div class="condition-label-container">
@@ -356,8 +354,8 @@
 
     <tr class="condition-row">
       <td class="condition-button-cell">
-        <button type="button" id="remove-rb-3" tabindex="-1" class="remove-condition disabled fix-size-small">-</button>
-        <button type="button" id="add-rb-3" tabindex="-1" class="add-condition fix-size-small">+</button>
+        <button type="button" id="remove-cb-3" tabindex="-1" class="remove-condition disabled fix-size-small">-</button>
+        <button type="button" id="add-cb-3" tabindex="-1" class="add-condition fix-size-small">+</button>
       </td>
       <td class="condition-label-cell">
         <div class="condition-label-container">
@@ -396,8 +394,8 @@
 
     <tr class="condition-row">
       <td class="condition-button-cell">
-        <button type="button" id="remove-rb-4" tabindex="-1" class="remove-condition disabled fix-size-small">-</button>
-        <button type="button" id="add-rb-4" tabindex="-1" class="add-condition fix-size-small">+</button>
+        <button type="button" id="remove-cb-4" tabindex="-1" class="remove-condition disabled fix-size-small">-</button>
+        <button type="button" id="add-cb-4" tabindex="-1" class="add-condition fix-size-small">+</button>
       </td>
       <td class="condition-label-cell">
         <div class="condition-label-container">
@@ -562,13 +560,6 @@
   <p>
     <input type="checkbox" name="fan-toggle" id="fan-toggle" class="trigger-chart-update">
     <label for="fan-toggle"> Display as fan plot instead of radar</label>
-  </p>
-  <p class="fan-mode-only hidden">
-    <label for="fan-tip-size">Tip size of bars: </label>
-    <input type="number" name="fan-tip-size" id="fan-tip-size" class="trigger-chart-update" value="3" min="0" step="1">
-    <label for="fan-bar-separation">Base separation of bars: </label>
-    <input type="number" name="fan-bar-separation" id="fan-bar-separation" class="trigger-chart-update" value="3"
-      min="0" step="1">
   </p>
   <p class="radar-mode-only">
     <input type="checkbox" name="grid-line-toggle" id="grid-line-toggle" class="trigger-chart-update" checked>
