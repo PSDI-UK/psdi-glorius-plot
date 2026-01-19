@@ -808,7 +808,7 @@ function setDataSorting(val) {
  * @param {Object} e The triggering event
  */
 function navigateCell(e) {
-  const currentCell = $(e.delegateTarget);
+  const currentCell = $(e.target).parents("td");
 
   // Get the parent row and table. Strictly, we shouldn't need to filter on the selector, but it will help us catch if
   // something goes wrong here, rather than the error happening somewhere later
@@ -858,7 +858,7 @@ function navigateCell(e) {
 
   // Determine which way to advance based on the key pressed
   let advance = noAdvance;
-  if (e.code == "Enter") {
+  if (e.code === "Enter" || e.code === "NumpadEnter") {
     if (e.shiftKey)
       advance = reverseEnter;
     else
@@ -1779,13 +1779,19 @@ function enableButtons() {
   $("#reset-plot-dims").on("click", resetPlotDims);
 }
 
+function handleNavigation(e) {
+  if (e.code === "Enter" || e.code === "NumpadEnter" || e.code === "Tab") {
+    e.preventDefault();
+    navigateCell(e);
+  }
+}
+
 function enableNavigation() {
-  $("td.condition-label-cell, td.baseline-value-cell, td.sample-value-cell").off("keyup");
-  $("td.condition-label-cell, td.baseline-value-cell, td.sample-value-cell").on("keyup", "input, .ql-editor", (e) => {
-    if (e.code === "Enter" || e.code === "Tab") {
-      e.preventDefault();
-      navigateCell(e);
-    }
+  $("td.condition-label-cell .ql-editor, td.baseline-value-cell input, td.sample-value-cell input").each(function (index) {
+    this.removeEventListener("keyup", handleNavigation);
+  });
+  $("td.condition-label-cell .ql-editor, td.baseline-value-cell input, td.sample-value-cell input").each(function (index) {
+    this.addEventListener("keyup", handleNavigation);
   });
 }
 

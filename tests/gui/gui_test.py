@@ -1019,25 +1019,22 @@ def test_table_navigation(driver: WebDriver):
                                                                    Keys.TAB).key_up(Keys.SHIFT).perform()
     assert l_condition_label_inputs[0] == driver.switch_to.active_element
 
-    # TODO: There seems to be a bug in Selenium that send_keys and key_up events don't trigger JQuery's on("key_up")
-    # events, as far as I can tell. This needs further investigation
+    # Now try navigating with Enter and Shift+Enter
+    ActionChains(driver).send_keys_to_element(driver.switch_to.active_element, Keys.ENTER).perform()
+    assert l_condition_label_inputs[1] == driver.switch_to.active_element
 
-    # # Now try navigating with Enter and Shift+Enter
-    # ActionChains(driver).send_keys_to_element(driver.switch_to.active_element, Keys.ENTER).perform()
-    # assert l_condition_label_inputs[1] == driver.switch_to.active_element
+    ActionChains(driver).key_down(Keys.SHIFT).send_keys_to_element(driver.switch_to.active_element,
+                                                                   Keys.ENTER).key_up(Keys.SHIFT).perform()
+    assert l_condition_label_inputs[0] == driver.switch_to.active_element
 
-    # ActionChains(driver).key_down(Keys.SHIFT).send_keys_to_element(driver.switch_to.active_element,
-    #                                                                Keys.ENTER).key_up(Keys.SHIFT).perform()
-    # assert l_condition_label_inputs[0] == driver.switch_to.active_element
+    # And try navigating to the next column and back
+    ActionChains(driver).send_keys_to_element(driver.switch_to.active_element,
+                                              Keys.ENTER*TEST_NUM_CONDITION_ROWS).perform()
+    assert l_baseline_inputs[0] == driver.switch_to.active_element
 
-    # # And try navigating to the next column and back
-    # ActionChains(driver).send_keys_to_element(driver.switch_to.active_element,
-    #                                           Keys.ENTER*TEST_NUM_CONDITION_ROWS).perform()
-    # assert l_baseline_inputs[0] == driver.switch_to.active_element
+    ActionChains(driver).send_keys_to_element(driver.switch_to.active_element, Keys.ENTER).perform()
+    assert ll_value_inputs[0][0] == driver.switch_to.active_element
 
-    # ActionChains(driver).send_keys_to_element(driver.switch_to.active_element, Keys.ENTER).perform()
-    # assert ll_value_inputs[0][0] == driver.switch_to.active_element
-
-    # ActionChains(driver).key_down(Keys.SHIFT).send_keys_to_element(driver.switch_to.active_element,
-    #                                                                Keys.ENTER*2).key_up(Keys.SHIFT).perform()
-    # assert l_condition_label_inputs[-1] == driver.switch_to.active_element
+    ActionChains(driver).key_down(Keys.SHIFT).send_keys_to_element(driver.switch_to.active_element,
+                                                                   Keys.ENTER*2).key_up(Keys.SHIFT).perform()
+    assert l_condition_label_inputs[-1] == driver.switch_to.active_element
