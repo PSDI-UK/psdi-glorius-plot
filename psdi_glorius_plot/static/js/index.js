@@ -804,6 +804,45 @@ function setDataSorting(val) {
 }
 
 /**
+ * Sets tabindex=-1 for all add/remove row buttons so that they'll be skipped over when tabbing within the input table
+ */
+function disableRowButtonTabs() {
+  $("button.remove-condition, button.add-condition").attr("tabindex", "-1");
+}
+
+/**
+ * Removes tabindex=-1 for all add/remove row buttons so that they'll no longer be skipped over once tabbing outside the
+ * input table
+ */
+function enableRowButtonTabs() {
+  $("button.remove-condition, button.add-condition").removeAttr("tabindex");
+}
+
+/**
+ * When the user presses the Escape key while inputting data, change focus to the add/remove row buttons
+ * @param {Object} e 
+ */
+function navigateToRowButtons(e) {
+  const currentCell = $(e.delegateTarget);
+
+  // Find the button we want to change focus to
+  const currentRow = currentCell.parent("tr");
+  if (currentRow.length != 1)
+    return console.error("navigateCell method called on an element whose parent isn't a table row");
+
+  const removeRowButton = currentRow.find("button.remove-condition");
+  const addRowButton = currentRow.find("button.add-condition");
+
+  // Prioritise moving to the remove row button, unless it's disabled
+  let targetButton = removeRowButton;
+  if (targetButton.attr("disabled")) {
+    targetButton = removeRowButton;
+  }
+
+  targetButton[0].focus();
+}
+
+/**
  * When the user presses the Enter key while inputting data, navigate to the next row
  * @param {Object} e The triggering event
  */
@@ -1777,11 +1816,26 @@ function enableButtons() {
 }
 
 function enableNavigation() {
-  $("td.condition-label-cell, td.baseline-value-cell, td.sample-value-cell").off("keyup");
-  $("td.condition-label-cell, td.baseline-value-cell, td.sample-value-cell").on("keyup", "input, .ql-editor", (e) => {
+
+  const inputElements = $("td.condition-label-cell, td.baseline-value-cell, td.sample-value-cell");
+
+  // Enable tabbing through row add/remove buttons whenever this is called
+  enableRowButtonTabs();
+
+  // When inputs are focused, disable tabbing through row add/remove, and reenable it when blurred
+  inputElements.off("focus");
+  inputElements.on("focus", "input, .ql-editor", disableRowButtonTabs);
+  inputElements.off("blur");
+  inputElements.on("blur", "input, .ql-editor", enableRowButtonTabs);
+
+  // Disable and re-enable tab/enter/esc navigation within the form
+  inputElements.off("keyup");
+  inputElements.on("keyup", "input, .ql-editor", function (e) {
     if (e.code === "Enter" || e.code === "NumpadEnter" || e.code === "Tab") {
       e.preventDefault();
       navigateCell(e);
+    } else if (e.code === "Escape") {
+      navigateToRowButtons(e);
     }
   });
 }
