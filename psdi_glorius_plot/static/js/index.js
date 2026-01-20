@@ -9,9 +9,8 @@ import { mixHexes } from "./color-mixing.js"
 import { exportImage, loadObject, saveObject } from "./io.js"
 import { clamp, disableButton, enableButton, getWebKitMode } from "./utility.js"
 import {
-  addQuillEditor as createQuillEditor, getQuillEditor, getQuillEditorHTML, setQuillEditor, removeQuillEditor,
-  updateQuillContents, enableQuillEvents, stripTags, waitForMathJax, drawFormatted,
-  incrementRenderBatch,
+  addQuillEditor, getQuillEditor, getQuillEditorHTML, setQuillEditor, removeQuillEditor, updateQuillContents,
+  disableQuillToolbar, enableQuillEvents, stripTags, waitForMathJax, drawFormatted, incrementRenderBatch,
 } from "./formatted-labels.js"
 
 const VERSION = "0.1";
@@ -317,7 +316,7 @@ function addConditionRow(e, updateAfter = true) {
     removeQuillEditor("#cl-" + (i - 1));
   }
   $("#cl-" + (targetRowIndex + 1)).html("");
-  createQuillEditor("#cl-" + (targetRowIndex + 1), CONDITION_PLACEHOLDER);
+  addQuillEditor("#cl-" + (targetRowIndex + 1), CONDITION_PLACEHOLDER);
   enableQuillEvents(generateIfUpdating, updateOutputLabelCallback);
 
   // If we skipped updating the plot before, do it now
@@ -833,6 +832,9 @@ function navigateToRowButtons(e) {
   const removeRowButton = currentRow.find("button.remove-condition");
   const addRowButton = currentRow.find("button.add-condition");
 
+  if (!addRowButton && !removeRowButton)
+    return;
+
   // Prioritise moving to the remove row button, unless it's disabled
   let targetButton = removeRowButton;
   if (targetButton.attr("disabled")) {
@@ -840,6 +842,12 @@ function navigateToRowButtons(e) {
   }
 
   targetButton[0].focus();
+
+  // If we moved away from a Quill editor, disable its toolbar
+  const quillEl = currentCell.find(".condition-input");
+  if (quillEl) {
+    disableQuillToolbar("#" + quillEl.attr("id"));
+  }
 }
 
 /**
@@ -1995,10 +2003,10 @@ function initTooltips() {
 }
 
 function initQuill() {
-  createQuillEditor("#title-input", "e.g. “Reaction-condition sensitivity analysis”");
-  createQuillEditor("#ol-0", "Define outcome");
+  addQuillEditor("#title-input", "e.g. “Reaction-condition sensitivity analysis”");
+  addQuillEditor("#ol-0", "Define outcome");
   $(".condition-input").each((i, e) => {
-    createQuillEditor("#cl-" + i, CONDITION_PLACEHOLDER);
+    addQuillEditor("#cl-" + i, CONDITION_PLACEHOLDER);
   })
   enableQuillEvents(generateIfUpdating, updateOutputLabelCallback);
 }
