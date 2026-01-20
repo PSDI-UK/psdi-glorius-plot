@@ -1666,6 +1666,7 @@ function fillExample() {
   // Check if the form is currently dirty, and check with the user before filling if so
   if (checkIsDirty()) {
     if (!confirm(DIRTY_FORMS_MESSAGE)) {
+      setTimeout(clearTooltips, 100);
       return;
     }
   }
@@ -1709,10 +1710,6 @@ function fillExample() {
   lDataCells.eq(8).val("13");
   lDataCells.eq(9).val("50");
 
-  // Clear all tooltips after generating, since clicking the button interferes with the normal trigger to clear its
-  // tooltip
-  clearTooltips();
-
   // Make sure the deviation is calculated, even in direct input mode (if not in this mode, it will be calculated when
   // the plot is generated)
   calcDeviation();
@@ -1722,6 +1719,11 @@ function fillExample() {
 
   // Set the current state of the form as "clean"
   cleanDirtyForms();
+
+  // Clear all tooltips after generating, since clicking the button interferes with the normal trigger to clear its
+  // tooltip. This needs to be delayed slightly since after clicking the alert, the tooltip handler things the mouse
+  // will still be over the button
+  setTimeout(clearTooltips, 100);
 }
 
 function enableCanvasUpdate() {
