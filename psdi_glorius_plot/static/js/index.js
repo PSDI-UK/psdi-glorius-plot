@@ -836,7 +836,7 @@ function navigateToRowButtons(e) {
   // Prioritise moving to the remove row button, unless it's disabled
   let targetButton = removeRowButton;
   if (targetButton.attr("disabled")) {
-    targetButton = removeRowButton;
+    targetButton = addRowButton;
   }
 
   targetButton[0].focus();
