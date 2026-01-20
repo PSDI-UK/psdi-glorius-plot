@@ -9,9 +9,8 @@ import { mixHexes } from "./color-mixing.js"
 import { exportImage, loadObject, saveObject } from "./io.js"
 import { clamp, disableButton, enableButton, getWebKitMode } from "./utility.js"
 import {
-  addQuillEditor as createQuillEditor, getQuillEditor, getQuillEditorHTML, setQuillEditor, removeQuillEditor,
-  updateQuillContents, enableQuillEvents, stripTags, waitForMathJax, drawFormatted,
-  incrementRenderBatch,
+  addQuillEditor, getQuillEditor, getQuillEditorHTML, setQuillEditor, removeQuillEditor, updateQuillContents,
+  disableQuillToolbar, enableQuillEvents, stripTags, waitForMathJax, drawFormatted, incrementRenderBatch,
 } from "./formatted-labels.js"
 
 const VERSION = "0.1";
@@ -317,7 +316,7 @@ function addConditionRow(e, updateAfter = true) {
     removeQuillEditor("#cl-" + (i - 1));
   }
   $("#cl-" + (targetRowIndex + 1)).html("");
-  createQuillEditor("#cl-" + (targetRowIndex + 1), CONDITION_PLACEHOLDER);
+  addQuillEditor("#cl-" + (targetRowIndex + 1), CONDITION_PLACEHOLDER);
   enableQuillEvents(generateIfUpdating, updateOutputLabelCallback);
 
   // If we skipped updating the plot before, do it now
@@ -801,6 +800,54 @@ function getDataSorting() {
 
 function setDataSorting(val) {
   $("#sort-option").val(val);
+}
+
+/**
+ * Sets tabindex=-1 for all add/remove row buttons so that they'll be skipped over when tabbing within the input table
+ */
+function disableRowButtonTabs() {
+  $("button.remove-condition, button.add-condition").attr("tabindex", "-1");
+}
+
+/**
+ * Removes tabindex=-1 for all add/remove row buttons so that they'll no longer be skipped over once tabbing outside the
+ * input table
+ */
+function enableRowButtonTabs() {
+  $("button.remove-condition, button.add-condition").removeAttr("tabindex");
+}
+
+/**
+ * When the user presses the Escape key while inputting data, change focus to the add/remove row buttons
+ * @param {Object} e 
+ */
+function navigateToRowButtons(e) {
+  const currentCell = $(e.delegateTarget);
+
+  // Find the button we want to change focus to
+  const currentRow = currentCell.parent("tr");
+  if (currentRow.length != 1)
+    return console.error("navigateCell method called on an element whose parent isn't a table row");
+
+  const removeRowButton = currentRow.find("button.remove-condition");
+  const addRowButton = currentRow.find("button.add-condition");
+
+  if (!addRowButton && !removeRowButton)
+    return;
+
+  // Prioritise moving to the remove row button, unless it's disabled
+  let targetButton = removeRowButton;
+  if (targetButton.attr("disabled")) {
+    targetButton = addRowButton;
+  }
+
+  targetButton[0].focus();
+
+  // If we moved away from a Quill editor, disable its toolbar
+  const quillEl = currentCell.find(".condition-input");
+  if (quillEl) {
+    disableQuillToolbar("#" + quillEl.attr("id"));
+  }
 }
 
 /**
@@ -1777,11 +1824,26 @@ function enableButtons() {
 }
 
 function enableNavigation() {
-  $("td.condition-label-cell, td.baseline-value-cell, td.sample-value-cell").off("keyup");
-  $("td.condition-label-cell, td.baseline-value-cell, td.sample-value-cell").on("keyup", "input, .ql-editor", (e) => {
+
+  const inputElements = $("td.condition-label-cell, td.baseline-value-cell, td.sample-value-cell");
+
+  // Enable tabbing through row add/remove buttons whenever this is called
+  enableRowButtonTabs();
+
+  // When inputs are focused, disable tabbing through row add/remove, and reenable it when blurred
+  inputElements.off("focus");
+  inputElements.on("focus", "input, .ql-editor", disableRowButtonTabs);
+  inputElements.off("blur");
+  inputElements.on("blur", "input, .ql-editor", enableRowButtonTabs);
+
+  // Disable and re-enable tab/enter/esc navigation within the form
+  inputElements.off("keyup");
+  inputElements.on("keyup", "input, .ql-editor", function (e) {
     if (e.code === "Enter" || e.code === "NumpadEnter" || e.code === "Tab") {
       e.preventDefault();
       navigateCell(e);
+    } else if (e.code === "Escape") {
+      navigateToRowButtons(e);
     }
   });
 }
@@ -1941,10 +2003,10 @@ function initTooltips() {
 }
 
 function initQuill() {
-  createQuillEditor("#title-input", "e.g. “Reaction-condition sensitivity analysis”");
-  createQuillEditor("#ol-0", "Define outcome");
+  addQuillEditor("#title-input", "e.g. “Reaction-condition sensitivity analysis”");
+  addQuillEditor("#ol-0", "Define outcome");
   $(".condition-input").each((i, e) => {
-    createQuillEditor("#cl-" + i, CONDITION_PLACEHOLDER);
+    addQuillEditor("#cl-" + i, CONDITION_PLACEHOLDER);
   })
   enableQuillEvents(generateIfUpdating, updateOutputLabelCallback);
 }

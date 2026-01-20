@@ -91,11 +91,11 @@ export function updateQuillContents(selector, contents) {
   dQuillEditors[selector].updateContents();
 }
 
-function enableQuillToolbar(selector) {
+export function enableQuillToolbar(selector) {
   $(selector).parent().find(".ql-toolbar").addClass("visible");
 }
 
-function disableQuillToolbar(selector) {
+export function disableQuillToolbar(selector) {
   $(selector).parent().find(".ql-toolbar").removeClass("visible");
 }
 
