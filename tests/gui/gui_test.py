@@ -663,6 +663,21 @@ def _set_axis_fontsize(driver: WebDriver, x: float):
     wait_for_element(driver, "//canvas[@id='glorius-plot']").click()
 
 
+def test_fan_plot_controls(driver: WebDriver):
+    """Test that toggling fan plot mode makes the radar-plot-specific controls disappear"""
+
+    # Load the home page and wait for the page cover to be removed
+    driver.get(f"{origin}/")
+    wait_for_cover_hidden(driver)
+
+    # Toggle fan plot mode, checking that nothing goes wrong when we do so
+    fan_select_element = wait_for_element(driver, "//select[@id='fan-select']")
+    fan_select = Select(fan_select_element)
+
+    wait_for_success(lambda: fan_select.select_by_value("fan"))
+    wait_for_success(lambda: fan_select.select_by_value("radar"))
+
+
 def test_plot_sizing(driver: WebDriver):
     """Test that we can resize the plot properly"""
 
@@ -743,21 +758,6 @@ def test_plot_sizing(driver: WebDriver):
     _set_plot_height(driver, init_plot_height*scale)
     assert _get_label_fontsize(driver) == init_label_fontsize*scale
     assert _get_axis_fontsize(driver) == init_axis_fontsize*scale
-
-
-def test_fan_plot_controls(driver: WebDriver):
-    """Test that toggling fan plot mode makes the radar-plot-specific controls disappear"""
-
-    # Load the home page and wait for the page cover to be removed
-    driver.get(f"{origin}/")
-    wait_for_cover_hidden(driver)
-
-    # Toggle fan plot mode, checking that nothing goes wrong when we do so
-    fan_select_element = wait_for_element(driver, "//select[@id='fan-select']")
-    fan_select = Select(fan_select_element)
-
-    wait_for_success(lambda: fan_select.select_by_value("fan"))
-    wait_for_success(lambda: fan_select.select_by_value("radar"))
 
 
 def _wait_for_download(filename):
