@@ -768,11 +768,14 @@ function setMaxColor(val) {
 }
 
 function getFanMode() {
-  return $("#fan-toggle").is(":checked");
+  return $("#fan-select").val() == "fan";
 }
 
 function setFanMode(val) {
-  $("#fan-toggle").prop("checked", val);
+  if (val)
+    $("#fan-select").val("fan");
+  else
+    $("#fan-select").val("radar");
 }
 
 /**
@@ -1783,7 +1786,6 @@ function enableAutoUpdates() {
 }
 
 function enableToggles() {
-  $("#fan-toggle").on("click", toggleChartMode);
   $("#auto-update-toggle").on("click", toggleAutoUpdates);
 }
 
@@ -1832,6 +1834,7 @@ function enableOnChangeTriggers() {
   enableDeviationCalc();
   enableCanvasUpdate();
 
+  $("#fan-select").on("change", toggleChartMode);
   $("#dev-plot-select").on("change", setDeviationPlotMode);
   $(".output-label-select").on("change", updateOutputLabelSelection);
   $("#color-select").on("change", updateColourSchemeSelection);
