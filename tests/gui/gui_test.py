@@ -976,6 +976,10 @@ def test_save_load_data(driver: WebDriver):
     aspect_ratio_lock_box = wait_for_element(driver, "//input[@id='lock-aspect-ratio']")
     aspect_ratio_lock_box.click()
 
+    fan_select_element = wait_for_element(driver, "//select[@id='fan-select']")
+    fan_select = Select(fan_select_element)
+    wait_for_success(lambda: fan_select.select_by_value("fan"))
+
     TEST_WIDTH = 800
     TEST_HEIGHT = 700
     TEST_LABEL_FONTSIZE = 20
@@ -984,9 +988,6 @@ def test_save_load_data(driver: WebDriver):
     _set_plot_height(driver, TEST_HEIGHT)
     _set_label_fontsize(driver, TEST_LABEL_FONTSIZE)
     _set_axis_fontsize(driver, TEST_AXIS_FONTSIZE)
-
-    fan_toggle = wait_for_element(driver, "//input[@id='fan-toggle']")
-    fan_toggle.click()
 
     # Now save the plot
     save_button = wait_for_element(driver, "//button[@id='save-data']")
@@ -1028,9 +1029,9 @@ def test_save_load_data(driver: WebDriver):
     for i, x in enumerate(l_condition_inputs):
         assert int(x.get_attribute("value")) == l_condition_samples[i]
 
+    assert fan_select.first_selected_option.get_attribute("value") == "fan"
+
     assert _get_plot_width(driver) == TEST_WIDTH
     assert _get_plot_height(driver) == TEST_HEIGHT
     assert _get_label_fontsize(driver) == TEST_LABEL_FONTSIZE
     assert _get_axis_fontsize(driver) == TEST_AXIS_FONTSIZE
-
-    assert fan_toggle.get_attribute("checked") == 'true'
