@@ -752,16 +752,12 @@ def test_fan_plot_controls(driver: WebDriver):
     driver.get(f"{origin}/")
     wait_for_cover_hidden(driver)
 
-    # Check that the radar plot controls are all present initially
-    grid_line_toggle = wait_for_element(driver, "//input[@id='grid-line-toggle']")
-    axis_line_toggle = wait_for_element(driver, "//input[@id='axis-line-toggle']")
+    # Toggle fan plot mode, checking that nothing goes wrong when we do so
+    fan_select_element = wait_for_element(driver, "//select[@id='fan-select']")
+    fan_select = Select(fan_select_element)
 
-    # Toggle fan plot mode, then check the radar-plot-specific elements are no longer present
-    wait_for_element(driver, "//input[@id='fan-toggle']").click()
-    with pytest.raises(MoveTargetOutOfBoundsException):
-        scroll_element_into_view(driver, grid_line_toggle)
-    with pytest.raises(MoveTargetOutOfBoundsException):
-        scroll_element_into_view(driver, axis_line_toggle)
+    wait_for_success(lambda: fan_select.select_by_value("fan"))
+    wait_for_success(lambda: fan_select.select_by_value("radar"))
 
 
 def _wait_for_download(filename):

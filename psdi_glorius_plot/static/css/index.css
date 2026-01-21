@@ -94,6 +94,11 @@ tr.direct-mode-only {
   display: var(--none-dev-mode-display) !important;
 }
 
+/* Remove the space after paragraphs which are followed by lists */
+p:has(+ul, +ol) {
+  margin-bottom: 0;
+}
+
 /* Customisation of input boxes */
 input.mean-value,
 input.abs-deviation-value,

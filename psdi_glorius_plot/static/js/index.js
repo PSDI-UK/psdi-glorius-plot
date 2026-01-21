@@ -13,7 +13,7 @@ import {
   disableQuillToolbar, enableQuillEvents, stripTags, waitForMathJax, drawFormatted, incrementRenderBatch,
 } from "./formatted-labels.js"
 
-const VERSION = "0.1";
+const VERSION = "0.2";
 
 const CHART_ID = "glorius-plot", CHART_SELECTOR = `#${CHART_ID}`;
 
@@ -93,6 +93,7 @@ const COLOR_TRANSPARENT = "#FFFFFF00";
 const BORDER_WIDTH = 4, L_BORDER_DASHES = [[], [6, 6], [4, 4], [2, 2], [1, 1]];
 const BASELINE_WIDTH = 4, BASELINE_COLOR = "#FFFFFF";
 const DATA_BG_COLOR = [COLOR_TRANSPARENT];
+const SHOW_GRID_LINES = true, SHOW_AXIS_LINES = true;
 const GRID_WIDTH = 1, GRID_COLOR = "#00000080";
 const TIP_SIZE = 3, BASE_SEPARATION = 3;
 const BAR_SIZE = 2 * (TIP_SIZE + BASE_SEPARATION + 1);
@@ -767,27 +768,14 @@ function setMaxColor(val) {
 }
 
 function getFanMode() {
-  return $("#fan-toggle").is(":checked");
+  return $("#fan-select").val() == "fan";
 }
 
 function setFanMode(val) {
-  $("#fan-toggle").prop("checked", val);
-}
-
-function getShowGridLines() {
-  return $("#grid-line-toggle").is(":checked");
-}
-
-function setShowGridLines(val) {
-  $("#grid-line-toggle").prop("checked", val);
-}
-
-function getShowAxisLines() {
-  return $("#axis-line-toggle").is(":checked");
-}
-
-function setShowAxisLines(val) {
-  $("#axis-line-toggle").prop("checked", val);
+  if (val)
+    $("#fan-select").val("fan");
+  else
+    $("#fan-select").val("radar");
 }
 
 /**
@@ -957,8 +945,6 @@ function getPlotData() {
     "max-output": getMaxOutput(),
     "band-width": getBandWidth(),
     "fan-display": getFanMode(),
-    "show-grid-lines": getShowGridLines(),
-    "show-axis-lines": getShowAxisLines(),
     "color-scheme": getColourScheme(),
     "min-color": getMinColor(),
     "max-color": getMaxColor(),
@@ -1046,8 +1032,6 @@ async function loadPlotData() {
     setMaxOutput(data["max-output"]);
     setBandWidth(data["band-width"]);
     setFanMode(data["fan-display"]);
-    setShowGridLines(data["show-grid-lines"]);
-    setShowAxisLines(data["show-axis-lines"]);
     setColourScheme(data["color-scheme"]);
     setMinColor(data["min-color"]);
     setMaxColor(data["max-color"]);
@@ -1201,8 +1185,6 @@ async function generatePlot() {
 
   const fanMode = getFanMode();
 
-  const showGridLines = getShowGridLines(), showAxisLines = getShowAxisLines();
-
   const minColor = getMinColor(), maxColor = getMaxColor();
 
   const numAnglePoints = numConditions * BAR_SIZE;
@@ -1288,7 +1270,7 @@ async function generatePlot() {
       let backgroundColor = mixHexes(maxColor, "#FFFFFF", colorRatio);
       lBackgroundColors.push(backgroundColor), lFill.push(0);
 
-      if (showGridLines)
+      if (SHOW_GRID_LINES)
         lBorderColors.push(GRID_COLOR), lBorderWidths.push(GRID_WIDTH);
       else
         lBorderColors.push(backgroundColor), lBorderWidths.push(0);
@@ -1309,7 +1291,7 @@ async function generatePlot() {
       let backgroundColor = mixHexes(minColor, "#FFFFFF", colorRatio);
       lBackgroundColors.push(backgroundColor), lFill.push(0);
 
-      if (showGridLines)
+      if (SHOW_GRID_LINES)
         lBorderColors.push(GRID_COLOR), lBorderWidths.push(GRID_WIDTH);
       else
         lBorderColors.push(backgroundColor), lBorderWidths.push(0);
@@ -1317,7 +1299,7 @@ async function generatePlot() {
     }
 
     // Make fake data for each axis line we want to draw if desired
-    if (showAxisLines) {
+    if (SHOW_AXIS_LINES) {
       numAxisLines = numConditions;
       for (let k = 0; k < numConditions; ++k) {
         lOutputLabels.push("");
@@ -1804,7 +1786,6 @@ function enableAutoUpdates() {
 }
 
 function enableToggles() {
-  $("#fan-toggle").on("click", toggleChartMode);
   $("#auto-update-toggle").on("click", toggleAutoUpdates);
 }
 
@@ -1853,6 +1834,7 @@ function enableOnChangeTriggers() {
   enableDeviationCalc();
   enableCanvasUpdate();
 
+  $("#fan-select").on("change", toggleChartMode);
   $("#dev-plot-select").on("change", setDeviationPlotMode);
   $(".output-label-select").on("change", updateOutputLabelSelection);
   $("#color-select").on("change", updateColourSchemeSelection);
