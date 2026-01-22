@@ -354,7 +354,7 @@ def test_table_navigation(driver: WebDriver):
     wait_for_cover_hidden(driver)
 
     # Start by setting up the number of rows and columns, then filling with random data
-    TEST_NUM_CONDITION_ROWS = 3
+    TEST_NUM_CONDITION_ROWS = 4
     _set_num_condition_rows(driver, TEST_NUM_CONDITION_ROWS)
     TEST_NUM_SAMPLE_COLS = 2
     _set_num_sample_columns(driver, TEST_NUM_SAMPLE_COLS)
@@ -366,6 +366,9 @@ def test_table_navigation(driver: WebDriver):
 
     # Fill up arrays with references to each of the input elements in the table
     l_baseline_inputs: list[WebElement] = driver.find_elements(By.XPATH, "//input[contains(@class,'baseline-value')]")
+    l_row_remove_buttons: list[WebElement] = driver.find_elements(
+        By.XPATH, "//button[contains(@class,'remove-condition')]")
+    l_row_add_buttons: list[WebElement] = driver.find_elements(By.XPATH, "//button[contains(@class,'add-condition')]")
     l_condition_label_inputs: list[WebElement] = [None] * TEST_NUM_CONDITION_ROWS
     ll_value_inputs: list[list[WebElement]] = [None] * TEST_NUM_CONDITION_ROWS
     table_element: WebElement = wait_for_element(driver, "*//table[contains(@class,'sensitivity-table')]")
@@ -381,7 +384,7 @@ def test_table_navigation(driver: WebDriver):
     l_baseline_inputs[0].click()
     assert l_baseline_inputs[0] == driver.switch_to.active_element
 
-    ActionChains(driver).send_keys_to_element(driver.switch_to.active_element, Keys.TAB).perform()
+    ActionChains(driver).send_keys(Keys.TAB).perform()
     assert l_baseline_inputs[1] == driver.switch_to.active_element
 
     ActionChains(driver).key_down(Keys.SHIFT).send_keys_to_element(driver.switch_to.active_element,
@@ -389,10 +392,10 @@ def test_table_navigation(driver: WebDriver):
     assert l_baseline_inputs[0] == driver.switch_to.active_element
 
     # Tab to the next line, and check that the first condition label input is selected, then the value input, and back
-    ActionChains(driver).send_keys_to_element(driver.switch_to.active_element, Keys.TAB*TEST_NUM_SAMPLE_COLS).perform()
+    ActionChains(driver).send_keys(Keys.TAB*TEST_NUM_SAMPLE_COLS).perform()
     assert l_condition_label_inputs[0] == driver.switch_to.active_element
 
-    ActionChains(driver).send_keys_to_element(driver.switch_to.active_element, Keys.TAB).perform()
+    ActionChains(driver).send_keys(Keys.TAB).perform()
     assert ll_value_inputs[0][0] == driver.switch_to.active_element
 
     ActionChains(driver).key_down(Keys.SHIFT).send_keys_to_element(driver.switch_to.active_element,
@@ -400,7 +403,7 @@ def test_table_navigation(driver: WebDriver):
     assert l_condition_label_inputs[0] == driver.switch_to.active_element
 
     # Now try navigating with Enter and Shift+Enter
-    ActionChains(driver).send_keys_to_element(driver.switch_to.active_element, Keys.ENTER).perform()
+    ActionChains(driver).send_keys(Keys.ENTER).perform()
     assert l_condition_label_inputs[1] == driver.switch_to.active_element
 
     ActionChains(driver).key_down(Keys.SHIFT).send_keys_to_element(driver.switch_to.active_element,
@@ -412,12 +415,34 @@ def test_table_navigation(driver: WebDriver):
                                               Keys.ENTER*TEST_NUM_CONDITION_ROWS).perform()
     assert l_baseline_inputs[0] == driver.switch_to.active_element
 
-    ActionChains(driver).send_keys_to_element(driver.switch_to.active_element, Keys.ENTER).perform()
+    ActionChains(driver).send_keys(Keys.ENTER).perform()
     assert ll_value_inputs[0][0] == driver.switch_to.active_element
 
     ActionChains(driver).key_down(Keys.SHIFT).send_keys_to_element(driver.switch_to.active_element,
                                                                    Keys.ENTER*2).key_up(Keys.SHIFT).perform()
     assert l_condition_label_inputs[-1] == driver.switch_to.active_element
+
+    # Now test navigating to the row add/remove buttons with escape
+    scroll_element_into_view(driver, l_condition_label_inputs[0])
+    l_condition_label_inputs[0].click()
+
+    ActionChains(driver).send_keys(Keys.ESCAPE).perform()
+    assert l_row_remove_buttons[0] == driver.switch_to.active_element
+
+    ActionChains(driver).send_keys(Keys.TAB).perform()
+    assert l_row_add_buttons[0] == driver.switch_to.active_element
+
+    ActionChains(driver).send_keys(Keys.TAB).perform()
+    ActionChains(driver).send_keys(Keys.ENTER).perform()
+    ActionChains(driver).send_keys(Keys.ESCAPE).perform()
+    assert l_row_remove_buttons[1] == driver.switch_to.active_element
+
+    ActionChains(driver).send_keys(Keys.TAB).perform()
+    assert l_row_add_buttons[1] == driver.switch_to.active_element
+
+    ActionChains(driver).key_down(Keys.SHIFT).send_keys_to_element(driver.switch_to.active_element,
+                                                                   Keys.TAB).key_up(Keys.SHIFT).perform()
+    assert l_row_remove_buttons[1] == driver.switch_to.active_element
 
 
 def _check_dev_outline_presence(driver: WebDriver, dev: str, present=True):
