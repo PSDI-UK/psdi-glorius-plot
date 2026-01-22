@@ -79,7 +79,11 @@ export function setQuillEditor(selector, editor) {
 }
 
 export function getQuillEditorHTML(selector) {
-  return cleanTags(getQuillEditor(selector).getSemanticHTML());
+  let editor = getQuillEditor(selector);
+  if (editor)
+    return cleanTags(editor.getSemanticHTML());
+  else
+    return "";
 }
 
 export function removeQuillEditor(selector) {

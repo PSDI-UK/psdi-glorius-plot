@@ -186,9 +186,9 @@
       <td class="empty-cell"></td>
       <td class="sample-button-cell">
         <div class="sample-button-container">
-          <button type="button" id="remove-sb-0" class="remove-sample disabled fix-size-small"
-            disabled="true">-</button>
-          <button type="button" id="add-sb-0" class="add-sample fix-size-small">+</button>
+          <button type="button" id="remove-sb-0" class="remove-sample disabled fix-size-small" disabled="true"
+            title="Remove this column">-</button>
+          <button type="button" id="add-sb-0" class="add-sample fix-size-small" title="Add a column">+</button>
         </div>
       </td>
       <td class="empty-cell button-mean-cell hidden"></td>
@@ -234,8 +234,9 @@
 
     <tr class="condition-row">
       <td class="condition-button-cell">
-        <button type="button" id="remove-cb-0" class="remove-condition disabled fix-size-small">-</button>
-        <button type="button" id="add-cb-0" class="add-condition fix-size-small">+</button>
+        <button type="button" id="remove-cb-0" class="remove-condition disabled fix-size-small"
+          title="Remove this row">-</button>
+        <button type="button" id="add-cb-0" class="add-condition fix-size-small" title="Add a row">+</button>
       </td>
       <td class="condition-label-cell">
         <div class="condition-label-container">
@@ -274,8 +275,9 @@
 
     <tr class="condition-row">
       <td class="condition-button-cell">
-        <button type="button" id="remove-cb-1" class="remove-condition disabled fix-size-small">-</button>
-        <button type="button" id="add-cb-1" class="add-condition fix-size-small">+</button>
+        <button type="button" id="remove-cb-1" class="remove-condition disabled fix-size-small"
+          title="Remove this row">-</button>
+        <button type="button" id="add-cb-1" class="add-condition fix-size-small" title="Add a row">+</button>
       </td>
       <td class="condition-label-cell">
         <div class="condition-label-container">
@@ -314,8 +316,9 @@
 
     <tr class="condition-row">
       <td class="condition-button-cell">
-        <button type="button" id="remove-cb-2" class="remove-condition disabled fix-size-small">-</button>
-        <button type="button" id="add-cb-2" class="add-condition fix-size-small">+</button>
+        <button type="button" id="remove-cb-2" class="remove-condition disabled fix-size-small"
+          title="Remove this row">-</button>
+        <button type="button" id="add-cb-2" class="add-condition fix-size-small" title="Add a row">+</button>
       </td>
       <td class="condition-label-cell">
         <div class="condition-label-container">
@@ -354,8 +357,9 @@
 
     <tr class="condition-row">
       <td class="condition-button-cell">
-        <button type="button" id="remove-cb-3" class="remove-condition disabled fix-size-small">-</button>
-        <button type="button" id="add-cb-3" class="add-condition fix-size-small">+</button>
+        <button type="button" id="remove-cb-3" class="remove-condition disabled fix-size-small"
+          title="Remove this row">-</button>
+        <button type="button" id="add-cb-3" class="add-condition fix-size-small" title="Add a row">+</button>
       </td>
       <td class="condition-label-cell">
         <div class="condition-label-container">
@@ -394,8 +398,9 @@
 
     <tr class="condition-row">
       <td class="condition-button-cell">
-        <button type="button" id="remove-cb-4" class="remove-condition disabled fix-size-small">-</button>
-        <button type="button" id="add-cb-4" class="add-condition fix-size-small">+</button>
+        <button type="button" id="remove-cb-4" class="remove-condition disabled fix-size-small"
+          title="Remove this row">-</button>
+        <button type="button" id="add-cb-4" class="add-condition fix-size-small" title="Add a row">+</button>
       </td>
       <td class="condition-label-cell">
         <div class="condition-label-container">
@@ -458,7 +463,7 @@
 
   </table>
 
-  <button type="button" id="generate-plot">Generate</button>
+  <button type="button" id="generate-plot" title="Generate the plot">Generate</button>
   <span id="auto-update" class="mouseover-tooltip" data-bs-toggle="tooltip" data-bs-custom-class="tooltip-on-light"
     data-bs-placement="top" title="This may result in some artifacts on the
       plot when labels are changed. If this happens, click the “Generate” button to re-render the plot">
@@ -466,7 +471,7 @@
     <label for="auto-update-toggle">Auto-update</label>
   </span>
   <br>
-  <button type="button" id="fill-random">Fill with random data</button>
+  <button type="button" id="fill-random" title="Fill the table with random data">Fill with random data</button>
   <button type="button" id="fill-example" class="mouseover-tooltip" data-bs-toggle="tooltip"
     data-bs-custom-class="tooltip-on-light" data-bs-placement="top" title="This fills the table with an example 
     dataset sourced from Table S9 of Zhang 𝘦𝘵 𝘢𝘭. (2024), “Solvent-Dependent Divergent Cyclization of
@@ -478,14 +483,16 @@
 <table id="export-image-buttons">
   <tr>
     <td>
-      <button type="button" id="export-image-png">Download Plot as PNG</button>
+      <button type="button" id="export-image-png" title="Export the plot as a .png image">Download Plot as PNG</button>
     </td>
   </tr>
 </table>
 <table id="save-load-data-buttons">
   <tr>
-    <td><button type="button" id="save-data">Save Data</button></td>
-    <td><button type="button" id="load-data" class="init-disabled" disabled>Load Data</button></td>
+    <td><button type="button" id="save-data" title="Save the input data and plot configuration in a .json file which
+      can be loaded later to resume or share work">Save Data</button></td>
+    <td><button type="button" id="load-data" class="init-disabled" title="Load data from a previously-saved .json file
+      - select this file in the file selector to the right" disabled>Load Data</button></td>
     <td><input type="file" name="load-data-file" id="load-data-file" accept=".json"></td>
   </tr>
 </table>
@@ -549,7 +556,8 @@
       </td>
     </tr>
   </table>
-  <button type="button" id="reset-plot-dims" class="trigger-chart-update">Reset Size and Shape</button>
+  <button type="button" id="reset-plot-dims" class="trigger-chart-update" title="Reset the plot height, plot width,
+  condition label font size, and axis label font size to their default values">Reset Size and Shape</button>
 
   <br>
   <br>
