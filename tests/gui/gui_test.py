@@ -353,6 +353,15 @@ def test_table_navigation(driver: WebDriver):
     driver.get(f"{origin}/")
     wait_for_cover_hidden(driver)
 
+    def _send_keys(keys: str, shift: bool = False):
+        if not shift:
+            ActionChains(driver).send_keys(keys).perform()
+        else:
+            ActionChains(driver).key_down(Keys.SHIFT).send_keys(keys).key_up(Keys.SHIFT).perform()
+
+    def _is_focused(e: WebElement) -> bool:
+        return e == driver.switch_to.active_element
+
     # Start by setting up the number of rows and columns, then filling with random data
     TEST_NUM_CONDITION_ROWS = 4
     _set_num_condition_rows(driver, TEST_NUM_CONDITION_ROWS)
@@ -382,67 +391,60 @@ def test_table_navigation(driver: WebDriver):
     # Select the first baseline input, and check that we can tab through to the other element and back
     scroll_element_into_view(driver, l_baseline_inputs[0])
     l_baseline_inputs[0].click()
-    assert l_baseline_inputs[0] == driver.switch_to.active_element
+    assert _is_focused(l_baseline_inputs[0])
 
-    ActionChains(driver).send_keys(Keys.TAB).perform()
-    assert l_baseline_inputs[1] == driver.switch_to.active_element
+    _send_keys(Keys.TAB)
+    assert _is_focused(l_baseline_inputs[1])
 
-    ActionChains(driver).key_down(Keys.SHIFT).send_keys_to_element(driver.switch_to.active_element,
-                                                                   Keys.TAB).key_up(Keys.SHIFT).perform()
-    assert l_baseline_inputs[0] == driver.switch_to.active_element
+    _send_keys(Keys.TAB, shift=True)
+    assert _is_focused(l_baseline_inputs[0])
 
     # Tab to the next line, and check that the first condition label input is selected, then the value input, and back
-    ActionChains(driver).send_keys(Keys.TAB*TEST_NUM_SAMPLE_COLS).perform()
-    assert l_condition_label_inputs[0] == driver.switch_to.active_element
+    _send_keys(Keys.TAB*TEST_NUM_SAMPLE_COLS)
+    assert _is_focused(l_condition_label_inputs[0])
 
-    ActionChains(driver).send_keys(Keys.TAB).perform()
-    assert ll_value_inputs[0][0] == driver.switch_to.active_element
+    _send_keys(Keys.TAB)
+    assert _is_focused(ll_value_inputs[0][0])
 
-    ActionChains(driver).key_down(Keys.SHIFT).send_keys_to_element(driver.switch_to.active_element,
-                                                                   Keys.TAB).key_up(Keys.SHIFT).perform()
-    assert l_condition_label_inputs[0] == driver.switch_to.active_element
+    _send_keys(Keys.TAB, shift=True)
+    assert _is_focused(l_condition_label_inputs[0])
 
     # Now try navigating with Enter and Shift+Enter
-    ActionChains(driver).send_keys(Keys.ENTER).perform()
-    assert l_condition_label_inputs[1] == driver.switch_to.active_element
+    _send_keys(Keys.ENTER)
+    assert _is_focused(l_condition_label_inputs[1])
 
-    ActionChains(driver).key_down(Keys.SHIFT).send_keys_to_element(driver.switch_to.active_element,
-                                                                   Keys.ENTER).key_up(Keys.SHIFT).perform()
-    assert l_condition_label_inputs[0] == driver.switch_to.active_element
+    _send_keys(Keys.ENTER, shift=True)
+    assert _is_focused(l_condition_label_inputs[0])
 
     # And try navigating to the next column and back
     ActionChains(driver).send_keys_to_element(driver.switch_to.active_element,
                                               Keys.ENTER*TEST_NUM_CONDITION_ROWS).perform()
-    assert l_baseline_inputs[0] == driver.switch_to.active_element
+    assert _is_focused(l_baseline_inputs[0])
 
-    ActionChains(driver).send_keys(Keys.ENTER).perform()
-    assert ll_value_inputs[0][0] == driver.switch_to.active_element
+    _send_keys(Keys.ENTER)
+    assert _is_focused(ll_value_inputs[0][0])
 
-    ActionChains(driver).key_down(Keys.SHIFT).send_keys_to_element(driver.switch_to.active_element,
-                                                                   Keys.ENTER*2).key_up(Keys.SHIFT).perform()
-    assert l_condition_label_inputs[-1] == driver.switch_to.active_element
+    _send_keys(Keys.ENTER*2, shift=True)
+    assert _is_focused(l_condition_label_inputs[-1])
 
     # Now test navigating to the row add/remove buttons with escape
     scroll_element_into_view(driver, l_condition_label_inputs[0])
     l_condition_label_inputs[0].click()
 
-    ActionChains(driver).send_keys(Keys.ESCAPE).perform()
-    assert l_row_remove_buttons[0] == driver.switch_to.active_element
+    _send_keys(Keys.ESCAPE)
+    assert _is_focused(l_row_remove_buttons[0])
 
-    ActionChains(driver).send_keys(Keys.TAB).perform()
-    assert l_row_add_buttons[0] == driver.switch_to.active_element
+    _send_keys(Keys.TAB)
+    assert _is_focused(l_row_add_buttons[0])
 
-    ActionChains(driver).send_keys(Keys.TAB).perform()
-    ActionChains(driver).send_keys(Keys.ENTER).perform()
-    ActionChains(driver).send_keys(Keys.ESCAPE).perform()
-    assert l_row_remove_buttons[1] == driver.switch_to.active_element
+    _send_keys(Keys.TAB+Keys.ENTER+Keys.ESCAPE)
+    assert _is_focused(l_row_remove_buttons[1])
 
-    ActionChains(driver).send_keys(Keys.TAB).perform()
-    assert l_row_add_buttons[1] == driver.switch_to.active_element
+    _send_keys(Keys.TAB)
+    assert _is_focused(l_row_add_buttons[1])
 
-    ActionChains(driver).key_down(Keys.SHIFT).send_keys_to_element(driver.switch_to.active_element,
-                                                                   Keys.TAB).key_up(Keys.SHIFT).perform()
-    assert l_row_remove_buttons[1] == driver.switch_to.active_element
+    _send_keys(Keys.TAB, shift=True)
+    assert _is_focused(l_row_remove_buttons[1])
 
 
 def _check_dev_outline_presence(driver: WebDriver, dev: str, present=True):
