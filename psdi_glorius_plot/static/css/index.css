@@ -551,3 +551,17 @@ details summary:active {
 .condition-input .ql-editor {
   width: 12rem;
 }
+
+.announcement-panel {
+  background-color: #ff89a2;
+  color           : black;
+  display         : flex;
+  flex-direction  : column;
+  align-items     : center;
+  padding         : 0.5rem;
+  border          : 1px solid var(--ifm-font-color-base);
+  border-radius   : 0.5rem;
+  height          : auto !important;
+  font-size       : 1rem;
+  text-align      : center;
+}
