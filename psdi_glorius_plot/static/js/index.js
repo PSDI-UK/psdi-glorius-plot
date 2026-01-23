@@ -1755,6 +1755,14 @@ function fillExample() {
   setTimeout(clearTooltips, 100);
 }
 
+function startROCrateExport() {
+  // Display the RO-crate export section
+  $("#rocrate-export").removeClass("hidden");
+
+  // And scroll down to it
+  $("#rocrate-export")[0].scrollIntoView({ behavior: 'smooth' });
+}
+
 function enableCanvasUpdate() {
   $("#width-input").on("change", updateWidth);
   $("#height-input").on("change", updateHeight);
@@ -1796,6 +1804,7 @@ function enableButtons() {
   $("#generate-plot").on("click", generatePlot);
 
   $("#export-image-png").on("click", () => exportImage(CHART_SELECTOR, "png"));
+  $("#export-rocrate-start").on("click", startROCrateExport);
 
   $("#save-data").on("click", () => saveObject(getPlotData(), "glorius_plot_data.json"));
   $("#load-data").on("click", loadPlotData);
