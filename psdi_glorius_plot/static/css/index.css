@@ -94,8 +94,9 @@ tr.direct-mode-only {
   display: var(--none-dev-mode-display) !important;
 }
 
-/* Remove the space after paragraphs which are followed by lists */
-p:has(+ul, +ol) {
+/* Remove the space after paragraphs which are followed by lists or which are the last child of their parent */
+p:has(+ul, +ol),
+p:last-child {
   margin-bottom: 0;
 }
 
@@ -141,6 +142,16 @@ button.init-disabled:hover {
 
 tr td:first-child button {
   margin-left: 0;
+}
+
+/* Draw outlines around the appropriate sections */
+#data-input,
+#plot-config,
+#rocrate-input {
+  border       : 1px solid var(--ifm-font-color-base);
+  border-radius: 0.5rem;
+  margin       : 1rem 0;
+  padding      : 0.5rem 1rem;
 }
 
 #glorius-plot {
