@@ -174,8 +174,7 @@ tr td:first-child button {
   text-align: left;
 }
 
-.output-label,
-#title-label {
+.label-cell {
   font-weight: bold;
 }
 
@@ -189,6 +188,13 @@ tr td:first-child button {
 
 #table-options td {
   max-width: 16rem;
+}
+
+/* Style lists */
+ul.no-bullet,
+ol.no-bullet {
+  list-style  : none;
+  padding-left: 1rem;
 }
 
 /* Style the sensitivity table */
@@ -225,7 +231,12 @@ tr td:first-child button {
   align-items    : center;
 }
 
-td.condition-button-cell {
+td.row-button-cell {
+  align-items   : center;
+  vertical-align: middle;
+}
+
+td.row-button-container {
   display        : flex;
   flex-direction : row;
   justify-content: space-between;
