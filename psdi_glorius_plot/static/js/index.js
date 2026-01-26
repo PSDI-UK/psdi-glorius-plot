@@ -1756,11 +1756,11 @@ function fillExample() {
 }
 
 function startROCrateExport() {
-  // Display the RO-crate export section
-  $("#rocrate-export").removeClass("hidden");
+  // Display the RO-crate export sections
+  $(".rocrate-export").removeClass("hidden");
 
-  // And scroll down to it
-  $("#rocrate-export")[0].scrollIntoView({ behavior: 'smooth' });
+  // And scroll down to the export title section
+  $("#rocrate-export-title")[0].scrollIntoView({ behavior: 'smooth' });
 }
 
 function enableCanvasUpdate() {

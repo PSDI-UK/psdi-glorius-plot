@@ -619,14 +619,20 @@
 
 {% block content_after_main %}
 <!-- TODO: When done working on this section, add the "hidden" class to the .secondary div -->
-<div class="secondary mathjax_ignore" id="rocrate-export">
+<div class="secondary mathjax_ignore rocrate-export" id="rocrate-export-title">
+  <div class="max-width-box">
+    <h4>Export a FAIR data package</h4>
+    <p>You can export a FAIR data package to accompany your Glorius plot by providing some additional information
+      here. If you choose not to add any additional information, a simple version of the data package will
+      instead be exported. The more information you can provide, the more useful the data package will be for others.
+    </p>
+  </div>
+</div>
+
+<!-- TODO: When done working on this section, add the "hidden" class to the .secondary div -->
+<div class="mathjax_ignore rocrate-export" id="rocrate-export">
   <div class="max-width-box">
     <form id="rocrate-input">
-      <h4>Export a FAIR data package</h4>
-      <p>You can export a FAIR data package to accompany your Glorius plot by providing some additional information
-        here. If you choose not to add any additional information, a simple version of the data package will
-        instead be exported. The more information you can provide, the more useful the data package will be for others.
-      </p>
 
       <div class="announcement-panel">
         <p>
@@ -704,7 +710,7 @@
       <p>Providing a ChemDraw file of your reaction provides invaluable information to help others to understand
         your experiment. The file is also machine-readable meaning that useful metadata can be automatically
         extracted and make it easier for your data to be found and understood.</p>
-      <input type="file" name="rocrate-cdxml" id="rocrate-cdxml">
+      <input type="file" name="rocrate-cdxml" id="rocrate-cdxml" accept=".cdxml">
 
       <br><br>
       <h5>About this dataset</h5>
