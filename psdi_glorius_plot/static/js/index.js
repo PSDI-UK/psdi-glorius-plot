@@ -56,6 +56,7 @@ const D_COLOR_SCHEMES = {
 };
 
 const CONDITION_PLACEHOLDER = "e.g. “High conc.”";
+const CONDITION_DESC_PLACEHOLDER = "e.g. “Concentration of XX”";
 
 const DEFAULT_VALUE_MEAN = 100, VALUE_MIN = 0., VALUE_MAX = 100.;
 
@@ -1994,11 +1995,26 @@ function initTooltips() {
 }
 
 function initQuill() {
+
   addQuillEditor("#title-input", "e.g. “Reaction-condition sensitivity analysis”");
   addQuillEditor("#ol-0", "Define outcome");
-  $(".condition-input").each((i, e) => {
+
+  $(".condition-input").each((i) => {
     addQuillEditor("#cl-" + i, CONDITION_PLACEHOLDER);
-  })
+  });
+
+  addQuillEditor("#rocrate-baseline-desc");
+
+  $(".rocrate-cond-desc-input").each((i) => {
+    addQuillEditor("#cl-" + i, CONDITION_DESC_PLACEHOLDER);
+  });
+
+  addQuillEditor("#rocrate-title-input");
+  addQuillEditor("#rocrate-desc-input");
+  addQuillEditor("#rocrate-about");
+  addQuillEditor("#rocrate-citation");
+
+
   enableQuillEvents(generateIfUpdating, updateOutputLabelCallback);
 }
 

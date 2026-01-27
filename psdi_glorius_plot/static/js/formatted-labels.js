@@ -6,6 +6,8 @@
 
 // Constants
 
+const FULL_CLASS = "ql-full";
+
 const QUILL_THEME = "snow";
 const QUILL_TOOLBAR = ['bold', 'italic', 'underline', { 'script': 'sub' }, { 'script': 'super' }];
 
@@ -26,33 +28,50 @@ const dQuillEditors = {};
  * Initialise a Quill editor
  */
 export function addQuillEditor(selector, placeholder = "", toolbar = QUILL_TOOLBAR) {
+
+  // Determine some options from the element's attributes
+  const el = $(selector);
+  const full = el.hasClass(FULL_CLASS);
+  if (!placeholder && el.attr("placeholder")) {
+    // Clean any whitespace in the placeholder text to be single spaces, since this may have linebreaks in it to avoid
+    // long lines in the HTML
+    placeholder = el.attr("placeholder").replaceAll(/\w+/gm, " ");
+  }
+
+  // Disable Quill's tab binding so the user can tab out of Quill's input boxes
+  let bindings = {
+    tab: {
+      key: [9, "tab", "Tab"],
+      handler: () => {
+        // We need to return true to restore default tab behaviour
+        return true;
+      }
+    }
+  };
+
+  // In the simple editor, we disable default bindings for enter to prevent newline inputs
+  if (!full) {
+    bindings.enter = {
+      key: [13, "enter", "Enter"],
+      handler: () => {
+        // Need to return false here so we don't insert a newline
+        return false;
+      }
+    };
+    bindings["shift enter"] = {
+      key: [13, "enter", "Enter"],
+      shiftKey: true,
+      handler: () => {
+        // Need to return false here so we don't insert a newline
+        return false;
+      }
+    };
+  }
+
   const editor = new Quill(selector, {
     modules: {
       keyboard: {
-        bindings: {
-          enter: {
-            key: [13, "enter", "Enter"],
-            handler: () => {
-              // Need to return false here so we don't insert a newline
-              return false;
-            }
-          },
-          "shift enter": {
-            key: [13, "enter", "Enter"],
-            shiftKey: true,
-            handler: () => {
-              // Need to return false here so we don't insert a newline
-              return false;
-            }
-          },
-          tab: {
-            key: [9, "tab", "Tab"],
-            handler: () => {
-              // And in the case of tab, we need to return true to restore default tab behaviour
-              return true;
-            }
-          }
-        }
+        bindings: bindings
       },
       toolbar: toolbar
     },
@@ -62,12 +81,15 @@ export function addQuillEditor(selector, placeholder = "", toolbar = QUILL_TOOLB
 
   dQuillEditors[selector] = editor;
 
-  editor.on("selection-change", (range) => {
-    if (range)
-      enableQuillToolbar(selector);
-    else
-      disableQuillToolbar(selector);
-  });
+  // For simple editors, show the toolbar only if the editor is active
+  if (!full) {
+    editor.on("selection-change", (range) => {
+      if (range)
+        enableQuillToolbar(selector);
+      else
+        disableQuillToolbar(selector);
+    });
+  }
 }
 
 export function getQuillEditor(selector) {
