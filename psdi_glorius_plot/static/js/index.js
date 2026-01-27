@@ -2014,7 +2014,6 @@ function initQuill() {
   addQuillEditor("#rocrate-about");
   addQuillEditor("#rocrate-citation");
 
-
   enableQuillEvents(generateIfUpdating, updateOutputLabelCallback);
 }
 

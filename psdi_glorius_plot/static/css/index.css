@@ -538,6 +538,7 @@ details summary:active {
   background-color: var(--ifm-background-color);
 }
 
+.ql-toolbar.ql-snow:has(+.ql-full),
 .ql-toolbar.ql-snow.visible {
   display: block;
 }
