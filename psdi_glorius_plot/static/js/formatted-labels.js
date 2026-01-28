@@ -81,15 +81,13 @@ export function addQuillEditor(selector, placeholder = "", toolbar = QUILL_TOOLB
 
   dQuillEditors[selector] = editor;
 
-  // For simple editors, show the toolbar only if the editor is active
-  if (!full) {
-    editor.on("selection-change", (range) => {
-      if (range)
-        enableQuillToolbar(selector);
-      else
-        disableQuillToolbar(selector);
-    });
-  }
+  // Show the toolbar only if the editor is active
+  editor.on("selection-change", (range) => {
+    if (range)
+      enableQuillToolbar(selector);
+    else
+      disableQuillToolbar(selector);
+  });
 }
 
 export function getQuillEditor(selector) {
