@@ -391,7 +391,8 @@ summary {
   padding-bottom: 0.25;
 }
 
-details>summary:before {
+details>summary:before,
+.info-marker::before {
   display         : inline-block;
   text-align      : center;
   padding         : 0;

@@ -643,17 +643,17 @@
       <br>
       <h5>About your experiment</h5>
 
-      <strong>Standard Conditions</strong>
-      <p>Add text in the box below to describe the standard conditions for the chemical transformation in your
-        experiment.</p>
+      <strong>Standard Conditions</strong><br>
+      <label for="baseline-desc-container" class="info-marker">Add text in the box below to describe the standard
+        conditions for the chemical transformation in your experiment:</label>
       <div id="baseline-desc-container">
         <div class="ql-full" id="rocrate-baseline-desc" placeholder="Describe standard conditions here"></div>
       </div>
 
       <br><br>
       <h5>Test Conditions</h5>
-      <p>Add a description which clearly describes how each 'Test condition' differs from the Standard Conditions
-        of your chemical transformation.</p>
+      <p class="info-marker">Add a description which clearly describes how each 'Test condition' differs from the
+        Standard Conditions of your chemical transformation.</p>
       <table id="rocrate-cond-desc-table">
         <tr class="rocrate-cond-row">
           <td class="rocrate-cond-label">
@@ -709,9 +709,9 @@
 
       <br>
       <strong>About your reaction</strong>
-      <p>Providing a ChemDraw file of your reaction provides invaluable information to help others to understand
-        your experiment. The file is also machine-readable meaning that useful metadata can be automatically
-        extracted and make it easier for your data to be found and understood.</p>
+      <label for="rocrate-cdxml" class="info-marker">Providing a ChemDraw file of your reaction provides invaluable
+        information to help others to understand your experiment. The file is also machine-readable meaning that useful
+        metadata can be automatically extracted and make it easier for your data to be found and understood.</label>
       <input type="file" name="rocrate-cdxml" id="rocrate-cdxml" accept=".cdxml">
 
       <br><br>
@@ -740,10 +740,10 @@
 
       <br><br>
       <strong>License:</strong>
-      <p>Choosing a license enables others to understand what they can do with your data. Select from the
-        license options below or choose an alternative license in Other. You can visit spdx.org to find out more
-        about kinds of licenses that might be appropriate for your project. If your license requires attribution, you
-        must enter bibliographic information about the contributors to this dataset.</p>
+      <p class="info-marker">Choosing a license enables others to understand what they can do with your data. Select
+        from the license options below or choose an alternative license in Other. You can visit spdx.org to find out
+        more about kinds of licenses that might be appropriate for your project. If your license requires attribution,
+        you must enter bibliographic information about the contributors to this dataset.</p>
       <ul class="no-bullet">
         <li><input type="radio" name="rocrate-license" id="rocrate-license-cc0" value="cc0-1.0">
           <a href="">CC0-1.0 (Public Domain)</a>
@@ -761,8 +761,9 @@
         </li>
       </ul>
 
-      <strong>About:</strong>
-      <p>You can customise the following text that describes the purpose of the dataset.</p>
+      <strong>About:</strong><br>
+      <label for="rocrate-about" class="info-marker">You can customise the following text that describes the purpose of
+        the dataset:</label>
       <div id="rocrate-about-container">
         <div class="ql-full" id="rocrate-about">
           This dataset enables users to visualise the sensitivity of a given chemical
@@ -775,9 +776,9 @@
       <br><br>
       <h5>Bibliographic Information</h5>
 
-      <p>Adding information in this section enables others to understand who contributed to the research and to
-        provide the appropriate attribution. If you do not have an ORCID, add a link to your LinkedIn account or
-        personal institutional web page.</p>
+      <p class="info-marker">Adding information in this section enables others to understand who contributed to the
+        research and to provide the appropriate attribution. If you do not have an ORCID, add a link to your LinkedIn
+        account or personal institutional web page.</p>
 
       <table id="rocrate-contrib-table">
         <tr class="rocrate-contrib-row" id="rcw-0">
@@ -823,8 +824,9 @@
         </tr>
       </table>
 
-      <p>Providing contact information enables a user to make contact if they are interested in your research or
-        wish to ask questions.</p>
+      <br>
+      <label for="rocrate-email-table" class="info-marker">Providing contact information enables a user to make contact
+        if they are interested in your research or wish to ask questions.</label>
       <table class="label-table" id="rocrate-email-table">
         <tr class="rocrate-email-row">
           <td class="label-cell">
@@ -837,8 +839,8 @@
       </table>
 
       <br>
-      <label for="rocrate-citation-container">The following citation will be added to the README for the data package
-        based on the information you have provided:</label>
+      <label for="rocrate-citation-container" class="info-marker">The following citation will be added to the README for
+        the data package based on the information you have provided:</label>
       <div id="rocrate-citation-container">
         <div class="ql-full" id="rocrate-citation" name="rocrate-citation">
           Please cite: Fuhao ZHANG and Frank Glorius, Dataset generated by PSDI Glorius Plot Generator version 0.1:
@@ -849,8 +851,8 @@
       <br><br>
       <h5>File Structure</h5>
 
-      <p>The following files and directory structure will be created in a zip file when you click the
-        <strong>Download Data Package</strong> button below.
+      <p class="info-marker">The following files and directory structure will be created in a zip file when you click
+        the <strong>Download Data Package</strong> button below.
       </p>
 
       <ul>
