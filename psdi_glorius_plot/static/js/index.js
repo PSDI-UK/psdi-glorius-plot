@@ -56,7 +56,7 @@ const D_COLOR_SCHEMES = {
 };
 
 const CONDITION_PLACEHOLDER = "e.g. “High conc.”";
-const CONDITION_DESC_PLACEHOLDER = "e.g. “Concentration of XX”";
+const CONDITION_DESC_PLACEHOLDER = "Enter description";
 
 const DEFAULT_VALUE_MEAN = 100, VALUE_MIN = 0., VALUE_MAX = 100.;
 
@@ -2006,7 +2006,7 @@ function initQuill() {
   addQuillEditor("#rocrate-baseline-desc");
 
   $(".rocrate-cond-desc-input").each((i) => {
-    addQuillEditor("#cl-" + i, CONDITION_DESC_PLACEHOLDER);
+    addQuillEditor("#rcdi-" + i, CONDITION_DESC_PLACEHOLDER);
   });
 
   addQuillEditor("#rocrate-title-input");

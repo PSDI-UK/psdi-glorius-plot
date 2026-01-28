@@ -201,7 +201,13 @@ ol.no-bullet {
   padding-left: 1rem;
 }
 
-/* Style the sensitivity table */
+/* Style the sensitivity table and related condition description table */
+.sensitivity-table,
+#rocrate-cond-desc-table {
+  border-collapse: separate;
+  border-spacing : 0 0;
+}
+
 .sensitivity-table th {
   max-width    : 8.5rem;
   padding-left : 0.25rem;
@@ -216,12 +222,8 @@ ol.no-bullet {
   padding-right: 0.5rem;
 }
 
-.sensitivity-table {
-  border-collapse: separate;
-  border-spacing : 0 0;
-}
-
-.sensitivity-table td {
+.sensitivity-table td,
+#rocrate-cond-desc-table td {
   padding-top   : 0.25rem;
   padding-bottom: 0.25rem;
   min-height    : 3rem;
@@ -565,6 +567,10 @@ details summary:active {
 
 .condition-input .ql-editor {
   width: 12rem;
+}
+
+.rocrate-cond-desc-input .ql-editor {
+  width: 20rem;
 }
 
 .announcement-panel {
