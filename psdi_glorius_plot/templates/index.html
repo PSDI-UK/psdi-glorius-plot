@@ -497,8 +497,9 @@
           PNG</button>
       </td>
       <td>
-        <button type="button" id="export-rocrate-start" title="Open the form to export the plot and data as an
-        RO-crate">Export RO-crate</button>
+        <button type="button" id="export-rocrate-start" class="mouseover-tooltip" data-bs-toggle="tooltip"
+          data-bs-custom-class="tooltip-on-light" data-bs-placement="top" title="UNDER DEVELOPMENT: Open the form to
+          export the plot and data as an RO-crate">Export RO-crate</button>
       </td>
     </tr>
   </table>
@@ -619,7 +620,7 @@
 
 {% block content_after_main %}
 <!-- TODO: When done working on this section, add the "hidden" class to the .secondary div -->
-<div class="secondary mathjax_ignore rocrate-export" id="rocrate-export-title">
+<div class="secondary mathjax_ignore rocrate-export hidden" id="rocrate-export-title">
   <div class="max-width-box">
     <h4>Export a FAIR data package</h4>
     <p>You can export a FAIR data package to accompany your Glorius plot by providing some additional information
@@ -630,13 +631,15 @@
 </div>
 
 <!-- TODO: When done working on this section, add the "hidden" class to the .secondary div -->
-<div class="mathjax_ignore rocrate-export" id="rocrate-export">
+<div class="mathjax_ignore rocrate-export hidden" id="rocrate-export">
   <div class="max-width-box">
     <form id="rocrate-input">
 
       <div class="announcement-panel">
         <p>
-          <strong>Alert:</strong> This functionality is currently under construction.
+          <strong>Alert:</strong> This functionality is currently under construction and is shown here purely for
+          development purposes. Aspects may not yet be implemented, may be partially functional, or may be broken
+          without warning.
         </p>
       </div>
 
@@ -744,20 +747,29 @@
         from the license options below or choose an alternative license in Other. You can visit spdx.org to find out
         more about kinds of licenses that might be appropriate for your project. If your license requires attribution,
         you must enter bibliographic information about the contributors to this dataset.</p>
+      <!-- TODO: Consider how we want the labels here to work. Might be more convenient to have the names unlinked and
+       links after the names -->
       <ul class="no-bullet">
-        <li><input type="radio" name="rocrate-license" id="rocrate-license-cc0" value="cc0-1.0">
-          <a href="">CC0-1.0 (Public Domain)</a>
+        <li><input type="radio" name="rocrate-license" id="rocrate-license-cc0" class="small-right-margin"
+            value="cc0-1.0">
+          <label for="rocrate-license-cc0"><a href="" target="_blank">CC0-1.0 (Public Domain)</a></label>
         </li>
-        <li><input type="radio" name="rocrate-license" id="rocrate-license-cc-by-4.0" value="cc-by-4.0">
-          <a href="">CC-BY-4.0 (Attribution)</a>
+        <li><input type="radio" name="rocrate-license" id="rocrate-license-cc-by-4.0" class="small-right-margin"
+            value="cc-by-4.0">
+          <label for="rocrate-license-cc-by-4.0"><a href="" target="_blank">CC-BY-4.0 (Attribution)</a></label>
         </li>
-        <li><input type="radio" name="rocrate-license" id="rocrate-license-cc-by-sa-4.0" value="cc-by-sa-4.0">
-          <a href="">CC-BY-SA-4.0 (Attribution Share Alike)</a>
+        <li><input type="radio" name="rocrate-license" id="rocrate-license-cc-by-sa-4.0" class="small-right-margin"
+            value="cc-by-sa-4.0">
+          <label for="rocrate-license-cc-by-sa-4.0"><a href="" target="_blank">CC-BY-SA-4.0 (Attribution Share
+              Alike)</a></label>
         </li>
-        <li><input type="radio" name="rocrate-license" id="rocrate-license-other" value="other">
-          <select name="rocrate-license-other-select" id="rocrate-license-other-select">
-            <option value="other" disabled selected>Other</option>
-          </select>
+        <li><input type="radio" name="rocrate-license" id="rocrate-license-other" class="small-right-margin"
+            value="other">
+          <label for="rocrate-license-other">
+            <select name="rocrate-license-other-select" id="rocrate-license-other-select">
+              <option value="other" disabled selected>Other</option>
+            </select>
+          </label>
         </li>
       </ul>
 

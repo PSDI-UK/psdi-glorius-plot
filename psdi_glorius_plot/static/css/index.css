@@ -259,8 +259,14 @@ td.row-button-cell {
   padding-right: 0.125rem;
 }
 
-input {
+input[type="text"],
+input[type="email"],
+input[type="url"] {
   border: 2px inset #767676;
+}
+
+input[type="radio"]:hover {
+  cursor: pointer;
 }
 
 input.condition-label {
@@ -339,6 +345,10 @@ input.rel-deviation-value {
 
 .no-left-margin {
   margin-left: 0 !important;
+}
+
+.small-right-margin {
+  margin-right: 0.25rem !important;
 }
 
 /* How to indicate text which has a tooltip on mouseover */
