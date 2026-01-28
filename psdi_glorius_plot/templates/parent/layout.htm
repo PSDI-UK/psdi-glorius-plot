@@ -75,11 +75,17 @@
   {% endblock %}
 
   {% block outer_content %}
+
+  {% block content_before_main %}{% endblock %}
+
   <div name="content mathjax_ignore">
     <div class="max-width-box">
       {% block inner_content %}{% endblock %}
     </div>
   </div>
+
+  {% block content_after_main %}{% endblock %}
+
   {% endblock %}
 
   {% block footer %}

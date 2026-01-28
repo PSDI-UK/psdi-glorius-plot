@@ -94,8 +94,9 @@ tr.direct-mode-only {
   display: var(--none-dev-mode-display) !important;
 }
 
-/* Remove the space after paragraphs which are followed by lists */
-p:has(+ul, +ol) {
+/* Remove the space after paragraphs which are followed by lists or which are the last child of their parent */
+p:has(+ul, +ol),
+p:last-child {
   margin-bottom: 0;
 }
 
@@ -115,11 +116,17 @@ input:disabled {
   background-color: var(--psdi-dm-bg-color-secondary-dark);
 }
 
-/* Buttons that are initially disabled */
-button:disabled {
+/* Buttons that are disabled */
+button:disabled,
+button.init-disabled {
   background-color: var(--psdi-bg-color-secondary);
   border-color    : rgba(118, 118, 118, 0.3);
   color           : gray
+}
+
+button:disabled,
+button.init-disabled:hover {
+  cursor: default;
 }
 
 /* Button with a fixed small size */
@@ -129,18 +136,14 @@ button.fix-size-small {
   padding: 0;
 }
 
-/* Buttons that are initially disabled */
-button.init-disabled {
-  background-color: var(--psdi-bg-color-secondary);
-  color           : gray
-}
-
-button.init-disabled:hover {
-  cursor: default;
-}
-
-tr td:first-child button {
-  margin-left: 0;
+/* Draw outlines around the appropriate sections */
+#data-input,
+#plot-config,
+#rocrate-input {
+  border       : 1px solid var(--ifm-font-color-base);
+  border-radius: 0.5rem;
+  margin       : 1rem 0;
+  padding      : 0.5rem 1rem;
 }
 
 #glorius-plot {
@@ -152,7 +155,11 @@ tr td:first-child button {
   display: none !important;
 }
 
-/* Style the title and output label tables */
+/* Table styling */
+
+table:has(+table) {
+  margin-bottom: 0.5rem;
+}
 
 .label-table td:has(label) {
   text-align   : right;
@@ -163,8 +170,7 @@ tr td:first-child button {
   text-align: left;
 }
 
-.output-label,
-#title-label {
+.label-cell {
   font-weight: bold;
 }
 
@@ -180,7 +186,20 @@ tr td:first-child button {
   max-width: 16rem;
 }
 
-/* Style the sensitivity table */
+/* Style lists */
+ul.no-bullet,
+ol.no-bullet {
+  list-style  : none;
+  padding-left: 1rem;
+}
+
+/* Style the sensitivity table and related condition description table */
+.sensitivity-table,
+#rocrate-cond-desc-table {
+  border-collapse: separate;
+  border-spacing : 0 0;
+}
+
 .sensitivity-table th {
   max-width    : 8.5rem;
   padding-left : 0.25rem;
@@ -195,15 +214,16 @@ tr td:first-child button {
   padding-right: 0.5rem;
 }
 
-.sensitivity-table {
-  border-collapse: separate;
-  border-spacing : 0 0;
-}
-
-.sensitivity-table td {
+.sensitivity-table td,
+#rocrate-cond-desc-table td {
   padding-top   : 0.25rem;
   padding-bottom: 0.25rem;
   min-height    : 3rem;
+}
+
+.sensitivity-table td:first-child button,
+.rocrate-contrib-button-cell button {
+  margin-left: 0;
 }
 
 .sample-button-container,
@@ -214,7 +234,12 @@ tr td:first-child button {
   align-items    : center;
 }
 
-td.condition-button-cell {
+td.row-button-cell {
+  align-items   : center;
+  vertical-align: middle;
+}
+
+.row-button-container {
   display        : flex;
   flex-direction : row;
   justify-content: space-between;
@@ -234,8 +259,14 @@ td.condition-button-cell {
   padding-right: 0.125rem;
 }
 
-input {
+input[type="text"],
+input[type="email"],
+input[type="url"] {
   border: 2px inset #767676;
+}
+
+input[type="radio"]:hover {
+  cursor: pointer;
 }
 
 input.condition-label {
@@ -312,8 +343,12 @@ input.rel-deviation-value {
   border-radius: 0 0 0.5rem 0.5rem;
 }
 
-button#reset-plot-dims {
-  margin-left: 0;
+.no-left-margin {
+  margin-left: 0 !important;
+}
+
+.small-right-margin {
+  margin-right: 0.25rem !important;
 }
 
 /* How to indicate text which has a tooltip on mouseover */
@@ -366,7 +401,8 @@ summary {
   padding-bottom: 0.25;
 }
 
-details>summary:before {
+details>summary:before,
+.info-marker::before {
   display         : inline-block;
   text-align      : center;
   padding         : 0;
@@ -434,6 +470,14 @@ details summary:active {
 }
 
 /* Quill styling */
+*:has(>.ql-container) {
+  --ql-height: 2rem;
+}
+
+*:has(>.ql-container.ql-full) {
+  --ql-height: 5rem;
+}
+
 .ql-container.ql-snow {
   border: none;
 }
@@ -446,7 +490,14 @@ details summary:active {
 .ql-toolbar.ql-snow,
 .ql-editor {
   padding: 1px 2px;
-  height : 2rem;
+}
+
+.ql-toolbar.ql-snow {
+  height: 2rem;
+}
+
+.ql-editor {
+  height: var(--ql-height);
 }
 
 .ql-toolbar.ql-snow {
@@ -454,7 +505,7 @@ details summary:active {
   border             : 1px solid #3A3A3A;
   border-bottom-width: 2px;
   position           : absolute;
-  bottom             : calc(2rem - 2px);
+  bottom             : calc(var(--ql-height) - 2px);
   z-index            : 1;
   background         : var(--ifm-background-color);
 }
@@ -467,22 +518,27 @@ details summary:active {
   color: var(--ifm-font-color-base);
 }
 
+.ql-toolbar.ql-snow .ql-formats button:hover .ql-stroke,
 .ql-toolbar.ql-snow .ql-formats button .ql-stroke {
   stroke: var(--ifm-font-color-base);
 }
 
+.ql-toolbar.ql-snow .ql-formats button:hover .ql-fill,
 .ql-toolbar.ql-snow .ql-formats button .ql-fill {
   fill: var(--ifm-font-color-base);
 }
 
+.ql-toolbar.ql-snow .ql-formats button:hover.ql-active,
 .ql-toolbar.ql-snow .ql-formats button.ql-active {
   color: #06c;
 }
 
+.ql-toolbar.ql-snow .ql-formats button:hover.ql-active .ql-stroke,
 .ql-toolbar.ql-snow .ql-formats button.ql-active .ql-stroke {
   stroke: #06c;
 }
 
+.ql-toolbar.ql-snow .ql-formats button:hover.ql-active .ql-fill,
 .ql-toolbar.ql-snow .ql-formats button.ql-active .ql-fill {
   fill: #06c;
 }
@@ -490,26 +546,6 @@ details summary:active {
 .ql-toolbar.ql-snow .ql-formats button:hover {
   color           : var(--ifm-font-color-base);
   background-color: var(--ifm-color-secondary);
-}
-
-.ql-toolbar.ql-snow .ql-formats button:hover .ql-stroke {
-  stroke: var(--ifm-font-color-base);
-}
-
-.ql-toolbar.ql-snow .ql-formats button:hover .ql-fill {
-  fill: var(--ifm-font-color-base);
-}
-
-.ql-toolbar.ql-snow .ql-formats button:hover.ql-active {
-  color: #06c;
-}
-
-.ql-toolbar.ql-snow .ql-formats button:hover.ql-active .ql-stroke {
-  stroke: #06c;
-}
-
-.ql-toolbar.ql-snow .ql-formats button:hover.ql-active .ql-fill {
-  fill: #06c;
 }
 
 .ql-toolbar.ql-snow .ql-formats button:active {
@@ -539,4 +575,22 @@ details summary:active {
 
 .condition-input .ql-editor {
   width: 12rem;
+}
+
+.rocrate-cond-desc-input .ql-editor {
+  width: 20rem;
+}
+
+.announcement-panel {
+  background-color: #ff89a2;
+  color           : black;
+  display         : flex;
+  flex-direction  : column;
+  align-items     : center;
+  padding         : 0.5rem;
+  border          : 1px solid var(--ifm-font-color-base);
+  border-radius   : 0.5rem;
+  height          : auto !important;
+  font-size       : 1rem;
+  text-align      : center;
 }

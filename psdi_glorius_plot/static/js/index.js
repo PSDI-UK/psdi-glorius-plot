@@ -56,6 +56,7 @@ const D_COLOR_SCHEMES = {
 };
 
 const CONDITION_PLACEHOLDER = "e.g. “High conc.”";
+const CONDITION_DESC_PLACEHOLDER = "Enter description";
 
 const DEFAULT_VALUE_MEAN = 100, VALUE_MIN = 0., VALUE_MAX = 100.;
 
@@ -1755,6 +1756,14 @@ function fillExample() {
   setTimeout(clearTooltips, 100);
 }
 
+function startROCrateExport() {
+  // Display the RO-crate export sections
+  $(".rocrate-export").removeClass("hidden");
+
+  // And scroll down to the export title section
+  $("#rocrate-export-title")[0].scrollIntoView({ behavior: 'smooth' });
+}
+
 function enableCanvasUpdate() {
   $("#width-input").on("change", updateWidth);
   $("#height-input").on("change", updateHeight);
@@ -1796,6 +1805,7 @@ function enableButtons() {
   $("#generate-plot").on("click", generatePlot);
 
   $("#export-image-png").on("click", () => exportImage(CHART_SELECTOR, "png"));
+  $("#export-rocrate-start").on("click", startROCrateExport);
 
   $("#save-data").on("click", () => saveObject(getPlotData(), "glorius_plot_data.json"));
   $("#load-data").on("click", loadPlotData);
@@ -1985,11 +1995,25 @@ function initTooltips() {
 }
 
 function initQuill() {
+
   addQuillEditor("#title-input", "e.g. “Reaction-condition sensitivity analysis”");
   addQuillEditor("#ol-0", "Define outcome");
-  $(".condition-input").each((i, e) => {
+
+  $(".condition-input").each((i) => {
     addQuillEditor("#cl-" + i, CONDITION_PLACEHOLDER);
-  })
+  });
+
+  addQuillEditor("#rocrate-baseline-desc");
+
+  $(".rocrate-cond-desc-input").each((i) => {
+    addQuillEditor("#rcdi-" + i, CONDITION_DESC_PLACEHOLDER);
+  });
+
+  addQuillEditor("#rocrate-title-input");
+  addQuillEditor("#rocrate-desc-input");
+  addQuillEditor("#rocrate-about");
+  addQuillEditor("#rocrate-citation");
+
   enableQuillEvents(generateIfUpdating, updateOutputLabelCallback);
 }
 

@@ -8,8 +8,8 @@
 
 {% block hero_title %}PSDI Glorius Plot Generator{% endblock %}
 
-{% block outer_content %}
-<div class="secondary mathjax_ignore">
+{% block content_before_main %}
+<div class="secondary mathjax_ignore" id="instructions">
   <div class="max-width-box">
     <p>
       This service enables users to visualise the sensitivity of a given chemical transformation to user-defined
@@ -95,17 +95,17 @@
   </div>
 </div>
 
-{{ super() }}
-
 {% endblock %}
 
 {% block inner_content %}
 
-<form class="sens-form">
+<form id="data-input">
+
+  <h4>Data Input</h4>
 
   <table class="title-table label-table">
     <tr class="title-row">
-      <td class="title-label-cell">
+      <td class="label-cell">
         <label for="title-input" id="title-label">Title:</label>
       </td>
       <td class="title-input-cell">
@@ -114,12 +114,11 @@
         </div>
       </td>
     </tr>
-
   </table>
 
   <table class="output-label-table label-table">
     <tr class="output-label-row">
-      <td class="output-label-cell">
+      <td class="label-cell">
         <label for="os-0" class="output-label">Outcome:</label>
       </td>
       <td class="output-label-select-cell">
@@ -233,10 +232,12 @@
     </tr>
 
     <tr class="condition-row">
-      <td class="condition-button-cell">
-        <button type="button" id="remove-cb-0" class="remove-condition disabled fix-size-small"
-          title="Remove this row">-</button>
-        <button type="button" id="add-cb-0" class="add-condition fix-size-small" title="Add a row">+</button>
+      <td class="condition-button-cell row-button-cell">
+        <div class="row-button-container">
+          <button type="button" id="remove-cb-0" class="remove-condition disabled fix-size-small"
+            title="Remove this row">-</button>
+          <button type="button" id="add-cb-0" class="add-condition fix-size-small" title="Add a row">+</button>
+        </div>
       </td>
       <td class="condition-label-cell">
         <div class="condition-label-container">
@@ -274,10 +275,12 @@
     </tr>
 
     <tr class="condition-row">
-      <td class="condition-button-cell">
-        <button type="button" id="remove-cb-1" class="remove-condition disabled fix-size-small"
-          title="Remove this row">-</button>
-        <button type="button" id="add-cb-1" class="add-condition fix-size-small" title="Add a row">+</button>
+      <td class="condition-button-cell row-button-cell">
+        <div class="row-button-container">
+          <button type="button" id="remove-cb-1" class="remove-condition disabled fix-size-small"
+            title="Remove this row">-</button>
+          <button type="button" id="add-cb-1" class="add-condition fix-size-small" title="Add a row">+</button>
+        </div>
       </td>
       <td class="condition-label-cell">
         <div class="condition-label-container">
@@ -315,10 +318,12 @@
     </tr>
 
     <tr class="condition-row">
-      <td class="condition-button-cell">
-        <button type="button" id="remove-cb-2" class="remove-condition disabled fix-size-small"
-          title="Remove this row">-</button>
-        <button type="button" id="add-cb-2" class="add-condition fix-size-small" title="Add a row">+</button>
+      <td class="condition-button-cell row-button-cell">
+        <div class="row-button-container">
+          <button type="button" id="remove-cb-2" class="remove-condition disabled fix-size-small"
+            title="Remove this row">-</button>
+          <button type="button" id="add-cb-2" class="add-condition fix-size-small" title="Add a row">+</button>
+        </div>
       </td>
       <td class="condition-label-cell">
         <div class="condition-label-container">
@@ -356,10 +361,12 @@
     </tr>
 
     <tr class="condition-row">
-      <td class="condition-button-cell">
-        <button type="button" id="remove-cb-3" class="remove-condition disabled fix-size-small"
-          title="Remove this row">-</button>
-        <button type="button" id="add-cb-3" class="add-condition fix-size-small" title="Add a row">+</button>
+      <td class="condition-button-cell row-button-cell">
+        <div class="row-button-container">
+          <button type="button" id="remove-cb-3" class="remove-condition disabled fix-size-small"
+            title="Remove this row">-</button>
+          <button type="button" id="add-cb-3" class="add-condition fix-size-small" title="Add a row">+</button>
+        </div>
       </td>
       <td class="condition-label-cell">
         <div class="condition-label-container">
@@ -397,10 +404,12 @@
     </tr>
 
     <tr class="condition-row">
-      <td class="condition-button-cell">
-        <button type="button" id="remove-cb-4" class="remove-condition disabled fix-size-small"
-          title="Remove this row">-</button>
-        <button type="button" id="add-cb-4" class="add-condition fix-size-small" title="Add a row">+</button>
+      <td class="condition-button-cell row-button-cell">
+        <div class="row-button-container">
+          <button type="button" id="remove-cb-4" class="remove-condition disabled fix-size-small"
+            title="Remove this row">-</button>
+          <button type="button" id="add-cb-4" class="add-condition fix-size-small" title="Add a row">+</button>
+        </div>
       </td>
       <td class="condition-label-cell">
         <div class="condition-label-container">
@@ -463,14 +472,6 @@
 
   </table>
 
-  <button type="button" id="generate-plot" title="Generate the plot">Generate</button>
-  <span id="auto-update" class="mouseover-tooltip" data-bs-toggle="tooltip" data-bs-custom-class="tooltip-on-light"
-    data-bs-placement="top" title="This may result in some artifacts on the
-      plot when labels are changed. If this happens, click the “Generate” button to re-render the plot">
-    <input type="checkbox" name="auto-update-toggle" id="auto-update-toggle" checked>
-    <label for="auto-update-toggle">Auto-update</label>
-  </span>
-  <br>
   <button type="button" id="fill-random" title="Fill the table with random data">Fill with random data</button>
   <button type="button" id="fill-example" class="mouseover-tooltip" data-bs-toggle="tooltip"
     data-bs-custom-class="tooltip-on-light" data-bs-placement="top" title="This fills the table with an example 
@@ -478,36 +479,54 @@
     Bicyclo[1.1.0]butanes”, https://doi.org/10.1002/anie.202418239">Fill with example data</button>
 </form>
 
-<canvas id="glorius-plot" class="white-bg"></canvas>
+<div id="plot-display">
+  <button type="button" id="generate-plot" title="Regenerate the plot">Regenerate Plot</button>
+  <span id="auto-update" class="mouseover-tooltip" data-bs-toggle="tooltip" data-bs-custom-class="tooltip-on-light"
+    data-bs-placement="top" title="If the regeneration of the plot is causing slowdown, disable this and click the
+    “Regenerate Plot” button to the left as needed to manually generate it">
+    <input type="checkbox" name="auto-update-toggle" id="auto-update-toggle" checked>
+    <label for="auto-update-toggle">Auto-update</label>
+  </span>
 
-<table id="export-image-buttons">
-  <tr>
-    <td>
-      <button type="button" id="export-image-png" title="Export the plot as a .png image">Download Plot as PNG</button>
-    </td>
-  </tr>
-</table>
-<table id="save-load-data-buttons">
-  <tr>
-    <td><button type="button" id="save-data" title="Save the input data and plot configuration in a .json file which
-      can be loaded later to resume or share work">Save Data</button></td>
-    <td><button type="button" id="load-data" class="init-disabled" title="Load data from a previously-saved .json file
-      - select this file in the file selector to the right" disabled>Load Data</button></td>
-    <td><input type="file" name="load-data-file" id="load-data-file" accept=".json"></td>
-  </tr>
-</table>
+  <canvas id="glorius-plot" class="white-bg"></canvas>
+
+  <table id="export-image-buttons">
+    <tr>
+      <td>
+        <button type="button" id="export-image-png" title="Export the plot as a .png image">Download Plot as
+          PNG</button>
+      </td>
+      <td>
+        <button type="button" id="export-rocrate-start" class="mouseover-tooltip" data-bs-toggle="tooltip"
+          data-bs-custom-class="tooltip-on-light" data-bs-placement="top" title="UNDER DEVELOPMENT: Open the form to
+          export the plot and data as an RO-crate">Export RO-crate</button>
+      </td>
+    </tr>
+  </table>
+  <table id="save-load-data-buttons">
+    <tr>
+      <td><button type="button" id="save-data" title="Save the input data and plot configuration in a .json file which
+        can be loaded later to resume or share work">Save Data</button></td>
+      <td><button type="button" id="load-data" class="init-disabled" title="Load data from a previously-saved .json file
+        - select this file in the file selector to the right" disabled>Load Data</button></td>
+      <td><input type="file" name="load-data-file" id="load-data-file" accept=".json"></td>
+    </tr>
+  </table>
+</div>
 
 <br>
 
-<p>
-  <label for="fan-select">Plot style: </label>
-  <select id="fan-select" class="trigger-chart-update">
-    <option value="radar">Radar</option>
-    <option value="fan">Fan</option>
-  </select>
-</p>
+<form id="plot-config">
+  <h4>Plot Configuration</h4>
 
-<form id="plot-options">
+  <p>
+    <label for="fan-select">Plot style: </label>
+    <select id="fan-select" class="trigger-chart-update">
+      <option value="radar">Radar</option>
+      <option value="fan">Fan</option>
+    </select>
+  </p>
+
   <table id="plot-size-options" class="label-table">
     <tr>
       <td>
@@ -597,4 +616,284 @@
     </select>
   </p>
 </form>
+{% endblock %}
+
+{% block content_after_main %}
+<!-- TODO: When done working on this section, add the "hidden" class to the .secondary div -->
+<div class="secondary mathjax_ignore rocrate-export hidden" id="rocrate-export-title">
+  <div class="max-width-box">
+    <h4>Export a FAIR data package</h4>
+    <p>You can export a FAIR data package to accompany your Glorius plot by providing some additional information
+      here. If you choose not to add any additional information, a simple version of the data package will
+      instead be exported. The more information you can provide, the more useful the data package will be for others.
+    </p>
+  </div>
+</div>
+
+<!-- TODO: When done working on this section, add the "hidden" class to the .secondary div -->
+<div class="mathjax_ignore rocrate-export hidden" id="rocrate-export">
+  <div class="max-width-box">
+    <form id="rocrate-input">
+
+      <div class="announcement-panel">
+        <p>
+          <strong>Alert:</strong> This functionality is currently under construction and is shown here purely for
+          development purposes. Aspects may not yet be implemented, may be partially functional, or may be broken
+          without warning.
+        </p>
+      </div>
+
+      <br>
+      <h5>About your experiment</h5>
+
+      <strong>Standard Conditions</strong><br>
+      <label for="baseline-desc-container" class="info-marker">Add text in the box below to describe the standard
+        conditions for the chemical transformation in your experiment:</label>
+      <div id="baseline-desc-container">
+        <div class="ql-full" id="rocrate-baseline-desc" placeholder="Describe standard conditions here"></div>
+      </div>
+
+      <br><br>
+      <h5>Test Conditions</h5>
+      <p class="info-marker">Add a description which clearly describes how each 'Test condition' differs from the
+        Standard Conditions of your chemical transformation.</p>
+      <table id="rocrate-cond-desc-table">
+        <tr class="rocrate-cond-row">
+          <td class="rocrate-cond-label">
+            <div class="rocrate-cond-desc-label" id="rcdl-0"></div>
+          </td>
+          <td class="rocrate-cond-desc">
+            <div class="rocrate-cond-desc-container">
+              <div class="rocrate-cond-desc-input" id="rcdi-0"></div>
+            </div>
+          </td>
+        </tr>
+        <tr class="rocrate-cond-row">
+          <td class="rocrate-cond-label">
+            <div class="rocrate-cond-desc-label" id="rcdl-1"></div>
+          </td>
+          <td class="rocrate-cond-desc">
+            <div class="rocrate-cond-desc-container">
+              <div class="rocrate-cond-desc-input" id="rcdi-1"></div>
+            </div>
+          </td>
+        </tr>
+        <tr class="rocrate-cond-row">
+          <td class="rocrate-cond-label">
+            <div class="rocrate-cond-desc-label" id="rcdl-2"></div>
+          </td>
+          <td class="rocrate-cond-desc">
+            <div class="rocrate-cond-desc-container">
+              <div class="rocrate-cond-desc-input" id="rcdi-2"></div>
+            </div>
+          </td>
+        </tr>
+        <tr class="rocrate-cond-row">
+          <td class="rocrate-cond-label">
+            <div class="rocrate-cond-desc-label" id="rcdl-3"></div>
+          </td>
+          <td class="rocrate-cond-desc">
+            <div class="rocrate-cond-desc-container">
+              <div class="rocrate-cond-desc-input" id="rcdi-3"></div>
+            </div>
+          </td>
+        </tr>
+        <tr class="rocrate-cond-row">
+          <td class="rocrate-cond-label">
+            <div class="rocrate-cond-desc-label" id="rcdl-4"></div>
+          </td>
+          <td class="rocrate-cond-desc">
+            <div class="rocrate-cond-desc-container">
+              <div class="rocrate-cond-desc-input" id="rcdi-4"></div>
+            </div>
+          </td>
+        </tr>
+      </table>
+
+      <br>
+      <strong>About your reaction</strong>
+      <label for="rocrate-cdxml" class="info-marker">Providing a ChemDraw file of your reaction provides invaluable
+        information to help others to understand your experiment. The file is also machine-readable meaning that useful
+        metadata can be automatically extracted and make it easier for your data to be found and understood.</label>
+      <input type="file" name="rocrate-cdxml" id="rocrate-cdxml" accept=".cdxml">
+
+      <br><br>
+      <h5>About this dataset</h5>
+
+      <table class="label-table" id="rocrate-title-table">
+        <tr class="title-row">
+          <td class="label-cell">
+            <label for="rocrate-title-input" id="rocrate-title-label">Title:</label>
+          </td>
+          <td class="title-input-cell">
+            <div class="title-input-container">
+              <div id="rocrate-title-input"></div>
+            </div>
+          </td>
+        </tr>
+      </table>
+
+      <label for="rocrate-desc-input" id="rocrate-desc-label"><strong>Description:</strong></label>
+      <div class="desc-input-container">
+        <div class="ql-full" id="rocrate-desc-input"></div>
+      </div>
+
+      <button type="button" id="rocrate-default-title-desc" class="no-left-margin">Use default title and
+        description</button>
+
+      <br><br>
+      <strong>License:</strong>
+      <p class="info-marker">Choosing a license enables others to understand what they can do with your data. Select
+        from the license options below or choose an alternative license in Other. You can visit spdx.org to find out
+        more about kinds of licenses that might be appropriate for your project. If your license requires attribution,
+        you must enter bibliographic information about the contributors to this dataset.</p>
+      <!-- TODO: Consider how we want the labels here to work. Might be more convenient to have the names unlinked and
+       links after the names -->
+      <ul class="no-bullet">
+        <li><input type="radio" name="rocrate-license" id="rocrate-license-cc0" class="small-right-margin"
+            value="cc0-1.0">
+          <label for="rocrate-license-cc0"><a href="" target="_blank">CC0-1.0 (Public Domain)</a></label>
+        </li>
+        <li><input type="radio" name="rocrate-license" id="rocrate-license-cc-by-4.0" class="small-right-margin"
+            value="cc-by-4.0">
+          <label for="rocrate-license-cc-by-4.0"><a href="" target="_blank">CC-BY-4.0 (Attribution)</a></label>
+        </li>
+        <li><input type="radio" name="rocrate-license" id="rocrate-license-cc-by-sa-4.0" class="small-right-margin"
+            value="cc-by-sa-4.0">
+          <label for="rocrate-license-cc-by-sa-4.0"><a href="" target="_blank">CC-BY-SA-4.0 (Attribution Share
+              Alike)</a></label>
+        </li>
+        <li><input type="radio" name="rocrate-license" id="rocrate-license-other" class="small-right-margin"
+            value="other">
+          <label for="rocrate-license-other">
+            <select name="rocrate-license-other-select" id="rocrate-license-other-select">
+              <option value="other" disabled selected>Other</option>
+            </select>
+          </label>
+        </li>
+      </ul>
+
+      <strong>About:</strong><br>
+      <label for="rocrate-about" class="info-marker">You can customise the following text that describes the purpose of
+        the dataset:</label>
+      <div id="rocrate-about-container">
+        <div class="ql-full" id="rocrate-about">
+          This dataset enables users to visualise the sensitivity of a given chemical
+          transformation to user-defined reaction conditions through the use of a Glorius Plot, based on an original
+          concept from the Glorius research group.
+        </div>
+      </div>
+      <button type="button" id="rocrate-about-default" class="no-left-margin">Restore default</button>
+
+      <br><br>
+      <h5>Bibliographic Information</h5>
+
+      <p class="info-marker">Adding information in this section enables others to understand who contributed to the
+        research and to provide the appropriate attribution. If you do not have an ORCID, add a link to your LinkedIn
+        account or personal institutional web page.</p>
+
+      <table id="rocrate-contrib-table">
+        <tr class="rocrate-contrib-row" id="rcw-0">
+          <td class="rocrate-contrib-button-cell row-button-cell">
+            <div class="row-button-container">
+              <button type="button" id="remove-rcb-0" class="remove-contrib disabled fix-size-small"
+                title="Remove this contributor">-</button>
+              <button type="button" id="add-rcb-0" class="add-contrib fix-size-small"
+                title="Add a contributor">+</button>
+            </div>
+          </td>
+          <td class="rocrate-contrib-cell" id="rcc-0">
+            <table class="label-table rocrate-name-table">
+              <tr class="rocrate-name-row">
+                <td class="label-cell">
+                  <label for="rni-0">Name:</label>
+                </td>
+                <td class="input-cell">
+                  <input type="text" name="rocrate-name-input" class="rocrate-name-input" id="rni-0">
+                </td>
+                <td class="button-cell">
+                  <button type="button" class="rocrate-orcid-lookup">ORCID Lookup</button>
+                </td>
+                <td class="label-cell">
+                  <label for="roi-0">ORCID:</label>
+                </td>
+                <td class="input-cell">
+                  <input type="text" name="rocrate-orcid-input" class="rocrate-orcid-input" id="roi-0">
+                </td>
+              </tr>
+            </table>
+            <table class="label-table" class="rocrate-webpage-table">
+              <tr class="rocrate-webpage-row">
+                <td class="label-cell">
+                  <label for="rw-0">LinkedIn or Institutional web page:</label>
+                </td>
+                <td class="input-cell">
+                  <input type="url" name="rocrate-webpage" class="rocrate-webpage" id="rw-0">
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+      </table>
+
+      <br>
+      <label for="rocrate-email-table" class="info-marker">Providing contact information enables a user to make contact
+        if they are interested in your research or wish to ask questions.</label>
+      <table class="label-table" id="rocrate-email-table">
+        <tr class="rocrate-email-row">
+          <td class="label-cell">
+            <label for="rocrate-email-input">Primary contact email:</label>
+          </td>
+          <td class="input-cell">
+            <input type="email" name="rocrate-email-input" id="rocrate-email-input">
+          </td>
+        </tr>
+      </table>
+
+      <br>
+      <label for="rocrate-citation-container" class="info-marker">The following citation will be added to the README for
+        the data package based on the information you have provided:</label>
+      <div id="rocrate-citation-container">
+        <div class="ql-full" id="rocrate-citation" name="rocrate-citation">
+          Please cite: Fuhao ZHANG and Frank Glorius, Dataset generated by PSDI Glorius Plot Generator version 0.1:
+          Reaction-condition sensitivity analysis for 1,3-cyclization (modified 2025-12-04).
+        </div>
+      </div>
+
+      <br><br>
+      <h5>File Structure</h5>
+
+      <p class="info-marker">The following files and directory structure will be created in a zip file when you click
+        the <strong>Download Data Package</strong> button below.
+      </p>
+
+      <ul>
+        <li><code>(root)/</code>
+          <ul>
+            <li><code>ESI.pdf</code></li>
+            <li><code>README.md</code></li>
+            <li><code>ro-crate-metadata.json</code></li>
+            <li><code>data/</code>
+              <ul>
+                <li><code>reaction_scheme.cdxml</code></li>
+                <li><code>standard_conditions.html</code></li>
+                <li><code>test_conditions.csv</code></li>
+                <li><code>plot/</code>
+                  <ul>
+                    <li><code>glorius_plot.png</code></li>
+                    <li><code>sensitivity_table.csv</code></li>
+                    <li><code>user_preferences.json</code></li>
+                  </ul>
+                </li>
+              </ul>
+            </li>
+          </ul>
+        </li>
+      </ul>
+
+      <button type="submit">Download Data Package</button>
+
+    </form>
+  </div>
+</div>
 {% endblock %}
