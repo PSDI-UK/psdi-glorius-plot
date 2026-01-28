@@ -35,7 +35,7 @@ export function addQuillEditor(selector, placeholder = "", toolbar = QUILL_TOOLB
   if (!placeholder && el.attr("placeholder")) {
     // Clean any whitespace in the placeholder text to be single spaces, since this may have linebreaks in it to avoid
     // long lines in the HTML
-    placeholder = el.attr("placeholder").replaceAll(/\w+/gm, " ");
+    placeholder = el.attr("placeholder").replaceAll(/\s+/gm, " ");
   }
 
   // Disable Quill's tab binding so the user can tab out of Quill's input boxes
