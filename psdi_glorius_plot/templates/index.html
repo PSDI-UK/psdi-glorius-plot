@@ -657,6 +657,11 @@
       <h5>About your experiment</h5>
 
       <strong>Standard Conditions</strong><br>
+      <label for="rocrate-cdxml" class="info-marker">Add a ChemDraw file that depicts the chemical process corresponding
+        to your “Standard Conditions”:</label>
+      <br>
+      <input type="file" name="rocrate-cdxml" id="rocrate-cdxml" accept=".cdxml">
+      <br><br>
       <label for="baseline-desc-container" class="info-marker">Add text to describe the experimental conditions that
         give the outcome you reported for the “Standard Conditions” of your chemical process:</label>
       <div id="baseline-desc-container">
@@ -719,13 +724,6 @@
           </td>
         </tr>
       </table>
-
-      <br>
-      <strong>About your reaction</strong>
-      <label for="rocrate-cdxml" class="info-marker">Providing a ChemDraw file of your reaction provides invaluable
-        information to help others to understand your experiment. The file is also machine-readable meaning that useful
-        metadata can be automatically extracted and make it easier for your data to be found and understood.</label>
-      <input type="file" name="rocrate-cdxml" id="rocrate-cdxml" accept=".cdxml">
 
       <br><br>
       <h5>About this dataset</h5>
