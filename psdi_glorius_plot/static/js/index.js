@@ -1756,12 +1756,19 @@ function fillExample() {
   setTimeout(clearTooltips, 100);
 }
 
-function startROCrateExport() {
-  // Display the RO-crate export sections
-  $(".rocrate-export").removeClass("hidden");
+/**
+ * Scroll to a section on the page and update the URL to point to it
+ * @param {String} selector 
+ */
+function _scrollToSection(selector) {
+  $(selector)[0].scrollIntoView({ behavior: 'smooth' });
+  window.history.pushState({}, "", selector);
+}
 
-  // And scroll down to the export title section
-  $("#rocrate-export-title")[0].scrollIntoView({ behavior: 'smooth' });
+function startROCrateExport() {
+  // Display the RO-crate export sections and scroll to it
+  $(".rocrate-export").removeClass("hidden");
+  _scrollToSection("#rocrate-export-title");
 }
 
 function enableCanvasUpdate() {
@@ -1812,6 +1819,8 @@ function enableButtons() {
   $("#load-data-file").on("change", checkPlotDataFile);
 
   $("#reset-plot-dims").on("click", resetPlotDims);
+
+  $("#returnToDataInput").on("click", () => _scrollToSection("#data-input"));
 }
 
 function enableNavigation() {
