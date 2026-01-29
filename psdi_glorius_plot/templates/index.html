@@ -743,7 +743,8 @@
 
       <br><br>
       <strong>License:</strong>
-      <p class="info-marker">Choosing a license enables others to understand what they can do with your data. Select
+      <p class="info-marker"><a href="https://guidance.psdi.ac.uk/docusaurus-pages/docs/guidance/fair/license/">
+          Choosing a license enables others to understand what they can do with your data</a>. Select
         from the license options below or choose an alternative license in Other. You can visit spdx.org to find out
         more about kinds of licenses that might be appropriate for your project. If your license requires attribution,
         you must enter bibliographic information about the contributors to this dataset.</p>
@@ -752,24 +753,29 @@
       <ul class="no-bullet">
         <li><input type="radio" name="rocrate-license" id="rocrate-license-cc0" class="small-right-margin"
             value="cc0-1.0">
-          <label for="rocrate-license-cc0"><a href="" target="_blank">CC0-1.0 (Public Domain)</a></label>
+          <label for="rocrate-license-cc0">CC0-1.0 (Public Domain) (<a href="https://spdx.org/licenses/CC0-1.0.html"
+              target="_blank">details</a>)</label>
         </li>
         <li><input type="radio" name="rocrate-license" id="rocrate-license-cc-by-4.0" class="small-right-margin"
             value="cc-by-4.0">
-          <label for="rocrate-license-cc-by-4.0"><a href="" target="_blank">CC-BY-4.0 (Attribution)</a></label>
+          <label for="rocrate-license-cc-by-4.0">CC-BY-4.0 (Attribution) (<a
+              href="https://spdx.org/licenses/CC-BY-4.0.html" target="_blank">details</a>)</label>
         </li>
         <li><input type="radio" name="rocrate-license" id="rocrate-license-cc-by-sa-4.0" class="small-right-margin"
             value="cc-by-sa-4.0">
-          <label for="rocrate-license-cc-by-sa-4.0"><a href="" target="_blank">CC-BY-SA-4.0 (Attribution Share
-              Alike)</a></label>
+          <label for="rocrate-license-cc-by-sa-4.0">CC-BY-SA-4.0 (Attribution Share Alike) (<a
+              href="https://spdx.org/licenses/CC-BY-SA-4.0.html" target="_blank">details</a>)</label>
         </li>
         <li><input type="radio" name="rocrate-license" id="rocrate-license-other" class="small-right-margin"
             value="other">
-          <label for="rocrate-license-other">
-            <select name="rocrate-license-other-select" id="rocrate-license-other-select">
-              <option value="other" disabled selected>Other</option>
-            </select>
-          </label>
+          <label for="rocrate-license-other">Other</label>
+          <div id="rocrate-license-other-details" class="nothidden">
+            <label for="rocrate-license-other-text">Please paste the text of the license as you want it to appear in the
+              box below. You can find a list of licenses with links to their texts
+              <a href="https://spdx.org/licenses/CC-BY-SA-4.0.html">here</a>.
+            </label><br>
+            <textarea name="rocrate-license-other-text" id="rocrate-license-other-text"></textarea>
+          </div>
         </li>
       </ul>
 
