@@ -99,9 +99,14 @@ const GRID_WIDTH = 1, GRID_COLOR = "#00000080";
 const TIP_SIZE = 3, BASE_SEPARATION = 3;
 const BAR_SIZE = 2 * (TIP_SIZE + BASE_SEPARATION + 1);
 
+// Text and placeholders for the RO-crate export section
+const BASELINE_DESC_INFO_TEXT = "Add text to describe the experimental conditions that give the REPLACEME you " +
+  "reported for the “Standard Conditions” of your chemical process:";
+
 // Globals
 let tooltipList;
 let autoUpdating = false, radarChart = null;
+let roCrateFormUpdating = false;
 let lastAspectRatio, lastLabelFontSizeWidthRatio, lastLabelFontSizeHeightRatio,
   lastAxisFontSizeWidthRatio, lastAxisFontSizeHeightRatio;
 let initWidth, initHeight, initLabelFontSize, initAxisFontSize;
@@ -1772,7 +1777,29 @@ function startROCrateExport() {
   $(".hidden-after-rocrate").addClass("hidden");
   $(".hidden-until-rocrate").removeClass("hidden");
   $(".rocrate-export").removeClass("hidden");
+
+  // Flag that we'll now want to start updating the RO-crate form, and do so now
+  roCrateFormUpdating = true;
+  updateROCrateForm();
+
   _scrollToSection("#rocrate-export-title");
+}
+
+function updateROCrateForm() {
+  // To save processing, this form only starts being updated after the user first reveals it
+  if (!roCrateFormUpdating)
+    return;
+
+  // Update the description text for the standard conditions description box
+  // If it's one of the built-in labels, make it lowercase. Don't if it's Custom, since we don't know if it's
+  // case-sensitive or not and it's better to play it safe
+  let outputLabel = getOutputLabel();
+  if ($(".output-label-select").val() != "Other")
+    outputLabel = outputLabel.toLowerCase();
+  else if (outputLabel == "")
+    outputLabel = "outcome";
+
+  $("label[for=\"baseline-desc-container\"]").html(BASELINE_DESC_INFO_TEXT.replace("REPLACEME", outputLabel));
 }
 
 function enableCanvasUpdate() {
@@ -1929,6 +1956,7 @@ function updateOutputLabel(label) {
 
 function updateOutputLabelCallback() {
   updateOutputLabel(getQuillEditorHTML("#ol-0"));
+  updateROCrateForm();
 }
 
 function updateColourSchemeSelection() {
