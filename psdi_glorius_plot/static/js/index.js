@@ -1765,8 +1765,12 @@ function _scrollToSection(selector) {
   window.history.pushState({}, "", selector);
 }
 
+/**
+ * Display the RO-crate export sections, scroll to the top of them, and show/adjust buttons to return to them
+ */
 function startROCrateExport() {
-  // Display the RO-crate export sections and scroll to it
+  $(".hidden-after-rocrate").addClass("hidden");
+  $(".hidden-until-rocrate").removeClass("hidden");
   $(".rocrate-export").removeClass("hidden");
   _scrollToSection("#rocrate-export-title");
 }
@@ -1821,6 +1825,7 @@ function enableButtons() {
   $("#reset-plot-dims").on("click", resetPlotDims);
 
   $("#returnToDataInput").on("click", () => _scrollToSection("#data-input"));
+  $(".returnToROCrateExport").on("click", () => _scrollToSection("#rocrate-export-title"));
 }
 
 function enableNavigation() {

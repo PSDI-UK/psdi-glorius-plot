@@ -101,6 +101,11 @@
 
 <form id="data-input">
 
+  <div class="hidden hidden-until-rocrate">
+    <button type="button" class="returnToROCrateExport no-left-margin">↪ Return to data package export</button>
+    <br><br>
+  </div>
+
   <h4>Data Input</h4>
 
   <table class="title-table label-table">
@@ -497,9 +502,12 @@
           PNG</button>
       </td>
       <td>
-        <button type="button" id="export-rocrate-start" class="mouseover-tooltip" data-bs-toggle="tooltip"
-          data-bs-custom-class="tooltip-on-light" data-bs-placement="top" title="UNDER DEVELOPMENT: Open the form to
-          export the plot and data as an RO-crate data package">Export data package</button>
+        <button type="button" id="export-rocrate-start" class="mouseover-tooltip hidden-after-rocrate"
+          data-bs-toggle="tooltip" data-bs-custom-class="tooltip-on-light" data-bs-placement="top" title="UNDER
+          DEVELOPMENT: Open the form to export the plot and data as an RO-crate data package">Export data
+          package</button>
+        <button type="button" class="returnToROCrateExport hidden hidden-until-rocrate">↪ Return to data package
+          export</button>
       </td>
     </tr>
   </table>
