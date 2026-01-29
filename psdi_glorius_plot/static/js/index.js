@@ -103,6 +103,10 @@ const BAR_SIZE = 2 * (TIP_SIZE + BASE_SEPARATION + 1);
 const BASELINE_DESC_INFO_TEXT = "Add text to describe the experimental conditions that give the REPLACEME you " +
   "reported for the “Standard Conditions” of your chemical process:";
 
+const DEFAULT_DATASET_ABOUT_TEXT = "This dataset enables users to visualise the sensitivity of a given chemical " +
+  "transformation to user-defined reaction conditions through the use of a Glorius Plot, based on an original concept " +
+  "from the Glorius research group.";
+
 // Globals
 let tooltipList;
 let autoUpdating = false, radarChart = null;
@@ -1765,7 +1769,7 @@ function fillExample() {
  * Scroll to a section on the page and update the URL to point to it
  * @param {String} selector 
  */
-function _scrollToSection(selector) {
+function scrollToSection(selector) {
   $(selector)[0].scrollIntoView({ behavior: 'smooth' });
   window.history.pushState({}, "", selector);
 }
@@ -1780,12 +1784,12 @@ function startROCrateExport() {
 
   // Flag that we'll now want to start updating the RO-crate form, and do so now
   roCrateFormUpdating = true;
-  updateROCrateForm();
+  updateROCrateForm(true);
 
-  _scrollToSection("#rocrate-export-title");
+  scrollToSection("#rocrate-export-title");
 }
 
-function updateROCrateForm() {
+function updateROCrateForm(firstTime = false) {
   // To save processing, this form only starts being updated after the user first reveals it
   if (!roCrateFormUpdating)
     return;
@@ -1800,6 +1804,15 @@ function updateROCrateForm() {
     outputLabel = "outcome";
 
   $("label[for=\"baseline-desc-container\"]").html(BASELINE_DESC_INFO_TEXT.replace("REPLACEME", outputLabel));
+
+  // The first time the form is updated only, set the title and about section based on what's in the form above
+  if (firstTime)
+    updateROCrateTitleDesc();
+}
+
+function updateROCrateTitleDesc() {
+  updateQuillContents("#rocrate-title-input", getTitle());
+  updateQuillContents("#rocrate-about", DEFAULT_DATASET_ABOUT_TEXT);
 }
 
 function enableCanvasUpdate() {
@@ -1851,8 +1864,10 @@ function enableButtons() {
 
   $("#reset-plot-dims").on("click", resetPlotDims);
 
-  $("#returnToDataInput").on("click", () => _scrollToSection("#data-input"));
-  $(".returnToROCrateExport").on("click", () => _scrollToSection("#rocrate-export-title"));
+  $("#returnToDataInput").on("click", () => scrollToSection("#data-input"));
+  $(".returnToROCrateExport").on("click", () => scrollToSection("#rocrate-export-title"));
+
+  $("#rocrate-default-title-desc").on("click", updateROCrateTitleDesc);
 }
 
 function enableNavigation() {
@@ -2052,7 +2067,6 @@ function initQuill() {
   });
 
   addQuillEditor("#rocrate-title-input");
-  addQuillEditor("#rocrate-desc-input");
   addQuillEditor("#rocrate-about");
   addQuillEditor("#rocrate-citation");
 
