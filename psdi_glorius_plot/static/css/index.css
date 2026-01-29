@@ -94,6 +94,8 @@ tr.direct-mode-only {
   display: var(--none-dev-mode-display) !important;
 }
 
+/* General element styling */
+
 /* Remove the space after paragraphs which are followed by lists or which are the last child of their parent */
 p:has(+ul, +ol),
 p:last-child {
@@ -134,6 +136,15 @@ button.fix-size-small {
   height : 2rem;
   width  : 1.5rem;
   padding: 0;
+}
+
+:root {
+  --textarea-height: 5rem;
+}
+
+textarea {
+  width : 100%;
+  height: var(--textarea-height);
 }
 
 /* Draw outlines around the appropriate sections */
@@ -475,7 +486,7 @@ details summary:active {
 }
 
 *:has(>.ql-container.ql-full) {
-  --ql-height: 5rem;
+  --ql-height: var(--textarea-height);
 }
 
 .ql-container.ql-snow {
@@ -588,6 +599,7 @@ details summary:active {
   flex-direction  : column;
   align-items     : center;
   padding         : 0.5rem;
+  margin          : 0.5rem;
   border          : 1px solid var(--ifm-font-color-base);
   border-radius   : 0.5rem;
   height          : auto !important;
