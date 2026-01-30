@@ -358,6 +358,10 @@ input.rel-deviation-value {
   margin-left: 0 !important;
 }
 
+.no-bottom-margin {
+  margin-bottom: 0 !important;
+}
+
 .small-right-margin {
   margin-right: 0.25rem !important;
 }
@@ -413,23 +417,33 @@ summary {
 }
 
 details>summary:before,
+.info-marker::before,
+.alert-marker::before {
+  display      : inline-block;
+  text-align   : center;
+  padding      : 0;
+  line-height  : 1rem;
+  color        : var(--psdi-light-text-color-body);
+  font-family  : serif;
+  font-weight  : bold;
+  width        : 1rem;
+  height       : 1rem;
+  border-radius: 0.5rem;
+  margin-right : 0.125rem;
+  position     : relative;
+  top          : 0;
+  right        : 0;
+}
+
+.alert-marker::before {
+  content         : "!";
+  background-color: var(--ifm-color-danger);
+}
+
+details>summary:before,
 .info-marker::before {
-  display         : inline-block;
-  text-align      : center;
-  padding         : 0;
   content         : "?";
-  line-height     : 1rem;
   background-color: var(--ifm-color-info);
-  color           : var(--psdi-light-text-color-body);
-  font-family     : serif;
-  font-weight     : bold;
-  width           : 1rem;
-  height          : 1rem;
-  border-radius   : 0.5rem;
-  margin-right    : 0.125rem;
-  position        : relative;
-  top             : 0;
-  right           : 0;
 }
 
 details[open]>summary:before {
