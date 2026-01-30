@@ -137,7 +137,8 @@ export function enableQuillEvents(alwaysCallback, otherCallbacks) {
     });
 
     editor.off("text-change");
-    editor.on("text-change", alwaysCallback);
+    if (!selector.includes("rocrate"))
+      editor.on("text-change", alwaysCallback);
 
   });
 

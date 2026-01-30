@@ -2104,8 +2104,6 @@ function initQuill() {
   addQuillEditor("#rocrate-title-input");
   addQuillEditor("#rocrate-about");
   addQuillEditor("#rocrate-citation");
-  getQuillEditor("#rocrate-citation").
-    checkCitationAuthors
 
   // Set up other callbacks we want to set up for specific editors, then enable all events tied to editors
   const otherCallbacks = {
