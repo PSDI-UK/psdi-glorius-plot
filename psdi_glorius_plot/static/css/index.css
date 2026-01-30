@@ -602,6 +602,11 @@ details summary:active {
   width: 12rem;
 }
 
+.rocrate-cond-desc-label {
+  text-align  : right;
+  margin-right: 0.5rem;
+}
+
 .rocrate-cond-desc-input .ql-editor {
   width: 20rem;
 }

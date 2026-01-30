@@ -1857,7 +1857,6 @@ function initROCrateCondDescs() {
   }
 
   // Update the condition labels to match the user input
-  const descRows = $(".rocrate-cond-row");
   const lConditionLabels = getLConditionLabels();
   for (let i = 0; i < numRows; ++i) {
     $("#rcdl-" + i).html(lConditionLabels[i] + ":");
