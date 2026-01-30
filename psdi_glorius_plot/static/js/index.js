@@ -1801,11 +1801,24 @@ function startROCrateExport() {
 }
 
 function updateROCrateForm(firstTime = false) {
-  // To save processing, this form only starts being updated after the user first reveals it
+
+  updateROCrateOutputLabel();
+
+  // The first time the form is updated only, set the title and about section based on what's in the form above
+  if (firstTime) {
+    initROCrateCondDescs();
+    updateROCrateTitleDesc();
+  }
+}
+
+/**
+ * Update the description text for the standard conditions description box
+ */
+function updateROCrateOutputLabel() {
+  // To save processing, this only starts being updated after the user first reveals the export section
   if (!roCrateFormUpdating)
     return;
 
-  // Update the description text for the standard conditions description box
   // If it's one of the built-in labels, make it lowercase. Don't if it's Custom, since we don't know if it's
   // case-sensitive or not and it's better to play it safe
   let outputLabel = getOutputLabel();
@@ -1815,10 +1828,41 @@ function updateROCrateForm(firstTime = false) {
     outputLabel = "outcome";
 
   $("label[for=\"baseline-desc-container\"]").html(BASELINE_DESC_INFO_TEXT.replace("REPLACEME", outputLabel));
+}
 
-  // The first time the form is updated only, set the title and about section based on what's in the form above
-  if (firstTime)
-    updateROCrateTitleDesc();
+/**
+ * Initialise the form to fill in descriptions for each condition
+ */
+function initROCrateCondDescs() {
+
+  // First make sure we have the right number of rows by adding or removing as necessary
+  const numRows = getNumConditions();
+  const descTable = $("#rocrate-cond-desc-table tbody");
+  const initDescRows = $(".rocrate-cond-row");
+  const numDescRows = initDescRows.length;
+
+  if (numRows > numDescRows) {
+    // Add the number of rows needed
+    for (let i = numDescRows; i < numRows; ++i) {
+      const newRow = initDescRows.eq(0).clone();
+      descTable.append(newRow);
+      newRow.find(".rocrate-cond-desc-label").attr("id", "rcdl-" + i);
+    }
+  } else if (numRows < numDescRows) {
+    // Remove the excess rows
+    initDescRows.each((i, el) => {
+      if (i >= numRows)
+        el.remove();
+    });
+  }
+
+  // Update the condition labels to match the user input
+  const descRows = $(".rocrate-cond-row");
+  const lConditionLabels = getLConditionLabels();
+  for (let i = 0; i < numRows; ++i) {
+    $("#rcdl-" + i).html(lConditionLabels[i] + ":");
+  }
+
 }
 
 function updateROCrateTitleDesc() {
@@ -2006,7 +2050,7 @@ function updateOutputLabel(label) {
 
 function updateOutputLabelCallback() {
   updateOutputLabel(getQuillEditorHTML("#ol-0"));
-  updateROCrateForm();
+  updateROCrateOutputLabel();
 }
 
 function updateColourSchemeSelection() {
