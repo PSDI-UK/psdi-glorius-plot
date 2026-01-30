@@ -1839,7 +1839,12 @@ function checkCitationAuthors() {
 }
 
 function updateROCrateDownloadEnabled() {
-  if (exportChecks.citationAuthor)
+  let allGood = true;
+  Object.values(exportChecks).forEach((check) => {
+    if (!check)
+      allGood = false;
+  });
+  if (allGood)
     $("#rocrate-download").removeAttr("disabled");
   else
     $("#rocrate-download").attr("disabled", "disabled");
