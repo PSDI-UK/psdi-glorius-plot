@@ -107,13 +107,22 @@ const DEFAULT_DATASET_ABOUT_TEXT = "This dataset enables users to visualise the 
   "transformation to user-defined reaction conditions through the use of a Glorius Plot, based on an original concept " +
   "from the Glorius research group.";
 
-// Globals
+const CITATION_AUTHOR_EXAMPLE_TEXT = "Author, A.; Author, B.; and Author, C.";
+
+// Globals - general
 let tooltipList;
+
+// Globals relating to plot generation
 let autoUpdating = false, radarChart = null;
-let roCrateFormUpdating = false;
 let lastAspectRatio, lastLabelFontSizeWidthRatio, lastLabelFontSizeHeightRatio,
   lastAxisFontSizeWidthRatio, lastAxisFontSizeHeightRatio;
 let initWidth, initHeight, initLabelFontSize, initAxisFontSize;
+
+// Globals relating to data package export
+let roCrateFormUpdating = false;
+let exportChecks = {
+  citationAuthor: false
+};
 
 /**
  * A ChartJS plugin which allows a custom background color for the plot
@@ -1774,6 +1783,8 @@ function scrollToSection(selector) {
   window.history.pushState({}, "", selector);
 }
 
+// Functions related to RO-crate data package export
+
 /**
  * Display the RO-crate export sections, scroll to the top of them, and show/adjust buttons to return to them
  */
@@ -1813,6 +1824,30 @@ function updateROCrateForm(firstTime = false) {
 function updateROCrateTitleDesc() {
   updateQuillContents("#rocrate-title-input", getTitle());
   updateQuillContents("#rocrate-about", DEFAULT_DATASET_ABOUT_TEXT);
+}
+
+function checkCitationAuthors() {
+  const citationText = getQuillEditorHTML("#rocrate-citation");
+  if (citationText.includes(CITATION_AUTHOR_EXAMPLE_TEXT)) {
+    exportChecks.citationAuthor = false;
+    $("#rocrate-citation-author-error").removeClass("hidden");
+  } else {
+    exportChecks.citationAuthor = true;
+    $("#rocrate-citation-author-error").addClass("hidden");
+  }
+  updateROCrateDownloadEnabled();
+}
+
+function updateROCrateDownloadEnabled() {
+  let allGood = true;
+  Object.values(exportChecks).forEach((check) => {
+    if (!check)
+      allGood = false;
+  });
+  if (allGood)
+    $("#rocrate-download").removeAttr("disabled");
+  else
+    $("#rocrate-download").attr("disabled", "disabled");
 }
 
 function enableCanvasUpdate() {
@@ -2069,8 +2104,15 @@ function initQuill() {
   addQuillEditor("#rocrate-title-input");
   addQuillEditor("#rocrate-about");
   addQuillEditor("#rocrate-citation");
+  getQuillEditor("#rocrate-citation").
+    checkCitationAuthors
 
-  enableQuillEvents(generateIfUpdating, updateOutputLabelCallback);
+  // Set up other callbacks we want to set up for specific editors, then enable all events tied to editors
+  const otherCallbacks = {
+    "#ol-0": updateOutputLabelCallback,
+    "#rocrate-citation": checkCitationAuthors
+  };
+  enableQuillEvents(generateIfUpdating, otherCallbacks);
 }
 
 $(document).ready(function () {
