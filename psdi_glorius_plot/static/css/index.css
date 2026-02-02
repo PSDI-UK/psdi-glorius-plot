@@ -397,7 +397,7 @@ details {
   padding-bottom: 0;
 }
 
-details>*:nth-child(2) {
+details>summary+* {
   margin-top: 0.75rem;
 }
 
@@ -416,23 +416,51 @@ summary {
   padding-bottom: 0.25;
 }
 
+summary>h1,
+summary>h2,
+summary>h3,
+summary>h4,
+summary>h5,
+summary>h6 {
+  display: inline;
+}
+
+:root {
+  --marker-height: 1rem;
+}
+
+.large-marker {
+  --marker-height: 1.75rem;
+}
+
 details>summary:before,
 .info-marker::before,
 .alert-marker::before {
   display      : inline-block;
   text-align   : center;
   padding      : 0;
-  line-height  : 1rem;
+  font-size    : var(--marker-height);
+  line-height  : var(--marker-height);
   color        : var(--psdi-light-text-color-body);
   font-family  : serif;
   font-weight  : bold;
-  width        : 1rem;
-  height       : 1rem;
-  border-radius: 0.5rem;
-  margin-right : 0.125rem;
+  width        : var(--marker-height);
+  height       : var(--marker-height);
+  border-radius: calc(var(--marker-height)/2);
+  margin-right : calc(var(--marker-height)/8);
   position     : relative;
   top          : 0;
   right        : 0;
+}
+
+details>summary:before {
+  content         : "+";
+  background-color: var(--ifm-color-info);
+}
+
+.info-marker::before {
+  content         : "?";
+  background-color: var(--ifm-color-info);
 }
 
 .alert-marker::before {
@@ -440,17 +468,12 @@ details>summary:before,
   background-color: var(--ifm-color-danger);
 }
 
-details>summary:before,
-.info-marker::before {
-  content         : "?";
-  background-color: var(--ifm-color-info);
-}
-
-details[open]>summary:before {
+details[open]>summary:before,
+details[open]>summary.info-marker::before {
   /* n-dash is used here, which is slightly wider than a hyphen */
   content    : "–";
-  top        : -0.125rem;
-  line-height: 0.75rem;
+  top        : calc(var(--marker-height)*-1/8);
+  line-height: calc(var(--marker-height)*3/4);
 }
 
 details summary:hover {
