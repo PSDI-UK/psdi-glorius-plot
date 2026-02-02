@@ -397,7 +397,7 @@ details {
   padding-bottom: 0;
 }
 
-details>*:nth-child(2) {
+details>summary+* {
   margin-top: 0.75rem;
 }
 
@@ -416,8 +416,21 @@ summary {
   padding-bottom: 0.25;
 }
 
+summary>h1,
+summary>h2,
+summary>h3,
+summary>h4,
+summary>h5,
+summary>h6 {
+  display: inline;
+}
+
 :root {
   --marker-height: 1rem;
+}
+
+.large-marker {
+  --marker-height: 1.75rem;
 }
 
 details>summary:before,
@@ -426,6 +439,7 @@ details>summary:before,
   display      : inline-block;
   text-align   : center;
   padding      : 0;
+  font-size    : var(--marker-height);
   line-height  : var(--marker-height);
   color        : var(--psdi-light-text-color-body);
   font-family  : serif;

@@ -99,14 +99,16 @@
 
 {% block inner_content %}
 
-<form id="data-input">
+<details id="data-input" open>
 
   <div class="hidden hidden-until-rocrate">
     <button type="button" class="returnToROCrateExport no-left-margin">↪ Return to data package export</button>
     <br><br>
   </div>
 
-  <h4>Data Input</h4>
+  <summary class="large-marker" open>
+    <h4>Data Input</h4>
+  </summary>
 
   <table class="title-table label-table">
     <tr class="title-row">
@@ -482,7 +484,7 @@
     data-bs-custom-class="tooltip-on-light" data-bs-placement="top" title="This fills the table with an example 
     dataset sourced from Table S9 of Zhang 𝘦𝘵 𝘢𝘭. (2024), “Solvent-Dependent Divergent Cyclization of
     Bicyclo[1.1.0]butanes”, https://doi.org/10.1002/anie.202418239">Fill with example data</button>
-</form>
+</details>
 
 <div id="plot-display">
   <button type="button" id="generate-plot" title="Regenerate the plot">Regenerate Plot</button>
@@ -524,8 +526,11 @@
 
 <br>
 
-<form id="plot-config">
-  <h4>Plot Configuration</h4>
+<details id="plot-config" open>
+
+  <summary class="large-marker">
+    <h4>Plot Configuration</h4>
+  </summary>
 
   <p>
     <label for="fan-select">Plot style: </label>
@@ -623,7 +628,7 @@
       <option value="0">As entered</option>
     </select>
   </p>
-</form>
+</details>
 {% endblock %}
 
 {% block content_after_main %}
