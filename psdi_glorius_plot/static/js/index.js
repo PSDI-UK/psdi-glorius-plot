@@ -1821,7 +1821,7 @@ function updateROCrateForm(firstTime = false) {
 
   // The first time the form is updated only, set the title and about section based on what's in the form above
   if (firstTime) {
-    initROCrateCondDescs();
+    initCondDescs();
     updateROCrateTitleDesc();
   }
 }
@@ -1848,7 +1848,7 @@ function updateROCrateOutputLabel() {
 /**
  * Initialise the form to fill in descriptions for each condition
  */
-function initROCrateCondDescs() {
+function initCondDescs() {
 
   // First make sure we have the right number of rows by adding or removing as necessary
   const numRows = getNumConditions();
@@ -1876,9 +1876,8 @@ function initROCrateCondDescs() {
   }
 
   // Update the condition labels to match the user input
-  const lConditionLabels = getLConditionLabels();
   for (let i = 0; i < numRows; ++i) {
-    $("#rcdl-" + i).html(lConditionLabels[i] + ":");
+    updateCondDescLabel(i);
   }
 
 }
@@ -1930,8 +1929,6 @@ function removeROCrateCondRow(targetRowIndex = -1) {
   // Update IDs to match the new row indices
   relabelCondDesc();
 
-  const newNumConditions = lRows.length;
-
   // Clean up the Quill dict to point to the moved positions of the editors, and add an editor for the new row
   for (let i = targetRowIndex; i < oldNumConditions - 1; ++i) {
     setQuillEditor("#rcdi-" + i, getQuillEditor("#rcdi-" + (i + 1)))
@@ -1952,6 +1949,10 @@ function relabelCondDesc() {
     lDescs.eq(i).attr("id", `rcdi-${i}`);
   }
 
+}
+
+function updateCondDescLabel(i) {
+  $("#rcdl-" + i).html(getConditionLabel(i) + ":");
 }
 
 function updateROCrateTitleDesc() {
@@ -2247,6 +2248,10 @@ function enableQuillEventsAndCallbacks() {
     "#ol-0": updateOutputLabelCallback,
     "#rocrate-citation": checkCitationAuthors
   };
+  const numConditions = getNumConditions();
+  for (let i = 0; i < numConditions; ++i) {
+    otherCallbacks["#cl-" + i] = () => { updateCondDescLabel(i) };
+  }
   enableQuillEvents(generateIfUpdating, otherCallbacks);
 
 }
