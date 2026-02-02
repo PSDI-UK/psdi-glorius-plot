@@ -15,3 +15,6 @@ assignees: brgillis
 
 **Does this task block the completion of any other issues? List them here**
 - ...
+
+**Relevant people**
+If there are any people you think should be notified of this issue, @ tag them here
