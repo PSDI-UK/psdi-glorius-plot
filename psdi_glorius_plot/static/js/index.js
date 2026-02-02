@@ -389,11 +389,18 @@ function removeConditionRow(e, updateAfter = true) {
     setQuillEditor("#cl-" + i, getQuillEditor("#cl-" + (i + 1)))
     removeQuillEditor("#cl-" + (i + 1));
   }
-  enableQuillEventsAndCallbacks();
 
   // If we skipped updating the plot before, do it now
   if (updateAfter && autoUpdating)
     generatePlot();
+
+  // If we've started updating the RO-Crate form, add a row to that (which will also update Quill editors events at the
+  // end) If not, we call the Quill editors events update here
+  if (roCrateFormUpdating) {
+    removeROCrateCondRow(targetRowIndex);
+  } else {
+    enableQuillEventsAndCallbacks();
+  }
 }
 
 function addSampleCol(e, updateAfter = true) {
@@ -1900,7 +1907,37 @@ function addROCrateCondRow(targetRowIndex = -1) {
   }
   addQuillEditor("#rcdi-" + (targetRowIndex + 1), CONDITION_DESC_PLACEHOLDER);
   enableQuillEventsAndCallbacks();
+}
 
+function removeROCrateCondRow(targetRowIndex = -1) {
+  const descTable = $("#rocrate-cond-desc-table tbody");
+  const lRows = descTable.find("tr");
+  const oldNumConditions = lRows.length;
+  const newRow = lRows.eq(0).clone();
+  newRow.find(".rocrate-cond-desc-label").html(":")
+  newRow.find(".rocrate-cond-desc-input .ql-editor").html("");
+
+  if (targetRowIndex == -1) {
+    targetRowIndex = oldNumConditions - 1;
+  }
+
+  // Remove the Quill editor first, so we don't hit a dangling reference by doing this after removing the row
+  removeQuillEditor("#rcdi-" + targetRowIndex);
+
+  // Remove the row from the table
+  lRows.eq(targetRowIndex).remove();
+
+  // Update IDs to match the new row indices
+  relabelCondDesc();
+
+  const newNumConditions = lRows.length;
+
+  // Clean up the Quill dict to point to the moved positions of the editors, and add an editor for the new row
+  for (let i = targetRowIndex; i < oldNumConditions - 1; ++i) {
+    setQuillEditor("#rcdi-" + i, getQuillEditor("#rcdi-" + (i + 1)))
+    removeQuillEditor("#rcdi-" + (i + 1));
+  }
+  enableQuillEventsAndCallbacks();
 }
 
 function relabelCondDesc() {
