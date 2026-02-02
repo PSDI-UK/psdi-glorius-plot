@@ -301,20 +301,20 @@ function addConditionRow(e, updateAfter = true) {
   }
 
   // Construct a new row by copying the first and clearing its input
-  const newRow = $(".condition-row")[0].cloneNode(true);
-  $(newRow).find(".condition-input .ql-editor p").html("");
-  $(newRow).find(".sample-value").val("");
-  $(newRow).find(".mean-value").val("100");
-  $(newRow).find(".abs-deviation-value").val("0");
-  $(newRow).find(".rel-deviation-value").val("0");
+  const newRow = $(".condition-row").eq(0).clone();
+  newRow.find(".condition-input .ql-editor p").html("");
+  newRow.find(".sample-value").val("");
+  newRow.find(".mean-value").val("100");
+  newRow.find(".abs-deviation-value").val("0");
+  newRow.find(".rel-deviation-value").val("0");
 
   // Determine where to add the row based on which button was clicked
   const targetRowIndex = getTargetIndex(e, oldNumConditions);
 
   if (targetRowIndex >= oldNumConditions - 1)
-    $(".sensitivity-table tbody")[0].insertBefore(newRow, $("#plot-select-row")[0]);
+    $(".sensitivity-table tbody #plot-select-row").before(newRow);
   else
-    $(".sensitivity-table tbody")[0].insertBefore(newRow, $(".condition-row")[targetRowIndex + 1]);
+    $(".sensitivity-table tbody .condition-row").eq(targetRowIndex + 1).before(newRow);
 
   if (updateAfter) {
     // Temporarily disable auto-updating the plot if it's enabled
@@ -337,11 +337,19 @@ function addConditionRow(e, updateAfter = true) {
   }
   $("#cl-" + (targetRowIndex + 1)).html("");
   addQuillEditor("#cl-" + (targetRowIndex + 1), CONDITION_PLACEHOLDER);
-  enableQuillEvents(generateIfUpdating, updateOutputLabelCallback);
 
   // If we skipped updating the plot before, do it now
   if (updateAfter && autoUpdating)
     generatePlot();
+
+  // If we've started updating the RO-Crate form, add a row to that (which will also update Quill editors events at the
+  // end) If not, we call the Quill editors events update here
+  if (roCrateFormUpdating) {
+    addROCrateCondRow(targetRowIndex);
+  } else {
+    enableQuillEventsAndCallbacks();
+  }
+
 }
 
 function removeConditionRow(e, updateAfter = true) {
@@ -381,7 +389,7 @@ function removeConditionRow(e, updateAfter = true) {
     setQuillEditor("#cl-" + i, getQuillEditor("#cl-" + (i + 1)))
     removeQuillEditor("#cl-" + (i + 1));
   }
-  enableQuillEvents(generateIfUpdating, updateOutputLabelCallback);
+  enableQuillEventsAndCallbacks();
 
   // If we skipped updating the plot before, do it now
   if (updateAfter && autoUpdating)
@@ -1847,6 +1855,10 @@ function initROCrateCondDescs() {
       const newRow = initDescRows.eq(0).clone();
       descTable.append(newRow);
       newRow.find(".rocrate-cond-desc-label").attr("id", "rcdl-" + i);
+      newRow.find(".rocrate-cond-desc-label").html(":");
+      newRow.find(".rocrate-cond-desc-input").attr("id", "rcdi-" + i);
+      newRow.find(".rocrate-cond-desc-input .ql-editor").html("");
+      addQuillEditor("#rcdi-" + i, CONDITION_DESC_PLACEHOLDER);
     }
   } else if (numRows < numDescRows) {
     // Remove the excess rows
@@ -1860,6 +1872,47 @@ function initROCrateCondDescs() {
   const lConditionLabels = getLConditionLabels();
   for (let i = 0; i < numRows; ++i) {
     $("#rcdl-" + i).html(lConditionLabels[i] + ":");
+  }
+
+}
+
+function addROCrateCondRow(targetRowIndex = -1) {
+  const descTable = $("#rocrate-cond-desc-table tbody");
+  const newRow = $(".rocrate-cond-row").eq(0).clone();
+  newRow.find(".rocrate-cond-desc-label").html(":")
+  newRow.find(".rocrate-cond-desc-input .ql-editor").html("");
+
+  if (targetRowIndex == -1) {
+    descTable.append(newRow);
+  } else {
+    descTable.find("tr").eq(targetRowIndex).after(newRow);
+  }
+
+  // Update IDs to match the new row indices
+  relabelCondDesc();
+
+  const newNumConditions = $(".rocrate-cond-row").length;
+
+  // Clean up the Quill dict to point to the moved positions of the editors, and add an editor for the new row
+  for (let i = newNumConditions - 1; i > targetRowIndex + 1; --i) {
+    setQuillEditor("#rcdi-" + i, getQuillEditor("#rcdi-" + (i - 1)));
+    removeQuillEditor("#rcdi-" + (i - 1));
+  }
+  addQuillEditor("#rcdi-" + (targetRowIndex + 1), CONDITION_DESC_PLACEHOLDER);
+  enableQuillEventsAndCallbacks();
+
+}
+
+function relabelCondDesc() {
+
+  const num = $(".rocrate-cond-row").length;
+  const lLabels = $(".rocrate-cond-desc-label");
+  const lDescs = $(".rocrate-cond-desc-input");
+
+  for (let i = 0; i < num; i++) {
+    // Fix the IDs of the labels and description inputs
+    lLabels.eq(i).attr("id", `rcdl-${i}`);
+    lDescs.eq(i).attr("id", `rcdi-${i}`);
   }
 
 }
@@ -2148,12 +2201,17 @@ function initQuill() {
   addQuillEditor("#rocrate-about");
   addQuillEditor("#rocrate-citation");
 
+  enableQuillEventsAndCallbacks();
+}
+
+function enableQuillEventsAndCallbacks() {
   // Set up other callbacks we want to set up for specific editors, then enable all events tied to editors
   const otherCallbacks = {
     "#ol-0": updateOutputLabelCallback,
     "#rocrate-citation": checkCitationAuthors
   };
   enableQuillEvents(generateIfUpdating, otherCallbacks);
+
 }
 
 $(document).ready(function () {
