@@ -120,13 +120,17 @@ input:disabled {
 
 /* Button styling */
 
-button:disabled:hover {
+button:disabled {
   background-color: var(--psdi-bg-color-secondary);
   border-color    : rgba(118, 118, 118, 0.3);
   color           : gray
 }
 
-button:disabled {
+button:disabled .text-icon {
+  filter: invert(50%);
+}
+
+button:disabled:hover {
   cursor: default;
 }
 
