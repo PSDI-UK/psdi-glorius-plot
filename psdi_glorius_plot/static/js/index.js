@@ -1030,10 +1030,8 @@ function getPlotData() {
 function checkPlotDataFile(event) {
   let lFiles = this.files;
   if (lFiles.length > 0) {
-    $("#load-data").removeClass("init-disabled")
     $("#load-data").prop({ disabled: false });
   } else {
-    $("#load-data").addClass("init-disabled");
     $("#load-data").prop({ disabled: true });
   }
 }

@@ -500,35 +500,7 @@
   </span>
 
   <canvas id="glorius-plot" class="white-bg"></canvas>
-
-  <table id="export-image-buttons">
-    <tr>
-      <td>
-        <button type="button" id="export-image-png" title="Export the plot as a .png image">Download Plot as
-          PNG</button>
-      </td>
-      <td>
-        <button type="button" id="export-rocrate-start" class="mouseover-tooltip hidden-after-rocrate"
-          data-bs-toggle="tooltip" data-bs-custom-class="tooltip-on-light" data-bs-placement="top" title="UNDER
-          DEVELOPMENT: Open the form to export the plot and data as an RO-crate data package">Export data
-          package</button>
-        <button type="button" class="returnToROCrateExport hidden hidden-until-rocrate">↪ Return to data package
-          export</button>
-      </td>
-    </tr>
-  </table>
-  <table id="save-load-data-buttons">
-    <tr>
-      <td><button type="button" id="save-data" title="Save the input data and plot configuration in a .json file which
-        can be loaded later to resume or share work">Save Data</button></td>
-      <td><button type="button" id="load-data" class="init-disabled" title="Load data from a previously-saved .json file
-        - select this file in the file selector to the right" disabled>Load Data</button></td>
-      <td><input type="file" name="load-data-file" id="load-data-file" accept=".json"></td>
-    </tr>
-  </table>
 </div>
-
-<br>
 
 <form>
   <details id="plot-config" open>
@@ -635,6 +607,56 @@
     </p>
   </details>
 </form>
+
+<div id="export-options">
+  <table id="save-load-data-buttons">
+    <tr>
+      <td>
+        <button type="button" id="save-data" title="Save the input data and plot configuration in a .json file which
+        can be loaded later to resume or share work">
+          <img src="{{url_for('static', filename='img/icon-download.svg')}}" alt="Download icon" class="text-icon">
+          Save Data
+        </button>
+      </td>
+      <td>
+        <button type="button" id="load-data" title="Load data from a previously-saved .json file
+        - select this file in the file selector to the right" disabled>
+          <img src="{{url_for('static', filename='img/icon-upload.svg')}}" alt="Upload icon" class="text-icon">
+          Load Data
+        </button>
+      </td>
+      <td><input type="file" name="load-data-file" id="load-data-file" accept=".json"></td>
+    </tr>
+  </table>
+  <table id="export-image-buttons">
+    <tr>
+      <td>
+        <button type="button" id="export-image-png" title="Export the plot as a bitmapped .png image">
+          <img src="{{url_for('static', filename='img/icon-download.svg')}}" alt="Download icon" class="text-icon">
+          Download Plot as PNG</button>
+      </td>
+      <td>
+        <button type="button" id="export-image-svg" title="Export the plot as a vector .svg image" disabled>
+          <img src="{{url_for('static', filename='img/icon-download.svg')}}" alt="Download icon" class="text-icon">
+          Download Plot as SVG</button>
+      </td>
+    </tr>
+  </table>
+  <table id="export-data-package-buttons">
+    <tr>
+      <td>
+        <button type="button" id="export-rocrate-start" class="mouseover-tooltip hidden-after-rocrate"
+          data-bs-toggle="tooltip" data-bs-custom-class="tooltip-on-light" data-bs-placement="top" title="UNDER
+          DEVELOPMENT: Open the form to export the plot and data as an RO-crate data package">
+          <img src="{{url_for('static', filename='img/icon-config.svg')}}" alt="Config icon" class="text-icon"
+            style="transform: translate(0, -6.25%);">
+          Export data package</button>
+        <button type="button" class="returnToROCrateExport hidden hidden-until-rocrate">↪ Return to data package
+          export</button>
+      </td>
+    </tr>
+  </table>
+</div>
 {% endblock %}
 
 {% block content_after_main %}
@@ -911,7 +933,10 @@
         </li>
       </ul>
 
-      <button type="submit" id="rocrate-download" disabled>Download Data Package</button>
+      <button type="submit" id="rocrate-download" disabled>
+        <img src="{{url_for('static', filename='img/icon-download.svg')}}" alt="Download icon" class="text-icon">
+        Download Data Package
+      </button>
 
     </form>
   </div>

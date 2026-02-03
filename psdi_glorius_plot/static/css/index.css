@@ -118,16 +118,19 @@ input:disabled {
   background-color: var(--psdi-dm-bg-color-secondary-dark);
 }
 
-/* Buttons that are disabled */
-button:disabled,
-button.init-disabled {
+/* Button styling */
+
+button:disabled {
   background-color: var(--psdi-bg-color-secondary);
   border-color    : rgba(118, 118, 118, 0.3);
   color           : gray
 }
 
-button:disabled,
-button.init-disabled:hover {
+button:disabled .text-icon {
+  filter: invert(50%);
+}
+
+button:disabled:hover {
   cursor: default;
 }
 
@@ -136,6 +139,20 @@ button.fix-size-small {
   height : 2rem;
   width  : 1.5rem;
   padding: 0;
+}
+
+/* Images that appear as icons alongside text */
+.text-icon {
+  height: 1rem;
+  color : var(--ifm-font-color-base);
+  fill  : var(--ifm-font-color-base);
+  stroke: var(--ifm-font-color-base);
+  filter: invert(100%);
+}
+
+
+[data-theme='dark'] .text-icon {
+  filter: invert(0%);
 }
 
 :root {
