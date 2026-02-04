@@ -1,7 +1,7 @@
 ---
 name: Task
 about: An agreed-upon task to be implemented
-title: "[TASK] ..."
+title: "[TASK] "
 labels: enhancement
 assignees: brgillis
 
