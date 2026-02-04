@@ -1982,6 +1982,16 @@ function updateROCrateDownloadEnabled() {
     $("#rocrate-download").attr("disabled", "disabled");
 }
 
+/**
+ * Create an RO-crate with all provided data and provide it to the user for download
+ */
+function exportROCrate() {
+  const rocrate = new JSZip();
+
+}
+
+// Functions related to automatic updating
+
 function enableCanvasUpdate() {
   $("#width-input").on("change", updateWidth);
   $("#height-input").on("change", updateHeight);
@@ -2035,6 +2045,8 @@ function enableButtons() {
   $(".returnToROCrateExport").on("click", () => scrollToSection("#rocrate-export-title"));
 
   $("#rocrate-default-title-desc").on("click", updateROCrateTitleDesc);
+
+  $("#rocrate-download").on("click", exportROCrate);
 }
 
 function enableNavigation() {
