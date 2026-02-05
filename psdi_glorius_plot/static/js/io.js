@@ -27,7 +27,15 @@ export function exportImage(chartSelector, format) {
  */
 export function saveObject(obj, filename) {
   let blob = new Blob([JSON.stringify(obj)], { type: "text/plain;charset=utf-8" });
+  saveBlob(blob, filename);
+}
 
+/**
+ * Save a blob to a file
+ * @param {Object} blob 
+ * @param {string} filename 
+ */
+export function saveBlob(blob, filename) {
   let link = document.createElement('a');
   link.href = URL.createObjectURL(blob);;
   link.download = filename;

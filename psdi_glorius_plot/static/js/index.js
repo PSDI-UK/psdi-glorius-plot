@@ -2064,7 +2064,7 @@ function exportROCrate() {
 
   rocrate.generateAsync({ type: "blob" })
     .then(function (blob) {
-      saveAs(blob, ROCRATE_FILENAME);
+      saveBlob(blob, ROCRATE_FILENAME);
     });
 }
 
