@@ -6,12 +6,14 @@
 
 import { initDirtyForms, cleanDirtyForms, checkIsDirty } from "./dirty-forms.js";
 import { mixHexes } from "./color-mixing.js"
-import { exportImage, loadObject, saveObject } from "./io.js"
+import { exportImage, loadObject, saveBlob, saveObject } from "./io.js"
 import { clamp, disableButton, enableButton, getWebKitMode } from "./utility.js"
 import {
   addQuillEditor, getQuillEditor, getQuillEditorHTML, setQuillEditor, removeQuillEditor, updateQuillContents,
   disableQuillToolbar, enableQuillEvents, stripTags, waitForMathJax, drawFormatted, incrementRenderBatch,
 } from "./formatted-labels.js"
+
+const DEBUG = true;
 
 const VERSION = "0.2";
 
@@ -1132,8 +1134,8 @@ function makeSensitivityTable(plotData, clean = false) {
 
   // Start the output string with the heading row
   let output = "Label";
-  for (j = 1; j < numSamples; ++j) {
-    output += ",Sample " + j + 1;
+  for (let j = 0; j < numSamples; ++j) {
+    output += ",Sample " + (j + 1);
   }
   output += "\r\n";
 
@@ -1143,7 +1145,7 @@ function makeSensitivityTable(plotData, clean = false) {
   output += "\r\n";
 
   // Add a row for each condition
-  for (i = 0; i < numConditions; ++i) {
+  for (let i = 0; i < numConditions; ++i) {
     output += csvSafe(lConditionLabels[i]);
     llConditionSamples[i].forEach((s) => output += "," + csvSafe(s));
     output += "\r\n";
@@ -1166,6 +1168,7 @@ function makeSensitivityTable(plotData, clean = false) {
  * @returns {String}
  */
 function csvSafe(s) {
+  s = s.toString();
   if (!s.includes(","))
     return s;
   s = s.replaceAll('"', '""');
@@ -1869,7 +1872,7 @@ function scrollToSection(selector) {
 /**
  * Display the RO-crate export sections, scroll to the top of them, and show/adjust buttons to return to them
  */
-function startROCrateExport() {
+function startROCrateExport(scroll = true) {
   $(".hidden-after-rocrate").addClass("hidden");
   $(".hidden-until-rocrate").removeClass("hidden");
   $(".rocrate-export").removeClass("hidden");
@@ -1878,7 +1881,8 @@ function startROCrateExport() {
   roCrateFormUpdating = true;
   updateROCrateForm(true);
 
-  scrollToSection("#rocrate-export-title");
+  if (scroll)
+    scrollToSection("#rocrate-export-title");
 }
 
 function updateROCrateForm(firstTime = false) {
@@ -2044,7 +2048,7 @@ function updateROCrateDownloadEnabled() {
     if (!check)
       allGood = false;
   });
-  if (allGood)
+  if (allGood || DEBUG)
     $("#rocrate-download").removeAttr("disabled");
   else
     $("#rocrate-download").attr("disabled", "disabled");
@@ -2053,14 +2057,26 @@ function updateROCrateDownloadEnabled() {
 /**
  * Create an RO-crate with all provided data and provide it to the user for download
  */
-function exportROCrate() {
+async function exportROCrate() {
   const rocrate = new JSZip();
 
   const plotData = getPlotData();
   const sensitivityTable = makeSensitivityTable(plotData, true);
+  const imagePromise = new Promise((resolve, reject) => {
+    $(CHART_SELECTOR)[0].toBlob((blob) => {
+      if (blob) {
+        resolve(blob);
+      } else {
+        reject(new Error("Could not create blob from canvas " + CHART_SELECTOR));
+      }
+    });
+  });
+
+
 
   rocrate.file(ROCRATE_PLOT_DIR + "user_preferences.json", JSON.stringify(plotData));
   rocrate.file(ROCRATE_PLOT_DIR + "sensitivity_table.csv", sensitivityTable);
+  rocrate.file(ROCRATE_PLOT_DIR + "glorius_plot.png", imagePromise);
 
   rocrate.generateAsync({ type: "blob" })
     .then(function (blob) {
@@ -2354,4 +2370,14 @@ $(document).ready(function () {
   enableOnChangeTriggers(), enableToggles(), enableButtons(), enableNavigation();
 
   enableDeviationCalc(), enableAutoUpdates(), enableCanvasUpdate();
+
+  // Special handling if we're debugging
+  if (DEBUG) {
+    // Open the ROCrate Export section and enable export even if checks don't pass
+    startROCrateExport(false);
+    updateROCrateDownloadEnabled();
+
+    // Fill with example data
+    fillExample();
+  }
 });
