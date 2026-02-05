@@ -6,12 +6,14 @@
 
 import { initDirtyForms, cleanDirtyForms, checkIsDirty } from "./dirty-forms.js";
 import { mixHexes } from "./color-mixing.js"
-import { exportImage, loadObject, saveObject } from "./io.js"
+import { exportImage, loadObject, saveBlob, saveObject } from "./io.js"
 import { clamp, disableButton, enableButton, getWebKitMode } from "./utility.js"
 import {
   addQuillEditor, getQuillEditor, getQuillEditorHTML, setQuillEditor, removeQuillEditor, updateQuillContents,
   disableQuillToolbar, enableQuillEvents, stripTags, waitForMathJax, drawFormatted, incrementRenderBatch,
 } from "./formatted-labels.js"
+
+const DEBUG = false;
 
 const VERSION = "0.2";
 
@@ -108,6 +110,16 @@ const DEFAULT_DATASET_ABOUT_TEXT = "This dataset enables users to visualise the 
   "from the Glorius research group.";
 
 const CITATION_AUTHOR_EXAMPLE_TEXT = "Author, A.; Author, B.; and Author, C.";
+
+// Structure of the output RO-crate file
+
+// TODO: Ask about desired filename
+const ROCRATE_FILENAME = "glorius_plot.zip";
+
+// TODO: Ask about desired base folder
+const ROCRATE_ROOT_DIR = "glorius_plot/"
+const ROCRATE_DATA_DIR = ROCRATE_ROOT_DIR + "data/"
+const ROCRATE_PLOT_DIR = ROCRATE_DATA_DIR + "plot/"
 
 // Globals - general
 let tooltipList;
@@ -962,7 +974,7 @@ function navigateCell(e) {
 /**
  * Get an object listing all the user preferences, which can be exported to save them
  * @param {boolean} [includeTable=false] 
- * @returns 
+ * @returns {Object}
  */
 function getPlotData() {
   let data = {
@@ -1103,6 +1115,65 @@ async function loadPlotData() {
 
     cleanDirtyForms();
   })
+}
+
+/**
+ * Given the full plot data, make a stringified CSV table of the sensitivity information
+ * @param {Object} plotData 
+ * @param {Boolean} clean If true, will remove the plot data from the input object 
+ * @returns {String}
+ */
+function makeSensitivityTable(plotData, clean = false) {
+
+  const lBaselineSamples = plotData["baseline-samples"];
+  const lConditionLabels = plotData["condition-labels"];
+  const llConditionSamples = plotData["condition-samples"];
+
+  const numSamples = lBaselineSamples.length;
+  const numConditions = lConditionLabels.length;
+
+  // Start the output string with the heading row
+  let output = "Label";
+  for (let j = 0; j < numSamples; ++j) {
+    output += ",Sample " + (j + 1);
+  }
+  output += "\r\n";
+
+  // Add the baseline row
+  output += "Standard Conditions";
+  lBaselineSamples.forEach((s) => output += "," + csvSafe(s));
+  output += "\r\n";
+
+  // Add a row for each condition
+  for (let i = 0; i < numConditions; ++i) {
+    output += csvSafe(lConditionLabels[i]);
+    llConditionSamples[i].forEach((s) => output += "," + csvSafe(s));
+    output += "\r\n";
+  }
+
+  // Remove this data from the input object if desired
+  if (clean) {
+    delete plotData["baseline-samples"];
+    delete plotData["condition-labels"];
+    delete plotData["condition-samples"];
+  }
+
+  return output;
+}
+
+/**
+ * Makes a string safe to be included as an element in a CSV file, wrapping it in quotes if necessary and escaping
+ * any existing quotes
+ * @param {String} s 
+ * @returns {String}
+ */
+function csvSafe(s) {
+  s = s.toString();
+  if (!s.includes(","))
+    return s;
+  s = s.replaceAll('"', '""');
+  s = '"' + s + '"';
+  return s;
 }
 
 /**
@@ -1801,7 +1872,7 @@ function scrollToSection(selector) {
 /**
  * Display the RO-crate export sections, scroll to the top of them, and show/adjust buttons to return to them
  */
-function startROCrateExport() {
+function startROCrateExport(scroll = true) {
   $(".hidden-after-rocrate").addClass("hidden");
   $(".hidden-until-rocrate").removeClass("hidden");
   $(".rocrate-export").removeClass("hidden");
@@ -1810,7 +1881,8 @@ function startROCrateExport() {
   roCrateFormUpdating = true;
   updateROCrateForm(true);
 
-  scrollToSection("#rocrate-export-title");
+  if (scroll)
+    scrollToSection("#rocrate-export-title");
 }
 
 function updateROCrateForm(firstTime = false) {
@@ -1976,11 +2048,43 @@ function updateROCrateDownloadEnabled() {
     if (!check)
       allGood = false;
   });
-  if (allGood)
+  if (allGood || DEBUG)
     $("#rocrate-download").removeAttr("disabled");
   else
     $("#rocrate-download").attr("disabled", "disabled");
 }
+
+/**
+ * Create an RO-crate with all provided data and provide it to the user for download
+ */
+async function exportROCrate() {
+  const rocrate = new JSZip();
+
+  const plotData = getPlotData();
+  const sensitivityTable = makeSensitivityTable(plotData, true);
+  const imagePromise = new Promise((resolve, reject) => {
+    $(CHART_SELECTOR)[0].toBlob((blob) => {
+      if (blob) {
+        resolve(blob);
+      } else {
+        reject(new Error("Could not create blob from canvas " + CHART_SELECTOR));
+      }
+    });
+  });
+
+
+
+  rocrate.file(ROCRATE_PLOT_DIR + "user_preferences.json", JSON.stringify(plotData));
+  rocrate.file(ROCRATE_PLOT_DIR + "sensitivity_table.csv", sensitivityTable);
+  rocrate.file(ROCRATE_PLOT_DIR + "glorius_plot.png", imagePromise);
+
+  rocrate.generateAsync({ type: "blob" })
+    .then(function (blob) {
+      saveBlob(blob, ROCRATE_FILENAME);
+    });
+}
+
+// Functions related to automatic updating
 
 function enableCanvasUpdate() {
   $("#width-input").on("change", updateWidth);
@@ -2035,6 +2139,8 @@ function enableButtons() {
   $(".returnToROCrateExport").on("click", () => scrollToSection("#rocrate-export-title"));
 
   $("#rocrate-default-title-desc").on("click", updateROCrateTitleDesc);
+
+  $("#rocrate-download").on("click", exportROCrate);
 }
 
 function enableNavigation() {
@@ -2264,4 +2370,14 @@ $(document).ready(function () {
   enableOnChangeTriggers(), enableToggles(), enableButtons(), enableNavigation();
 
   enableDeviationCalc(), enableAutoUpdates(), enableCanvasUpdate();
+
+  // Special handling if we're debugging
+  if (DEBUG) {
+    // Open the ROCrate Export section and enable export even if checks don't pass
+    startROCrateExport(false);
+    updateROCrateDownloadEnabled();
+
+    // Fill with example data
+    fillExample();
+  }
 });
