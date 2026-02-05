@@ -109,6 +109,16 @@ const DEFAULT_DATASET_ABOUT_TEXT = "This dataset enables users to visualise the 
 
 const CITATION_AUTHOR_EXAMPLE_TEXT = "Author, A.; Author, B.; and Author, C.";
 
+// Structure of the output RO-crate file
+
+// TODO: Ask about desired filename
+const ROCRATE_FILENAME = "glorius_plot.zip";
+
+// TODO: Ask about desired base folder
+const ROCRATE_ROOT_DIR = "glorius_plot/"
+const ROCRATE_DATA_DIR = ROCRATE_ROOT_DIR + "data/"
+const ROCRATE_PLOT_DIR = ROCRATE_DATA_DIR + "plot/"
+
 // Globals - general
 let tooltipList;
 
@@ -962,7 +972,7 @@ function navigateCell(e) {
 /**
  * Get an object listing all the user preferences, which can be exported to save them
  * @param {boolean} [includeTable=false] 
- * @returns 
+ * @returns {Object}
  */
 function getPlotData() {
   let data = {
@@ -1103,6 +1113,64 @@ async function loadPlotData() {
 
     cleanDirtyForms();
   })
+}
+
+/**
+ * Given the full plot data, make a stringified CSV table of the sensitivity information
+ * @param {Object} plotData 
+ * @param {Boolean} clean If true, will remove the plot data from the input object 
+ * @returns {String}
+ */
+function makeSensitivityTable(plotData, clean = false) {
+
+  const lBaselineSamples = plotData["baseline-samples"];
+  const lConditionLabels = plotData["condition-labels"];
+  const llConditionSamples = plotData["condition-samples"];
+
+  const numSamples = lBaselineSamples.length;
+  const numConditions = lConditionLabels.length;
+
+  // Start the output string with the heading row
+  let output = "Label";
+  for (j = 1; j < numSamples; ++j) {
+    output += ",Sample " + j + 1;
+  }
+  output += "\r\n";
+
+  // Add the baseline row
+  output += "Standard Conditions";
+  lBaselineSamples.forEach((s) => output += "," + csvSafe(s));
+  output += "\r\n";
+
+  // Add a row for each condition
+  for (i = 0; i < numConditions; ++i) {
+    output += csvSafe(lConditionLabels[i]);
+    llConditionSamples[i].forEach((s) => output += "," + csvSafe(s));
+    output += "\r\n";
+  }
+
+  // Remove this data from the input object if desired
+  if (clean) {
+    delete plotData["baseline-samples"];
+    delete plotData["condition-labels"];
+    delete plotData["condition-samples"];
+  }
+
+  return output;
+}
+
+/**
+ * Makes a string safe to be included as an element in a CSV file, wrapping it in quotes if necessary and escaping
+ * any existing quotes
+ * @param {String} s 
+ * @returns {String}
+ */
+function csvSafe(s) {
+  if (!s.includes(","))
+    return s;
+  s = s.replaceAll('"', '""');
+  s = '"' + s + '"';
+  return s;
 }
 
 /**
@@ -1988,6 +2056,16 @@ function updateROCrateDownloadEnabled() {
 function exportROCrate() {
   const rocrate = new JSZip();
 
+  const plotData = getPlotData();
+  const sensitivityTable = makeSensitivityTable(plotData, true);
+
+  rocrate.file(ROCRATE_PLOT_DIR + "user_preferences.json", JSON.stringify(plotData));
+  rocrate.file(ROCRATE_PLOT_DIR + "sensitivity_table.csv", sensitivityTable);
+
+  rocrate.generateAsync({ type: "blob" })
+    .then(function (blob) {
+      saveAs(blob, ROCRATE_FILENAME);
+    });
 }
 
 // Functions related to automatic updating
