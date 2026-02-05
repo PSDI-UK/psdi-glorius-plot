@@ -13,7 +13,7 @@ import {
   disableQuillToolbar, enableQuillEvents, stripTags, waitForMathJax, drawFormatted, incrementRenderBatch,
 } from "./formatted-labels.js"
 
-const DEBUG = true;
+const DEBUG = false;
 
 const VERSION = "0.2";
 
