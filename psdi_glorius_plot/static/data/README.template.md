@@ -10,12 +10,12 @@
 
 **Dataset Version**: $REPLACEME_DATASET_VER
 
-**About**: $REPLACEME_ABOUT
+**About**: $REPLACEME_ABOUT$REPLACEME_BIB
 
 ## File Structure
 
 - [**ESI.pdf**](./ESI.pdf): A PDF electronic supplementary information file containing the results table for the sensitivity of the reaction and the Glorius plot.
-- **[ro-crate-metadata.json](./ro-crate-metadata.json)**: A machine-readable file describing the dataset contained within this Research Object Crate (RO-Crate).$REPLACEME_BIB
+- **[ro-crate-metadata.json](./ro-crate-metadata.json)**: A machine-readable file describing the dataset contained within this Research Object Crate (RO-Crate).
 
 - **data folder**:$REPLACEME_REACTION_SCHEME_FILE$REPLACEME_BASELINE_FILE$REPLACEME_COND_DESC_FILE
   - **plot folder**:
