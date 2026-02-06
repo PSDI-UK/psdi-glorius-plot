@@ -2417,7 +2417,8 @@ function enableQuillEventsAndCallbacks() {
   const numConditions = getNumConditions();
   for (let i = 0; i < numConditions; ++i) {
     otherCallbacks["#cl-" + i] = () => { updateCondDescLabel(i) };
-    otherCallbacks["#rcdi-" + i] = checkCondDescs;
+    if (roCrateFormUpdating)
+      otherCallbacks["#rcdi-" + i] = checkCondDescs;
   }
   enableQuillEvents(generateIfUpdating, otherCallbacks);
 
