@@ -442,6 +442,10 @@ summary>h6 {
   display: inline;
 }
 
+.alert-text {
+  color: var(--ifm-color-danger);
+}
+
 :root {
   --marker-height: 1rem;
 }

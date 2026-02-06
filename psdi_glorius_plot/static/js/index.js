@@ -2027,6 +2027,67 @@ function updateROCrateTitleDesc() {
   updateQuillContents("#rocrate-about", DEFAULT_DATASET_ABOUT_TEXT);
 }
 
+/**
+ * Get whether or not a reaction scheme is provided
+ * @returns {Boolean}
+ */
+function reactionSchemePresent() {
+  return !!$("#rocrate-cdxml").val();
+}
+
+/**
+ * Check if a reaction scheme is uploaded. If so, display it in the File Structure section
+ */
+function updateReactionScheme() {
+  if (reactionSchemePresent())
+    $("#rocrate-reaction-scheme-li").removeClass("hidden");
+  else
+    $("#rocrate-reaction-scheme-li").addClass("hidden");
+}
+
+/**
+ * Get whether or not a baseline description is provided
+ * @returns {Boolean}
+ */
+function baselineDescPresent() {
+  return !!getQuillEditorHTML("#rocrate-baseline-desc");
+}
+
+/**
+ * Check if any text has been entered for the Standard Conditions description, and display it in the File Structure
+ * section if so
+ */
+function checkBaselineDesc() {
+  if (baselineDescPresent())
+    $("#rocrate-baseline-li").removeClass("hidden");
+  else
+    $("#rocrate-baseline-li").addClass("hidden");
+}
+
+/**
+ * Get whether or not a description is provided for at least one condition
+ * @returns {Boolean}
+ */
+function condDescsPresent() {
+  const numConditions = getNumConditions();
+  for (let i = 0; i < numConditions; ++i) {
+    if (getQuillEditorHTML("#rcdi-" + i))
+      return true;
+  }
+  return false;
+}
+
+/**
+ * Check if a description has been provided for any of the conditions, and display the file for it in the File Structure
+ * section if so
+ */
+function checkCondDescs() {
+  if (condDescsPresent())
+    $("#rocrate-test-conditions-li").removeClass("hidden");
+  else
+    $("#rocrate-test-conditions-li").addClass("hidden");
+}
+
 function checkCitationAuthors() {
   const citationText = getQuillEditorHTML("#rocrate-citation");
   if (citationText.includes(CITATION_AUTHOR_EXAMPLE_TEXT)) {
@@ -2068,8 +2129,6 @@ async function exportROCrate() {
       }
     });
   });
-
-
 
   rocrate.file(ROCRATE_PLOT_DIR + "user_preferences.json", JSON.stringify(plotData));
   rocrate.file(ROCRATE_PLOT_DIR + "sensitivity_table.csv", sensitivityTable);
@@ -2352,14 +2411,20 @@ function enableQuillEventsAndCallbacks() {
   // Set up other callbacks we want to set up for specific editors, then enable all events tied to editors
   const otherCallbacks = {
     "#ol-0": updateOutputLabelCallback,
-    "#rocrate-citation": checkCitationAuthors
+    "#rocrate-citation": checkCitationAuthors,
+    "#rocrate-baseline-desc": checkBaselineDesc
   };
   const numConditions = getNumConditions();
   for (let i = 0; i < numConditions; ++i) {
     otherCallbacks["#cl-" + i] = () => { updateCondDescLabel(i) };
+    otherCallbacks["#rcdi-" + i] = checkCondDescs;
   }
   enableQuillEvents(generateIfUpdating, otherCallbacks);
 
+}
+
+function enableROCrateOnChangeTriggers() {
+  $("#rocrate-cdxml").on("change", updateReactionScheme);
 }
 
 $(document).ready(function () {
@@ -2372,6 +2437,8 @@ $(document).ready(function () {
   enableOnChangeTriggers(), enableToggles(), enableButtons(), enableNavigation();
 
   enableDeviationCalc(), enableAutoUpdates(), enableCanvasUpdate();
+
+  enableROCrateOnChangeTriggers();
 
   // Special handling if we're debugging
   if (DEBUG) {
