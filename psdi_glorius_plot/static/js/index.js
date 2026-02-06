@@ -280,7 +280,7 @@ function relabelDim(dim) {
 
     // Set the heading text if we have any heading cells
     if (lHeadings.length > 0) {
-      let headingText = getQuillEditorHTML("#ol-0");
+      let headingText = getOutputLabel();
       updateOutputLabel(headingText);
     }
 
@@ -2317,7 +2317,7 @@ function updateOutputLabel(label) {
 }
 
 function updateOutputLabelCallback() {
-  updateOutputLabel(getQuillEditorHTML("#ol-0"));
+  updateOutputLabel(getOutputLabel());
   updateROCrateOutputLabel();
 }
 
