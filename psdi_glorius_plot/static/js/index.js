@@ -2037,6 +2037,17 @@ function updateReactionScheme() {
     $("#rocrate-reaction-scheme-li").addClass("hidden");
 }
 
+/**
+ * Check if any text has been entered for the Standard Conditions description, and display it in the File Structure
+ * section if so
+ */
+function checkBaselineDesc() {
+  if (getQuillEditorHTML("#rocrate-baseline-desc"))
+    $("#rocrate-baseline-li").removeClass("hidden");
+  else
+    $("#rocrate-baseline-li").addClass("hidden");
+}
+
 function checkCitationAuthors() {
   const citationText = getQuillEditorHTML("#rocrate-citation");
   if (citationText.includes(CITATION_AUTHOR_EXAMPLE_TEXT)) {
@@ -2078,8 +2089,6 @@ async function exportROCrate() {
       }
     });
   });
-
-
 
   rocrate.file(ROCRATE_PLOT_DIR + "user_preferences.json", JSON.stringify(plotData));
   rocrate.file(ROCRATE_PLOT_DIR + "sensitivity_table.csv", sensitivityTable);
@@ -2362,7 +2371,8 @@ function enableQuillEventsAndCallbacks() {
   // Set up other callbacks we want to set up for specific editors, then enable all events tied to editors
   const otherCallbacks = {
     "#ol-0": updateOutputLabelCallback,
-    "#rocrate-citation": checkCitationAuthors
+    "#rocrate-citation": checkCitationAuthors,
+    "#rocrate-baseline-desc": checkBaselineDesc
   };
   const numConditions = getNumConditions();
   for (let i = 0; i < numConditions; ++i) {
