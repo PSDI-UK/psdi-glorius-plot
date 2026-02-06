@@ -66,18 +66,24 @@ const RAND_BASELINE_MIN = 60., RAND_BASELINE_MAX = 100.;
 
 const D_DEV_PLOT_MODE_INFO = {
   relative: {
+    label: "Deviation (%)",
+    key: "rel-deviation",
     beforeOutput: "Deviation of ",
     afterOutput: " from standard conditions (%)",
     stripBegin: null,
     stripEnd: " (%)"
   },
   absolute: {
+    label: "Deviation (+/-)",
+    key: "abs-deviation",
     beforeOutput: "Deviation of ",
     afterOutput: " from standard conditions (+/-)",
     stripBegin: null,
     stripEnd: " (%)"
   },
   mean: {
+    label: "Mean",
+    key: "mean",
     beforeOutput: "Mean ",
     afterOutput: "",
     stripBegin: null,
@@ -1129,11 +1135,22 @@ function makeSensitivityTable(plotData, clean = false) {
   const numSamples = lBaselineSamples.length;
   const numConditions = lConditionLabels.length;
 
+  const devPlotMode = getDevPlotMode();
+  const includeDev = !(devPlotMode == "mean" && numSamples == 1);
+  const lDevValueInputs = $(`input.${D_DEV_PLOT_MODE_INFO[devPlotMode].key}-value`);
+
   // Start the output string with the heading row
-  let output = "Label";
-  for (let j = 0; j < numSamples; ++j) {
-    output += ",Sample " + (j + 1);
+  let output = "Test parameter";
+  const outputLabel = getOutputLabel();
+  if (numSamples == 1) {
+    output += "," + outputLabel;
+  } else {
+    for (let j = 0; j < numSamples; ++j) {
+      output += `,${outputLabel} ${j + 1}`;
+    }
   }
+  if (includeDev)
+    output += "," + D_DEV_PLOT_MODE_INFO[getDevPlotMode()].label;
   output += "\r\n";
 
   // Add the baseline row
@@ -1145,6 +1162,8 @@ function makeSensitivityTable(plotData, clean = false) {
   for (let i = 0; i < numConditions; ++i) {
     output += csvSafe(lConditionLabels[i]);
     llConditionSamples[i].forEach((s) => output += "," + csvSafe(s));
+    if (includeDev)
+      output += "," + lDevValueInputs[i].value;
     output += "\r\n";
   }
 
@@ -1458,15 +1477,9 @@ async function generatePlot() {
   for (let i = 0; i < numConditions; ++i) {
     let lSingleConditionData = [];
 
-    let valueSelector, inputSelector;
-    if (devPlotMode == "mean")
-      valueSelector = ".mean-value-cell", inputSelector = "input.mean-value"
-    else if (devPlotMode == "absolute")
-      valueSelector = ".abs-deviation-value-cell", inputSelector = "input.abs-deviation-value"
-    else
-      valueSelector = ".rel-deviation-value-cell", inputSelector = "input.rel-deviation-value"
-    const lCells = lSensRows.eq(i).find(valueSelector);
-    const lInputs = lCells.eq(0).find(inputSelector);
+    const devPlotModeKey = D_DEV_PLOT_MODE_INFO[devPlotMode].key;
+    const lCells = lSensRows.eq(i).find(`.${devPlotModeKey}-value-cell`);
+    const lInputs = lCells.eq(0).find(`input.${devPlotModeKey}-value`);
 
     for (let j = 0; j < numOutputs; ++j) {
       lSingleConditionData.push(lInputs[j].value);
