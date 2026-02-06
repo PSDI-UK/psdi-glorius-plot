@@ -2027,6 +2027,16 @@ function updateROCrateTitleDesc() {
   updateQuillContents("#rocrate-about", DEFAULT_DATASET_ABOUT_TEXT);
 }
 
+/**
+ * Check if a reaction scheme is uploaded. If so, display it in the File Structure section
+ */
+function updateReactionScheme() {
+  if ($("#rocrate-cdxml").val())
+    $("#rocrate-reaction-scheme-li").removeClass("hidden");
+  else
+    $("#rocrate-reaction-scheme-li").addClass("hidden");
+}
+
 function checkCitationAuthors() {
   const citationText = getQuillEditorHTML("#rocrate-citation");
   if (citationText.includes(CITATION_AUTHOR_EXAMPLE_TEXT)) {
@@ -2362,6 +2372,10 @@ function enableQuillEventsAndCallbacks() {
 
 }
 
+function enableROCrateOnChangeTriggers() {
+  $("#rocrate-cdxml").on("change", updateReactionScheme);
+}
+
 $(document).ready(function () {
 
   initDirtyForms("form", DIRTY_FORMS_MESSAGE);
@@ -2372,6 +2386,8 @@ $(document).ready(function () {
   enableOnChangeTriggers(), enableToggles(), enableButtons(), enableNavigation();
 
   enableDeviationCalc(), enableAutoUpdates(), enableCanvasUpdate();
+
+  enableROCrateOnChangeTriggers();
 
   // Special handling if we're debugging
   if (DEBUG) {
