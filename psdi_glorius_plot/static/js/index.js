@@ -113,10 +113,7 @@ const CITATION_AUTHOR_EXAMPLE_TEXT = "Author, A.; Author, B.; and Author, C.";
 
 // Structure of the output RO-crate file
 
-// TODO: Ask about desired filename
-const ROCRATE_FILENAME = "glorius_plot.zip";
-
-// TODO: Ask about desired base folder
+const ROCRATE_FILENAME_BASE = "glorius-plot-ro-crate.zip";
 const ROCRATE_ROOT_DIR = "glorius_plot/"
 const ROCRATE_DATA_DIR = ROCRATE_ROOT_DIR + "data/"
 const ROCRATE_PLOT_DIR = ROCRATE_DATA_DIR + "plot/"
@@ -2080,7 +2077,12 @@ async function exportROCrate() {
 
   rocrate.generateAsync({ type: "blob" })
     .then(function (blob) {
-      saveBlob(blob, ROCRATE_FILENAME);
+
+      // Get a timestamp in the format YYYY-MM-DD-HHMMSS-
+      let timestamp = (new Date()).toISOString();
+      timestamp = timestamp.replace(/[TZ]/g, "-").replace(/:|(\.\d*)/g, "");
+
+      saveBlob(blob, timestamp + ROCRATE_FILENAME_BASE);
     });
 }
 
