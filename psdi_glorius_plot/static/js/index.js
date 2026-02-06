@@ -2028,13 +2028,29 @@ function updateROCrateTitleDesc() {
 }
 
 /**
+ * Get whether or not a reaction scheme is provided
+ * @returns {Boolean}
+ */
+function reactionSchemePresent() {
+  return !!$("#rocrate-cdxml").val();
+}
+
+/**
  * Check if a reaction scheme is uploaded. If so, display it in the File Structure section
  */
 function updateReactionScheme() {
-  if ($("#rocrate-cdxml").val())
+  if (reactionSchemePresent())
     $("#rocrate-reaction-scheme-li").removeClass("hidden");
   else
     $("#rocrate-reaction-scheme-li").addClass("hidden");
+}
+
+/**
+ * Get whether or not a baseline description is provided
+ * @returns {Boolean}
+ */
+function baselineDescPresent() {
+  return !!getQuillEditorHTML("#rocrate-baseline-desc");
 }
 
 /**
@@ -2042,10 +2058,34 @@ function updateReactionScheme() {
  * section if so
  */
 function checkBaselineDesc() {
-  if (getQuillEditorHTML("#rocrate-baseline-desc"))
+  if (baselineDescPresent())
     $("#rocrate-baseline-li").removeClass("hidden");
   else
     $("#rocrate-baseline-li").addClass("hidden");
+}
+
+/**
+ * Get whether or not a description is provided for at least one condition
+ * @returns {Boolean}
+ */
+function condDescsPresent() {
+  const numConditions = getNumConditions();
+  for (let i = 0; i < numConditions; ++i) {
+    if (getQuillEditorHTML("#rcdi-" + i))
+      return true;
+  }
+  return false;
+}
+
+/**
+ * Check if a description has been provided for any of the conditions, and display the file for it in the File Structure
+ * section if so
+ */
+function checkCondDescs() {
+  if (condDescsPresent())
+    $("#rocrate-test-conditions-li").removeClass("hidden");
+  else
+    $("#rocrate-test-conditions-li").addClass("hidden");
 }
 
 function checkCitationAuthors() {
@@ -2377,6 +2417,7 @@ function enableQuillEventsAndCallbacks() {
   const numConditions = getNumConditions();
   for (let i = 0; i < numConditions; ++i) {
     otherCallbacks["#cl-" + i] = () => { updateCondDescLabel(i) };
+    otherCallbacks["#rcdi-" + i] = checkCondDescs;
   }
   enableQuillEvents(generateIfUpdating, otherCallbacks);
 
