@@ -12,6 +12,7 @@ import {
   addQuillEditor, getQuillEditor, getQuillEditorHTML, setQuillEditor, removeQuillEditor, updateQuillContents,
   disableQuillToolbar, enableQuillEvents, stripTags, waitForMathJax, drawFormatted, incrementRenderBatch,
 } from "./formatted-labels.js"
+import { makeReadme } from "./readme-template.js";
 
 const DEBUG = false;
 
@@ -2131,8 +2132,24 @@ function updateROCrateDownloadEnabled() {
 async function exportROCrate() {
   const rocrate = new JSZip();
 
+  const readmeText = makeReadme(
+    getQuillEditorHTML("#rocrate-title-input"),
+    getQuillEditorHTML("#rocrate-desc-input"),
+    VERSION,
+    getQuillEditorHTML("#rocrate-about"),
+    makeBibInfo(), // TODO: Implement this function
+    reactionSchemePresent(),
+    baselineDescPresent(),
+    condDescsPresent(),
+  );
+  rocrate.file(ROCRATE_DATA_DIR + "README.md", readmeText);
+
   const plotData = getPlotData();
+  rocrate.file(ROCRATE_PLOT_DIR + "user_preferences.json", JSON.stringify(plotData));
+
   const sensitivityTable = makeSensitivityTable(plotData, true);
+  rocrate.file(ROCRATE_PLOT_DIR + "sensitivity_table.csv", sensitivityTable);
+
   const imagePromise = new Promise((resolve, reject) => {
     $(CHART_SELECTOR)[0].toBlob((blob) => {
       if (blob) {
@@ -2142,9 +2159,6 @@ async function exportROCrate() {
       }
     });
   });
-
-  rocrate.file(ROCRATE_PLOT_DIR + "user_preferences.json", JSON.stringify(plotData));
-  rocrate.file(ROCRATE_PLOT_DIR + "sensitivity_table.csv", sensitivityTable);
   rocrate.file(ROCRATE_PLOT_DIR + "glorius_plot.png", imagePromise);
 
   rocrate.generateAsync({ type: "blob" })
