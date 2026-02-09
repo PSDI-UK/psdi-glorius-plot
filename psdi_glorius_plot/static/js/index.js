@@ -12,7 +12,7 @@ import {
   addQuillEditor, getQuillEditor, getQuillEditorHTML, setQuillEditor, removeQuillEditor, updateQuillContents,
   disableQuillToolbar, enableQuillEvents, stripTags, waitForMathJax, drawFormatted, incrementRenderBatch,
 } from "./formatted-labels.js"
-import { makeReadme } from "./readme-template.js";
+import { formatBibInfo, makeReadme } from "./readme-template.js";
 
 const DEBUG = false;
 
@@ -2170,6 +2170,24 @@ async function exportROCrate() {
 
       saveBlob(blob, timestamp + ROCRATE_FILENAME_BASE);
     });
+}
+
+/**
+ * Collect the author info and pass it to the formatter to make the bibliographic info section of the readme
+ * @returns {String} The text of the section
+ */
+function makeBibInfo() {
+  const lNamesAndORCIDs = [];
+
+  $(".rocrate-contrib-row").each((i, el) => {
+    const name = el.find(".rocrate-name-input").val();
+    const orcId = el.find(".rocrate-orcid-input").val();
+    lNamesAndORCIDs.push([name, orcId]);
+  });
+
+  const contactEmail = $("#rocrate-email-input").val();
+
+  return formatBibInfo(lNamesAndORCIDs, contactEmail);
 }
 
 // Functions related to automatic updating

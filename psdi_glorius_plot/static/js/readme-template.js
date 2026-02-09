@@ -1,3 +1,5 @@
+ORCID_URL_BASE = "https://orcid.org/";
+
 /**
  * Generates the text of a README file based on user input
  * @param {String} title The dataset title as provided by the user
@@ -18,9 +20,7 @@ export function makeReadme(title, desc, version, about, bibInfo, reactionSchemeP
   if (bibInfo) {
     bibInfo = `
 
-## Bibliographic Information
-
-${bibInfo}`;
+## Bibliographic Information${bibInfo}`;
   }
 
   // If the reaction scheme, baseline info, and/or condition description files are present, add lines for them
@@ -67,4 +67,40 @@ ${bibInfo}`;
 `;
 
   return text
+}
+
+/**
+ * Formats the bibliographic info section of the README.md file based on author info
+ * @param {Array<Array<string>>} lNamesAndORCIDs List of name, orcID pairs
+ * @param {String} contactEmail The contact email provided by the user
+ * @returns {String} The text of the section
+ */
+export function formatBibInfo(lNamesAndORCIDs, contactEmail) {
+
+  text = "";
+
+  lNamesAndORCIDs.forEach((name, orcId) => {
+
+    // If no name is present, skip this entry
+    if (!name)
+      return;
+
+    text += `\n\n**Name**: ${name}`
+
+    if (!orcId)
+      return;
+
+    // Check how the ORCID is formatted, and always print with the full URL
+    if (!orcId.startsWith(ORCID_URL_BASE))
+      orcId = ORCID_URL_BASE + orcId;
+
+    text += `\n\n- **ORCID**: ${orcId}`
+
+  });
+
+  if (contactEmail) {
+    text += `\n\n**Contact**: ${contactEmail}`
+  }
+
+  return text;
 }
