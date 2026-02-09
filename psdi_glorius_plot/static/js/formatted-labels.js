@@ -207,7 +207,7 @@ export async function drawFormatted(ctx, labelHTML, x, y, fontSize, hAlign, rend
     return;
 
   const adaptor = MathJax.startup.adaptor;
-  const mathJaxSVG = await MathJax.tex2svgPromise(getAsTex(labelHTML));
+  const mathJaxSVG = await MathJax.tex2svgPromise(HTMLToTex(labelHTML));
   let svgHTML = adaptor.tags(mathJaxSVG, 'svg')[0].outerHTML;
 
   // MathJax SVGs use &lt; and &gt; within their tags. Normally this is fine, but in older versions of Safari the above
@@ -240,7 +240,12 @@ export async function drawFormatted(ctx, labelHTML, x, y, fontSize, hAlign, rend
   drawMathJaxSVG(ctx, svgHTML, x, y, fontSize, hAlign, renderBatch);
 }
 
-function getAsTex(s) {
+/**
+ * Convert a string from HTML markup to TeX
+ * @param {String} s The string in HTML
+ * @returns The string converted to TeX
+ */
+export function HTMLToTex(s) {
   // Escape any characters that need to be escaped
   s = s.replaceAll("%", "\\%");
 
@@ -270,6 +275,20 @@ function getAsTex(s) {
     .replaceAll("<u>", "\\underline{").replaceAll("</u>", "}")
     .replaceAll("<sub>", "_{\\rm ").replaceAll("</sub>", "}")
     .replaceAll("<sup>", "^{\\rm ").replaceAll("</sup>", "}");
+
+  return s;
+}
+
+/**
+ * Convert a string from HTML markup to Markdown
+ * @param {String} s The string in HTML
+ * @returns The string converted to Markdown
+ */
+export function HTMLToMd(s) {
+  s = s.replaceAll(/<\/?em>/g, "*")
+    .replaceAll(/<\/?strong>/, "**")
+    .replaceAll(/<\/?sub>/, "~")
+    .replaceAll(/<\/?sup>/, "^");
 
   return s;
 }

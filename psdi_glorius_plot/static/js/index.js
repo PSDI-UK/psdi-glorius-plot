@@ -10,7 +10,7 @@ import { exportImage, loadObject, saveBlob, saveObject } from "./io.js"
 import { clamp, disableButton, enableButton, getWebKitMode } from "./utility.js"
 import {
   addQuillEditor, getQuillEditor, getQuillEditorHTML, setQuillEditor, removeQuillEditor, updateQuillContents,
-  disableQuillToolbar, enableQuillEvents, stripTags, waitForMathJax, drawFormatted, incrementRenderBatch,
+  disableQuillToolbar, enableQuillEvents, stripTags, waitForMathJax, drawFormatted, incrementRenderBatch, HTMLToMd,
 } from "./formatted-labels.js"
 import { formatBibInfo, makeReadme } from "./readme-template.js";
 
@@ -2133,11 +2133,11 @@ async function exportROCrate() {
   const rocrate = new JSZip();
 
   const readmeText = makeReadme(
-    getQuillEditorHTML("#rocrate-title-input"),
-    getQuillEditorHTML("#rocrate-desc-input"),
+    HTMLToMd(getQuillEditorHTML("#rocrate-title-input")),
+    HTMLToMd(getQuillEditorHTML("#rocrate-desc-input")),
     VERSION,
-    getQuillEditorHTML("#rocrate-about"),
-    makeBibInfo(), // TODO: Implement this function
+    HTMLToMd(getQuillEditorHTML("#rocrate-about")),
+    makeBibInfo(),
     reactionSchemePresent(),
     baselineDescPresent(),
     condDescsPresent(),
