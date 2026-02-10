@@ -286,9 +286,9 @@ export function HTMLToTex(s) {
  */
 export function HTMLToMd(s) {
   s = s.replaceAll(/<\/?em>/g, "*")
-    .replaceAll(/<\/?strong>/, "**")
-    .replaceAll(/<\/?sub>/, "~")
-    .replaceAll(/<\/?sup>/, "^");
+    .replaceAll(/<\/?strong>/g, "**")
+    .replaceAll(/<\/?sub>/g, "~")
+    .replaceAll(/<\/?sup>/g, "^");
 
   return s;
 }

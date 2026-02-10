@@ -651,7 +651,7 @@ function setConditionLabel(i, val) {
 
 function getLConditionLabels() {
   const lCondtionLabelsHTML = [];
-  $(".condition-input").each((i, e) => {
+  $(".condition-input").each((i) => {
     lCondtionLabelsHTML.push(getConditionLabel(i));
   })
   return lCondtionLabelsHTML;
@@ -1952,7 +1952,7 @@ function initCondDescs() {
     // Remove the excess rows
     initDescRows.each((i, el) => {
       if (i >= numRows)
-        el.remove();
+        $(el).remove();
     });
   }
 
@@ -2142,7 +2142,7 @@ async function exportROCrate() {
     baselineDescPresent(),
     condDescsPresent(),
   );
-  rocrate.file(ROCRATE_DATA_DIR + "README.md", readmeText);
+  rocrate.file(ROCRATE_ROOT_DIR + "README.md", readmeText);
 
   const plotData = getPlotData();
   rocrate.file(ROCRATE_PLOT_DIR + "user_preferences.json", JSON.stringify(plotData));
@@ -2180,8 +2180,9 @@ function makeBibInfo() {
   const lNamesAndORCIDs = [];
 
   $(".rocrate-contrib-row").each((i, el) => {
-    const name = el.find(".rocrate-name-input").val();
-    const orcId = el.find(".rocrate-orcid-input").val();
+    const oEl = $(el);
+    const name = oEl.find(".rocrate-name-input").val();
+    const orcId = oEl.find(".rocrate-orcid-input").val();
     lNamesAndORCIDs.push([name, orcId]);
   });
 

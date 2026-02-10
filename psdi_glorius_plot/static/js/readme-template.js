@@ -1,4 +1,4 @@
-ORCID_URL_BASE = "https://orcid.org/";
+const ORCID_URL_BASE = "https://orcid.org/";
 
 /**
  * Generates the text of a README file based on user input
@@ -77,9 +77,9 @@ export function makeReadme(title, desc, version, about, bibInfo, reactionSchemeP
  */
 export function formatBibInfo(lNamesAndORCIDs, contactEmail) {
 
-  text = "";
+  let text = "";
 
-  lNamesAndORCIDs.forEach((name, orcId) => {
+  lNamesAndORCIDs.forEach(([name, orcId]) => {
 
     // If no name is present, skip this entry
     if (!name)
