@@ -4,7 +4,6 @@ const ORCID_URL_BASE = "https://orcid.org/";
  * Generates the text of a README file based on user input
  * @param {String} title The dataset title as provided by the user
  * @param {String} desc The dataset description as provided by the user
- * @param {String} version TODO: Confirm source of this
  * @param {String} about The about text as provided by the user
  * @param {String} bibInfo The bibliographic info as provided by the user
  * @param {Boolean} reactionSchemePresent Whether or not a file is present in the crate describing the reaction scheme
@@ -12,7 +11,7 @@ const ORCID_URL_BASE = "https://orcid.org/";
  * @param {Boolean} condDescPresent Whether or not a file is present in the crate describing the different conditions
  * @returns {String} The full text of the README file
  */
-export function makeReadme(title, desc, version, about, bibInfo, reactionSchemePresent, baselineDescPresent,
+export function makeReadme(title, desc, about, bibInfo, reactionSchemePresent, baselineDescPresent,
   condDescPresent) {
   const timestamp = (new Date()).toISOString();
 
@@ -49,8 +48,6 @@ export function makeReadme(title, desc, version, about, bibInfo, reactionSchemeP
 **Description**: ${desc}
 
 **Date Published**: ${timestamp}
-
-**Dataset Version**: ${version}
 
 **About**: ${about}${bibInfo}
 
