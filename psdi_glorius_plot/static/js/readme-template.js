@@ -4,7 +4,6 @@ const ORCID_URL_BASE = "https://orcid.org/";
  * Generates the text of a README file based on user input
  * @param {String} title The dataset title as provided by the user
  * @param {String} desc The dataset description as provided by the user
- * @param {String} version TODO: Confirm source of this
  * @param {String} about The about text as provided by the user
  * @param {String} bibInfo The bibliographic info as provided by the user
  * @param {Boolean} reactionSchemePresent Whether or not a file is present in the crate describing the reaction scheme

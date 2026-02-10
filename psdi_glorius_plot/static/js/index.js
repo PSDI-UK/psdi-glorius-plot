@@ -14,10 +14,6 @@ import {
 } from "./formatted-labels.js"
 import { formatBibInfo, makeReadme } from "./readme-template.js";
 
-const DEBUG = false;
-
-const VERSION = "0.2";
-
 const CHART_ID = "glorius-plot", CHART_SELECTOR = `#${CHART_ID}`;
 
 const DIRTY_FORMS_MESSAGE = "Data currently entered in the form will be lost. Do you want to proceed?";
@@ -982,7 +978,7 @@ function navigateCell(e) {
  */
 function getPlotData() {
   let data = {
-    "version": VERSION,
+    "version": version,
     "title": getTitle(),
     "outcome-value": getOutcomeValue(),
     "outcome-text": getOutputLabel(),
@@ -2120,7 +2116,7 @@ function updateROCrateDownloadEnabled() {
     if (!check)
       allGood = false;
   });
-  if (allGood || DEBUG)
+  if (allGood || debug)
     $("#rocrate-download").removeAttr("disabled");
   else
     $("#rocrate-download").attr("disabled", "disabled");
@@ -2487,7 +2483,7 @@ $(document).ready(function () {
   enableROCrateOnChangeTriggers();
 
   // Special handling if we're debugging
-  if (DEBUG) {
+  if (debug) {
     // Open the ROCrate Export section and enable export even if checks don't pass
     startROCrateExport(false);
     updateROCrateDownloadEnabled();
