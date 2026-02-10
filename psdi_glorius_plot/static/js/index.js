@@ -10,8 +10,9 @@ import { exportImage, loadObject, saveBlob, saveObject } from "./io.js"
 import { clamp, disableButton, enableButton, getWebKitMode } from "./utility.js"
 import {
   addQuillEditor, getQuillEditor, getQuillEditorHTML, setQuillEditor, removeQuillEditor, updateQuillContents,
-  disableQuillToolbar, enableQuillEvents, stripTags, waitForMathJax, drawFormatted, incrementRenderBatch,
+  disableQuillToolbar, enableQuillEvents, stripTags, waitForMathJax, drawFormatted, incrementRenderBatch, HTMLToMd,
 } from "./formatted-labels.js"
+import { formatBibInfo, makeReadme } from "./readme-template.js";
 
 const DEBUG = false;
 
@@ -650,7 +651,7 @@ function setConditionLabel(i, val) {
 
 function getLConditionLabels() {
   const lCondtionLabelsHTML = [];
-  $(".condition-input").each((i, e) => {
+  $(".condition-input").each((i) => {
     lCondtionLabelsHTML.push(getConditionLabel(i));
   })
   return lCondtionLabelsHTML;
@@ -1951,7 +1952,7 @@ function initCondDescs() {
     // Remove the excess rows
     initDescRows.each((i, el) => {
       if (i >= numRows)
-        el.remove();
+        $(el).remove();
     });
   }
 
@@ -2131,8 +2132,24 @@ function updateROCrateDownloadEnabled() {
 async function exportROCrate() {
   const rocrate = new JSZip();
 
+  const readmeText = makeReadme(
+    HTMLToMd(getQuillEditorHTML("#rocrate-title-input")),
+    HTMLToMd(getQuillEditorHTML("#rocrate-desc-input")),
+    VERSION,
+    HTMLToMd(getQuillEditorHTML("#rocrate-about")),
+    makeBibInfo(),
+    reactionSchemePresent(),
+    baselineDescPresent(),
+    condDescsPresent(),
+  );
+  rocrate.file(ROCRATE_ROOT_DIR + "README.md", readmeText);
+
   const plotData = getPlotData();
+  rocrate.file(ROCRATE_PLOT_DIR + "user_preferences.json", JSON.stringify(plotData));
+
   const sensitivityTable = makeSensitivityTable(plotData, true);
+  rocrate.file(ROCRATE_PLOT_DIR + "sensitivity_table.csv", sensitivityTable);
+
   const imagePromise = new Promise((resolve, reject) => {
     $(CHART_SELECTOR)[0].toBlob((blob) => {
       if (blob) {
@@ -2142,9 +2159,6 @@ async function exportROCrate() {
       }
     });
   });
-
-  rocrate.file(ROCRATE_PLOT_DIR + "user_preferences.json", JSON.stringify(plotData));
-  rocrate.file(ROCRATE_PLOT_DIR + "sensitivity_table.csv", sensitivityTable);
   rocrate.file(ROCRATE_PLOT_DIR + "glorius_plot.png", imagePromise);
 
   rocrate.generateAsync({ type: "blob" })
@@ -2156,6 +2170,25 @@ async function exportROCrate() {
 
       saveBlob(blob, timestamp + ROCRATE_FILENAME_BASE);
     });
+}
+
+/**
+ * Collect the author info and pass it to the formatter to make the bibliographic info section of the readme
+ * @returns {String} The text of the section
+ */
+function makeBibInfo() {
+  const lNamesAndORCIDs = [];
+
+  $(".rocrate-contrib-row").each((i, el) => {
+    const oEl = $(el);
+    const name = oEl.find(".rocrate-name-input").val();
+    const orcId = oEl.find(".rocrate-orcid-input").val();
+    lNamesAndORCIDs.push([name, orcId]);
+  });
+
+  const contactEmail = $("#rocrate-email-input").val();
+
+  return formatBibInfo(lNamesAndORCIDs, contactEmail);
 }
 
 // Functions related to automatic updating
