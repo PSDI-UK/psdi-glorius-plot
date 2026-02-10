@@ -2135,7 +2135,6 @@ async function exportROCrate() {
   const readmeText = makeReadme(
     HTMLToMd(getQuillEditorHTML("#rocrate-title-input")),
     HTMLToMd(getQuillEditorHTML("#rocrate-desc-input")),
-    VERSION,
     HTMLToMd(getQuillEditorHTML("#rocrate-about")),
     makeBibInfo(),
     reactionSchemePresent(),

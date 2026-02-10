@@ -12,7 +12,7 @@ const ORCID_URL_BASE = "https://orcid.org/";
  * @param {Boolean} condDescPresent Whether or not a file is present in the crate describing the different conditions
  * @returns {String} The full text of the README file
  */
-export function makeReadme(title, desc, version, about, bibInfo, reactionSchemePresent, baselineDescPresent,
+export function makeReadme(title, desc, about, bibInfo, reactionSchemePresent, baselineDescPresent,
   condDescPresent) {
   const timestamp = (new Date()).toISOString();
 
@@ -49,8 +49,6 @@ export function makeReadme(title, desc, version, about, bibInfo, reactionSchemeP
 **Description**: ${desc}
 
 **Date Published**: ${timestamp}
-
-**Dataset Version**: ${version}
 
 **About**: ${about}${bibInfo}
 
