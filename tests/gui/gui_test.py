@@ -11,6 +11,7 @@ from multiprocessing import Process
 import pytest
 
 import psdi_glorius_plot
+from psdi_glorius_plot import constants as const
 
 # Skip all tests in this module if required packages for GUI testing aren't installed
 try:
@@ -54,6 +55,9 @@ EX_PLOT_FILENAME = "glorius_plot.png"
 SAVE_FILENAME = "glorius_plot_data.json"
 
 origin = os.environ.get("ORIGIN", DEFAULT_ORIGIN)
+
+# Run tests in production mode
+os.environ[const.PRODUCTION_EV] = "true"
 
 
 @pytest.fixture(scope="module", autouse=True)
