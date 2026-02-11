@@ -4,6 +4,7 @@ const ORCID_URL_BASE = "https://orcid.org/";
  * Generates the text of a metadata file based on user input
  * @param {String} title The dataset title as provided by the user
  * @param {String} desc The dataset description as provided by the user
+ * @param {String} version The version of this package
  * @param {String} authorInfo The formatted author info
  * @param {String} bibInfo The formatted bibliographic info
  * @param {Boolean} reactionSchemePresent Whether or not a file is present in the crate describing the reaction scheme
@@ -11,7 +12,7 @@ const ORCID_URL_BASE = "https://orcid.org/";
  * @param {Boolean} condDescPresent Whether or not a file is present in the crate describing the different conditions
  * @returns {String} The full text of the README file
  */
-export function makeMetadata(title, desc, authorInfo, bibInfo, reactionSchemePresent, baselineDescPresent,
+export function makeMetadata(title, desc, version, authorInfo, bibInfo, reactionSchemePresent, baselineDescPresent,
   condDescPresent) {
   const timestamp = (new Date()).toISOString();
 
@@ -103,7 +104,7 @@ export function makeMetadata(title, desc, authorInfo, bibInfo, reactionSchemePre
 			"@type": "SoftwareApplication",
 			"url": "https://psdi-uk.github.io/psdi-glorius-plot/",
 			"name": "PSDI Glorius Plot Generator",
-			"version": "0.1.1"
+			"version": "${version}"
 		},
 		{
 			"@id": "data/plot/glorius_plot.png",
