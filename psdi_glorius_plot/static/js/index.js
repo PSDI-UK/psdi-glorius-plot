@@ -2512,11 +2512,15 @@ $(document).ready(function () {
 
   // Special handling if we're debugging
   if (debug) {
+    // Fill with example data
+    fillExample();
+
     // Open the ROCrate Export section and enable export even if checks don't pass
     startROCrateExport(false);
     updateROCrateDownloadEnabled();
 
-    // Fill with example data
-    fillExample();
+    // The plot title is updated on a bit of a lag, so we do a brief async wait then call for it to be set in the
+    // RO-crate section too
+    setTimeout(updateROCrateTitleDesc, 100)
   }
 });
