@@ -2101,6 +2101,16 @@ function updateLicense() {
 }
 
 /**
+ * Get the name and URL of the selected license
+ * @returns {Array<string>} Two entries, first is name, second is URL
+ */
+function getLicenseInfo() {
+  const name = $("#rocrate-license-name").val();
+  const url = $("#rocrate-license-url").val();
+  return [name, url];
+}
+
+/**
  * Get whether or not a reaction scheme is provided
  * @returns {Boolean}
  */
