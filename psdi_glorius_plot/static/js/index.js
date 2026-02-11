@@ -978,7 +978,7 @@ function navigateCell(e) {
  */
 function getPlotData() {
   let data = {
-    "version": version,
+    "software-version": version,
     "title": getTitle(),
     "outcome-value": getOutcomeValue(),
     "outcome-text": getOutputLabel(),
