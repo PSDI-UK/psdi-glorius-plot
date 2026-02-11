@@ -12,7 +12,8 @@ import {
   addQuillEditor, getQuillEditor, getQuillEditorHTML, setQuillEditor, removeQuillEditor, updateQuillContents,
   disableQuillToolbar, enableQuillEvents, stripTags, waitForMathJax, drawFormatted, incrementRenderBatch, HTMLToMd,
 } from "./formatted-labels.js"
-import { formatBibInfo, makeReadme } from "./readme-template.js";
+import { formatReadmeBibInfo, makeReadme } from "./readme-template.js";
+import { formatMetadataBibInfo, makeMetadata } from "./metadata-template.js";
 
 const CHART_ID = "glorius-plot", CHART_SELECTOR = `#${CHART_ID}`;
 
@@ -978,7 +979,7 @@ function navigateCell(e) {
  */
 function getPlotData() {
   let data = {
-    "version": version,
+    "software-version": version,
     "title": getTitle(),
     "outcome-value": getOutcomeValue(),
     "outcome-text": getOutputLabel(),
@@ -2128,16 +2129,38 @@ function updateROCrateDownloadEnabled() {
 async function exportROCrate() {
   const rocrate = new JSZip();
 
+
+  const title = HTMLToMd(getQuillEditorHTML("#rocrate-title-input"));
+  const desc = HTMLToMd(getQuillEditorHTML("#rocrate-desc-input"));
+  const about = HTMLToMd(getQuillEditorHTML("#rocrate-about"));
+  const timestamp = (new Date()).toISOString();
+  const haveReactionScheme = reactionSchemePresent();
+  const haveBaselineDesc = baselineDescPresent();
+  const haveCondDescs = condDescsPresent();
+  const [readmeBibInfo, metadataPersonInfo, metadataBibInfo] = makeBibInfo();
+
   const readmeText = makeReadme(
-    HTMLToMd(getQuillEditorHTML("#rocrate-title-input")),
-    HTMLToMd(getQuillEditorHTML("#rocrate-desc-input")),
-    HTMLToMd(getQuillEditorHTML("#rocrate-about")),
-    makeBibInfo(),
-    reactionSchemePresent(),
-    baselineDescPresent(),
-    condDescsPresent(),
-  );
+    title,
+    desc,
+    about,
+    timestamp,
+    readmeBibInfo,
+    haveReactionScheme,
+    haveBaselineDesc,
+    haveCondDescs);
   rocrate.file(ROCRATE_ROOT_DIR + "README.md", readmeText);
+
+  const metadataText = makeMetadata(
+    title,
+    desc,
+    timestamp,
+    version,
+    metadataPersonInfo,
+    metadataBibInfo,
+    haveReactionScheme,
+    haveBaselineDesc,
+    haveCondDescs);
+  rocrate.file(ROCRATE_ROOT_DIR + "ro-crate-metadata.json", metadataText);
 
   const plotData = getPlotData();
   rocrate.file(ROCRATE_PLOT_DIR + "user_preferences.json", JSON.stringify(plotData));
@@ -2168,8 +2191,10 @@ async function exportROCrate() {
 }
 
 /**
- * Collect the author info and pass it to the formatter to make the bibliographic info section of the readme
- * @returns {String} The text of the section
+ * Collect the author info and pass it to the formatter to make the bibliographic info section of the readme and
+ * metadata files
+ * @returns {Array<string>} First element: Text for the ReadMe file, Second element: Text for author list in metadata,
+ * Third element: Text for biblio info in metadata file
  */
 function makeBibInfo() {
   const lNamesAndORCIDs = [];
@@ -2183,7 +2208,10 @@ function makeBibInfo() {
 
   const contactEmail = $("#rocrate-email-input").val();
 
-  return formatBibInfo(lNamesAndORCIDs, contactEmail);
+  const readmeInfo = formatReadmeBibInfo(lNamesAndORCIDs, contactEmail);
+  const [authorInfo, bibInfo] = formatMetadataBibInfo(lNamesAndORCIDs);
+
+  return [readmeInfo, authorInfo, bibInfo];
 }
 
 // Functions related to automatic updating
