@@ -13,16 +13,16 @@ const ORCID_URL_BASE = "https://orcid.org/";
  * @returns {String} The full text of the README file
  */
 export function makeMetadata(title, desc, version, authorInfo, bibInfo, reactionSchemePresent, baselineDescPresent,
-  condDescPresent) {
-  const timestamp = (new Date()).toISOString();
+	condDescPresent) {
+	const timestamp = (new Date()).toISOString();
 
-  // If the reaction scheme, baseline info, and/or condition description files are present, add lines for them
-  let reactionSchemePartLine = "";
-  let reactionSchemeInfo = "";
-  if (reactionSchemePresent) {
-    reactionSchemePartLine = `,
+	// If the reaction scheme, baseline info, and/or condition description files are present, add lines for them
+	let reactionSchemePartLine = "";
+	let reactionSchemeInfo = "";
+	if (reactionSchemePresent) {
+		reactionSchemePartLine = `,
 				{"@id": "data/reaction_scheme.cdxml"}`;
-    reactionSchemeInfo = `,
+		reactionSchemeInfo = `,
 		{
 			"@id": "data/reaction_scheme.cdxml",
 			"@type": "File",
@@ -30,13 +30,13 @@ export function makeMetadata(title, desc, version, authorInfo, bibInfo, reaction
 			"description": "ChemDraw file of the chemical transformation described by the Glorius plot.",
 			"encodingFormat": "application/vnd.chemdraw+xml"
 		}`;
-  }
-  let baselineDescPartLine = "";
-  let baselineDescInfo = "";
-  if (baselineDescPresent) {
-    baselineDescPartLine = `,
+	}
+	let baselineDescPartLine = "";
+	let baselineDescInfo = "";
+	if (baselineDescPresent) {
+		baselineDescPartLine = `,
 				{"@id": "data/standard_conditions.html"}`;
-    baselineDescInfo = `,
+		baselineDescInfo = `,
 		{
 			"@id": "data/reaction_scheme.cdxml",
 			"@type": "File",
@@ -44,13 +44,13 @@ export function makeMetadata(title, desc, version, authorInfo, bibInfo, reaction
 			"description": "ChemDraw file of the chemical transformation described by the Glorius plot.",
 			"encodingFormat": "application/vnd.chemdraw+xml"
 		}`;
-  }
-  let condDescPartLine = "";
-  let condDescInfo = "";
-  if (condDescPresent) {
-    condDescPartLine = `,
+	}
+	let condDescPartLine = "";
+	let condDescInfo = "";
+	if (condDescPresent) {
+		condDescPartLine = `,
 				{"@id": "data/test_conditions.csv"}`;
-    condDescInfo = `,
+		condDescInfo = `,
 		{
 			"@id": "data/reaction_scheme.cdxml",
 			"@type": "File",
@@ -58,9 +58,9 @@ export function makeMetadata(title, desc, version, authorInfo, bibInfo, reaction
 			"description": "ChemDraw file of the chemical transformation described by the Glorius plot.",
 			"encodingFormat": "application/vnd.chemdraw+xml"
 		}`;
-  }
+	}
 
-  text = `{
+	text = `{
     "@context": "https://w3id.org/ro/crate/1.1/context",
     "@graph": [
 		{
@@ -149,5 +149,67 @@ export function makeMetadata(title, desc, version, authorInfo, bibInfo, reaction
 	]
 }`;
 
-  return text
+	return text
+}
+
+/**
+ * Formats the author and bibliographic info sections of the metadata file based on author info
+ * @param {Array<Array<string>>} lNamesAndORCIDs List of name, orcID pairs
+ * @returns {Array<string>} First element: The text of the Author Info section. Second element: The text of the Biblio
+ *                          Info section
+ */
+export function formatBibInfo(lNamesAndORCIDs) {
+
+	let authorInfo = "";
+	let bibInfo = "";
+
+	// First check if we have any info to include in this section
+	if (!lNamesAndORCIDs)
+		return [authorInfo, bibInfo];
+
+	let haveSomeInfo = false;
+	lNamesAndORCIDs.forEach(([name, orcId]) => {
+		if (name || orcId)
+			haveSomeInfo = true;
+	});
+
+	// Fill out the beginning bit of the Author Info section
+	authorInfo = `,
+			"author": [`;
+
+	let firstEntry = true;
+	lNamesAndORCIDs.forEach(([name, orcId]) => {
+
+		// If no name or orcId is present, skip this entry
+		if (!(name || orcId))
+			return;
+
+		// We preferentially use the ORCID as ID, but fall back to using the name if an ORCID isn't provided
+		const id = orcId || name;
+
+		// Check how the ORCID is formatted, and always print with the full URL
+		if (orcId && !orcId.startsWith(ORCID_URL_BASE))
+			orcId = ORCID_URL_BASE + orcId;
+
+		// For every entry other than the first, we start with a comma before the entry in the Author Info
+		if (firstEntry)
+			firstEntry = false
+		else
+			authorInfo += ","
+
+		// Format and add the entries to the Author and Bib Info now
+		authorInfo += `
+				{
+					"@id": "${id}"
+				}`;
+		bibInfo += `,
+		{
+			"@id": "${id}",
+			"@type": "Person",
+			"name": "${name}"
+		}`;
+
+	});
+
+	return [authorInfo, bibInfo];
 }
