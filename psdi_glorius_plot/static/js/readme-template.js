@@ -72,7 +72,7 @@ export function makeReadme(title, desc, about, bibInfo, reactionSchemePresent, b
  * @param {String} contactEmail The contact email provided by the user
  * @returns {String} The text of the section
  */
-export function formatBibInfo(lNamesAndORCIDs, contactEmail) {
+export function formatReadmeBibInfo(lNamesAndORCIDs, contactEmail) {
 
   let text = "";
 

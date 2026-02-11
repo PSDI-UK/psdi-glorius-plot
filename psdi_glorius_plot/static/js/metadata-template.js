@@ -158,7 +158,7 @@ export function makeMetadata(title, desc, version, authorInfo, bibInfo, reaction
  * @returns {Array<string>} First element: The text of the Author Info section. Second element: The text of the Biblio
  *                          Info section
  */
-export function formatBibInfo(lNamesAndORCIDs) {
+export function formatMetadataBibInfo(lNamesAndORCIDs) {
 
 	let authorInfo = "";
 	let bibInfo = "";
