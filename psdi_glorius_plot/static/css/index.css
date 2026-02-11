@@ -383,6 +383,14 @@ input.rel-deviation-value {
   margin-right: 0.25rem !important;
 }
 
+.med-right-margin {
+  margin-right: 1rem !important;
+}
+
+.med-input {
+  width: 20rem !important;
+}
+
 /* How to indicate text which has a tooltip on mouseover */
 .mouseover-tooltip::before {
   display         : inline-flex;

@@ -825,12 +825,23 @@
         <li><input type="radio" name="rocrate-license" id="rocrate-license-other" class="small-right-margin"
             value="other">
           <label for="rocrate-license-other">Other</label>
-          <div id="rocrate-license-other-details" class="nothidden">
-            <label for="rocrate-license-other-text">Please paste the text of the license as you want it to appear in the
-              box below. You can find a list of licenses with links to their texts
-              <a href="https://spdx.org/licenses/CC-BY-SA-4.0.html">here</a>.
-            </label><br>
-            <textarea name="rocrate-license-other-text" id="rocrate-license-other-text"></textarea>
+          <div id="rocrate-license-details">
+            <table class="label-table">
+              <tr>
+                <td class="label-cell">
+                  <label for="rocrate-license-name">Name:</label>
+                </td>
+                <td class="input-cell">
+                  <input type="text" id="rocrate-license-name" class="med-input med-right-margin" disabled>
+                </td>
+                <td class="label-cell">
+                  <label for="rocrate-license-url">Link:</label>
+                </td>
+                <td class="input-cell">
+                  <input type="text" id="rocrate-license-url" class="med-input" disabled>
+                </td>
+              </tr>
+            </table>
           </div>
         </li>
       </ul>
