@@ -2129,9 +2129,11 @@ function updateROCrateDownloadEnabled() {
 async function exportROCrate() {
   const rocrate = new JSZip();
 
+
   const title = HTMLToMd(getQuillEditorHTML("#rocrate-title-input"));
   const desc = HTMLToMd(getQuillEditorHTML("#rocrate-desc-input"));
   const about = HTMLToMd(getQuillEditorHTML("#rocrate-about"));
+  const timestamp = (new Date()).toISOString();
   const haveReactionScheme = reactionSchemePresent();
   const haveBaselineDesc = baselineDescPresent();
   const haveCondDescs = condDescsPresent();
@@ -2141,6 +2143,7 @@ async function exportROCrate() {
     title,
     desc,
     about,
+    timestamp,
     readmeBibInfo,
     haveReactionScheme,
     haveBaselineDesc,
@@ -2150,6 +2153,7 @@ async function exportROCrate() {
   const metadataText = makeMetadata(
     title,
     desc,
+    timestamp,
     version,
     metadataPersonInfo,
     metadataBibInfo,

@@ -12,9 +12,8 @@ const ORCID_URL_BASE = "https://orcid.org/";
  * @param {Boolean} condDescPresent Whether or not a file is present in the crate describing the different conditions
  * @returns {String} The full text of the README file
  */
-export function makeMetadata(title, desc, version, authorInfo, bibInfo, reactionSchemePresent, baselineDescPresent,
-	condDescPresent) {
-	const timestamp = (new Date()).toISOString();
+export function makeMetadata(title, desc, timestamp, version, authorInfo, bibInfo, reactionSchemePresent,
+	baselineDescPresent, condDescPresent) {
 
 	// If the reaction scheme, baseline info, and/or condition description files are present, add lines for them
 	let reactionSchemePartLine = "";
@@ -38,11 +37,11 @@ export function makeMetadata(title, desc, version, authorInfo, bibInfo, reaction
 				{"@id": "data/standard_conditions.html"}`;
 		baselineDescInfo = `,
 		{
-			"@id": "data/reaction_scheme.cdxml",
+			"@id": "data/standard_conditions.html",
 			"@type": "File",
-			"name": "data/reaction_scheme.cdxml",
-			"description": "ChemDraw file of the chemical transformation described by the Glorius plot.",
-			"encodingFormat": "application/vnd.chemdraw+xml"
+			"name": "data/standard_conditions.html",
+			"description": "Standard conditions for the chemical transformation plotted by the PSDI Glorius plot Generator.",
+			"encodingFormat": "text/html"
 		}`;
 	}
 	let condDescPartLine = "";
@@ -52,15 +51,15 @@ export function makeMetadata(title, desc, version, authorInfo, bibInfo, reaction
 				{"@id": "data/test_conditions.csv"}`;
 		condDescInfo = `,
 		{
-			"@id": "data/reaction_scheme.cdxml",
+			"@id": "data/test_conditions.csv",
 			"@type": "File",
-			"name": "data/reaction_scheme.cdxml",
-			"description": "ChemDraw file of the chemical transformation described by the Glorius plot.",
-			"encodingFormat": "application/vnd.chemdraw+xml"
+			"name": "data/test_conditions.csv",
+			"description": "Experimental description for each test condition plotted by the PSDI Glorius Plot Generator.",
+			"encodingFormat": "text/csv"
 		}`;
 	}
 
-	text = `{
+	let text = `{
     "@context": "https://w3id.org/ro/crate/1.1/context",
     "@graph": [
 		{
@@ -77,7 +76,7 @@ export function makeMetadata(title, desc, version, authorInfo, bibInfo, reaction
 				{"@id": "data/plot/sensitivity_table.csv"},
 				{"@id": "data/plot/user_preferences.json"},
 				{"@id": "ESI.pdf"},
-				{"@id": "README.md"},${reactionSchemePartLine}${baselineDescPartLine}${condDescPartLine}
+				{"@id": "README.md"}${reactionSchemePartLine}${baselineDescPartLine}${condDescPartLine}
 			],
 			"mainEntity": {
                 "@id": "ESI.pdf"
@@ -173,6 +172,9 @@ export function formatMetadataBibInfo(lNamesAndORCIDs) {
 			haveSomeInfo = true;
 	});
 
+	if (!haveSomeInfo)
+		return [authorInfo, bibInfo];
+
 	// Fill out the beginning bit of the Author Info section
 	authorInfo = `,
 			"author": [`;
@@ -210,6 +212,10 @@ export function formatMetadataBibInfo(lNamesAndORCIDs) {
 		}`;
 
 	});
+
+	// Close the authorInfo section
+	authorInfo += `
+			]`
 
 	return [authorInfo, bibInfo];
 }
