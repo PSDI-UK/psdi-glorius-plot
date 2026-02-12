@@ -2209,6 +2209,7 @@ async function exportROCrate() {
   const haveReactionScheme = reactionSchemePresent();
   const haveBaselineDesc = baselineDescPresent();
   const haveCondDescs = condDescsPresent();
+  const [licenseName, licenseURL] = getLicenseInfo();
   const [readmeBibInfo, metadataPersonInfo, metadataBibInfo] = makeBibInfo();
 
   const readmeText = makeReadme(
@@ -2216,6 +2217,8 @@ async function exportROCrate() {
     desc,
     about,
     timestamp,
+    licenseName,
+    licenseURL,
     readmeBibInfo,
     haveReactionScheme,
     haveBaselineDesc,
@@ -2227,6 +2230,8 @@ async function exportROCrate() {
     desc,
     timestamp,
     version,
+    licenseName,
+    licenseURL,
     metadataPersonInfo,
     metadataBibInfo,
     haveReactionScheme,
