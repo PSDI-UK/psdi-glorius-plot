@@ -2129,6 +2129,14 @@ function updateReactionScheme() {
 }
 
 /**
+ * Get the reaction scheme file uploaded by the user
+ * @returns {File}
+ */
+function getReactionScheme() {
+  return $("#rocrate-cdxml")[0].files[0];
+}
+
+/**
  * Get whether or not a baseline description is provided
  * @returns {Boolean}
  */
@@ -2238,6 +2246,11 @@ async function exportROCrate() {
     haveBaselineDesc,
     haveCondDescs);
   rocrate.file(ROCRATE_ROOT_DIR + "ro-crate-metadata.json", metadataText);
+
+  if (haveReactionScheme) {
+    const reactionScheme = getReactionScheme();
+    rocrate.file(ROCRATE_DATA_DIR + "reaction_scheme.cdxml", reactionScheme);
+  }
 
   const plotData = getPlotData();
   rocrate.file(ROCRATE_PLOT_DIR + "user_preferences.json", JSON.stringify(plotData));
