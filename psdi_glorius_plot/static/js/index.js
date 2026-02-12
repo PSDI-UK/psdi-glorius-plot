@@ -115,6 +115,29 @@ const DEFAULT_DATASET_ABOUT_TEXT = "This dataset enables users to visualise the 
 
 const CITATION_AUTHOR_EXAMPLE_TEXT = "Author, A.; Author, B.; and Author, C.";
 
+const D_LICENSE_INFO = {
+  "cc0-1.0": {
+    name: "Creative Commons Zero v1.0 Universal",
+    id: "CC0-1.0",
+    url: "https://spdx.org/licenses/CC0-1.0.html"
+  },
+  "cc-by-4.0": {
+    name: "Creative Commons Attribution 4.0 International",
+    id: "CC0-1.0",
+    url: "https://spdx.org/licenses/CC-BY-4.0.html"
+  },
+  "cc-by-sa-4.0": {
+    name: "Creative Commons Attribution Share Alike 4.0 International",
+    id: "CC0-1.0",
+    url: "https://spdx.org/licenses/CC-BY-SA-4.0.html"
+  },
+  "other": {
+    name: "",
+    id: "",
+    url: ""
+  }
+}
+
 // Structure of the output RO-crate file
 
 const ROCRATE_FILENAME_BASE = "glorius-plot-ro-crate.zip";
@@ -1900,7 +1923,7 @@ function updateROCrateForm(firstTime = false) {
   // The first time the form is updated only, set the title and about section based on what's in the form above
   if (firstTime) {
     initCondDescs();
-    updateROCrateTitleDesc();
+    useDefaultROCrateTitleDesc();
   }
 }
 
@@ -2015,6 +2038,9 @@ function removeROCrateCondRow(targetRowIndex = -1) {
   enableQuillEventsAndCallbacks();
 }
 
+/**
+ * Relabel all condition description labels to match the conditions as input by the user
+ */
 function relabelCondDesc() {
 
   const num = $(".rocrate-cond-row").length;
@@ -2029,13 +2055,59 @@ function relabelCondDesc() {
 
 }
 
+/**
+ * Update the label for a given condition description to match the condition as input by the user
+ * @param {Number} i The index of the condition (row)
+ */
 function updateCondDescLabel(i) {
   $("#rcdl-" + i).html(getConditionLabel(i) + ":");
 }
 
-function updateROCrateTitleDesc() {
+/**
+ * Sets the title and description in the RO-crate section to defaults
+ */
+function useDefaultROCrateTitleDesc() {
   updateQuillContents("#rocrate-title-input", getTitle());
   updateQuillContents("#rocrate-about", DEFAULT_DATASET_ABOUT_TEXT);
+}
+
+/**
+ * Called when the license radio input is changed to update the values in the input boxes and set them as disabled or
+ * not-disabled based on whether or not the "Other" option is selected
+ */
+function updateLicense() {
+  const licenseNameInput = $("#rocrate-license-name");
+  const licenseUrlInput = $("#rocrate-license-url");
+
+  // Determine which license is selected and get the info on it
+  const license = $("input[name='rocrate-license']:checked").val();
+  const licenseInfo = D_LICENSE_INFO[license];
+
+  // Update the name and URL displayed
+  licenseNameInput.val(licenseInfo.name);
+  licenseUrlInput.val(licenseInfo.url);
+
+  // Determine whether or not to disable the license name and URL input based on whether or not the Other option is
+  // selected
+  if (license == "other") {
+    licenseNameInput.removeAttr("disabled");
+    licenseUrlInput.removeAttr("disabled");
+    licenseNameInput.focus();
+  } else {
+    licenseNameInput.attr("disabled", "disabled");
+    licenseUrlInput.attr("disabled", "disabled");
+  }
+
+}
+
+/**
+ * Get the name and URL of the selected license
+ * @returns {Array<string>} Two entries, first is name, second is URL
+ */
+function getLicenseInfo() {
+  const name = $("#rocrate-license-name").val();
+  const url = $("#rocrate-license-url").val();
+  return [name, url];
 }
 
 /**
@@ -2137,6 +2209,7 @@ async function exportROCrate() {
   const haveReactionScheme = reactionSchemePresent();
   const haveBaselineDesc = baselineDescPresent();
   const haveCondDescs = condDescsPresent();
+  const [licenseName, licenseURL] = getLicenseInfo();
   const [readmeBibInfo, metadataPersonInfo, metadataBibInfo] = makeBibInfo();
 
   const readmeText = makeReadme(
@@ -2144,6 +2217,8 @@ async function exportROCrate() {
     desc,
     about,
     timestamp,
+    licenseName,
+    licenseURL,
     readmeBibInfo,
     haveReactionScheme,
     haveBaselineDesc,
@@ -2155,6 +2230,8 @@ async function exportROCrate() {
     desc,
     timestamp,
     version,
+    licenseName,
+    licenseURL,
     metadataPersonInfo,
     metadataBibInfo,
     haveReactionScheme,
@@ -2268,7 +2345,7 @@ function enableButtons() {
   $("#returnToDataInput").on("click", () => scrollToSection("#data-input"));
   $(".returnToROCrateExport").on("click", () => scrollToSection("#rocrate-export-title"));
 
-  $("#rocrate-default-title-desc").on("click", updateROCrateTitleDesc);
+  $("#rocrate-default-title-desc").on("click", useDefaultROCrateTitleDesc);
 
   $("#rocrate-download").on("click", exportROCrate);
 }
@@ -2495,6 +2572,8 @@ function enableQuillEventsAndCallbacks() {
 
 function enableROCrateOnChangeTriggers() {
   $("#rocrate-cdxml").on("change", updateReactionScheme);
+  $("input[name='rocrate-license']").on("change", updateLicense);
+
 }
 
 $(document).ready(function () {
@@ -2512,11 +2591,15 @@ $(document).ready(function () {
 
   // Special handling if we're debugging
   if (debug) {
+    // Fill with example data
+    fillExample();
+
     // Open the ROCrate Export section and enable export even if checks don't pass
     startROCrateExport(false);
     updateROCrateDownloadEnabled();
 
-    // Fill with example data
-    fillExample();
+    // The plot title is updated on a bit of a lag, so we do a brief async wait then call for it to be set in the
+    // RO-crate section too
+    setTimeout(useDefaultROCrateTitleDesc, 100)
   }
 });

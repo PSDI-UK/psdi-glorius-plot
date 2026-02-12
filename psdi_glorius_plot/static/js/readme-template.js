@@ -5,14 +5,29 @@ const ORCID_URL_BASE = "https://orcid.org/";
  * @param {String} title The dataset title as provided by the user
  * @param {String} desc The dataset description as provided by the user
  * @param {String} about The about text as provided by the user
+ * @param {String} timestamp The timestampe of when this RO-crate is being created
+ * @param {String} licenseName The name of the license for this data
+ * @param {String} licenseURL The URL giving details on the license
  * @param {String} bibInfo The bibliographic info as provided by the user
  * @param {Boolean} reactionSchemePresent Whether or not a file is present in the crate describing the reaction scheme
  * @param {Boolean} baselineDescPresent Whether or not a file is present in the crate describing the standard conditions
  * @param {Boolean} condDescPresent Whether or not a file is present in the crate describing the different conditions
  * @returns {String} The full text of the README file
  */
-export function makeReadme(title, desc, about, timestamp, bibInfo, reactionSchemePresent, baselineDescPresent,
-  condDescPresent) {
+export function makeReadme(title, desc, about, timestamp, licenseName, licenseURL, bibInfo, reactionSchemePresent,
+  baselineDescPresent, condDescPresent) {
+
+  // If a license is provided, add a line for it
+  let licenseLine = "";
+  if (licenseURL) {
+    licenseLine = `
+
+**License:** [${licenseName || licenseURL}](${licenseURL})`;
+  } else if (licenseName) {
+    licenseLine = `
+
+**License:** ${licenseName}`;
+  }
 
   // If Bibliographic info is provided, add a section header to it
   if (bibInfo) {
@@ -46,7 +61,7 @@ export function makeReadme(title, desc, about, timestamp, bibInfo, reactionSchem
 
 **Description**: ${desc}
 
-**Date Published**: ${timestamp}
+**Date Published**: ${timestamp}${licenseLine}
 
 **About**: ${about}${bibInfo}
 
