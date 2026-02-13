@@ -10,7 +10,8 @@ import { exportImage, loadObject, saveBlob, saveObject } from "./io.js"
 import { clamp, disableButton, enableButton, getWebKitMode } from "./utility.js"
 import {
   addQuillEditor, getQuillEditor, getQuillEditorHTML, setQuillEditor, removeQuillEditor, updateQuillContents,
-  disableQuillToolbar, enableQuillEvents, stripTags, waitForMathJax, drawFormatted, incrementRenderBatch, HTMLToMd,
+  disableQuillToolbar, enableQuillEvents, cleanTags, stripTags, waitForMathJax, drawFormatted, incrementRenderBatch,
+  HTMLToMd,
 } from "./formatted-labels.js"
 import { formatReadmeBibInfo, makeReadme } from "./rocrate/readme.js";
 import { formatMetadataBibInfo, makeMetadata } from "./rocrate/metadata.js";
@@ -2142,7 +2143,7 @@ function getReactionScheme() {
  * @returns {String}
  */
 function getBaselineDesc() {
-  return getQuillEditorHTML("#rocrate-baseline-desc");
+  return getQuillEditorHTML("#rocrate-baseline-desc", false);
 }
 
 /**
@@ -2150,7 +2151,7 @@ function getBaselineDesc() {
  * @returns {Boolean}
  */
 function baselineDescPresent() {
-  return !!getBaselineDesc();
+  return !!cleanTags(getBaselineDesc());
 }
 
 /**
