@@ -10,10 +10,12 @@ import { exportImage, loadObject, saveBlob, saveObject } from "./io.js"
 import { clamp, disableButton, enableButton, getWebKitMode } from "./utility.js"
 import {
   addQuillEditor, getQuillEditor, getQuillEditorHTML, setQuillEditor, removeQuillEditor, updateQuillContents,
-  disableQuillToolbar, enableQuillEvents, stripTags, waitForMathJax, drawFormatted, incrementRenderBatch, HTMLToMd,
+  disableQuillToolbar, enableQuillEvents, cleanTags, stripTags, waitForMathJax, drawFormatted, incrementRenderBatch,
+  HTMLToMd,
 } from "./formatted-labels.js"
-import { formatReadmeBibInfo, makeReadme } from "./readme-template.js";
-import { formatMetadataBibInfo, makeMetadata } from "./metadata-template.js";
+import { formatReadmeBibInfo, makeReadme } from "./rocrate/readme.js";
+import { formatMetadataBibInfo, makeMetadata } from "./rocrate/metadata.js";
+import { makeBaselineDesc } from "./rocrate/baseline.js";
 
 const CHART_ID = "glorius-plot", CHART_SELECTOR = `#${CHART_ID}`;
 
@@ -2137,11 +2139,19 @@ function getReactionScheme() {
 }
 
 /**
+ * Get the user-provided Baseline description
+ * @returns {String}
+ */
+function getBaselineDesc() {
+  return getQuillEditorHTML("#rocrate-baseline-desc", false);
+}
+
+/**
  * Get whether or not a baseline description is provided
  * @returns {Boolean}
  */
 function baselineDescPresent() {
-  return !!getQuillEditorHTML("#rocrate-baseline-desc");
+  return !!cleanTags(getBaselineDesc());
 }
 
 /**
@@ -2250,6 +2260,11 @@ async function exportROCrate() {
   if (haveReactionScheme) {
     const reactionScheme = getReactionScheme();
     rocrate.file(ROCRATE_DATA_DIR + "reaction_scheme.cdxml", reactionScheme);
+  }
+
+  if (haveBaselineDesc) {
+    const baselineDesc = makeBaselineDesc(getBaselineDesc());
+    rocrate.file(ROCRATE_DATA_DIR + "standard_conditions.html", baselineDesc);
   }
 
   const plotData = getPlotData();

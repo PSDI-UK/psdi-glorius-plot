@@ -98,12 +98,23 @@ export function setQuillEditor(selector, editor) {
   dQuillEditors[selector] = editor;
 }
 
-export function getQuillEditorHTML(selector) {
-  let editor = getQuillEditor(selector);
-  if (editor)
-    return cleanTags(editor.getSemanticHTML());
-  else
+/**
+ * Gets the HTML content of a Quill text editor, by default cleaning it of tags that aren't used for formatted labels
+ * @param {String} selector The selector used as a key for the editor
+ * @param {Boolean} clean If true (default), will strip any HTML tags that aren't used for making formatted labels
+ * @returns {String}
+ */
+export function getQuillEditorHTML(selector, clean = true) {
+  const editor = getQuillEditor(selector);
+  if (!editor)
     return "";
+
+  const editorHTML = editor.getSemanticHTML();
+  if (clean)
+    return cleanTags(editorHTML);
+  else
+    return editorHTML
+
 }
 
 export function removeQuillEditor(selector) {
