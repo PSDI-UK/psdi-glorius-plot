@@ -1,4 +1,4 @@
-import { csvSafe } from "..io.js"
+import { csvSafe } from "../io.js"
 
 /**
  * Makes the CSV-formatted text of a table providing the descriptions of test conditions, given user input
