@@ -55,3 +55,18 @@ export async function loadObject(file, callbackSuccess, callbackError = (e) => a
 
   reader.readAsText(file);
 }
+
+/**
+ * Makes a string safe to be included as an element in a CSV file, wrapping it in quotes if necessary and escaping
+ * any existing quotes
+ * @param {String} s
+ * @returns {String}
+ */
+export function csvSafe(s) {
+  s = s.toString();
+  if (!s.includes(","))
+    return s;
+  s = s.replaceAll('"', '""');
+  s = '"' + s + '"';
+  return s;
+}
