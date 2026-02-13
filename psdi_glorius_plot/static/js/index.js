@@ -6,7 +6,7 @@
 
 import { initDirtyForms, cleanDirtyForms, checkIsDirty } from "./dirty-forms.js";
 import { mixHexes } from "./color-mixing.js"
-import { exportImage, loadObject, saveBlob, saveObject } from "./io.js"
+import { csvSafe, exportImage, loadObject, saveBlob, saveObject } from "./io.js"
 import { clamp, disableButton, enableButton, getWebKitMode } from "./utility.js"
 import {
   addQuillEditor, getQuillEditor, getQuillEditorHTML, setQuillEditor, removeQuillEditor, updateQuillContents,
@@ -16,6 +16,7 @@ import {
 import { formatReadmeBibInfo, makeReadme } from "./rocrate/readme.js";
 import { formatMetadataBibInfo, makeMetadata } from "./rocrate/metadata.js";
 import { makeBaselineDesc } from "./rocrate/baseline.js";
+import { makeCondDescTable } from "./rocrate/test-conditions.js";
 
 const CHART_ID = "glorius-plot", CHART_SELECTOR = `#${CHART_ID}`;
 
@@ -1201,21 +1202,6 @@ function makeSensitivityTable(plotData, clean = false) {
 }
 
 /**
- * Makes a string safe to be included as an element in a CSV file, wrapping it in quotes if necessary and escaping
- * any existing quotes
- * @param {String} s 
- * @returns {String}
- */
-function csvSafe(s) {
-  s = s.toString();
-  if (!s.includes(","))
-    return s;
-  s = s.replaceAll('"', '""');
-  s = '"' + s + '"';
-  return s;
-}
-
-/**
  * Calculate the deviation for each condition
  */
 function calcDeviation() {
@@ -2166,6 +2152,20 @@ function checkBaselineDesc() {
 }
 
 /**
+ * Gets a list of the conditions and user-provided descriptions
+ * @returns {Array<Array<string>>} List of two element pairs, where the first is the condition label, and the
+ *                                 second is the condition description
+ */
+function getCondDescs() {
+  const numConditions = getNumConditions();
+  let lCondDescs = [];
+  for (let i = 0; i < numConditions; ++i) {
+    lCondDescs.push([getConditionLabel(i), getQuillEditorHTML("#rcdi-" + i)]);
+  }
+  return lCondDescs;
+}
+
+/**
  * Get whether or not a description is provided for at least one condition
  * @returns {Boolean}
  */
@@ -2265,6 +2265,11 @@ async function exportROCrate() {
   if (haveBaselineDesc) {
     const baselineDesc = makeBaselineDesc(getBaselineDesc());
     rocrate.file(ROCRATE_DATA_DIR + "standard_conditions.html", baselineDesc);
+  }
+
+  if (haveCondDescs) {
+    const condDescTable = makeCondDescTable(getCondDescs());
+    rocrate.file(ROCRATE_DATA_DIR + "test_conditions.csv", condDescTable);
   }
 
   const plotData = getPlotData();
