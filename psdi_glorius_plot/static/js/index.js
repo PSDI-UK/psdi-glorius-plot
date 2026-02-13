@@ -2090,12 +2090,13 @@ function updateLicense() {
 
 /**
  * Get the name and URL of the selected license
- * @returns {Array<string>} Two entries, first is name, second is URL
+ * @returns {Object} The license info, in name and url attributes
  */
 function getLicenseInfo() {
-  const name = $("#rocrate-license-name").val();
-  const url = $("#rocrate-license-url").val();
-  return [name, url];
+  return {
+    name: $("#rocrate-license-name").val(),
+    url: $("#rocrate-license-url").val()
+  };
 }
 
 /**
@@ -2219,55 +2220,36 @@ function updateROCrateDownloadEnabled() {
 async function exportROCrate() {
   const rocrate = new JSZip();
 
+  const rocrateInfo = {
+    title: HTMLToMd(getQuillEditorHTML("#rocrate-title-input")),
+    desc: HTMLToMd(getQuillEditorHTML("#rocrate-desc-input")),
+    about: HTMLToMd(getQuillEditorHTML("#rocrate-about")),
+    timestamp: (new Date()).toISOString(),
+    version: version,
+    haveReactionScheme: reactionSchemePresent(),
+    haveBaselineDesc: baselineDescPresent(),
+    haveCondDescs: condDescsPresent(),
+    licenseInfo: getLicenseInfo(),
+    bibInfo: makeBibInfo(),
+  };
 
-  const title = HTMLToMd(getQuillEditorHTML("#rocrate-title-input"));
-  const desc = HTMLToMd(getQuillEditorHTML("#rocrate-desc-input"));
-  const about = HTMLToMd(getQuillEditorHTML("#rocrate-about"));
-  const timestamp = (new Date()).toISOString();
-  const haveReactionScheme = reactionSchemePresent();
-  const haveBaselineDesc = baselineDescPresent();
-  const haveCondDescs = condDescsPresent();
-  const [licenseName, licenseURL] = getLicenseInfo();
-  const [readmeBibInfo, metadataPersonInfo, metadataBibInfo] = makeBibInfo();
-
-  const readmeText = makeReadme(
-    title,
-    desc,
-    about,
-    timestamp,
-    licenseName,
-    licenseURL,
-    readmeBibInfo,
-    haveReactionScheme,
-    haveBaselineDesc,
-    haveCondDescs);
+  const readmeText = makeReadme(rocrateInfo);
   rocrate.file(ROCRATE_ROOT_DIR + "README.md", readmeText);
 
-  const metadataText = makeMetadata(
-    title,
-    desc,
-    timestamp,
-    version,
-    licenseName,
-    licenseURL,
-    metadataPersonInfo,
-    metadataBibInfo,
-    haveReactionScheme,
-    haveBaselineDesc,
-    haveCondDescs);
+  const metadataText = makeMetadata(rocrateInfo);
   rocrate.file(ROCRATE_ROOT_DIR + "ro-crate-metadata.json", metadataText);
 
-  if (haveReactionScheme) {
+  if (rocrateInfo.haveReactionScheme) {
     const reactionScheme = getReactionScheme();
     rocrate.file(ROCRATE_DATA_DIR + "reaction_scheme.cdxml", reactionScheme);
   }
 
-  if (haveBaselineDesc) {
+  if (rocrateInfo.haveBaselineDesc) {
     const baselineDesc = makeBaselineDesc(getBaselineDesc());
     rocrate.file(ROCRATE_DATA_DIR + "standard_conditions.html", baselineDesc);
   }
 
-  if (haveCondDescs) {
+  if (rocrateInfo.haveCondDescs) {
     const condDescTable = makeCondDescTable(getCondDescs());
     rocrate.file(ROCRATE_DATA_DIR + "test_conditions.csv", condDescTable);
   }
@@ -2318,10 +2300,12 @@ function makeBibInfo() {
 
   const contactEmail = $("#rocrate-email-input").val();
 
-  const readmeInfo = formatReadmeBibInfo(lNamesAndORCIDs, contactEmail);
-  const [authorInfo, bibInfo] = formatMetadataBibInfo(lNamesAndORCIDs);
+  const bibInfo = {
+    readmeInfo: formatReadmeBibInfo(lNamesAndORCIDs, contactEmail)
+  };
+  [bibInfo.authorInfoText, bibInfo.bibInfoText] = formatMetadataBibInfo(lNamesAndORCIDs);
 
-  return [readmeInfo, authorInfo, bibInfo];
+  return bibInfo;
 }
 
 // Functions related to automatic updating

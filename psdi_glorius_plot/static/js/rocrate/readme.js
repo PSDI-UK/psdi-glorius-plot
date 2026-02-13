@@ -2,53 +2,44 @@ const ORCID_URL_BASE = "https://orcid.org/";
 
 /**
  * Generates the text of a README file based on user input
- * @param {String} title The dataset title as provided by the user
- * @param {String} desc The dataset description as provided by the user
- * @param {String} about The about text as provided by the user
- * @param {String} timestamp The timestampe of when this RO-crate is being created
- * @param {String} licenseName The name of the license for this data
- * @param {String} licenseURL The URL giving details on the license
- * @param {String} bibInfo The bibliographic info as provided by the user
- * @param {Boolean} reactionSchemePresent Whether or not a file is present in the crate describing the reaction scheme
- * @param {Boolean} baselineDescPresent Whether or not a file is present in the crate describing the standard conditions
- * @param {Boolean} condDescPresent Whether or not a file is present in the crate describing the different conditions
+ * @param {Object} rocrateInfo Object containing user-input data for the RO-crate output
  * @returns {String} The full text of the README file
  */
-export function makeReadme(title, desc, about, timestamp, licenseName, licenseURL, bibInfo, reactionSchemePresent,
-  baselineDescPresent, condDescPresent) {
+export function makeReadme(rocrateInfo) {
 
   // If a license is provided, add a line for it
   let licenseLine = "";
-  if (licenseURL) {
+  if (rocrateInfo.licenseURL) {
     licenseLine = `
 
-**License:** [${licenseName || licenseURL}](${licenseURL})`;
-  } else if (licenseName) {
+**License:** [${rocrateInfo.licenseName || rocrateInfo.licenseURL}](${rocrateInfo.licenseURL})`;
+  } else if (rocrateInfo.licenseName) {
     licenseLine = `
 
-**License:** ${licenseName}`;
+**License:** ${rocrateInfo.licenseName}`;
   }
 
   // If Bibliographic info is provided, add a section header to it
-  if (bibInfo) {
-    bibInfo = `
+  let bibInfoText = "";
+  if (rocrateInfo.bibInfo.readmeInfo) {
+    bibInfoText = `
 
-## Bibliographic Information${bibInfo}`;
+## Bibliographic Information${rocrateInfo.bibInfo.readmeInfo}`;
   }
 
   // If the reaction scheme, baseline info, and/or condition description files are present, add lines for them
   let reactionSchemeLine = "";
-  if (reactionSchemePresent) {
+  if (rocrateInfo.haveReactionScheme) {
     reactionSchemeLine = `
   - [**reaction_scheme.cdxml**](./data/reaction_scheme.cdxml): ChemDraw file of the chemical transformation described by the Glorius plot.`;
   }
   let baselineLine = "";
-  if (baselineDescPresent) {
+  if (rocrateInfo.haveBaselineDesc) {
     baselineLine = `
   - [**standard_conditions.csv**](./data/standard_conditions.csv): Standard conditions for the chemical transformation plotted by the PSDI Glorius plot Generator.`;
   }
   let condDescLine = "";
-  if (condDescPresent) {
+  if (rocrateInfo.haveCondDescs) {
     condDescLine = `
   - [**test_conditions.csv**](./data/test_conditions.csv): Experimental description for each test condition plotted by the PSDI Glorius Plot Generator.`;
   }
@@ -57,13 +48,13 @@ export function makeReadme(title, desc, about, timestamp, licenseName, licenseUR
 
 ## About
 
-**Title**: ${title}
+**Title**: ${rocrateInfo.title}
 
-**Description**: ${desc}
+**Description**: ${rocrateInfo.desc}
 
-**Date Published**: ${timestamp}${licenseLine}
+**Date Published**: ${rocrateInfo.timestamp}${licenseLine}
 
-**About**: ${about}${bibInfo}
+**About**: ${rocrateInfo.about}${bibInfoText}
 
 ## File Structure
 
