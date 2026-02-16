@@ -17,7 +17,7 @@ import { formatReadmeBibInfo, makeReadme } from "./rocrate/readme.js";
 import { formatMetadataBibInfo, makeMetadata } from "./rocrate/metadata.js";
 import { makeBaselineDesc } from "./rocrate/baseline.js";
 import { makeCondDescTable } from "./rocrate/test-conditions.js";
-import { makeESI } from "./rocrate/esi.js";
+import { formatESIBibInfo, makeESI } from "./rocrate/esi.js";
 
 const CHART_ID = "glorius-plot", CHART_SELECTOR = `#${CHART_ID}`;
 
@@ -2311,7 +2311,8 @@ function makeBibInfo() {
   const contactEmail = $("#rocrate-email-input").val();
 
   const bibInfo = {
-    readmeInfo: formatReadmeBibInfo(lNamesAndORCIDs, contactEmail)
+    readmeInfo: formatReadmeBibInfo(lNamesAndORCIDs, contactEmail),
+    esiInfo: formatESIBibInfo(lNamesAndORCIDs, contactEmail)
   };
   [bibInfo.authorInfoText, bibInfo.bibInfoText] = formatMetadataBibInfo(lNamesAndORCIDs);
 
