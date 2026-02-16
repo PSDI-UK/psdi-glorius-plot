@@ -72,8 +72,8 @@ export function makeMetadata(rocrateInfo) {
 		{
 			"@id": "./",
 			"@type": "Dataset",
-			"name": "${rocrateInfo.title}",
-			"description": "${rocrateInfo.desc}",
+			"name": "${rocrateInfo.title.txt}",
+			"description": "${rocrateInfo.desc.txt}",
 			"datePublished": "${rocrateInfo.timestamp}",
 			"instrument": {
 				"@id": "https://psdi-uk.github.io/psdi-glorius-plot/"

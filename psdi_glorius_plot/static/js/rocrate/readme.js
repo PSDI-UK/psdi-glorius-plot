@@ -48,13 +48,13 @@ export function makeReadme(rocrateInfo) {
 
 ## About
 
-**Title**: ${rocrateInfo.title}
+**Title**: ${rocrateInfo.title.md}
 
-**Description**: ${rocrateInfo.desc}
+**Description**: ${rocrateInfo.desc.md}
 
 **Date Published**: ${rocrateInfo.timestamp}${licenseLine}
 
-**About**: ${rocrateInfo.about}${bibInfoText}
+**About**: ${rocrateInfo.about.md}${bibInfoText}
 
 ## File Structure
 

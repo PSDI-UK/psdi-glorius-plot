@@ -6,7 +6,7 @@
 
 import { initDirtyForms, cleanDirtyForms, checkIsDirty } from "./dirty-forms.js";
 import { mixHexes } from "./color-mixing.js"
-import { csvSafe, exportImage, loadObject, saveBlob, saveObject } from "./io.js"
+import { exportImage, loadObject, makeCsv, saveBlob, saveObject } from "./io.js"
 import { clamp, disableButton, enableButton, getWebKitMode } from "./utility.js"
 import {
   addQuillEditor, getQuillEditor, getQuillEditorHTML, setQuillEditor, removeQuillEditor, updateQuillContents,
@@ -1179,17 +1179,19 @@ function makeSensitivityTable(plotData, clean = false) {
   output += "\r\n";
 
   // Add the baseline row
-  output += "Standard Conditions";
-  lBaselineSamples.forEach((s) => output += "," + csvSafe(s));
-  output += "\r\n";
+  const lRows = [];
+  const headerRow = ["Standard Conditions"];
+  lBaselineSamples.forEach((s) => headerRow.push(s));
+  lRows.push(headerRow);
 
   // Add a row for each condition
   for (let i = 0; i < numConditions; ++i) {
-    output += csvSafe(lConditionLabels[i]);
-    llConditionSamples[i].forEach((s) => output += "," + csvSafe(s));
+    const newRow = []
+    newRow.push(lConditionLabels[i]);
+    llConditionSamples[i].forEach((s) => newRow.push(s));
     if (includeDev)
-      output += "," + lDevValueInputs[i].value;
-    output += "\r\n";
+      newRow.push(lDevValueInputs[i].value);
+    lRows.push(newRow);
   }
 
   // Remove this data from the input object if desired
@@ -1199,7 +1201,10 @@ function makeSensitivityTable(plotData, clean = false) {
     delete plotData["condition-samples"];
   }
 
-  return output;
+  return {
+    arr: lRows,
+    csv: makeCsv(lRows)
+  };
 }
 
 /**
@@ -2215,54 +2220,54 @@ function updateROCrateDownloadEnabled() {
     $("#rocrate-download").attr("disabled", "disabled");
 }
 
+function makeTextVersions(textHTML) {
+  return {
+    html: textHTML,
+    md: HTMLToMd(textHTML),
+    txt: stripTags(textHTML)
+  };
+}
+
 /**
  * Create an RO-crate with all provided data and provide it to the user for download
  */
 async function exportROCrate() {
   const rocrate = new JSZip();
 
+  const plotData = getPlotData();
   const rocrateInfo = {
-    title: HTMLToMd(getQuillEditorHTML("#rocrate-title-input")),
-    desc: HTMLToMd(getQuillEditorHTML("#rocrate-desc-input")),
-    about: HTMLToMd(getQuillEditorHTML("#rocrate-about")),
+    title: makeTextVersions(getQuillEditorHTML("#rocrate-title-input")),
+    desc: makeTextVersions(getQuillEditorHTML("#rocrate-desc-input")),
+    about: makeTextVersions(getQuillEditorHTML("#rocrate-about")),
     timestamp: (new Date()).toISOString(),
     version: version,
-    haveReactionScheme: reactionSchemePresent(),
-    haveBaselineDesc: baselineDescPresent(),
-    haveCondDescs: condDescsPresent(),
+    reactionSchemeFile: reactionSchemePresent() && getReactionScheme(),
+    baselineDesc: baselineDescPresent() && makeTextVersions(getBaselineDesc()),
+    condDescTable: condDescsPresent() && makeCondDescTable(getCondDescs()),
     licenseInfo: getLicenseInfo(),
     bibInfo: makeBibInfo(),
+    plotData: plotData,
+    sensitivityTable: makeSensitivityTable(plotData, true)
   };
 
-  const readmeText = makeReadme(rocrateInfo);
-  rocrate.file(ROCRATE_ROOT_DIR + "README.md", readmeText);
+  rocrate.file(ROCRATE_ROOT_DIR + "README.md", makeReadme(rocrateInfo));
+  rocrate.file(ROCRATE_ROOT_DIR + "ro-crate-metadata.json", makeMetadata(rocrateInfo));
+  rocrate.file(ROCRATE_ROOT_DIR + "ESI.pdf", makeESI(rocrateInfo));
 
-  const metadataText = makeMetadata(rocrateInfo);
-  rocrate.file(ROCRATE_ROOT_DIR + "ro-crate-metadata.json", metadataText);
-
-  const esi = makeESI(rocrateInfo);
-  rocrate.file(ROCRATE_ROOT_DIR + "ESI.pdf", esi);
-
-  if (rocrateInfo.haveReactionScheme) {
-    const reactionScheme = getReactionScheme();
-    rocrate.file(ROCRATE_DATA_DIR + "reaction_scheme.cdxml", reactionScheme);
+  if (rocrateInfo.reactionSchemeFile) {
+    rocrate.file(ROCRATE_DATA_DIR + "reaction_scheme.cdxml", rocrateInfo.reactionSchemeFile);
   }
 
-  if (rocrateInfo.haveBaselineDesc) {
-    const baselineDesc = makeBaselineDesc(getBaselineDesc());
-    rocrate.file(ROCRATE_DATA_DIR + "standard_conditions.html", baselineDesc);
+  if (rocrateInfo.baselineDesc) {
+    rocrate.file(ROCRATE_DATA_DIR + "standard_conditions.html", makeBaselineDesc(rocrateInfo.baselineDesc.html));
   }
 
   if (rocrateInfo.haveCondDescs) {
-    const condDescTable = makeCondDescTable(getCondDescs());
-    rocrate.file(ROCRATE_DATA_DIR + "test_conditions.csv", condDescTable);
+    rocrate.file(ROCRATE_DATA_DIR + "test_conditions.csv", rocrateInfo.condDescTable.csv);
   }
 
-  const plotData = getPlotData();
-  rocrate.file(ROCRATE_PLOT_DIR + "user_preferences.json", JSON.stringify(plotData));
-
-  const sensitivityTable = makeSensitivityTable(plotData, true);
-  rocrate.file(ROCRATE_PLOT_DIR + "sensitivity_table.csv", sensitivityTable);
+  rocrate.file(ROCRATE_PLOT_DIR + "user_preferences.json", JSON.stringify(rocrateInfo.plotData));
+  rocrate.file(ROCRATE_PLOT_DIR + "sensitivity_table.csv", rocrateInfo.sensitivityTable.csv);
 
   const imagePromise = new Promise((resolve, reject) => {
     $(CHART_SELECTOR)[0].toBlob((blob) => {

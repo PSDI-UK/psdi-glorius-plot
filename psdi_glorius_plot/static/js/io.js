@@ -70,3 +70,24 @@ export function csvSafe(s) {
   s = '"' + s + '"';
   return s;
 }
+
+/**
+ * Convert an array of arrays into the text contents of a CSV table
+ * @param {Array<Array<String>>} lRows 
+ * @returns {String}
+ */
+export function makeCsv(lRows) {
+  let csv = "";
+
+  lRows.forEach((lCells) => {
+    if (csv)
+      csv += "\n";
+
+    for (let i = 0; i < lCells.length; ++i) {
+      if (i > 0)
+        csv += ","
+      csv += csvSafe(lCells[i]);
+    }
+  })
+  return csv;
+}
