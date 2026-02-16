@@ -29,17 +29,17 @@ export function makeReadme(rocrateInfo) {
 
   // If the reaction scheme, baseline info, and/or condition description files are present, add lines for them
   let reactionSchemeLine = "";
-  if (rocrateInfo.haveReactionScheme) {
+  if (rocrateInfo.reactionSchemeFile) {
     reactionSchemeLine = `
   - [**reaction_scheme.cdxml**](./data/reaction_scheme.cdxml): ChemDraw file of the chemical transformation described by the Glorius plot.`;
   }
   let baselineLine = "";
-  if (rocrateInfo.haveBaselineDesc) {
+  if (rocrateInfo.baselineDesc) {
     baselineLine = `
   - [**standard_conditions.csv**](./data/standard_conditions.csv): Standard conditions for the chemical transformation plotted by the PSDI Glorius plot Generator.`;
   }
   let condDescLine = "";
-  if (rocrateInfo.haveCondDescs) {
+  if (rocrateInfo.condDescTable) {
     condDescLine = `
   - [**test_conditions.csv**](./data/test_conditions.csv): Experimental description for each test condition plotted by the PSDI Glorius Plot Generator.`;
   }

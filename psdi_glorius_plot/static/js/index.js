@@ -1918,6 +1918,7 @@ function updateROCrateForm(firstTime = false) {
   if (firstTime) {
     initCondDescs();
     useDefaultROCrateTitleDesc();
+    enableQuillEventsAndCallbacks();
   }
 }
 
@@ -2262,7 +2263,7 @@ async function exportROCrate() {
     rocrate.file(ROCRATE_DATA_DIR + "standard_conditions.html", makeBaselineDesc(rocrateInfo.baselineDesc.html));
   }
 
-  if (rocrateInfo.haveCondDescs) {
+  if (rocrateInfo.condDescTable) {
     rocrate.file(ROCRATE_DATA_DIR + "test_conditions.csv", rocrateInfo.condDescTable.csv);
   }
 
@@ -2593,7 +2594,6 @@ function enableQuillEventsAndCallbacks() {
       otherCallbacks["#rcdi-" + i] = checkCondDescs;
   }
   enableQuillEvents(generateIfUpdating, otherCallbacks);
-
 }
 
 function enableROCrateOnChangeTriggers() {

@@ -25,7 +25,7 @@ export function makeMetadata(rocrateInfo) {
 	// If the reaction scheme, baseline info, and/or condition description files are present, add lines for them
 	let reactionSchemePartLine = "";
 	let reactionSchemeInfoText = "";
-	if (rocrateInfo.haveReactionScheme) {
+	if (rocrateInfo.reactionSchemeFile) {
 		reactionSchemePartLine = `,
 				{"@id": "data/reaction_scheme.cdxml"}`;
 		reactionSchemeInfoText = `,
@@ -39,7 +39,7 @@ export function makeMetadata(rocrateInfo) {
 	}
 	let baselineDescPartLine = "";
 	let baselineDescInfoText = "";
-	if (rocrateInfo.haveBaselineDesc) {
+	if (rocrateInfo.baselineDesc) {
 		baselineDescPartLine = `,
 				{"@id": "data/standard_conditions.html"}`;
 		baselineDescInfoText = `,
@@ -53,7 +53,7 @@ export function makeMetadata(rocrateInfo) {
 	}
 	let condDescPartLine = "";
 	let condDescInfoText = "";
-	if (rocrateInfo.haveCondDescs) {
+	if (rocrateInfo.condDescTable) {
 		condDescPartLine = `,
 				{"@id": "data/test_conditions.csv"}`;
 		condDescInfoText = `,
