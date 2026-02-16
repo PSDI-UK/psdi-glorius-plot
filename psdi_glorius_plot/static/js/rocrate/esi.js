@@ -1,5 +1,11 @@
 const ORCID_URL_BASE = "https://orcid.org/";
 
+// Shortcuts for linebreaks in the file. These need to be copied when added to the document content, e.g. with
+// { ...linebreakLarge }
+const linebreakLarge = { text: "", style: { fontSize: 16 } }
+const linebreakMed = { text: "", style: { fontSize: 12 } }
+const linebreakSmall = { text: "", style: { fontSize: 6 } }
+
 /**
  * 
  * @param {*} rocrateInfo 
@@ -20,21 +26,37 @@ export function makeESI(rocrateInfo) {
     fontSize: 16
   };
 
+  // Create the document contents, starting with the main header and the (always-present) Biblio Info section
   const docContent = [
     {
       text: rocrateInfo.title.txt,
       style: 'header'
     },
-    "",
+    { ...linebreakLarge },
     {
       text: "Bibliographic Information",
       style: 'subheader'
     },
-    "",
+    { ...linebreakSmall },
     {
       text: rocrateInfo.bibInfo.esiInfo
-    }
+    },
+    { ...linebreakMed }
   ];
+
+  // Append other sections to the document content, if they're going to be present
+  if (rocrateInfo.baselineDesc) {
+    docContent.push({
+      text: "Standard conditions",
+      style: 'subheader'
+    },
+      { ...linebreakSmall },
+      // TODO: Need to implement a function to format HTML into a format that can be used with PDFmake. Using MD for now
+      rocrateInfo.baselineDesc.md
+    )
+  }
+
+
   const pdf = pdfMake.createPdf({ content: docContent, styles: docStyles, defaultStyle: defaultStyle }).getBlob();
   return pdf;
 }

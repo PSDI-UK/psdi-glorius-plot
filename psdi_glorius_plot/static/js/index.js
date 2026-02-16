@@ -2224,7 +2224,7 @@ function updateROCrateDownloadEnabled() {
 function makeTextVersions(textHTML) {
   return {
     html: textHTML,
-    md: HTMLToMd(textHTML),
+    md: HTMLToMd(cleanTags(textHTML)),
     txt: stripTags(textHTML)
   };
 }
