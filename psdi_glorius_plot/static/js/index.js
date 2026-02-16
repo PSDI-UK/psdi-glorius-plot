@@ -17,6 +17,7 @@ import { formatReadmeBibInfo, makeReadme } from "./rocrate/readme.js";
 import { formatMetadataBibInfo, makeMetadata } from "./rocrate/metadata.js";
 import { makeBaselineDesc } from "./rocrate/baseline.js";
 import { makeCondDescTable } from "./rocrate/test-conditions.js";
+import { makeESI } from "./rocrate/esi.js";
 
 const CHART_ID = "glorius-plot", CHART_SELECTOR = `#${CHART_ID}`;
 
@@ -2238,6 +2239,9 @@ async function exportROCrate() {
 
   const metadataText = makeMetadata(rocrateInfo);
   rocrate.file(ROCRATE_ROOT_DIR + "ro-crate-metadata.json", metadataText);
+
+  const esi = makeESI(rocrateInfo);
+  rocrate.file(ROCRATE_ROOT_DIR + "ESI.pdf", esi);
 
   if (rocrateInfo.haveReactionScheme) {
     const reactionScheme = getReactionScheme();
