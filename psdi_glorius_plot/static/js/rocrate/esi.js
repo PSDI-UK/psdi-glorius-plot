@@ -6,6 +6,19 @@ const linebreakLarge = { text: "", style: { fontSize: 16 } }
 const linebreakMed = { text: "", style: { fontSize: 12 } }
 const linebreakSmall = { text: "", style: { fontSize: 6 } }
 
+export function initPdfFonts(siteUrl) {
+  var fonts = {
+    Arial: {
+      normal: siteUrl + "static/fonts/Arial Regular.ttf",
+      bold: siteUrl + "static/fonts/Arial Bold.ttf",
+      italics: siteUrl + "static/fonts/Arial Italic.ttf",
+      bolditalics: siteUrl + "static/fonts/Arial Bold Italic.ttf"
+    }
+  };
+
+  pdfMake.addFonts(fonts);
+}
+
 /**
  * 
  * @param {*} rocrateInfo 
@@ -14,16 +27,17 @@ const linebreakSmall = { text: "", style: { fontSize: 6 } }
 export function makeESI(rocrateInfo) {
   const docStyles = {
     header: {
-      fontSize: 21,
+      fontSize: 14,
       bold: true
     },
     subheader: {
-      fontSize: 18,
+      fontSize: 12,
       bold: true
     }
   }
   const defaultStyle = {
-    fontSize: 16
+    font: "Arial",
+    fontSize: 12
   };
 
   // Create the document contents, starting with the main header and the (always-present) Biblio Info section
