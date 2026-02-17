@@ -2133,6 +2133,22 @@ function getReactionScheme() {
 }
 
 /**
+ * Get whether or not a reaction scheme image is provided
+ * @returns {Boolean}
+ */
+function reactionSchemeImgPresent() {
+  return !!$("#rocrate-img").val();
+}
+
+/**
+ * Get the reaction scheme file uploaded by the user
+ * @returns {File}
+ */
+function getReactionSchemeImg() {
+  return $("#rocrate-img")[0].files[0];
+}
+
+/**
  * Get the user-provided Baseline description
  * @returns {String}
  */
@@ -2243,6 +2259,7 @@ async function exportROCrate() {
     timestamp: (new Date()).toISOString(),
     version: version,
     reactionSchemeFile: reactionSchemePresent() && getReactionScheme(),
+    reactionSchemeImg: reactionSchemeImgPresent() && getReactionSchemeImg(),
     baselineDesc: baselineDescPresent() && makeTextVersions(getBaselineDesc()),
     condDescTable: condDescsPresent() && makeCondDescTable(getCondDescs()),
     licenseInfo: getLicenseInfo(),

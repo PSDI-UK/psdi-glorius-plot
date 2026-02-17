@@ -1,3 +1,5 @@
+import { loadDataURL } from "../io.js";
+
 const ORCID_URL_BASE = "https://orcid.org/";
 
 let pdfFontsLoaded = false;
@@ -30,7 +32,13 @@ function initPdfFonts(siteUrl) {
  * @param {*} rocrateInfo 
  * @returns 
  */
-export function makeESI(rocrateInfo) {
+export async function makeESI(rocrateInfo) {
+
+  if (rocrateInfo.reactionSchemeImg) {
+    // The Image needs to be fully loaded before we create the PDF, so we start loading as early as possible, and wait
+    // on it as long as possible, then fill in the info in the document tree when it's ready
+    var reactionSchemeImgPromise = loadDataURL(rocrateInfo.reactionSchemeImg);
+  }
 
   // Load fonts for the PDF renderer
   initPdfFonts(window.location.protocol + "//" + window.location.host + "/");
@@ -99,6 +107,31 @@ export function makeESI(rocrateInfo) {
       },
       { ...linebreakMed }
     )
+  }
+
+  if (rocrateInfo.reactionSchemeImg) {
+
+    // Use a function-scope variable here so we can reference it later when we're ready to fill in with the loaded
+    // DataURL
+    var reactionSchemeImgInfo = {
+      image: null
+    }
+
+    docContent.push(
+      {
+        text: "Reaction",
+        style: "subheader"
+      },
+      { ...linebreakSmall },
+      reactionSchemeImgInfo,
+      { ...linebreakMed }
+    )
+
+  }
+
+  if (rocrateInfo.reactionSchemeImg) {
+    // Just before creating the PDF, we wait and load the DataURL for the reaction scheme image
+    reactionSchemeImgInfo.image = await reactionSchemeImgPromise;
   }
 
   const pdf = pdfMake.createPdf({ content: docContent, styles: docStyles, defaultStyle: defaultStyle }).getBlob();

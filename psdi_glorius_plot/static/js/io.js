@@ -56,6 +56,17 @@ export async function loadObject(file, callbackSuccess, callbackError = (e) => a
   reader.readAsText(file);
 }
 
+export async function loadDataURL(file) {
+  return new Promise((resolve, reject) => {
+    var fr = new FileReader();
+    fr.onload = () => {
+      resolve(fr.result)
+    };
+    fr.onerror = reject;
+    fr.readAsDataURL(file);
+  });
+}
+
 /**
  * Makes a string safe to be included as an element in a CSV file, wrapping it in quotes if necessary and escaping
  * any existing quotes
