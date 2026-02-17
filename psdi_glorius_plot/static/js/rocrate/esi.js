@@ -114,7 +114,8 @@ export async function makeESI(rocrateInfo) {
     // Use a function-scope variable here so we can reference it later when we're ready to fill in with the loaded
     // DataURL
     var reactionSchemeImgInfo = {
-      image: null
+      image: null,
+      fit: [500, 500]
     }
 
     docContent.push(
