@@ -1,12 +1,18 @@
 const ORCID_URL_BASE = "https://orcid.org/";
 
+let pdfFontsLoaded = false;
+
 // Shortcuts for linebreaks in the file. These need to be copied when added to the document content, e.g. with
 // { ...linebreakLarge }
 const linebreakLarge = { text: "", style: { fontSize: 16 } }
 const linebreakMed = { text: "", style: { fontSize: 12 } }
 const linebreakSmall = { text: "", style: { fontSize: 6 } }
 
-export function initPdfFonts(siteUrl) {
+function initPdfFonts(siteUrl) {
+  if (pdfFontsLoaded)
+    return
+  pdfFontsLoaded = true;
+
   var fonts = {
     Arial: {
       normal: siteUrl + "static/fonts/Arial Regular.ttf",
@@ -25,6 +31,10 @@ export function initPdfFonts(siteUrl) {
  * @returns 
  */
 export function makeESI(rocrateInfo) {
+
+  // Load fonts for the PDF renderer
+  initPdfFonts(window.location.protocol + "//" + window.location.host + "/");
+
   const docStyles = {
     header: {
       fontSize: 14,
@@ -44,12 +54,12 @@ export function makeESI(rocrateInfo) {
   const docContent = [
     {
       text: rocrateInfo.title.txt,
-      style: 'header'
+      style: "header"
     },
     { ...linebreakLarge },
     {
       text: "Bibliographic Information",
-      style: 'subheader'
+      style: "subheader"
     },
     { ...linebreakSmall },
     {
@@ -60,16 +70,36 @@ export function makeESI(rocrateInfo) {
 
   // Append other sections to the document content, if they're going to be present
   if (rocrateInfo.baselineDesc) {
-    docContent.push({
-      text: "Standard conditions",
-      style: 'subheader'
-    },
+    docContent.push(
+      {
+        text: "Standard conditions",
+        style: "subheader"
+      },
       { ...linebreakSmall },
       // TODO: Need to implement a function to format HTML into a format that can be used with PDFmake. Using MD for now
-      rocrateInfo.baselineDesc.md
+      rocrateInfo.baselineDesc.md,
+      { ...linebreakMed }
     )
   }
 
+  if (rocrateInfo.condDescTable) {
+    // TODO: Format table cells
+
+    docContent.push(
+      {
+        text: "Preparation of sensitivity assessment of reaction",
+        style: "subheader"
+      },
+      { ...linebreakSmall },
+      {
+        layout: "noBorders",
+        table: {
+          body: rocrateInfo.condDescTable.arr
+        }
+      },
+      { ...linebreakMed }
+    )
+  }
 
   const pdf = pdfMake.createPdf({ content: docContent, styles: docStyles, defaultStyle: defaultStyle }).getBlob();
   return pdf;

@@ -17,7 +17,7 @@ import { formatReadmeBibInfo, makeReadme } from "./rocrate/readme.js";
 import { formatMetadataBibInfo, makeMetadata } from "./rocrate/metadata.js";
 import { makeBaselineDesc } from "./rocrate/baseline.js";
 import { makeCondDescTable } from "./rocrate/test-conditions.js";
-import { formatESIBibInfo, initPdfFonts, makeESI } from "./rocrate/esi.js";
+import { formatESIBibInfo, makeESI } from "./rocrate/esi.js";
 
 const CHART_ID = "glorius-plot", CHART_SELECTOR = `#${CHART_ID}`;
 
@@ -1905,9 +1905,6 @@ function startROCrateExport(scroll = true) {
   // Flag that we'll now want to start updating the RO-crate form, and do so now
   roCrateFormUpdating = true;
   updateROCrateForm(true);
-
-  // Load fonts for the PDF renderer
-  initPdfFonts(window.location.protocol + "//" + window.location.host + "/");
 
   if (scroll)
     scrollToSection("#rocrate-export-title");
