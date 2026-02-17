@@ -1164,25 +1164,27 @@ function makeSensitivityTable(plotData, clean = false) {
   const includeDev = !(devPlotMode == "mean" && numSamples == 1);
   const lDevValueInputs = $(`input.${D_DEV_PLOT_MODE_INFO[devPlotMode].key}-value`);
 
-  // Start the output string with the heading row
-  let output = "Test parameter";
+  // Start the output array
+  const lRows = [];
+  const headerRow = ["Test parameter"];
   const outputLabel = getOutputLabel();
   if (numSamples == 1) {
-    output += "," + outputLabel;
+    headerRow.push(outputLabel);
   } else {
     for (let j = 0; j < numSamples; ++j) {
-      output += `,${outputLabel} ${j + 1}`;
+
+      headerRow.push(`${outputLabel} ${j + 1}`);
     }
   }
   if (includeDev)
-    output += "," + D_DEV_PLOT_MODE_INFO[getDevPlotMode()].label;
-  output += "\r\n";
+    headerRow.push(D_DEV_PLOT_MODE_INFO[getDevPlotMode()].label);
+  lRows.push(headerRow);
 
   // Add the baseline row
-  const lRows = [];
-  const headerRow = ["Standard Conditions"];
-  lBaselineSamples.forEach((s) => headerRow.push(s));
-  lRows.push(headerRow);
+  const baselineRow = ["Standard Conditions"];
+  lBaselineSamples.forEach((s) => baselineRow.push(s));
+  baselineRow.push("");
+  lRows.push(baselineRow);
 
   // Add a row for each condition
   for (let i = 0; i < numConditions; ++i) {

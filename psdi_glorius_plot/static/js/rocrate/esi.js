@@ -130,6 +130,21 @@ export async function makeESI(rocrateInfo) {
 
   }
 
+  docContent.push(
+    {
+      text: "Results of sensitivity of reaction",
+      style: "subheader"
+    },
+    { ...linebreakSmall },
+    {
+      layout: "noBorders",
+      table: {
+        body: rocrateInfo.sensitivityTable.arr
+      }
+    },
+    { ...linebreakMed }
+  )
+
   if (rocrateInfo.reactionSchemeImg) {
     // Just before creating the PDF, we wait and load the DataURL for the reaction scheme image
     reactionSchemeImgInfo.image = await reactionSchemeImgPromise;
