@@ -4,12 +4,6 @@ const ORCID_URL_BASE = "https://orcid.org/";
 
 let pdfFontsLoaded = false;
 
-// Shortcuts for linebreaks in the file. These need to be copied when added to the document content, e.g. with
-// { ...linebreakLarge }
-const linebreakLarge = { text: "", style: { fontSize: 16 } }
-const linebreakMed = { text: "", style: { fontSize: 12 } }
-const linebreakSmall = { text: "", style: { fontSize: 6 } }
-
 function initPdfFonts(siteUrl) {
   if (pdfFontsLoaded)
     return
@@ -45,12 +39,13 @@ export async function makeESI(rocrateInfo) {
 
   const docStyles = {
     header: {
-      fontSize: 14,
+      fontSize: 18,
       bold: true
     },
     subheader: {
-      fontSize: 12,
-      bold: true
+      fontSize: 14,
+      bold: true,
+      margin: [0, 20, 0, 8]
     }
   }
   const defaultStyle = {
@@ -64,16 +59,13 @@ export async function makeESI(rocrateInfo) {
       text: rocrateInfo.title.txt,
       style: "header"
     },
-    { ...linebreakLarge },
     {
       text: "Bibliographic Information",
       style: "subheader"
     },
-    { ...linebreakSmall },
     {
       text: rocrateInfo.bibInfo.esiInfo
-    },
-    { ...linebreakMed }
+    }
   ];
 
   // Append other sections to the document content, if they're going to be present
@@ -83,10 +75,8 @@ export async function makeESI(rocrateInfo) {
         text: "Standard conditions",
         style: "subheader"
       },
-      { ...linebreakSmall },
       // TODO: Need to implement a function to format HTML into a format that can be used with PDFmake. Using MD for now
-      rocrateInfo.baselineDesc.md,
-      { ...linebreakMed }
+      rocrateInfo.baselineDesc.md
     )
   }
 
@@ -98,14 +88,13 @@ export async function makeESI(rocrateInfo) {
         text: "Preparation of sensitivity assessment of reaction",
         style: "subheader"
       },
-      { ...linebreakSmall },
       {
         layout: "noBorders",
         table: {
+          headerRows: 1,
           body: rocrateInfo.condDescTable.arr
         }
-      },
-      { ...linebreakMed }
+      }
     )
   }
 
@@ -115,24 +104,31 @@ export async function makeESI(rocrateInfo) {
     // DataURL
     var reactionSchemeImgInfo = {
       image: null,
-      fit: [500, 500]
+      fit: [500, 700]
     }
 
     docContent.push(
       {
-        text: "Reaction",
-        style: "subheader"
-      },
-      { ...linebreakSmall },
-      reactionSchemeImgInfo,
-      { ...linebreakMed }
+        layout: "noBorders",
+        table: {
+          headerRows: 2,
+          keepWithHeaderRows: true,
+          body: [
+            [{
+              text: "Reaction",
+              style: "subheader"
+            }],
+            [reactionSchemeImgInfo],
+          ]
+        }
+      }
     )
 
   }
 
   var gloriusPlotImgInfo = {
     image: null,
-    fit: [500, 500]
+    fit: [500, 700]
   }
 
   docContent.push(
@@ -140,21 +136,28 @@ export async function makeESI(rocrateInfo) {
       text: "Results of sensitivity of reaction",
       style: "subheader"
     },
-    { ...linebreakSmall },
     {
       layout: "noBorders",
       table: {
+        headerRows: 1,
         body: rocrateInfo.sensitivityTable.arr
       }
     },
-    { ...linebreakMed },
     {
-      text: "Glorius plot",
-      style: "subheader"
-    },
-    { ...linebreakSmall },
-    gloriusPlotImgInfo,
-    { ...linebreakMed }
+      layout: "noBorders",
+      table: {
+        headerRows: 2,
+        keepWithHeaderRows: true,
+        body: [
+          [{
+            text: "Glorius plot",
+            style: "subheader"
+          }],
+          [gloriusPlotImgInfo],
+        ]
+      }
+    }
+
   )
 
   // Just before creating the PDF, we wait and load the DataURLs for the images
