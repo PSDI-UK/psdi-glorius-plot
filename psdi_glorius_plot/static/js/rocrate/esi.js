@@ -130,6 +130,11 @@ export async function makeESI(rocrateInfo) {
 
   }
 
+  var gloriusPlotImgInfo = {
+    image: null,
+    fit: [500, 500]
+  }
+
   docContent.push(
     {
       text: "Results of sensitivity of reaction",
@@ -142,11 +147,30 @@ export async function makeESI(rocrateInfo) {
         body: rocrateInfo.sensitivityTable.arr
       }
     },
+    { ...linebreakMed },
+    {
+      text: "Glorius plot",
+      style: "subheader"
+    },
+    { ...linebreakSmall },
+    gloriusPlotImgInfo,
     { ...linebreakMed }
   )
 
+  // Just before creating the PDF, we wait and load the DataURLs for the images
+
+  // The gloriusPlot is provided as a promise for a Blob, but the current version of pdfMake only accepts paths to
+  // images and dataURLs, so we convert the Blob to the latter using the FileReader API
+  gloriusPlotImgInfo.image = await rocrateInfo.gloriusPlotPromise.then((blob) => {
+    return new Promise((resolve, reject) => {
+      var fr = new FileReader();
+      fr.onload = (e) => { resolve(e.target.result); }
+      fr.onerror = (e) => { reject(e.target.result); }
+      fr.readAsDataURL(blob);
+    });
+  });
+
   if (rocrateInfo.reactionSchemeImg) {
-    // Just before creating the PDF, we wait and load the DataURL for the reaction scheme image
     reactionSchemeImgInfo.image = await reactionSchemeImgPromise;
   }
 

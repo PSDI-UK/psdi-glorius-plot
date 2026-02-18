@@ -2251,9 +2251,13 @@ function makeTextVersions(textHTML) {
  * Create an RO-crate with all provided data and provide it to the user for download
  */
 async function exportROCrate() {
-  const rocrate = new JSZip();
 
+  // Set up a rocrateInfo object containing all info that will be needed to construct the various files in the rocrate
+
+  // plotData will be modified when the Sensitivity Table is created to remove redundant information in it, so we create
+  // it as a separate variable here outside the rocrateInfo object so we can do so
   const plotData = getPlotData();
+
   const rocrateInfo = {
     title: makeTextVersions(getQuillEditorHTML("#rocrate-title-input")),
     desc: makeTextVersions(getQuillEditorHTML("#rocrate-desc-input")),
@@ -2267,38 +2271,35 @@ async function exportROCrate() {
     licenseInfo: getLicenseInfo(),
     bibInfo: makeBibInfo(),
     plotData: plotData,
-    sensitivityTable: makeSensitivityTable(plotData, true)
+    sensitivityTable: makeSensitivityTable(plotData, true),
+    gloriusPlotPromise: new Promise((resolve, reject) => {
+      $(CHART_SELECTOR)[0].toBlob((blob) => {
+        if (blob) {
+          resolve(blob);
+        } else {
+          reject(new Error("Could not create blob from canvas " + CHART_SELECTOR));
+        }
+      });
+    })
   };
+
+  // Create the zip file object and fill it with all desired files, then finally export it
+  const rocrate = new JSZip();
 
   rocrate.file(ROCRATE_ROOT_DIR + "README.md", makeReadme(rocrateInfo));
   rocrate.file(ROCRATE_ROOT_DIR + "ro-crate-metadata.json", makeMetadata(rocrateInfo));
   rocrate.file(ROCRATE_ROOT_DIR + "ESI.pdf", makeESI(rocrateInfo));
 
-  if (rocrateInfo.reactionSchemeFile) {
+  if (rocrateInfo.reactionSchemeFile)
     rocrate.file(ROCRATE_DATA_DIR + "reaction_scheme.cdxml", rocrateInfo.reactionSchemeFile);
-  }
-
-  if (rocrateInfo.baselineDesc) {
+  if (rocrateInfo.baselineDesc)
     rocrate.file(ROCRATE_DATA_DIR + "standard_conditions.html", makeBaselineDesc(rocrateInfo.baselineDesc.html));
-  }
-
-  if (rocrateInfo.condDescTable) {
+  if (rocrateInfo.condDescTable)
     rocrate.file(ROCRATE_DATA_DIR + "test_conditions.csv", rocrateInfo.condDescTable.csv);
-  }
 
   rocrate.file(ROCRATE_PLOT_DIR + "user_preferences.json", JSON.stringify(rocrateInfo.plotData));
   rocrate.file(ROCRATE_PLOT_DIR + "sensitivity_table.csv", rocrateInfo.sensitivityTable.csv);
-
-  const imagePromise = new Promise((resolve, reject) => {
-    $(CHART_SELECTOR)[0].toBlob((blob) => {
-      if (blob) {
-        resolve(blob);
-      } else {
-        reject(new Error("Could not create blob from canvas " + CHART_SELECTOR));
-      }
-    });
-  });
-  rocrate.file(ROCRATE_PLOT_DIR + "glorius_plot.png", imagePromise);
+  rocrate.file(ROCRATE_PLOT_DIR + "glorius_plot.png", rocrateInfo.gloriusPlotPromise);
 
   rocrate.generateAsync({ type: "blob" })
     .then(function (blob) {
