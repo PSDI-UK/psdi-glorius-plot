@@ -1,3 +1,4 @@
+import { cleanTags } from "../formatted-labels.js";
 import { loadDataURL } from "../io.js";
 
 const ORCID_URL_BASE = "https://orcid.org/";
@@ -75,13 +76,18 @@ export async function makeESI(rocrateInfo) {
         text: "Standard conditions",
         style: "subheader"
       },
-      // TODO: Need to implement a function to format HTML into a format that can be used with PDFmake. Using MD for now
-      rocrateInfo.baselineDesc.md
+      formatFromHTML(rocrateInfo.baselineDesc.html)
     )
   }
 
   if (rocrateInfo.condDescTable) {
-    // TODO: Format table cells
+
+    // Format table cells individually
+    const condDescTableFormatted = rocrateInfo.condDescTable.arr.map((row) => {
+      return row.map((cell) => {
+        return formatFromHTML(cell);
+      })
+    });
 
     docContent.push(
       {
@@ -92,7 +98,7 @@ export async function makeESI(rocrateInfo) {
         layout: "noBorders",
         table: {
           headerRows: 1,
-          body: rocrateInfo.condDescTable.arr
+          body: condDescTableFormatted
         }
       }
     )
@@ -131,6 +137,18 @@ export async function makeESI(rocrateInfo) {
     fit: [500, 700]
   }
 
+
+
+  // Format table cells individually
+  const sensitivityTableFormatted = rocrateInfo.sensitivityTable.arr.map((row) => {
+    return row.map((cell) => {
+      if (typeof cell === "string" || cell instanceof String)
+        return formatFromHTML(cell);
+      else
+        return cell.toString();
+    })
+  });
+
   docContent.push(
     {
       text: "Results of sensitivity of reaction",
@@ -140,7 +158,7 @@ export async function makeESI(rocrateInfo) {
       layout: "noBorders",
       table: {
         headerRows: 1,
-        body: rocrateInfo.sensitivityTable.arr
+        body: sensitivityTableFormatted
       }
     },
     {
@@ -224,4 +242,82 @@ export function formatESIBibInfo(lNamesAndORCIDs, contactEmail) {
   }
 
   return lTextSegments;
+}
+
+/**
+ * Formats a string with HTML markup into an array of text segments formatted for pdfMake
+ * @param {String} text 
+ * @returns {Array<String>}
+ */
+function formatFromHTML(text) {
+  text = cleanTags(text);
+
+  // Regex which captures any of the formatting tags we're looking for, with a capturing group which notes which tag it
+  // is
+  const tagRegex = /<(\/?em|\/?strong|\/?u|\/?sub|\/?sup)>/gmu;
+
+  // Per how RegEx splits are handled, the resulting string here will be alternating segments and capturing groups,
+  // e.g. High <em>c</em> => ["High ", "em", "c", "/em", ""]
+  const lInTextSegments = text.split(tagRegex);
+  const numTags = (lInTextSegments.length - 1) / 2;
+
+  // Early return in case there's no formatting to be done
+  if (numTags == 0)
+    return text;
+
+  // Start building the output array - it will always start out unformatted
+  let lOutTextSegments = [{
+    text: lInTextSegments[0],
+    bold: false,
+    italics: false,
+    sub: false,
+    sup: false,
+    decoration: false
+  }];
+
+  for (let i = 0; i < numTags; ++i) {
+    // Use the previous segment as a base for any changes to style relative to it
+    const newSegment = { ...lOutTextSegments[i] };
+
+    // Set the text to that of the next segment
+    newSegment.text = lInTextSegments[2 * i + 2];
+
+    // Check what the tag is, and from that adjust the style as appropriate
+    switch (lInTextSegments[2 * i + 1]) {
+      case "em":
+        newSegment.italics = true;
+        break;
+      case "/em":
+        newSegment.italics = false;
+        break;
+      case "strong":
+        newSegment.bold = true;
+        break;
+      case "/strong":
+        newSegment.bold = false;
+        break;
+      case "u":
+        newSegment.decoration = "underline";
+        break;
+      case "/u":
+        newSegment.decoration = false;
+        break;
+      case "sub":
+        newSegment.sub = true;
+        break;
+      case "/sub":
+        newSegment.sub = false;
+        break;
+      case "sup":
+        newSegment.sup = true;
+        break;
+      case "/sup":
+        newSegment.sup = false;
+        break;
+      default:
+    }
+    lOutTextSegments.push(newSegment);
+  }
+
+  return { text: lOutTextSegments };
 }

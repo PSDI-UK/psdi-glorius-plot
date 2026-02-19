@@ -35,7 +35,7 @@ export function addQuillEditor(selector, placeholder = "", toolbar = QUILL_TOOLB
   if (!placeholder && el.attr("placeholder")) {
     // Clean any whitespace in the placeholder text to be single spaces, since this may have linebreaks in it to avoid
     // long lines in the HTML
-    placeholder = el.attr("placeholder").replaceAll(/\s+/gm, " ");
+    placeholder = el.attr("placeholder").replaceAll(/\s+/gmu, " ");
   }
 
   // Disable Quill's tab binding so the user can tab out of Quill's input boxes
@@ -191,8 +191,8 @@ export function cleanTags(s) {
   return s.replaceAll("&nbsp;", " ")
     .replaceAll("<p>", "").replaceAll("</p>", "")
     .replaceAll("<br>", "")
-    .replaceAll(/<span\b[^>]*>/gm, "").replaceAll("</span>", "")
-    .replaceAll(/<([a-zA-Z]+)\b[^>]*>/gm, "<$1>");
+    .replaceAll(/<span\b[^>]*>/gmu, "").replaceAll("</span>", "")
+    .replaceAll(/<([a-zA-Z]+)\b[^>]*>/gmu, "<$1>");
 }
 
 /**
@@ -201,12 +201,11 @@ export function cleanTags(s) {
  * @returns {string}
  */
 export function stripTags(s) {
-  return cleanTags(s)
-    .replaceAll("<em>", "").replaceAll("</em>", "")
-    .replaceAll("<strong>", "").replaceAll("</strong>", "")
-    .replaceAll("<u>", "").replaceAll("</u>", "")
-    .replaceAll("<sub>", "").replaceAll("</sub>", "")
-    .replaceAll("<sup>", "").replaceAll("</sup>", "");
+  return cleanTags(s).replaceAll(/<\/?em>/g, "")
+    .replaceAll(/<\/?strong>/g, "")
+    .replaceAll(/<\/?u>/g, "")
+    .replaceAll(/<\/?sup>/g, "")
+    .replaceAll(/<\/?sub>/g, "");
 }
 
 export function incrementRenderBatch() {
@@ -275,7 +274,7 @@ export function HTMLToTex(s) {
   let changed = true;
   while (changed) {
     let old_s = s;
-    s = s.replaceAll(/<strong>((?!<\/strong>).*?)<em>(.*?)<\/em>(.*?)<\/strong>/gm,
+    s = s.replaceAll(/<strong>((?!<\/strong>).*?)<em>(.*?)<\/em>(.*?)<\/strong>/gmu,
       "<strong>$1<\/strong>\\mathbfit{$2}<strong>$3<\/strong>");
     if (s == old_s)
       changed = false;
@@ -298,6 +297,7 @@ export function HTMLToTex(s) {
 export function HTMLToMd(s) {
   s = s.replaceAll(/<\/?em>/g, "*")
     .replaceAll(/<\/?strong>/g, "**")
+    .replaceAll(/<\/?u>/g, "")
     .replaceAll(/<\/?sub>/g, "~")
     .replaceAll(/<\/?sup>/g, "^");
 
