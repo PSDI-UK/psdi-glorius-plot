@@ -701,10 +701,15 @@
       <h5>About your experiment</h5>
 
       <strong>Standard Conditions</strong><br>
-      <label for="rocrate-cdxml" class="info-marker">Add a ChemDraw file that depicts the chemical process corresponding
-        to your “Standard Conditions”:</label>
+      <label for="rocrate-cdxml" class="info-marker">Add a ChemDraw <code>.cdxml</code> file that depicts the chemical
+        process corresponding to your “Standard Conditions”:</label>
       <br>
-      <input type="file" name="rocrate-cdxml" id="rocrate-cdxml" accept=".cdxml">
+      <input type="file" name="rocrate-cdxml" id="rocrate-cdxml" accept=".cdxml"><br>
+      <label for="rocrate-img" class="info-marker">Add a <code>.png</code> illustration of the reaction which will be
+        added to the supplementary information file. This can be generated from a <code>.cdxml</code> file using e.g.
+        the <a href="https://data-conversion.psdi.ac.uk/">PSDI Data Conversion Service</a>:</label>
+      <br>
+      <input type="file" name="rocrate-img" id="rocrate-img" accept=".png,.jpg,.jpeg">
       <br><br>
       <label for="baseline-desc-container" class="info-marker">Add text to describe the experimental conditions that
         give the outcome you reported for the “Standard Conditions” of your chemical process:</label>

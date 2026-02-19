@@ -56,6 +56,17 @@ export async function loadObject(file, callbackSuccess, callbackError = (e) => a
   reader.readAsText(file);
 }
 
+export async function loadDataURL(file) {
+  return new Promise((resolve, reject) => {
+    var fr = new FileReader();
+    fr.onload = () => {
+      resolve(fr.result)
+    };
+    fr.onerror = reject;
+    fr.readAsDataURL(file);
+  });
+}
+
 /**
  * Makes a string safe to be included as an element in a CSV file, wrapping it in quotes if necessary and escaping
  * any existing quotes
@@ -69,4 +80,25 @@ export function csvSafe(s) {
   s = s.replaceAll('"', '""');
   s = '"' + s + '"';
   return s;
+}
+
+/**
+ * Convert an array of arrays into the text contents of a CSV table
+ * @param {Array<Array<String>>} lRows 
+ * @returns {String}
+ */
+export function makeCsv(lRows) {
+  let csv = "";
+
+  lRows.forEach((lCells) => {
+    if (csv)
+      csv += "\n";
+
+    for (let i = 0; i < lCells.length; ++i) {
+      if (i > 0)
+        csv += ","
+      csv += csvSafe(lCells[i]);
+    }
+  })
+  return csv;
 }

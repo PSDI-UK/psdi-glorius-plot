@@ -6,7 +6,7 @@
 
 import { initDirtyForms, cleanDirtyForms, checkIsDirty } from "./dirty-forms.js";
 import { mixHexes } from "./color-mixing.js"
-import { csvSafe, exportImage, loadObject, saveBlob, saveObject } from "./io.js"
+import { exportImage, loadObject, makeCsv, saveBlob, saveObject } from "./io.js"
 import { clamp, disableButton, enableButton, getWebKitMode } from "./utility.js"
 import {
   addQuillEditor, getQuillEditor, getQuillEditorHTML, setQuillEditor, removeQuillEditor, updateQuillContents,
@@ -17,6 +17,7 @@ import { formatReadmeBibInfo, makeReadme } from "./rocrate/readme.js";
 import { formatMetadataBibInfo, makeMetadata } from "./rocrate/metadata.js";
 import { makeBaselineDesc } from "./rocrate/baseline.js";
 import { makeCondDescTable } from "./rocrate/test-conditions.js";
+import { formatESIBibInfo, makeESI } from "./rocrate/esi.js";
 
 const CHART_ID = "glorius-plot", CHART_SELECTOR = `#${CHART_ID}`;
 
@@ -1163,32 +1164,36 @@ function makeSensitivityTable(plotData, clean = false) {
   const includeDev = !(devPlotMode == "mean" && numSamples == 1);
   const lDevValueInputs = $(`input.${D_DEV_PLOT_MODE_INFO[devPlotMode].key}-value`);
 
-  // Start the output string with the heading row
-  let output = "Test parameter";
+  // Start the output array
+  const lRows = [];
+  const headerRow = ["Test parameter"];
   const outputLabel = getOutputLabel();
   if (numSamples == 1) {
-    output += "," + outputLabel;
+    headerRow.push(outputLabel);
   } else {
     for (let j = 0; j < numSamples; ++j) {
-      output += `,${outputLabel} ${j + 1}`;
+
+      headerRow.push(`${outputLabel} ${j + 1}`);
     }
   }
   if (includeDev)
-    output += "," + D_DEV_PLOT_MODE_INFO[getDevPlotMode()].label;
-  output += "\r\n";
+    headerRow.push(D_DEV_PLOT_MODE_INFO[getDevPlotMode()].label);
+  lRows.push(headerRow);
 
   // Add the baseline row
-  output += "Standard Conditions";
-  lBaselineSamples.forEach((s) => output += "," + csvSafe(s));
-  output += "\r\n";
+  const baselineRow = ["Standard Conditions"];
+  lBaselineSamples.forEach((s) => baselineRow.push(s));
+  baselineRow.push("");
+  lRows.push(baselineRow);
 
   // Add a row for each condition
   for (let i = 0; i < numConditions; ++i) {
-    output += csvSafe(lConditionLabels[i]);
-    llConditionSamples[i].forEach((s) => output += "," + csvSafe(s));
+    const newRow = []
+    newRow.push(lConditionLabels[i]);
+    llConditionSamples[i].forEach((s) => newRow.push(s));
     if (includeDev)
-      output += "," + lDevValueInputs[i].value;
-    output += "\r\n";
+      newRow.push(lDevValueInputs[i].value);
+    lRows.push(newRow);
   }
 
   // Remove this data from the input object if desired
@@ -1198,7 +1203,10 @@ function makeSensitivityTable(plotData, clean = false) {
     delete plotData["condition-samples"];
   }
 
-  return output;
+  return {
+    arr: lRows,
+    csv: makeCsv(lRows)
+  };
 }
 
 /**
@@ -1912,6 +1920,7 @@ function updateROCrateForm(firstTime = false) {
   if (firstTime) {
     initCondDescs();
     useDefaultROCrateTitleDesc();
+    enableQuillEventsAndCallbacks();
   }
 }
 
@@ -2090,12 +2099,13 @@ function updateLicense() {
 
 /**
  * Get the name and URL of the selected license
- * @returns {Array<string>} Two entries, first is name, second is URL
+ * @returns {Object} The license info, in name and url attributes
  */
 function getLicenseInfo() {
-  const name = $("#rocrate-license-name").val();
-  const url = $("#rocrate-license-url").val();
-  return [name, url];
+  return {
+    name: $("#rocrate-license-name").val(),
+    url: $("#rocrate-license-url").val()
+  };
 }
 
 /**
@@ -2122,6 +2132,22 @@ function updateReactionScheme() {
  */
 function getReactionScheme() {
   return $("#rocrate-cdxml")[0].files[0];
+}
+
+/**
+ * Get whether or not a reaction scheme image is provided
+ * @returns {Boolean}
+ */
+function reactionSchemeImgPresent() {
+  return !!$("#rocrate-img").val();
+}
+
+/**
+ * Get the reaction scheme file uploaded by the user
+ * @returns {File}
+ */
+function getReactionSchemeImg() {
+  return $("#rocrate-img")[0].files[0];
 }
 
 /**
@@ -2213,81 +2239,67 @@ function updateROCrateDownloadEnabled() {
     $("#rocrate-download").attr("disabled", "disabled");
 }
 
+function makeTextVersions(textHTML) {
+  return {
+    html: textHTML,
+    md: HTMLToMd(cleanTags(textHTML)),
+    txt: stripTags(textHTML)
+  };
+}
+
 /**
  * Create an RO-crate with all provided data and provide it to the user for download
  */
 async function exportROCrate() {
+
+  // Set up a rocrateInfo object containing all info that will be needed to construct the various files in the rocrate
+
+  // plotData will be modified when the Sensitivity Table is created to remove redundant information in it, so we create
+  // it as a separate variable here outside the rocrateInfo object so we can do so
+  const plotData = getPlotData();
+
+  const rocrateInfo = {
+    title: makeTextVersions(getQuillEditorHTML("#rocrate-title-input")),
+    desc: makeTextVersions(getQuillEditorHTML("#rocrate-desc-input")),
+    about: makeTextVersions(getQuillEditorHTML("#rocrate-about")),
+    timestamp: (new Date()).toISOString(),
+    version: version,
+    reactionSchemeFile: reactionSchemePresent() && getReactionScheme(),
+    reactionSchemeImg: reactionSchemeImgPresent() && getReactionSchemeImg(),
+    baselineDesc: baselineDescPresent() && makeTextVersions(getBaselineDesc()),
+    condDescTable: condDescsPresent() && makeCondDescTable(getCondDescs()),
+    licenseInfo: getLicenseInfo(),
+    bibInfo: makeBibInfo(),
+    plotData: plotData,
+    sensitivityTable: makeSensitivityTable(plotData, true),
+    gloriusPlotPromise: new Promise((resolve, reject) => {
+      $(CHART_SELECTOR)[0].toBlob((blob) => {
+        if (blob) {
+          resolve(blob);
+        } else {
+          reject(new Error("Could not create blob from canvas " + CHART_SELECTOR));
+        }
+      });
+    })
+  };
+
+  // Create the zip file object and fill it with all desired files, then finally export it
   const rocrate = new JSZip();
 
+  rocrate.file(ROCRATE_ROOT_DIR + "README.md", makeReadme(rocrateInfo));
+  rocrate.file(ROCRATE_ROOT_DIR + "ro-crate-metadata.json", makeMetadata(rocrateInfo));
+  rocrate.file(ROCRATE_ROOT_DIR + "ESI.pdf", makeESI(rocrateInfo));
 
-  const title = HTMLToMd(getQuillEditorHTML("#rocrate-title-input"));
-  const desc = HTMLToMd(getQuillEditorHTML("#rocrate-desc-input"));
-  const about = HTMLToMd(getQuillEditorHTML("#rocrate-about"));
-  const timestamp = (new Date()).toISOString();
-  const haveReactionScheme = reactionSchemePresent();
-  const haveBaselineDesc = baselineDescPresent();
-  const haveCondDescs = condDescsPresent();
-  const [licenseName, licenseURL] = getLicenseInfo();
-  const [readmeBibInfo, metadataPersonInfo, metadataBibInfo] = makeBibInfo();
+  if (rocrateInfo.reactionSchemeFile)
+    rocrate.file(ROCRATE_DATA_DIR + "reaction_scheme.cdxml", rocrateInfo.reactionSchemeFile);
+  if (rocrateInfo.baselineDesc)
+    rocrate.file(ROCRATE_DATA_DIR + "standard_conditions.html", makeBaselineDesc(rocrateInfo.baselineDesc.html));
+  if (rocrateInfo.condDescTable)
+    rocrate.file(ROCRATE_DATA_DIR + "test_conditions.csv", rocrateInfo.condDescTable.csv);
 
-  const readmeText = makeReadme(
-    title,
-    desc,
-    about,
-    timestamp,
-    licenseName,
-    licenseURL,
-    readmeBibInfo,
-    haveReactionScheme,
-    haveBaselineDesc,
-    haveCondDescs);
-  rocrate.file(ROCRATE_ROOT_DIR + "README.md", readmeText);
-
-  const metadataText = makeMetadata(
-    title,
-    desc,
-    timestamp,
-    version,
-    licenseName,
-    licenseURL,
-    metadataPersonInfo,
-    metadataBibInfo,
-    haveReactionScheme,
-    haveBaselineDesc,
-    haveCondDescs);
-  rocrate.file(ROCRATE_ROOT_DIR + "ro-crate-metadata.json", metadataText);
-
-  if (haveReactionScheme) {
-    const reactionScheme = getReactionScheme();
-    rocrate.file(ROCRATE_DATA_DIR + "reaction_scheme.cdxml", reactionScheme);
-  }
-
-  if (haveBaselineDesc) {
-    const baselineDesc = makeBaselineDesc(getBaselineDesc());
-    rocrate.file(ROCRATE_DATA_DIR + "standard_conditions.html", baselineDesc);
-  }
-
-  if (haveCondDescs) {
-    const condDescTable = makeCondDescTable(getCondDescs());
-    rocrate.file(ROCRATE_DATA_DIR + "test_conditions.csv", condDescTable);
-  }
-
-  const plotData = getPlotData();
-  rocrate.file(ROCRATE_PLOT_DIR + "user_preferences.json", JSON.stringify(plotData));
-
-  const sensitivityTable = makeSensitivityTable(plotData, true);
-  rocrate.file(ROCRATE_PLOT_DIR + "sensitivity_table.csv", sensitivityTable);
-
-  const imagePromise = new Promise((resolve, reject) => {
-    $(CHART_SELECTOR)[0].toBlob((blob) => {
-      if (blob) {
-        resolve(blob);
-      } else {
-        reject(new Error("Could not create blob from canvas " + CHART_SELECTOR));
-      }
-    });
-  });
-  rocrate.file(ROCRATE_PLOT_DIR + "glorius_plot.png", imagePromise);
+  rocrate.file(ROCRATE_PLOT_DIR + "user_preferences.json", JSON.stringify(rocrateInfo.plotData));
+  rocrate.file(ROCRATE_PLOT_DIR + "sensitivity_table.csv", rocrateInfo.sensitivityTable.csv);
+  rocrate.file(ROCRATE_PLOT_DIR + "glorius_plot.png", rocrateInfo.gloriusPlotPromise);
 
   rocrate.generateAsync({ type: "blob" })
     .then(function (blob) {
@@ -2318,10 +2330,13 @@ function makeBibInfo() {
 
   const contactEmail = $("#rocrate-email-input").val();
 
-  const readmeInfo = formatReadmeBibInfo(lNamesAndORCIDs, contactEmail);
-  const [authorInfo, bibInfo] = formatMetadataBibInfo(lNamesAndORCIDs);
+  const bibInfo = {
+    readmeInfo: formatReadmeBibInfo(lNamesAndORCIDs, contactEmail),
+    esiInfo: formatESIBibInfo(lNamesAndORCIDs, contactEmail)
+  };
+  [bibInfo.authorInfoText, bibInfo.bibInfoText] = formatMetadataBibInfo(lNamesAndORCIDs);
 
-  return [readmeInfo, authorInfo, bibInfo];
+  return bibInfo;
 }
 
 // Functions related to automatic updating
@@ -2600,7 +2615,6 @@ function enableQuillEventsAndCallbacks() {
       otherCallbacks["#rcdi-" + i] = checkCondDescs;
   }
   enableQuillEvents(generateIfUpdating, otherCallbacks);
-
 }
 
 function enableROCrateOnChangeTriggers() {

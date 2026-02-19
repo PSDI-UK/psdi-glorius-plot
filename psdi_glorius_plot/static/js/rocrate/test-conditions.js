@@ -1,4 +1,4 @@
-import { csvSafe } from "../io.js"
+import { makeCsv } from "../io.js"
 
 /**
  * Makes the CSV-formatted text of a table providing the descriptions of test conditions, given user input
@@ -7,11 +7,14 @@ import { csvSafe } from "../io.js"
  * @returns {String}
  */
 export function makeCondDescTable(lCondDescs) {
-  let text = "Test parameter,Experimental conditions";
+  let lRows = [["Test parameter", "Experimental conditions"]];
 
-  lCondDescs.forEach(([cond, desc]) => {
-    text += "\n" + csvSafe(cond) + "," + csvSafe(desc)
+  lCondDescs.forEach((row) => {
+    lRows.push(row);
   })
 
-  return text;
+  return {
+    arr: lRows,
+    csv: makeCsv(lRows)
+  };
 }
