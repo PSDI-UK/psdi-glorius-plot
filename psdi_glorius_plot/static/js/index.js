@@ -1953,28 +1953,7 @@ function initCondDescs() {
 
   // First make sure we have the right number of rows by adding or removing as necessary
   const numRows = getNumConditions();
-  const descTable = $("#rocrate-cond-desc-table tbody");
-  const initDescRows = $(".rocrate-cond-row");
-  const numDescRows = initDescRows.length;
-
-  if (numRows > numDescRows) {
-    // Add the number of rows needed
-    for (let i = numDescRows; i < numRows; ++i) {
-      const newRow = initDescRows.eq(0).clone();
-      descTable.append(newRow);
-      newRow.find(".rocrate-cond-desc-label").attr("id", "rcdl-" + i);
-      newRow.find(".rocrate-cond-desc-label").html(":");
-      newRow.find(".rocrate-cond-desc-input").attr("id", "rcdi-" + i);
-      newRow.find(".rocrate-cond-desc-input .ql-editor").html("");
-      addQuillEditor("#rcdi-" + i, CONDITION_DESC_PLACEHOLDER);
-    }
-  } else if (numRows < numDescRows) {
-    // Remove the excess rows
-    initDescRows.each((i, el) => {
-      if (i >= numRows)
-        $(el).remove();
-    });
-  }
+  setNumROCrateCondRow(numRows);
 
   // Update the condition labels to match the user input
   for (let i = 0; i < numRows; ++i) {
@@ -1983,13 +1962,14 @@ function initCondDescs() {
 
 }
 
-function addROCrateCondRow(targetRowIndex = -1) {
+function addROCrateCondRow(targetRowIndex = -1, updateAfter = true) {
   const descTable = $("#rocrate-cond-desc-table tbody");
   const newRow = $(".rocrate-cond-row").eq(0).clone();
   newRow.find(".rocrate-cond-desc-label").html(":")
   newRow.find(".rocrate-cond-desc-input .ql-editor").html("");
 
   if (targetRowIndex == -1) {
+    targetRowIndex = descTable.find("tr").length - 1;
     descTable.append(newRow);
   } else {
     descTable.find("tr").eq(targetRowIndex).after(newRow);
@@ -2006,10 +1986,12 @@ function addROCrateCondRow(targetRowIndex = -1) {
     removeQuillEditor("#rcdi-" + (i - 1));
   }
   addQuillEditor("#rcdi-" + (targetRowIndex + 1), CONDITION_DESC_PLACEHOLDER);
-  enableQuillEventsAndCallbacks();
+
+  if (updateAfter)
+    enableQuillEventsAndCallbacks();
 }
 
-function removeROCrateCondRow(targetRowIndex = -1) {
+function removeROCrateCondRow(targetRowIndex = -1, updateAfter = true) {
   const descTable = $("#rocrate-cond-desc-table tbody");
   const lRows = descTable.find("tr");
   const oldNumConditions = lRows.length;
@@ -2034,6 +2016,25 @@ function removeROCrateCondRow(targetRowIndex = -1) {
   for (let i = targetRowIndex; i < oldNumConditions - 1; ++i) {
     setQuillEditor("#rcdi-" + i, getQuillEditor("#rcdi-" + (i + 1)))
     removeQuillEditor("#rcdi-" + (i + 1));
+  }
+
+  if (updateAfter)
+    enableQuillEventsAndCallbacks();
+}
+
+function setNumROCrateCondRow(num) {
+  const oldNum = $("#rocrate-cond-desc-table tr").length;
+
+  if (oldNum < num) {
+    for (let i = 0; i < num - oldNum; ++i) {
+      addROCrateCondRow(-1, false);
+    }
+  } else if (oldNum > num) {
+    for (let i = 0; i < oldNum - num; ++i) {
+      removeROCrateCondRow(-1, false);
+    }
+  } else {
+    return;
   }
   enableQuillEventsAndCallbacks();
 }
