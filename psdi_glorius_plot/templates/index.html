@@ -867,7 +867,8 @@
 
       <label class="info-marker">Adding information in this section enables others to understand who contributed to the
         research and to provide the appropriate attribution. If you do not have an ORCID, add a link to your LinkedIn
-        account or personal institutional web page.</label>
+        account or personal institutional web page. You can search for the ORCIDs of yourself and coauthors using the
+        search box on the <a href="https://orcid.org/">ORCID site</a>.</label>
 
       <table id="rocrate-contrib-table" class="label-table">
         <tr class="rocrate-contrib-row" id="rcw-0">
@@ -886,13 +887,13 @@
             <input type="text" name="rocrate-name-input" class="rocrate-name-input" id="rni-0">
           </td>
           <td class="button-cell">
-            <button type="button" class="rocrate-orcid-lookup" id="rob-0">ORCID Lookup</button>
+            <button type="button" class="rocrate-orcid-lookup hidden" id="rob-0">ORCID Lookup</button>
           </td>
           <td class="label-cell">
-            <label for="roi-0" class="rocrate-orcid-label" id="rol-0">ORCID:</label>
+            <label for="roi-0" class="rocrate-orcid-label med-left-margin" id="rol-0">ORCID or other link:</label>
           </td>
           <td class="input-cell">
-            <input type="text" name="rocrate-orcid-input" class="rocrate-orcid-input" id="roi-0">
+            <input type="url" name="rocrate-orcid-input" class="rocrate-orcid-input" id="roi-0">
           </td>
         </tr>
       </table>

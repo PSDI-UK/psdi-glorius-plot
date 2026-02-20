@@ -379,6 +379,14 @@ input.rel-deviation-value {
   margin-bottom: 0 !important;
 }
 
+.small-left-margin {
+  margin-left: 0.25rem !important;
+}
+
+.med-left-margin {
+  margin-left: 1rem !important;
+}
+
 .small-right-margin {
   margin-right: 0.25rem !important;
 }

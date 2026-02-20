@@ -1,4 +1,4 @@
-const ORCID_URL_BASE = "https://orcid.org/";
+import { formatORCIDUrl } from "./esi.js";
 
 /**
  * Generates the text of a metadata file based on user input
@@ -180,18 +180,16 @@ export function formatMetadataBibInfo(lNamesAndORCIDs) {
 			"author": [`;
 
 	let firstEntry = true;
-	lNamesAndORCIDs.forEach(([name, orcId]) => {
+	lNamesAndORCIDs.forEach(([name, site]) => {
 
-		// If no name or orcId is present, skip this entry
-		if (!(name || orcId))
+		// If no name or site is present, skip this entry
+		if (!(name || site))
 			return;
 
-		// We preferentially use the ORCID as ID, but fall back to using the name if an ORCID isn't provided
-		const id = orcId || name;
+		const url = site && formatORCIDUrl(site);
 
-		// Check how the ORCID is formatted, and always print with the full URL
-		if (orcId && !orcId.startsWith(ORCID_URL_BASE))
-			orcId = ORCID_URL_BASE + orcId;
+		// We preferentially use the url as ID, but fall back to using the name if a site isn't provided
+		const id = url || name;
 
 		// For every entry other than the first, we start with a comma before the entry in the Author Info
 		if (firstEntry)

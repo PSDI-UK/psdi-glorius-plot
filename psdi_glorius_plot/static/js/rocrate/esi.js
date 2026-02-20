@@ -199,6 +199,18 @@ export async function makeESI(rocrateInfo) {
   return pdf;
 }
 
+/**
+ * Check how the ORCID is formatted - if it matches an ORCID format, convert it to a URL, otherwise leave it as entered
+ * @param {String} s 
+ * @returns {String}
+ */
+export function formatORCIDUrl(s) {
+  const orcIdMatch = s.match(/^(\d\d\d\d)-?(\d\d\d\d)-?(\d\d\d\d)-?(\d\d\d\d)$/);
+  if (orcIdMatch)
+    s = `${ORCID_URL_BASE}${orcIdMatch[1]}-${orcIdMatch[2]}-${orcIdMatch[3]}-${orcIdMatch[4]}`;
+  return s;
+}
+
 export function formatESIBibInfo(lNamesAndORCIDs, contactEmail) {
 
   const lFormattedNames = [];
@@ -208,9 +220,11 @@ export function formatESIBibInfo(lNamesAndORCIDs, contactEmail) {
     if (!name)
       return;
 
-    // Check how the ORCID is formatted, and always print with the full URL
-    if (!orcId.startsWith(ORCID_URL_BASE))
-      orcId = ORCID_URL_BASE + orcId;
+    // Check how the ORCID is formatted - if it matches an ORCID format, convert it to a URL, otherwise leave it as
+    // entered
+    const orcIdMatch = orcId.match(/^(\d\d\d\d)-?(\d\d\d\d)-?(\d\d\d\d)-?(\d\d\d\d)$/);
+    if (orcIdMatch)
+      orcId = `${ORCID_URL_BASE}${orcIdMatch[1]}-${orcIdMatch[2]}-${orcIdMatch[3]}-${orcIdMatch[4]}`;
 
     lFormattedNames.push({ text: name, link: orcId, decoration: 'underline' })
 

@@ -1,4 +1,4 @@
-const ORCID_URL_BASE = "https://orcid.org/";
+import { formatORCIDUrl } from "./esi.js";
 
 /**
  * Generates the text of a README file based on user input
@@ -73,15 +73,15 @@ export function makeReadme(rocrateInfo) {
 
 /**
  * Formats the bibliographic info section of the README.md file based on author info
- * @param {Array<Array<string>>} lNamesAndORCIDs List of name, orcID pairs
+ * @param {Array<Array<string>>} lNamesAndSites List of name, site pairs
  * @param {String} contactEmail The contact email provided by the user
  * @returns {String} The text of the section
  */
-export function formatReadmeBibInfo(lNamesAndORCIDs, contactEmail) {
+export function formatReadmeBibInfo(lNamesAndSites, contactEmail) {
 
   let text = "";
 
-  lNamesAndORCIDs.forEach(([name, orcId]) => {
+  lNamesAndSites.forEach(([name, site]) => {
 
     // If no name is present, skip this entry
     if (!name)
@@ -89,14 +89,12 @@ export function formatReadmeBibInfo(lNamesAndORCIDs, contactEmail) {
 
     text += `\n\n**Name**: ${name}`
 
-    if (!orcId)
+    if (!site)
       return;
 
-    // Check how the ORCID is formatted, and always print with the full URL
-    if (!orcId.startsWith(ORCID_URL_BASE))
-      orcId = ORCID_URL_BASE + orcId;
+    const url = formatORCIDUrl(site);
 
-    text += `\n\n- **ORCID**: ${orcId}`
+    text += `\n\n- **Site**: ${url}`
 
   });
 
