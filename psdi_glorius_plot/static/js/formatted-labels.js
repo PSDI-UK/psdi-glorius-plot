@@ -197,8 +197,8 @@ export function cleanTags(s) {
 
 /**
  * Removes all relevant HTML tags from a string, including those that are used in other parts of the code for formatting
- * @param {string} s 
- * @returns {string}
+ * @param {String} s 
+ * @returns {String}
  */
 export function stripTags(s) {
   return cleanTags(s).replaceAll(/<\/?em>/g, "")
@@ -206,6 +206,31 @@ export function stripTags(s) {
     .replaceAll(/<\/?u>/g, "")
     .replaceAll(/<\/?sup>/g, "")
     .replaceAll(/<\/?sub>/g, "");
+}
+
+/**
+ * Remove any tags which enclose the whole string without interruption, e.g.:
+ *   <em>A</em> -> A
+ *   <em>A</em> B -> <em>A</em> B
+ *   <em>A</em> B <em>C</em> -> <em>A</em> B <em>C</em>
+ * @param {String} s 
+ * @returns {String}
+ */
+export function removeGlobalTags(s) {
+
+  const tagRegex = /^<(\w+)>(.*?)<\/\1>/u;
+
+  let haveMatch = true;
+  while (haveMatch) {
+    let match = s.match(tagRegex);
+
+    if (s && match && match[0] == s)
+      s = match[2];
+    else
+      haveMatch = false;
+  }
+
+  return s;
 }
 
 export function incrementRenderBatch() {
