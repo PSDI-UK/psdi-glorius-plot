@@ -233,7 +233,6 @@ export function formatESIBibInfo(lNamesAndORCIDs, contactEmail) {
       else
         lTextSegments.push("and ", lFormattedNames[i], ".");
     }
-    lTextSegments.push(".");
   }
 
   if (contactEmail) {
