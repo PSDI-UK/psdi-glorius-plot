@@ -663,6 +663,11 @@ details summary:active {
   width: 20rem;
 }
 
+#rocrate-title-input .ql-editor,
+#rocrate-desc-input .ql-editor {
+  width: 40rem;
+}
+
 .announcement-panel {
   background-color: #ff89a2;
   color           : black;

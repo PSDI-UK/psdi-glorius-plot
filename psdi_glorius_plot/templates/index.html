@@ -784,7 +784,7 @@
           </td>
           <td class="title-input-cell">
             <div class="title-input-container">
-              <div id="rocrate-title-input"></div>
+              <div id="rocrate-title-input" placeholder="Enter dataset title"></div>
             </div>
           </td>
         </tr>
@@ -794,7 +794,7 @@
           </td>
           <td class="desc-input-cell">
             <div class="desc-input-container">
-              <div id="rocrate-desc-input"></div>
+              <div id="rocrate-desc-input" placeholder="Enter brief dataset description"></div>
             </div>
           </td>
         </tr>
@@ -804,7 +804,8 @@
       <label for="rocrate-about" class="info-marker">You can customise the following text that describes the purpose of
         the dataset:</label>
       <div id="rocrate-about-container">
-        <div class="ql-full" id="rocrate-about">
+        <div class="ql-full" id="rocrate-about"
+          placeholder="Enter full description of the dataset, describing its purpose">
           This dataset enables users to visualise the sensitivity of a given chemical
           transformation to user-defined reaction conditions through the use of a Glorius Plot, based on an original
           concept from the Glorius research group.
@@ -864,50 +865,34 @@
       <br>
       <h5>Bibliographic Information</h5>
 
-      <p class="info-marker">Adding information in this section enables others to understand who contributed to the
+      <label class="info-marker">Adding information in this section enables others to understand who contributed to the
         research and to provide the appropriate attribution. If you do not have an ORCID, add a link to your LinkedIn
-        account or personal institutional web page.</p>
+        account or personal institutional web page.</label>
 
-      <table id="rocrate-contrib-table">
+      <table id="rocrate-contrib-table" class="label-table">
         <tr class="rocrate-contrib-row" id="rcw-0">
           <td class="rocrate-contrib-button-cell row-button-cell">
             <div class="row-button-container">
-              <button type="button" id="remove-rcb-0" class="remove-contrib disabled fix-size-small"
+              <button type="button" id="remove-rcb-0" class="remove-contrib fix-size-small" disabled
                 title="Remove this contributor">-</button>
               <button type="button" id="add-rcb-0" class="add-contrib fix-size-small"
                 title="Add a contributor">+</button>
             </div>
           </td>
-          <td class="rocrate-contrib-cell" id="rcc-0">
-            <table class="label-table rocrate-name-table">
-              <tr class="rocrate-name-row">
-                <td class="label-cell">
-                  <label for="rni-0">Name:</label>
-                </td>
-                <td class="input-cell">
-                  <input type="text" name="rocrate-name-input" class="rocrate-name-input" id="rni-0">
-                </td>
-                <td class="button-cell">
-                  <button type="button" class="rocrate-orcid-lookup">ORCID Lookup</button>
-                </td>
-                <td class="label-cell">
-                  <label for="roi-0">ORCID:</label>
-                </td>
-                <td class="input-cell">
-                  <input type="text" name="rocrate-orcid-input" class="rocrate-orcid-input" id="roi-0">
-                </td>
-              </tr>
-            </table>
-            <table class="label-table" class="rocrate-webpage-table">
-              <tr class="rocrate-webpage-row">
-                <td class="label-cell">
-                  <label for="rw-0">LinkedIn or Institutional web page:</label>
-                </td>
-                <td class="input-cell">
-                  <input type="url" name="rocrate-webpage" class="rocrate-webpage" id="rw-0">
-                </td>
-              </tr>
-            </table>
+          <td class="label-cell">
+            <label for="rni-0" class="rocrate-name-label" id="rnl-0">Name:</label>
+          </td>
+          <td class="input-cell">
+            <input type="text" name="rocrate-name-input" class="rocrate-name-input" id="rni-0">
+          </td>
+          <td class="button-cell">
+            <button type="button" class="rocrate-orcid-lookup" id="rob-0">ORCID Lookup</button>
+          </td>
+          <td class="label-cell">
+            <label for="roi-0" class="rocrate-orcid-label" id="rol-0">ORCID:</label>
+          </td>
+          <td class="input-cell">
+            <input type="text" name="rocrate-orcid-input" class="rocrate-orcid-input" id="roi-0">
           </td>
         </tr>
       </table>

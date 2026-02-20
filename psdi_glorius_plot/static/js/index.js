@@ -109,13 +109,15 @@ const GRID_WIDTH = 1, GRID_COLOR = "#00000080";
 const TIP_SIZE = 3, BASE_SEPARATION = 3;
 const BAR_SIZE = 2 * (TIP_SIZE + BASE_SEPARATION + 1);
 
-// Text and placeholders for the RO-crate export section
+// Constants related to the RO-crate export section
 const BASELINE_DESC_INFO_TEXT = "Add text to describe the experimental conditions that give the REPLACEME you " +
   "reported for the “Standard Conditions” of your chemical process:";
 
 const DEFAULT_DATASET_ABOUT_TEXT = "This dataset enables users to visualise the sensitivity of a given chemical " +
   "transformation to user-defined reaction conditions through the use of a Glorius Plot, based on an original concept " +
   "from the Glorius research group.";
+
+const MIN_NUM_CONTRIBS = 1, MAX_NUM_CONTRIBS = 10;
 
 const CITATION_AUTHOR_EXAMPLE_TEXT = "Author, A.; Author, B.; and Author, C.";
 
@@ -1953,28 +1955,7 @@ function initCondDescs() {
 
   // First make sure we have the right number of rows by adding or removing as necessary
   const numRows = getNumConditions();
-  const descTable = $("#rocrate-cond-desc-table tbody");
-  const initDescRows = $(".rocrate-cond-row");
-  const numDescRows = initDescRows.length;
-
-  if (numRows > numDescRows) {
-    // Add the number of rows needed
-    for (let i = numDescRows; i < numRows; ++i) {
-      const newRow = initDescRows.eq(0).clone();
-      descTable.append(newRow);
-      newRow.find(".rocrate-cond-desc-label").attr("id", "rcdl-" + i);
-      newRow.find(".rocrate-cond-desc-label").html(":");
-      newRow.find(".rocrate-cond-desc-input").attr("id", "rcdi-" + i);
-      newRow.find(".rocrate-cond-desc-input .ql-editor").html("");
-      addQuillEditor("#rcdi-" + i, CONDITION_DESC_PLACEHOLDER);
-    }
-  } else if (numRows < numDescRows) {
-    // Remove the excess rows
-    initDescRows.each((i, el) => {
-      if (i >= numRows)
-        $(el).remove();
-    });
-  }
+  setNumROCrateCondRow(numRows);
 
   // Update the condition labels to match the user input
   for (let i = 0; i < numRows; ++i) {
@@ -1983,13 +1964,14 @@ function initCondDescs() {
 
 }
 
-function addROCrateCondRow(targetRowIndex = -1) {
-  const descTable = $("#rocrate-cond-desc-table tbody");
+function addROCrateCondRow(targetRowIndex = -1, updateAfter = true) {
+  const descTable = $("#rocrate-cond-desc-table>tbody");
   const newRow = $(".rocrate-cond-row").eq(0).clone();
   newRow.find(".rocrate-cond-desc-label").html(":")
   newRow.find(".rocrate-cond-desc-input .ql-editor").html("");
 
   if (targetRowIndex == -1) {
+    targetRowIndex = descTable.find("tr").length - 1;
     descTable.append(newRow);
   } else {
     descTable.find("tr").eq(targetRowIndex).after(newRow);
@@ -2006,16 +1988,15 @@ function addROCrateCondRow(targetRowIndex = -1) {
     removeQuillEditor("#rcdi-" + (i - 1));
   }
   addQuillEditor("#rcdi-" + (targetRowIndex + 1), CONDITION_DESC_PLACEHOLDER);
-  enableQuillEventsAndCallbacks();
+
+  if (updateAfter)
+    enableQuillEventsAndCallbacks();
 }
 
-function removeROCrateCondRow(targetRowIndex = -1) {
-  const descTable = $("#rocrate-cond-desc-table tbody");
+function removeROCrateCondRow(targetRowIndex = -1, updateAfter = true) {
+  const descTable = $("#rocrate-cond-desc-table>tbody");
   const lRows = descTable.find("tr");
   const oldNumConditions = lRows.length;
-  const newRow = lRows.eq(0).clone();
-  newRow.find(".rocrate-cond-desc-label").html(":")
-  newRow.find(".rocrate-cond-desc-input .ql-editor").html("");
 
   if (targetRowIndex == -1) {
     targetRowIndex = oldNumConditions - 1;
@@ -2035,6 +2016,25 @@ function removeROCrateCondRow(targetRowIndex = -1) {
     setQuillEditor("#rcdi-" + i, getQuillEditor("#rcdi-" + (i + 1)))
     removeQuillEditor("#rcdi-" + (i + 1));
   }
+
+  if (updateAfter)
+    enableQuillEventsAndCallbacks();
+}
+
+function setNumROCrateCondRow(num) {
+  const oldNum = $("#rocrate-cond-desc-table tr").length;
+
+  if (oldNum < num) {
+    for (let i = 0; i < num - oldNum; ++i) {
+      addROCrateCondRow(-1, false);
+    }
+  } else if (oldNum > num) {
+    for (let i = 0; i < oldNum - num; ++i) {
+      removeROCrateCondRow(-1, false);
+    }
+  } else {
+    return;
+  }
   enableQuillEventsAndCallbacks();
 }
 
@@ -2053,6 +2053,114 @@ function relabelCondDesc() {
     lDescs.eq(i).attr("id", `rcdi-${i}`);
   }
 
+}
+
+function addROCrateContribRow(e, updateAfter = true) {
+  const contribTable = $("#rocrate-contrib-table>tbody");
+  const newRow = $(".rocrate-contrib-row").eq(0).clone();
+  newRow.find(".rocrate-name-input").val("");
+  newRow.find(".rocrate-orcid-input").val("");
+
+  const targetRowIndex = getTargetIndex(e, contribTable.find("tr").length - 1);
+
+  if (targetRowIndex == -1) {
+    contribTable.append(newRow);
+  } else {
+    contribTable.find("tr").eq(targetRowIndex).after(newRow);
+  }
+
+  // Update IDs to match the new row indices
+  relabelContribs();
+
+  if (updateAfter)
+    updateROCrateContribButtons();
+}
+
+function removeROCrateContribRow(e, updateAfter = true) {
+  const contribTable = $("#rocrate-contrib-table>tbody");
+  const lRows = contribTable.find("tr");
+
+  const targetRowIndex = getTargetIndex(e, contribTable.find("tr").length - 1);
+
+  if (targetRowIndex == -1) {
+    targetRowIndex = lRows.length - 1;
+  }
+
+  // Remove the row from the table
+  lRows.eq(targetRowIndex).remove();
+
+  // Update IDs to match the new row indices
+  relabelContribs();
+
+  if (updateAfter)
+    updateROCrateContribButtons();
+}
+
+function setNumROCrateContribRow(num) {
+  const oldNum = $("#rocrate-contrib-table>tbody>tr").length;
+
+  if (oldNum < num) {
+    for (let i = 0; i < num - oldNum; ++i) {
+      addROCrateContribRow(null, false);
+    }
+  } else if (oldNum > num) {
+    for (let i = 0; i < oldNum - num; ++i) {
+      removeROCrateContribRow(null, false);
+    }
+  } else {
+    return;
+  }
+  updateROCrateContribButtons();
+}
+
+/**
+ * Fix the IDs of all contributor inputs
+ */
+function relabelContribs() {
+
+  const num = $(".rocrate-contrib-row").length;
+  const lRemoveButtons = $(".remove-contrib");
+  const lAddButtons = $(".add-contrib");
+  const lNameLabels = $(".rocrate-name-label");
+  const lNameInputs = $(".rocrate-name-input");
+  const lOrcidButtons = $(".rocrate-orcid-lookup");
+  const lOrcidLabels = $(".rocrate-orcid-label");
+  const lOrcidInputs = $(".rocrate-orcid-input");
+
+  for (let i = 0; i < num; i++) {
+    // Fix the IDs of the labels and inputs
+    lRemoveButtons.eq(i).attr("id", `remove-rcb-${i}`);
+    lAddButtons.eq(i).attr("id", `add-rcb-${i}`);
+    lNameLabels.eq(i).attr("id", `rnl-${i}`);
+    lNameInputs.eq(i).attr("id", `rni-${i}`);
+    lOrcidButtons.eq(i).attr("id", `rob-${i}`);
+    lOrcidLabels.eq(i).attr("id", `rol-${i}`);
+    lOrcidInputs.eq(i).attr("id", `roi-${i}`);
+  }
+}
+
+function updateROCrateContribButtons() {
+
+  const lAddContribButtons = $("button.add-contrib");
+  const lRemoveContribButtons = $("button.remove-contrib");
+
+  // Make sure all buttons have the proper events set
+  lAddContribButtons.off("click");
+  lRemoveContribButtons.off("click");
+
+  lAddContribButtons.on("click", addROCrateContribRow);
+  lRemoveContribButtons.on("click", removeROCrateContribRow);
+
+  // Enable/disable buttons as appropriate depending on if we're at the min, max, or neither
+  const numContribs = $("#rocrate-contrib-table>tbody>tr").length;
+  if (numContribs >= MAX_NUM_CONTRIBS)
+    lAddContribButtons.attr("disabled", "disabled");
+  else
+    lAddContribButtons.removeAttr("disabled");
+  if (numContribs <= MIN_NUM_CONTRIBS)
+    lRemoveContribButtons.attr("disabled", "disabled");
+  else
+    lRemoveContribButtons.removeAttr("disabled");
 }
 
 /**
@@ -2498,7 +2606,7 @@ function initNumDimControls(dim) {
 
   $("button.add-" + dim).on("click", (e) => addDim(dim, e, true));
   $("button.remove-" + dim).on("click", (e) => removeDim(dim, e, true));
-  $("select#num-" + dim).on("change", (e) => setNumDim(dim, $(e.target).val()));
+  $("select#num-" + dim).on("change", (e) => setNumDim(dim, $(e.target).val()))
 }
 
 function updateOutputLabelSelection(e) {
@@ -2671,6 +2779,7 @@ $(document).ready(function () {
   enableDeviationCalc(), enableAutoUpdates(), enableCanvasUpdate();
 
   enableROCrateOnChangeTriggers();
+  updateROCrateContribButtons();
 
   // Special handling if we're debugging
   if (debug) {
