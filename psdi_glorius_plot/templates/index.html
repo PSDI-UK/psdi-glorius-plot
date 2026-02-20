@@ -864,50 +864,34 @@
       <br>
       <h5>Bibliographic Information</h5>
 
-      <p class="info-marker">Adding information in this section enables others to understand who contributed to the
+      <label class="info-marker">Adding information in this section enables others to understand who contributed to the
         research and to provide the appropriate attribution. If you do not have an ORCID, add a link to your LinkedIn
-        account or personal institutional web page.</p>
+        account or personal institutional web page.</label>
 
-      <table id="rocrate-contrib-table">
+      <table id="rocrate-contrib-table" class="label-table">
         <tr class="rocrate-contrib-row" id="rcw-0">
           <td class="rocrate-contrib-button-cell row-button-cell">
             <div class="row-button-container">
-              <button type="button" id="remove-rcb-0" class="remove-contrib disabled fix-size-small"
+              <button type="button" id="remove-rcb-0" class="remove-contrib fix-size-small" disabled
                 title="Remove this contributor">-</button>
               <button type="button" id="add-rcb-0" class="add-contrib fix-size-small"
                 title="Add a contributor">+</button>
             </div>
           </td>
-          <td class="rocrate-contrib-cell" id="rcc-0">
-            <table class="label-table rocrate-name-table">
-              <tr class="rocrate-name-row">
-                <td class="label-cell">
-                  <label for="rni-0">Name:</label>
-                </td>
-                <td class="input-cell">
-                  <input type="text" name="rocrate-name-input" class="rocrate-name-input" id="rni-0">
-                </td>
-                <td class="button-cell">
-                  <button type="button" class="rocrate-orcid-lookup">ORCID Lookup</button>
-                </td>
-                <td class="label-cell">
-                  <label for="roi-0">ORCID:</label>
-                </td>
-                <td class="input-cell">
-                  <input type="text" name="rocrate-orcid-input" class="rocrate-orcid-input" id="roi-0">
-                </td>
-              </tr>
-            </table>
-            <table class="label-table" class="rocrate-webpage-table">
-              <tr class="rocrate-webpage-row">
-                <td class="label-cell">
-                  <label for="rw-0">LinkedIn or Institutional web page:</label>
-                </td>
-                <td class="input-cell">
-                  <input type="url" name="rocrate-webpage" class="rocrate-webpage" id="rw-0">
-                </td>
-              </tr>
-            </table>
+          <td class="label-cell">
+            <label for="rni-0">Name:</label>
+          </td>
+          <td class="input-cell">
+            <input type="text" name="rocrate-name-input" class="rocrate-name-input" id="rni-0">
+          </td>
+          <td class="button-cell">
+            <button type="button" class="rocrate-orcid-lookup">ORCID Lookup</button>
+          </td>
+          <td class="label-cell">
+            <label for="roi-0">ORCID:</label>
+          </td>
+          <td class="input-cell">
+            <input type="text" name="rocrate-orcid-input" class="rocrate-orcid-input" id="roi-0">
           </td>
         </tr>
       </table>
