@@ -2058,8 +2058,8 @@ function relabelCondDesc() {
 function addROCrateContribRow(e, updateAfter = true) {
   const contribTable = $("#rocrate-contrib-table>tbody");
   const newRow = $(".rocrate-contrib-row").eq(0).clone();
-  newRow.find(".rocrate-name-input .ql-editor").val("");
-  newRow.find(".rocrate-orcid-input .ql-editor").val("");
+  newRow.find(".rocrate-name-input").val("");
+  newRow.find(".rocrate-orcid-input").val("");
 
   const targetRowIndex = getTargetIndex(e, contribTable.find("tr").length - 1);
 
@@ -2119,6 +2119,8 @@ function setNumROCrateContribRow(num) {
 function relabelContribs() {
 
   const num = $(".rocrate-contrib-row").length;
+  const lRemoveButtons = $(".remove-contrib");
+  const lAddButtons = $(".add-contrib");
   const lNameLabels = $(".rocrate-name-label");
   const lNameInputs = $(".rocrate-name-input");
   const lOrcidButtons = $(".rocrate-orcid-lookup");
@@ -2127,13 +2129,38 @@ function relabelContribs() {
 
   for (let i = 0; i < num; i++) {
     // Fix the IDs of the labels and inputs
+    lRemoveButtons.eq(i).attr("id", `remove-rcb-${i}`);
+    lAddButtons.eq(i).attr("id", `add-rcb-${i}`);
     lNameLabels.eq(i).attr("id", `rnl-${i}`);
     lNameInputs.eq(i).attr("id", `rni-${i}`);
     lOrcidButtons.eq(i).attr("id", `rob-${i}`);
     lOrcidLabels.eq(i).attr("id", `rol-${i}`);
     lOrcidInputs.eq(i).attr("id", `roi-${i}`);
   }
+}
 
+function updateROCrateContribButtons() {
+
+  const lAddContribButtons = $("button.add-contrib");
+  const lRemoveContribButtons = $("button.remove-contrib");
+
+  // Make sure all buttons have the proper events set
+  lAddContribButtons.off("click");
+  lRemoveContribButtons.off("click");
+
+  lAddContribButtons.on("click", addROCrateContribRow);
+  lRemoveContribButtons.on("click", removeROCrateContribRow);
+
+  // Enable/disable buttons as appropriate depending on if we're at the min, max, or neither
+  const numContribs = $("#rocrate-contrib-table>tbody>tr").length;
+  if (numContribs >= MAX_NUM_CONTRIBS)
+    lAddContribButtons.attr("disabled", "disabled");
+  else
+    lAddContribButtons.removeAttr("disabled");
+  if (numContribs <= MIN_NUM_CONTRIBS)
+    lRemoveContribButtons.attr("disabled", "disabled");
+  else
+    lRemoveContribButtons.removeAttr("disabled");
 }
 
 /**
@@ -2580,30 +2607,6 @@ function initNumDimControls(dim) {
   $("button.add-" + dim).on("click", (e) => addDim(dim, e, true));
   $("button.remove-" + dim).on("click", (e) => removeDim(dim, e, true));
   $("select#num-" + dim).on("change", (e) => setNumDim(dim, $(e.target).val()))
-}
-
-function updateROCrateContribButtons() {
-
-  const lAddContribButtons = $("button.add-contrib");
-  const lRemoveContribButtons = $("button.remove-contrib");
-
-  // Make sure all buttons have the proper events set
-  lAddContribButtons.off("click");
-  lRemoveContribButtons.off("click");
-
-  lAddContribButtons.on("click", addROCrateContribRow);
-  lRemoveContribButtons.on("click", removeROCrateContribRow);
-
-  // Enable/disable buttons as appropriate depending on if we're at the min, max, or neither
-  const numContribs = $("#rocrate-contrib-table>tbody>tr").length;
-  if (numContribs >= MAX_NUM_CONTRIBS)
-    lAddContribButtons.attr("disabled", "disabled");
-  else
-    lAddContribButtons.removeAttr("disabled");
-  if (numContribs <= MIN_NUM_CONTRIBS)
-    lRemoveContribButtons.attr("disabled", "disabled");
-  else
-    lRemoveContribButtons.removeAttr("disabled");
 }
 
 function updateOutputLabelSelection(e) {
