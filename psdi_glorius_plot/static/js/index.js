@@ -2063,11 +2063,7 @@ function addROCrateContribRow(e, updateAfter = true) {
 
   const targetRowIndex = getTargetIndex(e, contribTable.find("tr").length - 1);
 
-  if (targetRowIndex == -1) {
-    contribTable.append(newRow);
-  } else {
-    contribTable.find("tr").eq(targetRowIndex).after(newRow);
-  }
+  contribTable.find("tr").eq(targetRowIndex).after(newRow);
 
   // Update IDs to match the new row indices
   relabelContribs();
@@ -2081,10 +2077,6 @@ function removeROCrateContribRow(e, updateAfter = true) {
   const lRows = contribTable.find("tr");
 
   const targetRowIndex = getTargetIndex(e, contribTable.find("tr").length - 1);
-
-  if (targetRowIndex == -1) {
-    targetRowIndex = lRows.length - 1;
-  }
 
   // Remove the row from the table
   lRows.eq(targetRowIndex).remove();
@@ -2111,6 +2103,22 @@ function setNumROCrateContribRow(num) {
     return;
   }
   updateROCrateContribButtons();
+}
+
+/**
+ * Open a search for the entered author name on the ORCID site
+ * @param {Event} e 
+ */
+function lookupOrcid(e) {
+  const contribTable = $("#rocrate-contrib-table>tbody");
+
+  const targetRowIndex = getTargetIndex(e, contribTable.find("tr").length - 1);
+  const targetRow = contribTable.find("tr").eq(targetRowIndex);
+  let authorName = targetRow.find(".rocrate-name-input").val();
+
+  // Construct the URL to use for the search on ORCID's site and open it in a new tab
+  const lookupUrl = `https://orcid.org/orcid-search/search?searchQuery=${authorName.replace(" ", "%20")}`
+  window.open(lookupUrl, '_blank').focus();
 }
 
 /**
@@ -2143,13 +2151,16 @@ function updateROCrateContribButtons() {
 
   const lAddContribButtons = $("button.add-contrib");
   const lRemoveContribButtons = $("button.remove-contrib");
+  const lOrcidLookupButtons = $("button.rocrate-orcid-lookup");
 
   // Make sure all buttons have the proper events set
   lAddContribButtons.off("click");
   lRemoveContribButtons.off("click");
+  lOrcidLookupButtons.off("click");
 
   lAddContribButtons.on("click", addROCrateContribRow);
   lRemoveContribButtons.on("click", removeROCrateContribRow);
+  lOrcidLookupButtons.on("click", lookupOrcid);
 
   // Enable/disable buttons as appropriate depending on if we're at the min, max, or neither
   const numContribs = $("#rocrate-contrib-table>tbody>tr").length;
