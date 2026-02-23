@@ -119,8 +119,6 @@ const DEFAULT_DATASET_ABOUT_TEXT = "This dataset enables users to visualise the 
 
 const MIN_NUM_CONTRIBS = 1, MAX_NUM_CONTRIBS = 10;
 
-const CITATION_AUTHOR_EXAMPLE_TEXT = "Author, A.; Author, B.; and Author, C.";
-
 const D_LICENSE_INFO = {
   "cc0-1.0": {
     name: "Creative Commons Zero v1.0 Universal",
@@ -163,11 +161,11 @@ let initWidth, initHeight, initLabelFontSize, initAxisFontSize;
 // Globals relating to data package export
 let roCrateFormUpdating = false;
 let exportChecks = {
-  citationAuthor: false
 };
 
 // Stored valued for user-input values to revert to if they click the button to do so
-let lastDatasetTitle, lastDatasetDesc, lastDatasetAbout;
+let lastDatasetTitle, lastDatasetDesc, lastDatasetAbout, lastCitation;
+let userHasEditedCitation = false;
 
 /**
  * A ChartJS plugin which allows a custom background color for the plot
@@ -1917,15 +1915,18 @@ function startROCrateExport(scroll = true) {
     scrollToSection("#rocrate-export-title");
 }
 
-function updateROCrateForm(firstTime = false) {
+async function updateROCrateForm(firstTime = false) {
 
   updateROCrateOutputLabel();
 
-  // The first time the form is updated only, set the title and about section based on what's in the form above
+  // The first time the form is updated only, set the title/about and citation sections based on what's in the form
+  // above, and do other initialisation tasks
   if (firstTime) {
     initCondDescs();
-    useDefaultROCrateTitleDesc;
     enableQuillEventsAndCallbacks();
+    useDefaultROCrateTitleDesc();
+    // Update citation after a bit of a lag, since it depends on the title
+    setTimeout(useDefaultCitation, 100);
   }
 }
 
@@ -2069,7 +2070,7 @@ function addROCrateContribRow(e, updateAfter = true) {
   relabelContribs();
 
   if (updateAfter)
-    updateROCrateContribButtons();
+    postContribRowUpdate();
 }
 
 function removeROCrateContribRow(e, updateAfter = true) {
@@ -2085,7 +2086,7 @@ function removeROCrateContribRow(e, updateAfter = true) {
   relabelContribs();
 
   if (updateAfter)
-    updateROCrateContribButtons();
+    postContribRowUpdate();
 }
 
 function setNumROCrateContribRow(num) {
@@ -2102,7 +2103,7 @@ function setNumROCrateContribRow(num) {
   } else {
     return;
   }
-  updateROCrateContribButtons();
+  postContribRowUpdate();
 }
 
 /**
@@ -2147,7 +2148,7 @@ function relabelContribs() {
   }
 }
 
-function updateROCrateContribButtons() {
+function postContribRowUpdate() {
 
   const lAddContribButtons = $("button.add-contrib");
   const lRemoveContribButtons = $("button.remove-contrib");
@@ -2172,6 +2173,16 @@ function updateROCrateContribButtons() {
     lRemoveContribButtons.attr("disabled", "disabled");
   else
     lRemoveContribButtons.removeAttr("disabled");
+
+  // Enable on change triggers for each name input
+  for (let i = 0; i < numContribs; ++i) {
+    const e = $("#rni-" + i);
+    e.off("change");
+    e.on("change", () => {
+      if (!userHasEditedCitation)
+        useDefaultCitation();
+    });
+  }
 }
 
 /**
@@ -2219,6 +2230,133 @@ function revertROCrateTitleDesc() {
   lastDatasetTitle = tempDatasetTitle;
   lastDatasetDesc = tempDatasetDesc;
   lastDatasetAbout = tempDatasetAbout;
+}
+
+function formatInitials(forename) {
+  let initials = "";
+  const forenameSegments = forename.split(/\s+/u);
+  forenameSegments.forEach((s) => {
+    initials += `${s[0].toUpperCase()}.`;
+  });
+  return initials;
+}
+
+function useDefaultCitation(e) {
+
+  // If this isn't the initialisation call (which will be the case if event info from a button click is passed here),
+  // store the previous citation
+  if (e) {
+    lastCitation = getQuillEditorHTML("#rocrate-citation");
+    userHasEditedCitation = false;
+    $("#rocrate-revert-citation").removeAttr("disabled");
+  }
+  const datasetTitle = getQuillEditorHTML("#rocrate-title-input")
+  const date = (new Date()).toISOString().slice(0, 9);
+
+  const lNames = [];
+  $(".rocrate-name-input").each((_, nameInput) => {
+    let name = nameInput.value;
+
+    // Take a best guess at formatting the name as surname, forename
+    const lNameSegments = name.split(/\s+/u);
+    let formattedName;
+    if (!lNameSegments[0]) {
+      return;
+    } else if (lNameSegments.length == 1) {
+      formattedName = name;
+    } else {
+
+      // Check if we can split by a comma, in which case surname is before, forename after
+      const lCommaSplitSegments = name.split(/,\s+/u);
+      if (lCommaSplitSegments.length == 2) {
+        formattedName = `${lCommaSplitSegments[0]}, ${formatInitials(lCommaSplitSegments[1])}`;
+      } else {
+
+        // We either have zero commas, or more than one, so they aren't a good guide. If more than one, strip them all
+        if (lCommaSplitSegments.length > 2) {
+          lNameSegments.forEach((s, i) => {
+            lNameSegments[i] = s.replace(",", "");
+          });
+        }
+
+        // Now, let's check if the surname segments are indicated by being in all-caps
+        const lCapsSurnameSegments = [];
+        const lCapsForenameSegments = [];
+        lNameSegments.forEach((s) => {
+          if (s.length > 1 && s === s.toUpperCase()) {
+            lCapsSurnameSegments.push(s);
+          } else {
+            lCapsForenameSegments.push(s);
+          }
+        });
+
+        if (lCapsSurnameSegments.length > 0) {
+          // Turn the all-caps segments into just the first letter capitalised
+          lCapsSurnameSegments.forEach((s, i) => {
+            s = s.toLowerCase();
+            lCapsSurnameSegments[i] = s[0].toUpperCase() + s.slice(1);
+          });
+          formattedName = `${lCapsSurnameSegments.join(" ")}, ${formatInitials(lCapsForenameSegments.join(" "))}`;
+        } else {
+          // If we get here, there's no obvious indications of what's the forename and what's the surname, so we'll
+          // take the best guess that only the final segment is the surname, which is the most-likely scenario for a
+          // site aimed at British users like this one
+          formattedName = `${lNameSegments.at(-1)}, ${formatInitials(lNameSegments.slice(0, -1).join(" "))}`;
+        }
+      }
+    }
+
+    lNames.push(formattedName);
+  });
+
+  // Format differently depending on if we have, none, one, two, or three or more authors
+  let authorList;
+  if (lNames.length == 0) {
+    authorList = "";
+  } else if (lNames.length == 1) {
+    authorList = lNames[0];
+  } else if (lNames.length == 2) {
+    authorList = lNames[0];
+    authorList = `${lNames[0]}; and ${lNames[1]}`;
+  } else {
+    authorList = "";
+    for (let i = 0; i < lNames.length; ++i) {
+      if (i < lNames.length - 1)
+        authorList += `${lNames[i]}; `;
+      else
+        authorList += `and ${lNames[i]}`;
+    }
+  }
+
+  if (authorList.length > 0 && authorList.at(-1) == ".") {
+    authorList += " ";
+  } else if (authorList.length > 0) {
+    authorList += ". ";
+  }
+
+  const citation = `Please cite: <em>${authorList}</em>${datasetTitle} generated by PSDI Glorius Plot Generator ` +
+    `version ${version} (${date}).`;
+
+  const lastUserHasEditedCitation = userHasEditedCitation;
+  updateQuillContents("#rocrate-citation", citation);
+  if (e) {
+    userHasEditedCitation = false;
+  } else {
+    userHasEditedCitation = lastUserHasEditedCitation;
+  }
+}
+
+/**
+ * Reverts the text in the citation in the RO-crate section to what it was before the
+ * last click of the Default or Revert button
+ */
+function revertCitation() {
+  // Swap the values in the inputs and the stored values
+  let tempCitation = getQuillEditorHTML("#rocrate-citation");
+  updateQuillContents("#rocrate-citation", lastCitation);
+  lastCitation = tempCitation;
+
+  userHasEditedCitation = true;
 }
 
 /**
@@ -2368,18 +2506,6 @@ function checkCondDescs() {
     $("#rocrate-test-conditions-li").addClass("hidden");
 }
 
-function checkCitationAuthors() {
-  const citationText = getQuillEditorHTML("#rocrate-citation");
-  if (citationText.includes(CITATION_AUTHOR_EXAMPLE_TEXT)) {
-    exportChecks.citationAuthor = false;
-    $("#rocrate-citation-author-error").removeClass("hidden");
-  } else {
-    exportChecks.citationAuthor = true;
-    $("#rocrate-citation-author-error").addClass("hidden");
-  }
-  updateROCrateDownloadEnabled();
-}
-
 function updateROCrateDownloadEnabled() {
   let allGood = true;
   Object.values(exportChecks).forEach((check) => {
@@ -2474,7 +2600,7 @@ async function exportROCrate() {
 function makeBibInfo() {
   const lNamesAndORCIDs = [];
 
-  $(".rocrate-contrib-row").each((i, el) => {
+  $(".rocrate-contrib-row").each((_, el) => {
     const oEl = $(el);
     const name = oEl.find(".rocrate-name-input").val();
     const orcId = oEl.find(".rocrate-orcid-input").val();
@@ -2548,6 +2674,9 @@ function enableButtons() {
 
   $("#rocrate-default-title-desc").on("click", useDefaultROCrateTitleDesc);
   $("#rocrate-revert-title-desc").on("click", revertROCrateTitleDesc);
+
+  $("#rocrate-default-citation").on("click", useDefaultCitation);
+  $("#rocrate-revert-citation").on("click", revertCitation);
 
   $("#rocrate-download").on("click", exportROCrate);
 }
@@ -2760,8 +2889,8 @@ function enableQuillEventsAndCallbacks() {
   // Set up other callbacks we want to set up for specific editors, then enable all events tied to editors
   const otherCallbacks = {
     "#ol-0": updateOutputLabelCallback,
-    "#rocrate-citation": checkCitationAuthors,
-    "#rocrate-baseline-desc": checkBaselineDesc
+    "#rocrate-baseline-desc": checkBaselineDesc,
+    "#rocrate-citation": () => { userHasEditedCitation = true; }
   };
   const numConditions = getNumConditions();
   for (let i = 0; i < numConditions; ++i) {
@@ -2775,7 +2904,6 @@ function enableQuillEventsAndCallbacks() {
 function enableROCrateOnChangeTriggers() {
   $("#rocrate-cdxml").on("change", updateReactionScheme);
   $("input[name='rocrate-license']").on("change", updateLicense);
-
 }
 
 $(document).ready(function () {
@@ -2790,7 +2918,7 @@ $(document).ready(function () {
   enableDeviationCalc(), enableAutoUpdates(), enableCanvasUpdate();
 
   enableROCrateOnChangeTriggers();
-  updateROCrateContribButtons();
+  postContribRowUpdate();
 
   // Special handling if we're debugging
   if (debug) {
@@ -2803,6 +2931,9 @@ $(document).ready(function () {
 
     // The plot title is updated on a bit of a lag, so we do a brief async wait then call for it to be set in the
     // RO-crate section too
-    setTimeout(useDefaultROCrateTitleDesc, 100);
+    setTimeout(() => {
+      useDefaultROCrateTitleDesc();
+      useDefaultCitation();
+    }, 100);
   }
 });
