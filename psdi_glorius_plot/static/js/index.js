@@ -2070,7 +2070,7 @@ function addROCrateContribRow(e, updateAfter = true) {
   relabelContribs();
 
   if (updateAfter)
-    updateROCrateContribButtons();
+    postContribRowUpdate();
 }
 
 function removeROCrateContribRow(e, updateAfter = true) {
@@ -2086,7 +2086,7 @@ function removeROCrateContribRow(e, updateAfter = true) {
   relabelContribs();
 
   if (updateAfter)
-    updateROCrateContribButtons();
+    postContribRowUpdate();
 }
 
 function setNumROCrateContribRow(num) {
@@ -2103,7 +2103,7 @@ function setNumROCrateContribRow(num) {
   } else {
     return;
   }
-  updateROCrateContribButtons();
+  postContribRowUpdate();
 }
 
 /**
@@ -2148,7 +2148,7 @@ function relabelContribs() {
   }
 }
 
-function updateROCrateContribButtons() {
+function postContribRowUpdate() {
 
   const lAddContribButtons = $("button.add-contrib");
   const lRemoveContribButtons = $("button.remove-contrib");
@@ -2173,6 +2173,16 @@ function updateROCrateContribButtons() {
     lRemoveContribButtons.attr("disabled", "disabled");
   else
     lRemoveContribButtons.removeAttr("disabled");
+
+  // Enable on change triggers for each name input
+  for (let i = 0; i < numContribs; ++i) {
+    const e = $("#rni-" + i);
+    e.off("change");
+    e.on("change", () => {
+      if (!userHasEditedCitation)
+        useDefaultCitation();
+    });
+  }
 }
 
 /**
@@ -2837,7 +2847,7 @@ $(document).ready(function () {
   enableDeviationCalc(), enableAutoUpdates(), enableCanvasUpdate();
 
   enableROCrateOnChangeTriggers();
-  updateROCrateContribButtons();
+  postContribRowUpdate();
 
   // Special handling if we're debugging
   if (debug) {
