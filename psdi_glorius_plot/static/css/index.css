@@ -523,12 +523,12 @@ details summary:active {
 
 .tooltip-on-light {
   --bs-tooltip-bg   : var(--ifm-color-primary);
-  --bs-tooltip-color: var(--psdi-light-text-color-body);
+  --bs-tooltip-color: var(--ifm-hero-text-color);
 }
 
 .tooltip-on-dark {
   --bs-tooltip-bg   : var(--ifm-background-color);
-  --bs-tooltip-color: var(--psdi-dark-text-color-body);
+  --bs-tooltip-color: var(--ifm-font-color-base);
 }
 
 /* Canvas styling */
