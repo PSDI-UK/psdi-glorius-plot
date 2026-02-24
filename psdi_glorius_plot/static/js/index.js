@@ -2241,6 +2241,30 @@ function formatInitials(forename) {
   return initials;
 }
 
+/**
+ * Capitalize a surname as best as we can guess how it should be, e.g. SMITH -> Smith, O'FLANNERY -> O'Flannery,
+ * MACDONALD -> MacDonald, MACKENZIE -> Mackenzie
+ * @param {String} surname The surname to try to capitalize
+ * @returns {String}
+ */
+function surnameToCapitalized(s) {
+  // Start by making the string all lowercase except the first letter, which should be upper case
+  s = s[0].toUpperCase() + s.slice(1).toLowerCase();
+
+  // Check for prefixes which commonly indicate the letter afterwards will be capitalised, and do so
+  if (s.match(/^(Mc|O')/ui) && s.length > 2) {
+    // "Mc" and "O'" prefixes are almost universally followed by another capital letter, so capitalize whatever the
+    // next letter is
+    s = s.slice(0, 2) + s[2].toUpperCase() + s.slice(3);
+  } else if (s.startsWith("Mac") && !s.startsWith("Mack") && s.length > 3) {
+    // "Mac" is usually but not always followed a capital letter, e.g. "MacDonald" but not "Mackenzie". The best
+    // rule here is to capitalize after "Mac" but not "Mack"
+    s = s.slice(0, 3) + s[3].toUpperCase() + s.slice(4);
+  }
+
+  return s;
+}
+
 function useDefaultCitation(e) {
 
   // If this isn't the initialisation call (which will be the case if event info from a button click is passed here),
@@ -2293,8 +2317,7 @@ function useDefaultCitation(e) {
         if (lCapsSurnameSegments.length > 0) {
           // Turn the all-caps segments into just the first letter capitalised
           lCapsSurnameSegments.forEach((s, i) => {
-            s = s.toLowerCase();
-            lCapsSurnameSegments[i] = s[0].toUpperCase() + s.slice(1);
+            lCapsSurnameSegments[i] = surnameToCapitalized(s);
           });
           formattedName = `${lCapsSurnameSegments.join(" ")}, ${formatInitials(lCapsForenameSegments.join(" "))}`;
         } else {
