@@ -669,7 +669,7 @@
   <br>
   <h4>Export as a FAIR data package</h4>
   <label for="export-data-package-buttons" class="info-marker">You can export a FAIR data package to accompany your
-    Glorius Plot by providing some additional information. The more information you can provide, the more useful the
+    Glorius plot by providing some additional information. The more information you can provide, the more useful the
     data package will be for others. If you choose not to add any additional information, a simple version of the data
     package will be exported instead. Click the “Configure Data Package” button below to set up and export your data
     package.
@@ -680,320 +680,314 @@
       <img src="{{url_for('static', filename='img/icon-config.svg')}}" alt="Config icon" class="text-icon"
         style="transform: translate(0, -6.25%);">
       Configure Data Package</button>
-    <button type="button" class="returnToROCrateExport hidden hidden-until-rocrate">↪ Return to data package
-      export</button>
-  </div>
-</div>
-{% endblock %}
-
-{% block content_after_main %}
-<div class="secondary mathjax_ignore hidden rocrate-export" id="rocrate-export-title">
-  <div class="max-width-box">
-    <h4>Export a FAIR data package</h4>
-    <p>You can export a FAIR data package to accompany your Glorius plot by providing some additional information
-      here. If you choose not to add any additional information, a simple version of the data package will
-      instead be exported. The more information you can provide, the more useful the data package will be for others.
-    </p>
   </div>
 </div>
 
-<div class="mathjax_ignore hidden rocrate-export" id="rocrate-export">
-  <div class="max-width-box">
-    <form id="rocrate-input">
 
-      <div class="announcement-panel">
-        <p>
-          <strong>Alert:</strong> This functionality is currently under construction and is shown here purely for
-          development purposes. Aspects may not yet be implemented, may be partially functional, or may be broken
-          without warning.
-        </p>
-      </div>
+<details id="rocrate-input" class="hidden rocrate-export" open>
+  <summary class="large-marker">
+    <h4 id="rocrate-export-title">Configure your data package</h4>
+  </summary>
+  <p>
+    Enter additional information in this section to make your data package more useful for others. Refer to the <a
+      href="#rocrate-file-structure">File Structure</a> section for information about what files will be included in
+    your FAIR data package. When you have finished configuring your preferences, click the “Download Data Package”
+    button to download a FAIR data package containing your plot, data, and other information you provided.
+  </p>
+  <form>
 
-      <button type="button" id="returnToDataInput" class="no-left-margin">↩ Return to data input</button>
+    <button type="button" id="returnToDataInput" class="no-left-margin">↩ Return to data input</button>
 
-      <br><br>
-      <h5>About your experiment</h5>
+    <br><br>
+    <h5>About your experiment</h5>
 
-      <strong>Standard Conditions</strong><br>
-      <label for="rocrate-cdxml" class="info-marker">Add a ChemDraw <code>.cdxml</code> file that depicts the chemical
-        process corresponding to your “Standard Conditions”:</label>
-      <br>
-      <input type="file" name="rocrate-cdxml" id="rocrate-cdxml" accept=".cdxml"><br>
-      <label for="rocrate-img" class="info-marker">Add a <code>.png</code> illustration of the reaction which will be
-        added to the supplementary information file. This can be generated from a <code>.cdxml</code> file using e.g.
-        the <a href="https://data-conversion.psdi.ac.uk/">PSDI Data Conversion Service</a>:</label>
-      <br>
-      <input type="file" name="rocrate-img" id="rocrate-img" accept=".png,.jpg,.jpeg">
-      <br><br>
-      <label for="baseline-desc-container" class="info-marker">Add text to describe the experimental conditions that
-        give the outcome you reported for the “Standard Conditions” of your chemical process:</label>
-      <div id="baseline-desc-container">
-        <div class="ql-full" id="rocrate-baseline-desc" placeholder="Describe standard conditions here"></div>
-      </div>
+    <strong>Standard Conditions</strong><br>
+    <label for="rocrate-cdxml" class="info-marker">Add a ChemDraw <code>.cdxml</code> file that depicts the chemical
+      process corresponding to your “Standard Conditions”. Including a <code>.cdxml</code> file enables chemical
+      information to be linked to your data.</label>
+    <br>
+    <input type="file" name="rocrate-cdxml" id="rocrate-cdxml" accept=".cdxml"><br>
+    <label for="rocrate-img" class="info-marker">Add a <code>.png</code> illustration of the reaction which will be
+      added to the supplementary information file. This can be generated from a <code>.cdxml</code> file using e.g.
+      the <a href="https://data-conversion.psdi.ac.uk/">PSDI Data Conversion Service</a>.</label>
+    <br>
+    <input type="file" name="rocrate-img" id="rocrate-img" accept=".png,.jpg,.jpeg">
+    <br><br>
+    <label for="baseline-desc-container" class="info-marker">Add text to describe the experimental conditions that
+      give the isolated yield (%) you reported for the “Standard Conditions” of your
+      chemical process:</label>
+    <div id="baseline-desc-container">
+      <div class="ql-full" id="rocrate-baseline-desc" placeholder="Describe standard conditions here"></div>
+    </div>
 
-      <br>
-      <strong>Test Conditions</strong>
-      <p class="info-marker">Add a description which clearly describes how each 'Test condition' differs from the
-        “Standard Conditions” of your chemical transformation.</p>
-      <table id="rocrate-cond-desc-table">
-        <tr class="rocrate-cond-row">
-          <td class="rocrate-cond-label">
-            <div class="rocrate-cond-desc-label" id="rcdl-0"></div>
-          </td>
-          <td class="rocrate-cond-desc">
-            <div class="rocrate-cond-desc-container">
-              <div class="rocrate-cond-desc-input" id="rcdi-0"></div>
-            </div>
-          </td>
-        </tr>
-        <tr class="rocrate-cond-row">
-          <td class="rocrate-cond-label">
-            <div class="rocrate-cond-desc-label" id="rcdl-1"></div>
-          </td>
-          <td class="rocrate-cond-desc">
-            <div class="rocrate-cond-desc-container">
-              <div class="rocrate-cond-desc-input" id="rcdi-1"></div>
-            </div>
-          </td>
-        </tr>
-        <tr class="rocrate-cond-row">
-          <td class="rocrate-cond-label">
-            <div class="rocrate-cond-desc-label" id="rcdl-2"></div>
-          </td>
-          <td class="rocrate-cond-desc">
-            <div class="rocrate-cond-desc-container">
-              <div class="rocrate-cond-desc-input" id="rcdi-2"></div>
-            </div>
-          </td>
-        </tr>
-        <tr class="rocrate-cond-row">
-          <td class="rocrate-cond-label">
-            <div class="rocrate-cond-desc-label" id="rcdl-3"></div>
-          </td>
-          <td class="rocrate-cond-desc">
-            <div class="rocrate-cond-desc-container">
-              <div class="rocrate-cond-desc-input" id="rcdi-3"></div>
-            </div>
-          </td>
-        </tr>
-        <tr class="rocrate-cond-row">
-          <td class="rocrate-cond-label">
-            <div class="rocrate-cond-desc-label" id="rcdl-4"></div>
-          </td>
-          <td class="rocrate-cond-desc">
-            <div class="rocrate-cond-desc-container">
-              <div class="rocrate-cond-desc-input" id="rcdi-4"></div>
-            </div>
-          </td>
-        </tr>
-      </table>
-
-      <br><br>
-      <h5>About this dataset</h5>
-
-      <table class="label-table" id="rocrate-title-table">
-        <tr class="title-row">
-          <td class="label-cell">
-            <label for="rocrate-title-input" id="rocrate-title-label">Title:</label>
-          </td>
-          <td class="title-input-cell">
-            <div class="title-input-container">
-              <div id="rocrate-title-input" placeholder="Enter dataset title"></div>
-            </div>
-          </td>
-        </tr>
-        <tr class="desc-row">
-          <td class="label-cell">
-            <label for="rocrate-desc-input" id="rocrate-desc-label">Description:</label>
-          </td>
-          <td class="desc-input-cell">
-            <div class="desc-input-container">
-              <div id="rocrate-desc-input" placeholder="Enter brief dataset description"></div>
-            </div>
-          </td>
-        </tr>
-      </table>
-
-      <strong>About:</strong><br>
-      <label for="rocrate-about" class="info-marker">You can customise the following text that describes the purpose of
-        the dataset:</label>
-      <div id="rocrate-about-container">
-        <div class="ql-full" id="rocrate-about"
-          placeholder="Enter full description of the dataset, describing its purpose">
-          This dataset enables users to visualise the sensitivity of a given chemical
-          transformation to user-defined reaction conditions through the use of a Glorius Plot, based on an original
-          concept from the Glorius research group.
-        </div>
-      </div>
-
-      <button type="button" id="rocrate-default-title-desc" class="no-left-margin">Use defaults</button>
-      <button type="button" id="rocrate-revert-title-desc" class="no-left-margin" disabled>Revert</button>
-
-      <br><br>
-      <strong>License:</strong>
-      <p class="info-marker"><a href="https://guidance.psdi.ac.uk/docusaurus-pages/docs/guidance/fair/license/">
-          Choosing a license enables others to understand what they can do with your data</a>. Select
-        from the license options below or choose an alternative license in Other. You can visit <a
-          href="https://spdx.org">spdx.org</a> to find out more about kinds of licenses that might be appropriate for
-        your project. If your license requires attribution, you must enter bibliographic information about the
-        contributors to this dataset.</p>
-      <ul class="no-bullet">
-        <li><input type="radio" name="rocrate-license" id="rocrate-license-cc0" class="small-right-margin"
-            value="cc0-1.0">
-          <label for="rocrate-license-cc0"><a href="https://spdx.org/licenses/CC0-1.0.html" target="_blank">CC0-1.0
-              (Public Domain)</a></label>
-        </li>
-        <li><input type="radio" name="rocrate-license" id="rocrate-license-cc-by-4.0" class="small-right-margin"
-            value="cc-by-4.0">
-          <label for="rocrate-license-cc-by-4.0"><a href="https://spdx.org/licenses/CC-BY-4.0.html"
-              target="_blank">CC-BY-4.0 (Attribution)</a></label>
-        </li>
-        <li><input type="radio" name="rocrate-license" id="rocrate-license-cc-by-sa-4.0" class="small-right-margin"
-            value="cc-by-sa-4.0">
-          <label for="rocrate-license-cc-by-sa-4.0"><a href="https://spdx.org/licenses/CC-BY-SA-4.0.html"
-              target="_blank">CC-BY-SA-4.0 (Attribution Share Alike)</a></label>
-        </li>
-        <li><input type="radio" name="rocrate-license" id="rocrate-license-other" class="small-right-margin"
-            value="other">
-          <label for="rocrate-license-other">Other</label>
-          <div id="rocrate-license-details">
-            <table class="label-table">
-              <tr>
-                <td class="label-cell">
-                  <label for="rocrate-license-name">Name:</label>
-                </td>
-                <td class="input-cell">
-                  <input type="text" id="rocrate-license-name" class="med-input med-right-margin" disabled>
-                </td>
-                <td class="label-cell">
-                  <label for="rocrate-license-url">Link:</label>
-                </td>
-                <td class="input-cell">
-                  <input type="text" id="rocrate-license-url" class="med-input" disabled>
-                </td>
-              </tr>
-            </table>
+    <br>
+    <strong>Test Conditions</strong>
+    <p class="info-marker">Add a description which clearly describes how each “Test condition” differs from the
+      Standard Conditions of your chemical transformation.</p>
+    <table id="rocrate-cond-desc-table">
+      <tr class="rocrate-cond-row">
+        <td class="rocrate-cond-label">
+          <div class="rocrate-cond-desc-label" id="rcdl-0"></div>
+        </td>
+        <td class="rocrate-cond-desc">
+          <div class="rocrate-cond-desc-container">
+            <div class="rocrate-cond-desc-input" id="rcdi-0"></div>
           </div>
-        </li>
-      </ul>
+        </td>
+      </tr>
+      <tr class="rocrate-cond-row">
+        <td class="rocrate-cond-label">
+          <div class="rocrate-cond-desc-label" id="rcdl-1"></div>
+        </td>
+        <td class="rocrate-cond-desc">
+          <div class="rocrate-cond-desc-container">
+            <div class="rocrate-cond-desc-input" id="rcdi-1"></div>
+          </div>
+        </td>
+      </tr>
+      <tr class="rocrate-cond-row">
+        <td class="rocrate-cond-label">
+          <div class="rocrate-cond-desc-label" id="rcdl-2"></div>
+        </td>
+        <td class="rocrate-cond-desc">
+          <div class="rocrate-cond-desc-container">
+            <div class="rocrate-cond-desc-input" id="rcdi-2"></div>
+          </div>
+        </td>
+      </tr>
+      <tr class="rocrate-cond-row">
+        <td class="rocrate-cond-label">
+          <div class="rocrate-cond-desc-label" id="rcdl-3"></div>
+        </td>
+        <td class="rocrate-cond-desc">
+          <div class="rocrate-cond-desc-container">
+            <div class="rocrate-cond-desc-input" id="rcdi-3"></div>
+          </div>
+        </td>
+      </tr>
+      <tr class="rocrate-cond-row">
+        <td class="rocrate-cond-label">
+          <div class="rocrate-cond-desc-label" id="rcdl-4"></div>
+        </td>
+        <td class="rocrate-cond-desc">
+          <div class="rocrate-cond-desc-container">
+            <div class="rocrate-cond-desc-input" id="rcdi-4"></div>
+          </div>
+        </td>
+      </tr>
+    </table>
 
-      <br>
-      <h5>Bibliographic Information</h5>
+    <br><br>
+    <h5>About this dataset</h5>
 
-      <p class="info-marker">Adding information in this section enables others to understand who contributed to the
-        research and to provide the appropriate attribution. If you do not have an ORCID, add a link to your LinkedIn
-        account or personal institutional web page.</p>
+    <table class="label-table" id="rocrate-title-table">
+      <tr class="title-row">
+        <td class="label-cell">
+          <label for="rocrate-title-input" id="rocrate-title-label">Title:</label>
+        </td>
+        <td class="title-input-cell">
+          <div class="title-input-container">
+            <div id="rocrate-title-input" placeholder="Enter dataset title"></div>
+          </div>
+        </td>
+      </tr>
+      <tr class="desc-row">
+        <td class="label-cell">
+          <label for="rocrate-desc-input" id="rocrate-desc-label">Description:</label>
+        </td>
+        <td class="desc-input-cell">
+          <div class="desc-input-container">
+            <div id="rocrate-desc-input" placeholder="Enter brief dataset description"></div>
+          </div>
+        </td>
+      </tr>
+    </table>
 
-      <table id="rocrate-num-contrib-table" class="label-table">
-        <tr>
-          <td>
-            <label for="num-contrib">Number of contributors: </label>
-          </td>
-          <td>
-            <select name="num-contrib" id="num-contrib">
-              <option value="1" selected>1</option>
-              <option value="2">2</option>
-              <option value="3">3</option>
-              <option value="4">4</option>
-              <option value="5">5</option>
-              <option value="6">6</option>
-              <option value="7">7</option>
-              <option value="8">8</option>
-              <option value="9">9</option>
-              <option value="10">10</option>
-            </select>
-          </td>
-        </tr>
-      </table>
-      <table id="rocrate-contrib-table" class="label-table">
-        <tr class="rocrate-contrib-row" id="rcw-0">
-          <td class="rocrate-contrib-button-cell row-button-cell">
-            <div class="row-button-container">
-              <button type="button" id="remove-rcb-0" class="remove-contrib fix-size-small" disabled
-                title="Remove this contributor">-</button>
-              <button type="button" id="add-rcb-0" class="add-contrib fix-size-small"
-                title="Add a contributor">+</button>
-            </div>
-          </td>
-          <td class="label-cell">
-            <label for="rni-0" class="rocrate-name-label" id="rnl-0">Name:</label>
-          </td>
-          <td class="input-cell">
-            <input type="text" name="rocrate-name-input" class="rocrate-name-input" id="rni-0">
-          </td>
-          <td class="button-cell">
-            <button type="button" class="rocrate-orcid-lookup" id="rob-0">ORCID Lookup</button>
-          </td>
-          <td class="label-cell">
-            <label for="roi-0" class="rocrate-orcid-label" id="rol-0">ORCID or other link:</label>
-          </td>
-          <td class="input-cell">
-            <input type="url" name="rocrate-orcid-input" class="rocrate-orcid-input" id="roi-0">
-          </td>
-        </tr>
-      </table>
-
-      <br>
-      <label for="rocrate-email-table" class="info-marker">Providing contact information enables a user to make contact
-        if they are interested in your research or wish to ask questions.</label>
-      <table class="label-table" id="rocrate-email-table">
-        <tr class="rocrate-email-row">
-          <td class="label-cell">
-            <label for="rocrate-email-input">Primary contact email:</label>
-          </td>
-          <td class="input-cell">
-            <input type="email" name="rocrate-email-input" id="rocrate-email-input">
-          </td>
-        </tr>
-      </table>
-
-      <br>
-      <label for="rocrate-citation-container" class="info-marker">Please customise citation text in the box below. This
-        citation will be added to the README describing your data package:</label>
-      </p>
-      <div id="rocrate-citation-container">
-        <div class="ql-full" id="rocrate-citation" name="rocrate-citation"></div>
+    <strong>About:</strong><br>
+    <label for="rocrate-about" class="info-marker">You can customise the following text that describes the purpose
+      of the dataset:</label>
+    <div id="rocrate-about-container">
+      <div class="ql-full" id="rocrate-about"
+        placeholder="Enter full description of the dataset, describing its purpose">
+        This dataset enables users to visualise the sensitivity of a given chemical
+        transformation to user-defined reaction conditions through the use of a Glorius Plot, based on an original
+        concept from the Glorius research group.
       </div>
-      <button type="button" id="rocrate-default-citation" class="no-left-margin">Use default</button>
-      <button type="button" id="rocrate-revert-citation" class="no-left-margin" disabled>Revert</button>
+    </div>
 
-      <br><br>
-      <h5>File Structure</h5>
+    <button type="button" id="rocrate-default-title-desc" class="no-left-margin">Use defaults</button>
+    <button type="button" id="rocrate-revert-title-desc" class="no-left-margin" disabled>Revert</button>
 
-      <p class="info-marker">The following files and directory structure will be created in a zip file when you click
-        the <strong>Download Data Package</strong> button below.
-      </p>
+    <br><br>
+    <strong>License:</strong>
+    <p class="info-marker"><a href="https://guidance.psdi.ac.uk/docusaurus-pages/docs/guidance/fair/license/">
+        Choosing a license enables others to understand what they can do with your data</a>. Select
+      from the license options below or choose an alternative license in Other. You can visit <a
+        href="https://spdx.org">spdx.org</a> to find out more about kinds of licenses that might be appropriate for
+      your project. If your license requires attribution, you must enter bibliographic information about the
+      contributors to this dataset below.</p>
+    <ul class="no-bullet">
+      <li><input type="radio" name="rocrate-license" id="rocrate-license-none" class="small-right-margin" value="none"
+          checked>
+        <label for="rocrate-license-none">None (not recommended)</label>
+      </li>
+      <li><input type="radio" name="rocrate-license" id="rocrate-license-cc0" class="small-right-margin"
+          value="cc0-1.0">
+        <label for="rocrate-license-cc0"><a href="https://spdx.org/licenses/CC0-1.0.html" target="_blank">CC0-1.0
+            (Public Domain)</a></label>
+      </li>
+      <li><input type="radio" name="rocrate-license" id="rocrate-license-cc-by-4.0" class="small-right-margin"
+          value="cc-by-4.0">
+        <label for="rocrate-license-cc-by-4.0"><a href="https://spdx.org/licenses/CC-BY-4.0.html"
+            target="_blank">CC-BY-4.0 (Attribution)</a></label>
+      </li>
+      <li><input type="radio" name="rocrate-license" id="rocrate-license-cc-by-sa-4.0" class="small-right-margin"
+          value="cc-by-sa-4.0">
+        <label for="rocrate-license-cc-by-sa-4.0"><a href="https://spdx.org/licenses/CC-BY-SA-4.0.html"
+            target="_blank">CC-BY-SA-4.0 (Attribution Share Alike)</a></label>
+      </li>
+      <li><input type="radio" name="rocrate-license" id="rocrate-license-other" class="small-right-margin"
+          value="other">
+        <label for="rocrate-license-other">Other</label>
+        <div id="rocrate-license-details">
+          <table class="label-table">
+            <tr>
+              <td class="label-cell">
+                <label for="rocrate-license-name">Name:</label>
+              </td>
+              <td class="input-cell">
+                <input type="text" id="rocrate-license-name" class="med-input med-right-margin" disabled>
+              </td>
+              <td class="label-cell">
+                <label for="rocrate-license-url">Link:</label>
+              </td>
+              <td class="input-cell">
+                <input type="text" id="rocrate-license-url" class="med-input" disabled>
+              </td>
+            </tr>
+          </table>
+        </div>
+      </li>
+    </ul>
 
-      <ul>
-        <li><code>glorius-plot/</code>
-          <ul>
-            <li><code>ESI.pdf</code></li>
-            <li><code>README.md</code></li>
-            <li><code>ro-crate-metadata.json</code></li>
-            <li><code>data/</code>
-              <ul>
-                <li id="rocrate-reaction-scheme-li" class="hidden"><code>reaction_scheme.cdxml</code></li>
-                <li id="rocrate-baseline-li" class="hidden"><code>standard_conditions.html</code></li>
-                <li id="rocrate-test-conditions-li" class="hidden"><code>test_conditions.csv</code></li>
-                <li><code>plot/</code>
-                  <ul>
-                    <li><code>glorius_plot.png</code></li>
-                    <li><code>sensitivity_table.csv</code></li>
-                    <li><code>user_preferences.json</code></li>
-                  </ul>
-                </li>
-              </ul>
-            </li>
-          </ul>
-        </li>
-      </ul>
+    <br>
+    <h5>Bibliographic Information</h5>
 
-      <button type="button" id="rocrate-download" disabled>
-        <img src="{{url_for('static', filename='img/icon-download.svg')}}" alt="Download icon" class="text-icon">
-        Download Data Package
-      </button>
+    <p class="info-marker">
+      Adding information in this section enables others to understand who contributed to the research and to provide the
+      appropriate attribution. If you do not have an ORCID, <a href="https://orcid.org/register">Register on the ORCID
+        website</a> to create a persistent identifier that links you to your research and data. Alternatively add a link
+      to your LinkedIn account or personal institutional web page.
+    </p>
 
-    </form>
-  </div>
-</div>
+    <table id="rocrate-num-contrib-table" class="label-table">
+      <tr>
+        <td>
+          <label for="num-contrib">Number of contributors: </label>
+        </td>
+        <td>
+          <select name="num-contrib" id="num-contrib">
+            <option value="1" selected>1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+            <option value="6">6</option>
+            <option value="7">7</option>
+            <option value="8">8</option>
+            <option value="9">9</option>
+            <option value="10">10</option>
+          </select>
+        </td>
+      </tr>
+    </table>
+    <table id="rocrate-contrib-table" class="label-table">
+      <tr class="rocrate-contrib-row" id="rcw-0">
+        <td class="rocrate-contrib-button-cell row-button-cell">
+          <div class="row-button-container">
+            <button type="button" id="remove-rcb-0" class="remove-contrib fix-size-small" disabled
+              title="Remove this contributor">-</button>
+            <button type="button" id="add-rcb-0" class="add-contrib fix-size-small" title="Add a contributor">+</button>
+          </div>
+        </td>
+        <td class="label-cell">
+          <label for="rni-0" class="rocrate-name-label" id="rnl-0">Name:</label>
+        </td>
+        <td class="input-cell">
+          <input type="text" name="rocrate-name-input" class="rocrate-name-input" id="rni-0">
+        </td>
+        <td class="button-cell">
+          <button type="button" class="rocrate-orcid-lookup" id="rob-0">ORCID Lookup</button>
+        </td>
+        <td class="label-cell">
+          <label for="roi-0" class="rocrate-orcid-label" id="rol-0">ORCID or other link:</label>
+        </td>
+        <td class="input-cell">
+          <input type="url" name="rocrate-orcid-input" class="rocrate-orcid-input" id="roi-0">
+        </td>
+      </tr>
+    </table>
+
+    <br>
+    <label for="rocrate-email-table" class="info-marker">Providing contact information enables a user to make
+      contact if they are interested in your research or wish to ask questions.</label>
+    <table class="label-table" id="rocrate-email-table">
+      <tr class="rocrate-email-row">
+        <td class="label-cell">
+          <label for="rocrate-email-input">Primary contact email:</label>
+        </td>
+        <td class="input-cell">
+          <input type="email" name="rocrate-email-input" id="rocrate-email-input">
+        </td>
+      </tr>
+    </table>
+
+    <br>
+    <label for="rocrate-citation-container" class="info-marker">Please customise citation text in the box below.
+      This citation will be added to the README describing your data package:</label>
+    </p>
+    <div id="rocrate-citation-container">
+      <div class="ql-full" id="rocrate-citation" name="rocrate-citation"></div>
+    </div>
+    <button type="button" id="rocrate-default-citation" class="no-left-margin">Use default</button>
+    <button type="button" id="rocrate-revert-citation" class="no-left-margin" disabled>Revert</button>
+
+    <br><br>
+    <h5 id="rocrate-file-structure">File Structure</h5>
+
+    <p class="info-marker">The following files and directory structure will be created in a zip file when you click
+      the “Download Data Package” button below.
+    </p>
+
+    <ul>
+      <li><code>glorius-plot/</code>
+        <ul>
+          <li><code>ESI.pdf</code></li>
+          <li><code>README.md</code></li>
+          <li><code>ro-crate-metadata.json</code></li>
+          <li><code>data/</code>
+            <ul>
+              <li id="rocrate-reaction-scheme-li" class="hidden"><code>reaction_scheme.cdxml</code></li>
+              <li id="rocrate-baseline-li" class="hidden"><code>standard_conditions.html</code></li>
+              <li id="rocrate-test-conditions-li" class="hidden"><code>test_conditions.csv</code></li>
+              <li><code>plot/</code>
+                <ul>
+                  <li><code>glorius_plot.png</code></li>
+                  <li><code>sensitivity_table.csv</code></li>
+                  <li><code>user_preferences.json</code></li>
+                </ul>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </li>
+    </ul>
+
+    <button type="button" id="rocrate-download" disabled>
+      <img src="{{url_for('static', filename='img/icon-download.svg')}}" alt="Download icon" class="text-icon">
+      Download Data Package
+    </button>
+
+  </form>
+</details>
 {% endblock %}
