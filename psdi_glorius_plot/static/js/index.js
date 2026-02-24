@@ -165,8 +165,7 @@ let initWidth, initHeight, initLabelFontSize, initAxisFontSize;
 
 // Globals relating to data package export
 let roCrateFormUpdating = false;
-let exportChecks = {
-};
+let exportChecks = {};
 
 // Stored valued for user-input values to revert to if they click the button to do so
 let lastColorVal = "colourblind", lastCustomColorMin = null, lastCustomColorMax = null;
@@ -2727,9 +2726,8 @@ function enableOnChangeTriggers() {
   $("#fan-select").on("change", toggleChartMode);
   $("#dev-plot-select").on("change", generateIfUpdating);
   $(".output-label-select").on("change", updateOutputLabelSelection);
-  $("#color-select").on("change", updateColourSchemeSelection);
-  $("#min-color-input").on("change", selectCustomColourScheme);
-  $("#max-color-input").on("change", selectCustomColourScheme);
+  $("#color-select").on("change", updateColorSchemeSelection);
+  $(".color-custom").on("change", selectCustomColorScheme);
   $(".plot-select").on("change", updatePlotSelect);
 }
 
@@ -2794,8 +2792,17 @@ function updateOutputLabelCallback() {
   updateROCrateOutputLabel();
 }
 
-function updateColourSchemeSelection() {
+/**
+ * When the user changes the colour scheme selection, update the min and max appropriately, remembering any previous
+ * custom colours
+ */
+function updateColorSchemeSelection() {
+
   let newValue = this.value;
+
+  // Return if no change
+  if (newValue === lastColorVal)
+    return;
 
   if (newValue !== "custom") {
     if (lastColorVal === "custom") {
@@ -2804,7 +2811,7 @@ function updateColourSchemeSelection() {
     }
     $("#min-color-input").val(D_COLOR_SCHEMES[newValue].min);
     $("#max-color-input").val(D_COLOR_SCHEMES[newValue].max);
-  } else if (lastCustomColorMin && lastColorVal !== "custom") {
+  } else if (lastCustomColorMin && lastColorVal !== "custom" && !userChangedColourInput) {
     $("#min-color-input").val(lastCustomColorMin);
     $("#max-color-input").val(lastCustomColorMax);
   }
@@ -2816,8 +2823,9 @@ function updateColourSchemeSelection() {
 /**
  * When the colour is manually changed, change to the "Other" scheme in the selection box
  */
-function selectCustomColourScheme() {
-  $("#color-select").val("custom").change();
+function selectCustomColorScheme() {
+  $("#color-select").val("custom");
+  lastColorVal = "custom";
 }
 
 /**
