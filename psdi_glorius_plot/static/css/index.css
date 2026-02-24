@@ -30,20 +30,6 @@
   --fan-mode-display  : block;
 }
 
-[dev-calc-mode="absolute"] {
-  --rel-dev-mode-display     : none;
-  --abs-dev-mode-display     : inline;
-  --non-none-dev-mode-display: inline;
-  --none-dev-mode-display    : none;
-}
-
-[dev-calc-mode="none"] {
-  --rel-dev-mode-display     : none;
-  --abs-dev-mode-display     : none;
-  --non-none-dev-mode-display: none;
-  --none-dev-mode-display    : inline;
-}
-
 .calc-mode-only {
   display: var(--calc-mode-display) !important;
 }

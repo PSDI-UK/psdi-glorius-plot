@@ -665,20 +665,23 @@
       </td>
     </tr>
   </table>
-  <table id="export-data-package-buttons">
-    <tr>
-      <td>
-        <button type="button" id="export-rocrate-start" class="mouseover-tooltip hidden-after-rocrate"
-          data-bs-toggle="tooltip" data-bs-custom-class="tooltip-on-light" data-bs-placement="top" title="UNDER
-          DEVELOPMENT: Open the form to export the plot and data as an RO-crate data package">
-          <img src="{{url_for('static', filename='img/icon-config.svg')}}" alt="Config icon" class="text-icon"
-            style="transform: translate(0, -6.25%);">
-          Export data package</button>
-        <button type="button" class="returnToROCrateExport hidden hidden-until-rocrate">↪ Return to data package
-          export</button>
-      </td>
-    </tr>
-  </table>
+
+  <br>
+  <h4>Export as a FAIR data package</h4>
+  <label for="export-data-package-buttons">You can export a FAIR data package to accompany your Glorius plot by
+    providing some additional information. The more information you can provide, the more useful the data package will
+    be for others. If you choose not to add any additional information, a simple version of the data package will be
+    exported instead. Click the “Configure Data Package” button below to set up and export your data package.
+  </label>
+  <div id="export-data-package-buttons">
+    <button type="button" id="export-rocrate-start" class="hidden-after-rocrate"
+      title="Open the form to export the plot and data as an RO-crate data package">
+      <img src="{{url_for('static', filename='img/icon-config.svg')}}" alt="Config icon" class="text-icon"
+        style="transform: translate(0, -6.25%);">
+      Configure Data Package</button>
+    <button type="button" class="returnToROCrateExport hidden hidden-until-rocrate">↪ Return to data package
+      export</button>
+  </div>
 </div>
 {% endblock %}
 
@@ -831,9 +834,10 @@
       <strong>License:</strong>
       <p class="info-marker"><a href="https://guidance.psdi.ac.uk/docusaurus-pages/docs/guidance/fair/license/">
           Choosing a license enables others to understand what they can do with your data</a>. Select
-        from the license options below or choose an alternative license in Other. You can visit spdx.org to find out
-        more about kinds of licenses that might be appropriate for your project. If your license requires attribution,
-        you must enter bibliographic information about the contributors to this dataset.</p>
+        from the license options below or choose an alternative license in Other. You can visit <a
+          href="https://spdx.org">spdx.org</a> to find out more about kinds of licenses that might be appropriate for
+        your project. If your license requires attribution, you must enter bibliographic information about the
+        contributors to this dataset.</p>
       <ul class="no-bullet">
         <li><input type="radio" name="rocrate-license" id="rocrate-license-cc0" class="small-right-margin"
             value="cc0-1.0">
