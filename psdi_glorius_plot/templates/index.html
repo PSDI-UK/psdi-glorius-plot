@@ -621,8 +621,8 @@
 
 <div id="export-options">
   <h4>Save your progress</h4>
-  <label for="save-load-data-buttons">Save your progress as a JSON file or reload it. To reload, select a file with the
-    “Choose File” button below, then click the “Resume Work” button.
+  <label for="save-load-data-buttons">Save your progress as a <code>.json</code> file or reload it. To reload, select a
+    file with the “Choose File” button below, then click the “Resume Work” button.
   </label>
   <table id="save-load-data-buttons">
     <tr>
@@ -643,6 +643,13 @@
       <td><input type="file" name="load-data-file" id="load-data-file" accept=".json"></td>
     </tr>
   </table>
+
+  <br>
+  <h4>Export plot as an image</h4>
+  <label for="export-image-buttons">You can export your Glorius Plot as a <code>.png</code> or <code>.svg</code> file.
+    <code>.png</code> has broader compatibility, while <code>.svg</code> allows the image to be resized without losing
+    detail.
+  </label>
   <table id="export-image-buttons">
     <tr>
       <td>
@@ -651,7 +658,8 @@
           Download Plot as PNG</button>
       </td>
       <td>
-        <button type="button" id="export-image-svg" title="Export the plot as a vector .svg image" disabled>
+        <button type="button" id="export-image-svg" title="Export the plot as a vector .svg image (not yet implemented)"
+          disabled>
           <img src="{{url_for('static', filename='img/icon-download.svg')}}" alt="Download icon" class="text-icon">
           Download Plot as SVG</button>
       </td>
