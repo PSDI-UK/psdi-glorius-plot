@@ -254,7 +254,7 @@ function setNumDim(dim, num, updateAfter = true) {
 }
 
 function updateDimSelector(dim) {
-  $("select#num-" + dim).val(getDimSize(dim)).change();
+  $("select#num-" + dim).val(getDimSize(dim));
 }
 
 function updateButtonStatus(dim) {
@@ -1846,7 +1846,7 @@ function fillExample() {
 
   // Set the title and output label
   $("#title-input .ql-editor p").html("<b>Reaction-condition sensitivity analysis for 1,3-cyclization</b>");
-  $(".output-label-select").val("Isolated Yield (%)").change();
+  $(".output-label-select").val("Isolated Yield (%)").trigger("change");
 
   // Fill the condition labels
   updateQuillContents("#cl-0", "High <em>c</em>")
