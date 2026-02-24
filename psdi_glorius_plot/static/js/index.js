@@ -2728,6 +2728,8 @@ function enableOnChangeTriggers() {
   $("#dev-plot-select").on("change", generateIfUpdating);
   $(".output-label-select").on("change", updateOutputLabelSelection);
   $("#color-select").on("change", updateColourSchemeSelection);
+  $("#min-color-input").on("change", selectCustomColourScheme);
+  $("#max-color-input").on("change", selectCustomColourScheme);
   $(".plot-select").on("change", updatePlotSelect);
 }
 
@@ -2795,20 +2797,27 @@ function updateOutputLabelCallback() {
 function updateColourSchemeSelection() {
   let newValue = this.value;
 
-  if (newValue != "custom") {
-    if (lastColorVal == "custom") {
+  if (newValue !== "custom") {
+    if (lastColorVal === "custom") {
       lastCustomColorMin = $("#min-color-input").val();
       lastCustomColorMax = $("#max-color-input").val();
     }
     $("#min-color-input").val(D_COLOR_SCHEMES[newValue].min);
     $("#max-color-input").val(D_COLOR_SCHEMES[newValue].max);
-  } else if (lastCustomColorMin) {
+  } else if (lastCustomColorMin && lastColorVal !== "custom") {
     $("#min-color-input").val(lastCustomColorMin);
     $("#max-color-input").val(lastCustomColorMax);
   }
   lastColorVal = newValue;
 
   generateIfUpdating();
+}
+
+/**
+ * When the colour is manually changed, change to the "Other" scheme in the selection box
+ */
+function selectCustomColourScheme() {
+  $("#color-select").val("custom").change();
 }
 
 /**
