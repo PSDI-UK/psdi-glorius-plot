@@ -169,6 +169,7 @@ let exportChecks = {
 };
 
 // Stored valued for user-input values to revert to if they click the button to do so
+let lastColorVal = "colourblind", lastCustomColorMin = null, lastCustomColorMax = null;
 let lastLicenseVal = "none", lastLicenseName = "", lastLicenseUrl = "";
 let lastDatasetTitle, lastDatasetDesc, lastDatasetAbout, lastCitation;
 let userHasEditedCitation = false;
@@ -2793,15 +2794,19 @@ function updateOutputLabelCallback() {
 
 function updateColourSchemeSelection() {
   let newValue = this.value;
-  let customColorInput = $(".color-custom");
 
   if (newValue != "custom") {
-    customColorInput.addClass("hidden");
+    if (lastColorVal == "custom") {
+      lastCustomColorMin = $("#min-color-input").val();
+      lastCustomColorMax = $("#max-color-input").val();
+    }
     $("#min-color-input").val(D_COLOR_SCHEMES[newValue].min);
     $("#max-color-input").val(D_COLOR_SCHEMES[newValue].max);
-  } else {
-    customColorInput.removeClass("hidden");
+  } else if (lastCustomColorMin) {
+    $("#min-color-input").val(lastCustomColorMin);
+    $("#max-color-input").val(lastCustomColorMax);
   }
+  lastColorVal = newValue;
 
   generateIfUpdating();
 }

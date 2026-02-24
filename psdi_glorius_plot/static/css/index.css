@@ -64,22 +64,6 @@ tr.direct-mode-only {
   display: var(--fan-mode-display) !important;
 }
 
-.rel-dev-mode-only {
-  display: var(--rel-dev-mode-display) !important;
-}
-
-.abs-dev-mode-only {
-  display: var(--abs-dev-mode-display) !important;
-}
-
-.non-none-dev-mode-only {
-  display: var(--non-none-dev-mode-display) !important;
-}
-
-.none-dev-mode-only {
-  display: var(--none-dev-mode-display) !important;
-}
-
 /* General element styling */
 
 /* Remove the space after paragraphs which are followed by lists or which are the last child of their parent */
@@ -375,6 +359,10 @@ input.rel-deviation-value {
 
 .med-right-margin {
   margin-right: 1rem !important;
+}
+
+.small-input {
+  width: 4rem !important;
 }
 
 .med-input {
