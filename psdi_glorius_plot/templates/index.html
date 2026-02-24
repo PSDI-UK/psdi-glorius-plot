@@ -621,8 +621,8 @@
 
 <div id="export-options">
   <h4>Save your progress</h4>
-  <label for="save-load-data-buttons">Save your progress as a <code>.json</code> file or reload it. To reload, select a
-    file with the “Choose File” button below, then click the “Resume Work” button.
+  <label for="save-load-data-buttons" class="info-marker">Save your progress as a <code>.json</code> file or reload it.
+    To reload, select a file with the “Choose File” button below, then click the “Resume Work” button.
   </label>
   <table id="save-load-data-buttons">
     <tr>
@@ -646,9 +646,9 @@
 
   <br>
   <h4>Export plot as an image</h4>
-  <label for="export-image-buttons">You can export your Glorius Plot as a <code>.png</code> or <code>.svg</code> file.
-    <code>.png</code> has broader compatibility, while <code>.svg</code> allows the image to be resized without losing
-    detail.
+  <label for="export-image-buttons" class="info-marker">You can export your Glorius Plot as a <code>.png</code> or
+    <code>.svg</code> file. <code>.png</code> has broader compatibility, while <code>.svg</code> allows the image to be
+    resized without losing detail.
   </label>
   <table id="export-image-buttons">
     <tr>
@@ -668,10 +668,11 @@
 
   <br>
   <h4>Export as a FAIR data package</h4>
-  <label for="export-data-package-buttons">You can export a FAIR data package to accompany your Glorius plot by
-    providing some additional information. The more information you can provide, the more useful the data package will
-    be for others. If you choose not to add any additional information, a simple version of the data package will be
-    exported instead. Click the “Configure Data Package” button below to set up and export your data package.
+  <label for="export-data-package-buttons" class="info-marker">You can export a FAIR data package to accompany your
+    Glorius Plot by providing some additional information. The more information you can provide, the more useful the
+    data package will be for others. If you choose not to add any additional information, a simple version of the data
+    package will be exported instead. Click the “Configure Data Package” button below to set up and export your data
+    package.
   </label>
   <div id="export-data-package-buttons">
     <button type="button" id="export-rocrate-start" class="hidden-after-rocrate"
@@ -686,7 +687,6 @@
 {% endblock %}
 
 {% block content_after_main %}
-<!-- TODO: When done working on this section, add the "hidden" class to the .secondary div -->
 <div class="secondary mathjax_ignore hidden rocrate-export" id="rocrate-export-title">
   <div class="max-width-box">
     <h4>Export a FAIR data package</h4>
@@ -697,7 +697,6 @@
   </div>
 </div>
 
-<!-- TODO: When done working on this section, add the "hidden" class to the .secondary div -->
 <div class="mathjax_ignore hidden rocrate-export" id="rocrate-export">
   <div class="max-width-box">
     <form id="rocrate-input">
@@ -884,7 +883,6 @@
       <p class="info-marker">Adding information in this section enables others to understand who contributed to the
         research and to provide the appropriate attribution. If you do not have an ORCID, add a link to your LinkedIn
         account or personal institutional web page.</p>
-
 
       <table id="rocrate-num-contrib-table" class="label-table">
         <tr>
