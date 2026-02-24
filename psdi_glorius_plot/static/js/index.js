@@ -7,7 +7,7 @@
 import { initDirtyForms, cleanDirtyForms, checkIsDirty } from "./dirty-forms.js";
 import { mixHexes } from "./color-mixing.js"
 import { exportImage, loadObject, makeCsv, saveBlob, saveObject } from "./io.js"
-import { clamp, disableButton, enableButton, getWebKitMode } from "./utility.js"
+import { clamp, getWebKitMode } from "./utility.js"
 import {
   addQuillEditor, getQuillEditor, getQuillEditorHTML, setQuillEditor, removeQuillEditor, updateQuillContents,
   disableQuillToolbar, enableQuillEvents, removeGlobalTags, cleanTags, stripTags, waitForMathJax, drawFormatted,
@@ -183,17 +183,15 @@ const customCanvasBackgroundColorPlugin = {
 };
 
 /**
- * Get the index value stored at the end of an event's target's ID, setting to the maximum possible index if the event
- * is null
- * @param {*} e The triggering event
- * @param {number} indexLength The length of the axis for this index (one more than its maximum value if it's
- *                             zero-indexed)
- * @return {number} The index of the triggering event, or else the maximum index
+ * Get the index value stored at the end of an event's target's ID
+ * @param {Event} e The triggering event
+ * @param {number} defaultVal The default value to be returned if the triggering event is null
+ * @return {number} The index of the triggering event, or else the default value
  */
-function getTargetIndex(e, indexLength) {
+function getTargetIndex(e, defaultVal = 0) {
   let targetIndex;
   if (e === null) {
-    targetIndex = indexLength - 1;
+    targetIndex = defaultVal;
   } else {
     let eId = e.target.id;
     targetIndex = +(eId.split("-").at(-1));
@@ -257,14 +255,14 @@ function updateButtonStatus(dim) {
   const num = getDimSize(dim);
 
   if (num >= D_DIM_LIMITS[dim].max)
-    disableButton($("button.add-" + dim));
+    $("button.add-" + dim).attr("disabled", true);
   else
-    enableButton($("button.add-" + dim));
+    $("button.add-" + dim).removeAttr("disabled");
 
   if (num <= D_DIM_LIMITS[dim].min)
-    disableButton($("button.remove-" + dim));
+    $("button.remove-" + dim).attr("disabled", true);
   else
-    enableButton($("button.remove-" + dim));
+    $("button.remove-" + dim).removeAttr("disabled");
 }
 
 function postTableUpdateCleanup(dim, updateAfter) {
@@ -352,7 +350,7 @@ function addConditionRow(e, updateAfter = true) {
   newRow.find(".rel-deviation-value").val("0");
 
   // Determine where to add the row based on which button was clicked
-  const targetRowIndex = getTargetIndex(e, oldNumConditions);
+  const targetRowIndex = getTargetIndex(e, oldNumConditions - 1);
 
   if (targetRowIndex >= oldNumConditions - 1)
     $(".sensitivity-table tbody #plot-select-row").before(newRow);
@@ -405,7 +403,7 @@ function removeConditionRow(e, updateAfter = true) {
   }
 
   // Determine which row to remove based on which button was clicked
-  const targetRowIndex = getTargetIndex(e, oldNumConditions);
+  const targetRowIndex = getTargetIndex(e, oldNumConditions - 1);
 
   // Remove the Quill editor first, so we don't hit a dangling reference by doing this after removing the row
   removeQuillEditor("#cl-" + targetRowIndex);
@@ -456,7 +454,7 @@ function addSampleCol(e, updateAfter = true) {
   }
 
   // Determine where to add the column based on which button was clicked
-  const targetColIndex = getTargetIndex(e, numSamples);
+  const targetColIndex = getTargetIndex(e, numSamples - 1);
 
   // Construct and insert a new button cell, heading cell, and baseline value cell
   const newButtonCell = $(".sample-button-cell")[0].cloneNode(true);
@@ -505,7 +503,7 @@ function removeSampleCol(e, updateAfter = true) {
   }
 
   // Determine which row to remove based on which button was clicked
-  const targetColIndex = getTargetIndex(e, numSamples);
+  const targetColIndex = getTargetIndex(e, numSamples - 1);
 
   // Remove the appropriate button cell, heading cell, and baseline cell
 
@@ -2166,11 +2164,11 @@ function postContribRowUpdate() {
   // Enable/disable buttons as appropriate depending on if we're at the min, max, or neither
   const numContribs = $("#rocrate-contrib-table>tbody>tr").length;
   if (numContribs >= MAX_NUM_CONTRIBS)
-    lAddContribButtons.attr("disabled", "disabled");
+    lAddContribButtons.attr("disabled", true);
   else
     lAddContribButtons.removeAttr("disabled");
   if (numContribs <= MIN_NUM_CONTRIBS)
-    lRemoveContribButtons.attr("disabled", "disabled");
+    lRemoveContribButtons.attr("disabled", true);
   else
     lRemoveContribButtons.removeAttr("disabled");
 
@@ -2405,8 +2403,8 @@ function updateLicense() {
     licenseUrlInput.removeAttr("disabled");
     licenseNameInput.focus();
   } else {
-    licenseNameInput.attr("disabled", "disabled");
-    licenseUrlInput.attr("disabled", "disabled");
+    licenseNameInput.attr("disabled", true);
+    licenseUrlInput.attr("disabled", true);
   }
 
 }
@@ -2538,7 +2536,7 @@ function updateROCrateDownloadEnabled() {
   if (allGood || debug)
     $("#rocrate-download").removeAttr("disabled");
   else
-    $("#rocrate-download").attr("disabled", "disabled");
+    $("#rocrate-download").attr("disabled", true);
 }
 
 function makeTextVersions(textHTML) {

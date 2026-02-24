@@ -4,14 +4,6 @@
  * @author Bryan Gillis
  */
 
-export function disableButton(button) {
-  button.prop({ disabled: true });
-}
-
-export function enableButton(button) {
-  button.prop({ disabled: false });
-}
-
 /**
  * Clamps a value between an allowed minimum and maximum
  * @param {number} x The value to be clamped
