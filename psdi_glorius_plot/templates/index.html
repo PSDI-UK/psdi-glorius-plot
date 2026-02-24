@@ -592,13 +592,6 @@
             class="trigger-chart-update small-input">
         </td>
         <td>
-          <label for="max-output-input" class="small-left-margin">Maximum output:</label>
-        </td>
-        <td>
-          <input type="number" step="any" value="50" name="max-output-input" id="max-output-input"
-            class="trigger-chart-update small-input">
-        </td>
-        <td>
           <label for="band-width-input" class="small-left-margin">Band width: </label>
         </td>
         <td>
@@ -608,9 +601,18 @@
       </tr>
       <tr>
         <td>
-          <label for="color-select">Colour scheme:</label>
+          <label for="max-output-input" class="small-left-margin">Maximum output:</label>
         </td>
         <td>
+          <input type="number" step="any" value="50" name="max-output-input" id="max-output-input"
+            class="trigger-chart-update small-input">
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <label for="color-select">Colour scheme:</label>
+        </td>
+        <td colspan="2">
           <select name="color-select" id="color-select">
             <option value="colourblind" selected>Colourblind-friendly</option>
             <option value="classic">Classic</option>
@@ -627,16 +629,8 @@
         </td>
       </tr>
       <tr>
-        <td>
-          <label for="sort-option">Data arrangement:</label>
-        </td>
-        <td>
-          <select name="sort-option" id="sort-option" class="trigger-chart-update">
-            <option value="1">Ascending</option>
-            <option value="-1">Descending</option>
-            <option value="0">As entered</option>
-          </select>
-        </td>
+        <td class="empty-cell"></td>
+        <td colspan="2" class="empty-cell"></td>
         <td>
           <label for="max-color-input">Color at highest output:</label>
         </td>
@@ -644,6 +638,20 @@
           <input type="color" value="#0093F5" name="max-color-input" id="max-color-input"
             class="trigger-chart-update color-custom small-input">
         </td>
+      </tr>
+      <tr>
+        <td>
+          <label for="sort-option">Data arrangement:</label>
+        </td>
+        <td colspan="2">
+          <select name="sort-option" id="sort-option" class="trigger-chart-update">
+            <option value="1">Ascending</option>
+            <option value="-1">Descending</option>
+            <option value="0">As entered</option>
+          </select>
+        </td>
+        <td class="empty-cell"></td>
+        <td class="empty-cell"></td>
       </tr>
     </table>
   </details>
