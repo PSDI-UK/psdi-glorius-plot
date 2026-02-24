@@ -7,7 +7,7 @@
 import { initDirtyForms, cleanDirtyForms, checkIsDirty } from "./dirty-forms.js";
 import { mixHexes } from "./color-mixing.js"
 import { exportImage, loadObject, makeCsv, saveBlob, saveObject } from "./io.js"
-import { clamp, getWebKitMode } from "./utility.js"
+import { clamp, forenameToInitials, getWebKitMode, surnameToCapitalized } from "./utility.js"
 import {
   addQuillEditor, getQuillEditor, getQuillEditorHTML, setQuillEditor, removeQuillEditor, updateQuillContents,
   disableQuillToolbar, enableQuillEvents, removeGlobalTags, cleanTags, stripTags, waitForMathJax, drawFormatted,
@@ -2231,39 +2231,6 @@ function revertROCrateTitleDesc() {
   lastDatasetAbout = tempDatasetAbout;
 }
 
-function formatInitials(forename) {
-  let initials = "";
-  const forenameSegments = forename.split(/\s+/u);
-  forenameSegments.forEach((s) => {
-    initials += `${s[0].toUpperCase()}.`;
-  });
-  return initials;
-}
-
-/**
- * Capitalize a surname as best as we can guess how it should be, e.g. SMITH -> Smith, O'FLANNERY -> O'Flannery,
- * MACDONALD -> MacDonald, MACKENZIE -> Mackenzie
- * @param {String} surname The surname to try to capitalize
- * @returns {String}
- */
-function surnameToCapitalized(s) {
-  // Start by making the string all lowercase except the first letter, which should be upper case
-  s = s[0].toUpperCase() + s.slice(1).toLowerCase();
-
-  // Check for prefixes which commonly indicate the letter afterwards will be capitalised, and do so
-  if (s.match(/^(Mc|O')/ui) && s.length > 2) {
-    // "Mc" and "O'" prefixes are almost universally followed by another capital letter, so capitalize whatever the
-    // next letter is
-    s = s.slice(0, 2) + s[2].toUpperCase() + s.slice(3);
-  } else if (s.startsWith("Mac") && !s.startsWith("Mack") && s.length > 3) {
-    // "Mac" is usually but not always followed a capital letter, e.g. "MacDonald" but not "Mackenzie". The best
-    // rule here is to capitalize after "Mac" but not "Mack"
-    s = s.slice(0, 3) + s[3].toUpperCase() + s.slice(4);
-  }
-
-  return s;
-}
-
 function useDefaultCitation(e) {
 
   // If this isn't the initialisation call (which will be the case if event info from a button click is passed here),
@@ -2292,7 +2259,7 @@ function useDefaultCitation(e) {
       // Check if we can split by a comma, in which case surname is before, forename after
       const lCommaSplitSegments = name.split(/,\s+/u);
       if (lCommaSplitSegments.length == 2) {
-        formattedName = `${lCommaSplitSegments[0]}, ${formatInitials(lCommaSplitSegments[1])}`;
+        formattedName = `${lCommaSplitSegments[0]}, ${forenameToInitials(lCommaSplitSegments[1])}`;
       } else {
 
         // We either have zero commas, or more than one, so they aren't a good guide. If more than one, strip them all
@@ -2318,12 +2285,12 @@ function useDefaultCitation(e) {
           lCapsSurnameSegments.forEach((s, i) => {
             lCapsSurnameSegments[i] = surnameToCapitalized(s);
           });
-          formattedName = `${lCapsSurnameSegments.join(" ")}, ${formatInitials(lCapsForenameSegments.join(" "))}`;
+          formattedName = `${lCapsSurnameSegments.join(" ")}, ${forenameToInitials(lCapsForenameSegments.join(" "))}`;
         } else {
           // If we get here, there's no obvious indications of what's the forename and what's the surname, so we'll
           // take the best guess that only the final segment is the surname, which is the most-likely scenario for a
           // site aimed at British users like this one
-          formattedName = `${lNameSegments.at(-1)}, ${formatInitials(lNameSegments.slice(0, -1).join(" "))}`;
+          formattedName = `${lNameSegments.at(-1)}, ${forenameToInitials(lNameSegments.slice(0, -1).join(" "))}`;
         }
       }
     }
