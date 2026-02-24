@@ -157,7 +157,7 @@
         </td>
       </tr>
     </table>
-    <table id="table-options label-table">
+    <table id="table-options" class="label-table">
       <tr>
         <td>
           <label for="num-condition">Test conditions: </label>
@@ -865,11 +865,33 @@
       <br>
       <h5>Bibliographic Information</h5>
 
-      <label class="info-marker">Adding information in this section enables others to understand who contributed to the
+      <p class="info-marker">Adding information in this section enables others to understand who contributed to the
         research and to provide the appropriate attribution. If you do not have an ORCID, add a link to your LinkedIn
         account or personal institutional web page. You can search for the ORCIDs of yourself and coauthors using the
-        search box on the <a href="https://orcid.org/">ORCID site</a>.</label>
+        search box on the <a href="https://orcid.org/">ORCID site</a>.</p>
 
+
+      <table id="rocrate-num-contrib-table" class="label-table">
+        <tr>
+          <td>
+            <label for="num-contrib">Number of contributors: </label>
+          </td>
+          <td>
+            <select name="num-contrib" id="num-contrib">
+              <option value="1" selected>1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+              <option value="5">5</option>
+              <option value="6">6</option>
+              <option value="7">7</option>
+              <option value="8">8</option>
+              <option value="9">9</option>
+              <option value="10">10</option>
+            </select>
+          </td>
+        </tr>
+      </table>
       <table id="rocrate-contrib-table" class="label-table">
         <tr class="rocrate-contrib-row" id="rcw-0">
           <td class="rocrate-contrib-button-cell row-button-cell">

@@ -1068,12 +1068,12 @@ function getPlotData() {
   return data;
 }
 
-function checkPlotDataFile(event) {
+function checkPlotDataFile() {
   let lFiles = this.files;
   if (lFiles.length > 0) {
-    $("#load-data").prop({ disabled: false });
+    $("#load-data").removeAttr("disabled");
   } else {
-    $("#load-data").prop({ disabled: true });
+    $("#load-data").attr("disabled", true);
   }
 }
 
@@ -2087,8 +2087,9 @@ function removeROCrateContribRow(e, updateAfter = true) {
     postContribRowUpdate();
 }
 
-function setNumROCrateContribRow(num) {
+function setNumROCrateContribRow(e) {
   const oldNum = $("#rocrate-contrib-table>tbody>tr").length;
+  const num = +($(e.target).find(":selected").val());
 
   if (oldNum < num) {
     for (let i = 0; i < num - oldNum; ++i) {
@@ -2925,6 +2926,7 @@ function enableQuillEventsAndCallbacks() {
 function enableROCrateOnChangeTriggers() {
   $("#rocrate-cdxml").on("change", updateReactionScheme);
   $("input[name='rocrate-license']").on("change", updateLicense);
+  $("#num-contrib").on("change", setNumROCrateContribRow)
 }
 
 $(document).ready(function () {
