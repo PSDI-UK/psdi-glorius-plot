@@ -2054,15 +2054,22 @@ function relabelCondDesc() {
 
 }
 
+/**
+ * Get the number of contributor rows currently in the contributor table
+ * @returns {int}
+ */
+function getNumContribs() {
+  return $(".rocrate-contrib-row").length;
+}
+
 function addROCrateContribRow(e, updateAfter = true) {
-  const contribTable = $("#rocrate-contrib-table>tbody");
   const newRow = $(".rocrate-contrib-row").eq(0).clone();
   newRow.find(".rocrate-name-input").val("");
   newRow.find(".rocrate-orcid-input").val("");
 
-  const targetRowIndex = getTargetIndex(e, contribTable.find("tr").length - 1);
+  const targetRowIndex = getTargetIndex(e, getNumContribs() - 1);
 
-  contribTable.find("tr").eq(targetRowIndex).after(newRow);
+  $(".rocrate-contrib-row").eq(targetRowIndex).after(newRow);
 
   // Update IDs to match the new row indices
   relabelContribs();
@@ -2072,10 +2079,8 @@ function addROCrateContribRow(e, updateAfter = true) {
 }
 
 function removeROCrateContribRow(e, updateAfter = true) {
-  const contribTable = $("#rocrate-contrib-table>tbody");
-  const lRows = contribTable.find("tr");
-
-  const targetRowIndex = getTargetIndex(e, contribTable.find("tr").length - 1);
+  const lRows = $("..rocrate-contrib-row");
+  const targetRowIndex = getTargetIndex(e, getNumContribs() - 1);
 
   // Remove the row from the table
   lRows.eq(targetRowIndex).remove();
@@ -2088,7 +2093,7 @@ function removeROCrateContribRow(e, updateAfter = true) {
 }
 
 function setNumROCrateContribRow(e) {
-  const oldNum = $("#rocrate-contrib-table>tbody>tr").length;
+  const oldNum = getNumContribs();
   const num = +($(e.target).find(":selected").val());
 
   if (oldNum < num) {
@@ -2110,11 +2115,9 @@ function setNumROCrateContribRow(e) {
  * @param {Event} e 
  */
 function lookupOrcid(e) {
-  const contribTable = $("#rocrate-contrib-table>tbody");
-
-  const targetRowIndex = getTargetIndex(e, contribTable.find("tr").length - 1);
-  const targetRow = contribTable.find("tr").eq(targetRowIndex);
-  let authorName = targetRow.find(".rocrate-name-input").val();
+  const targetRowIndex = getTargetIndex(e, getNumContribs() - 1);
+  const targetRow = $(".rocrate-contrib-row").eq(targetRowIndex);
+  const authorName = targetRow.find(".rocrate-name-input").val();
 
   // Construct the URL to use for the search on ORCID's site and open it in a new tab
   const lookupUrl = `https://orcid.org/orcid-search/search?searchQuery=${authorName.replace(" ", "%20")}`
@@ -2126,7 +2129,7 @@ function lookupOrcid(e) {
  */
 function relabelContribs() {
 
-  const num = $(".rocrate-contrib-row").length;
+  const num = getNumContribs();
   const lRemoveButtons = $(".remove-contrib");
   const lAddButtons = $(".add-contrib");
   const lNameLabels = $(".rocrate-name-label");
@@ -2163,7 +2166,7 @@ function postContribRowUpdate() {
   lOrcidLookupButtons.on("click", lookupOrcid);
 
   // Enable/disable buttons as appropriate depending on if we're at the min, max, or neither
-  const numContribs = $("#rocrate-contrib-table>tbody>tr").length;
+  const numContribs = getNumContribs();
   if (numContribs >= MAX_NUM_CONTRIBS)
     lAddContribButtons.attr("disabled", true);
   else
