@@ -210,10 +210,6 @@ table:has(+table) {
   height: calc(2rem + 2px);
 }
 
-#table-options td {
-  max-width: 16rem;
-}
-
 /* Style lists */
 ul.no-bullet,
 ol.no-bullet {

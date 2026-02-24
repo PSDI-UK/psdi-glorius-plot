@@ -7,7 +7,7 @@
 import { initDirtyForms, cleanDirtyForms, checkIsDirty } from "./dirty-forms.js";
 import { mixHexes } from "./color-mixing.js"
 import { exportImage, loadObject, makeCsv, saveBlob, saveObject } from "./io.js"
-import { clamp, disableButton, enableButton, getWebKitMode } from "./utility.js"
+import { clamp, forenameToInitials, getWebKitMode, surnameToCapitalized } from "./utility.js"
 import {
   addQuillEditor, getQuillEditor, getQuillEditorHTML, setQuillEditor, removeQuillEditor, updateQuillContents,
   disableQuillToolbar, enableQuillEvents, removeGlobalTags, cleanTags, stripTags, waitForMathJax, drawFormatted,
@@ -183,17 +183,15 @@ const customCanvasBackgroundColorPlugin = {
 };
 
 /**
- * Get the index value stored at the end of an event's target's ID, setting to the maximum possible index if the event
- * is null
- * @param {*} e The triggering event
- * @param {number} indexLength The length of the axis for this index (one more than its maximum value if it's
- *                             zero-indexed)
- * @return {number} The index of the triggering event, or else the maximum index
+ * Get the index value stored at the end of an event's target's ID
+ * @param {Event} e The triggering event
+ * @param {number} defaultVal The default value to be returned if the triggering event is null
+ * @return {number} The index of the triggering event, or else the default value
  */
-function getTargetIndex(e, indexLength) {
+function getTargetIndex(e, defaultVal = 0) {
   let targetIndex;
   if (e === null) {
-    targetIndex = indexLength - 1;
+    targetIndex = defaultVal;
   } else {
     let eId = e.target.id;
     targetIndex = +(eId.split("-").at(-1));
@@ -257,14 +255,14 @@ function updateButtonStatus(dim) {
   const num = getDimSize(dim);
 
   if (num >= D_DIM_LIMITS[dim].max)
-    disableButton($("button.add-" + dim));
+    $("button.add-" + dim).attr("disabled", true);
   else
-    enableButton($("button.add-" + dim));
+    $("button.add-" + dim).removeAttr("disabled");
 
   if (num <= D_DIM_LIMITS[dim].min)
-    disableButton($("button.remove-" + dim));
+    $("button.remove-" + dim).attr("disabled", true);
   else
-    enableButton($("button.remove-" + dim));
+    $("button.remove-" + dim).removeAttr("disabled");
 }
 
 function postTableUpdateCleanup(dim, updateAfter) {
@@ -352,7 +350,7 @@ function addConditionRow(e, updateAfter = true) {
   newRow.find(".rel-deviation-value").val("0");
 
   // Determine where to add the row based on which button was clicked
-  const targetRowIndex = getTargetIndex(e, oldNumConditions);
+  const targetRowIndex = getTargetIndex(e, oldNumConditions - 1);
 
   if (targetRowIndex >= oldNumConditions - 1)
     $(".sensitivity-table tbody #plot-select-row").before(newRow);
@@ -405,7 +403,7 @@ function removeConditionRow(e, updateAfter = true) {
   }
 
   // Determine which row to remove based on which button was clicked
-  const targetRowIndex = getTargetIndex(e, oldNumConditions);
+  const targetRowIndex = getTargetIndex(e, oldNumConditions - 1);
 
   // Remove the Quill editor first, so we don't hit a dangling reference by doing this after removing the row
   removeQuillEditor("#cl-" + targetRowIndex);
@@ -456,7 +454,7 @@ function addSampleCol(e, updateAfter = true) {
   }
 
   // Determine where to add the column based on which button was clicked
-  const targetColIndex = getTargetIndex(e, numSamples);
+  const targetColIndex = getTargetIndex(e, numSamples - 1);
 
   // Construct and insert a new button cell, heading cell, and baseline value cell
   const newButtonCell = $(".sample-button-cell")[0].cloneNode(true);
@@ -505,7 +503,7 @@ function removeSampleCol(e, updateAfter = true) {
   }
 
   // Determine which row to remove based on which button was clicked
-  const targetColIndex = getTargetIndex(e, numSamples);
+  const targetColIndex = getTargetIndex(e, numSamples - 1);
 
   // Remove the appropriate button cell, heading cell, and baseline cell
 
@@ -1070,12 +1068,12 @@ function getPlotData() {
   return data;
 }
 
-function checkPlotDataFile(event) {
+function checkPlotDataFile() {
   let lFiles = this.files;
   if (lFiles.length > 0) {
-    $("#load-data").prop({ disabled: false });
+    $("#load-data").removeAttr("disabled");
   } else {
-    $("#load-data").prop({ disabled: true });
+    $("#load-data").attr("disabled", true);
   }
 }
 
@@ -2056,15 +2054,22 @@ function relabelCondDesc() {
 
 }
 
+/**
+ * Get the number of contributor rows currently in the contributor table
+ * @returns {int}
+ */
+function getNumContribs() {
+  return $(".rocrate-contrib-row").length;
+}
+
 function addROCrateContribRow(e, updateAfter = true) {
-  const contribTable = $("#rocrate-contrib-table>tbody");
   const newRow = $(".rocrate-contrib-row").eq(0).clone();
   newRow.find(".rocrate-name-input").val("");
   newRow.find(".rocrate-orcid-input").val("");
 
-  const targetRowIndex = getTargetIndex(e, contribTable.find("tr").length - 1);
+  const targetRowIndex = getTargetIndex(e, getNumContribs() - 1);
 
-  contribTable.find("tr").eq(targetRowIndex).after(newRow);
+  $(".rocrate-contrib-row").eq(targetRowIndex).after(newRow);
 
   // Update IDs to match the new row indices
   relabelContribs();
@@ -2074,10 +2079,8 @@ function addROCrateContribRow(e, updateAfter = true) {
 }
 
 function removeROCrateContribRow(e, updateAfter = true) {
-  const contribTable = $("#rocrate-contrib-table>tbody");
-  const lRows = contribTable.find("tr");
-
-  const targetRowIndex = getTargetIndex(e, contribTable.find("tr").length - 1);
+  const lRows = $("..rocrate-contrib-row");
+  const targetRowIndex = getTargetIndex(e, getNumContribs() - 1);
 
   // Remove the row from the table
   lRows.eq(targetRowIndex).remove();
@@ -2089,8 +2092,9 @@ function removeROCrateContribRow(e, updateAfter = true) {
     postContribRowUpdate();
 }
 
-function setNumROCrateContribRow(num) {
-  const oldNum = $("#rocrate-contrib-table>tbody>tr").length;
+function setNumROCrateContribRow(e) {
+  const oldNum = getNumContribs();
+  const num = +($(e.target).find(":selected").val());
 
   if (oldNum < num) {
     for (let i = 0; i < num - oldNum; ++i) {
@@ -2111,11 +2115,9 @@ function setNumROCrateContribRow(num) {
  * @param {Event} e 
  */
 function lookupOrcid(e) {
-  const contribTable = $("#rocrate-contrib-table>tbody");
-
-  const targetRowIndex = getTargetIndex(e, contribTable.find("tr").length - 1);
-  const targetRow = contribTable.find("tr").eq(targetRowIndex);
-  let authorName = targetRow.find(".rocrate-name-input").val();
+  const targetRowIndex = getTargetIndex(e, getNumContribs() - 1);
+  const targetRow = $(".rocrate-contrib-row").eq(targetRowIndex);
+  const authorName = targetRow.find(".rocrate-name-input").val();
 
   // Construct the URL to use for the search on ORCID's site and open it in a new tab
   const lookupUrl = `https://orcid.org/orcid-search/search?searchQuery=${authorName.replace(" ", "%20")}`
@@ -2127,7 +2129,7 @@ function lookupOrcid(e) {
  */
 function relabelContribs() {
 
-  const num = $(".rocrate-contrib-row").length;
+  const num = getNumContribs();
   const lRemoveButtons = $(".remove-contrib");
   const lAddButtons = $(".add-contrib");
   const lNameLabels = $(".rocrate-name-label");
@@ -2164,13 +2166,13 @@ function postContribRowUpdate() {
   lOrcidLookupButtons.on("click", lookupOrcid);
 
   // Enable/disable buttons as appropriate depending on if we're at the min, max, or neither
-  const numContribs = $("#rocrate-contrib-table>tbody>tr").length;
+  const numContribs = getNumContribs();
   if (numContribs >= MAX_NUM_CONTRIBS)
-    lAddContribButtons.attr("disabled", "disabled");
+    lAddContribButtons.attr("disabled", true);
   else
     lAddContribButtons.removeAttr("disabled");
   if (numContribs <= MIN_NUM_CONTRIBS)
-    lRemoveContribButtons.attr("disabled", "disabled");
+    lRemoveContribButtons.attr("disabled", true);
   else
     lRemoveContribButtons.removeAttr("disabled");
 
@@ -2232,39 +2234,6 @@ function revertROCrateTitleDesc() {
   lastDatasetAbout = tempDatasetAbout;
 }
 
-function formatInitials(forename) {
-  let initials = "";
-  const forenameSegments = forename.split(/\s+/u);
-  forenameSegments.forEach((s) => {
-    initials += `${s[0].toUpperCase()}.`;
-  });
-  return initials;
-}
-
-/**
- * Capitalize a surname as best as we can guess how it should be, e.g. SMITH -> Smith, O'FLANNERY -> O'Flannery,
- * MACDONALD -> MacDonald, MACKENZIE -> Mackenzie
- * @param {String} surname The surname to try to capitalize
- * @returns {String}
- */
-function surnameToCapitalized(s) {
-  // Start by making the string all lowercase except the first letter, which should be upper case
-  s = s[0].toUpperCase() + s.slice(1).toLowerCase();
-
-  // Check for prefixes which commonly indicate the letter afterwards will be capitalised, and do so
-  if (s.match(/^(Mc|O')/ui) && s.length > 2) {
-    // "Mc" and "O'" prefixes are almost universally followed by another capital letter, so capitalize whatever the
-    // next letter is
-    s = s.slice(0, 2) + s[2].toUpperCase() + s.slice(3);
-  } else if (s.startsWith("Mac") && !s.startsWith("Mack") && s.length > 3) {
-    // "Mac" is usually but not always followed a capital letter, e.g. "MacDonald" but not "Mackenzie". The best
-    // rule here is to capitalize after "Mac" but not "Mack"
-    s = s.slice(0, 3) + s[3].toUpperCase() + s.slice(4);
-  }
-
-  return s;
-}
-
 function useDefaultCitation(e) {
 
   // If this isn't the initialisation call (which will be the case if event info from a button click is passed here),
@@ -2293,7 +2262,7 @@ function useDefaultCitation(e) {
       // Check if we can split by a comma, in which case surname is before, forename after
       const lCommaSplitSegments = name.split(/,\s+/u);
       if (lCommaSplitSegments.length == 2) {
-        formattedName = `${lCommaSplitSegments[0]}, ${formatInitials(lCommaSplitSegments[1])}`;
+        formattedName = `${lCommaSplitSegments[0]}, ${forenameToInitials(lCommaSplitSegments[1])}`;
       } else {
 
         // We either have zero commas, or more than one, so they aren't a good guide. If more than one, strip them all
@@ -2319,12 +2288,12 @@ function useDefaultCitation(e) {
           lCapsSurnameSegments.forEach((s, i) => {
             lCapsSurnameSegments[i] = surnameToCapitalized(s);
           });
-          formattedName = `${lCapsSurnameSegments.join(" ")}, ${formatInitials(lCapsForenameSegments.join(" "))}`;
+          formattedName = `${lCapsSurnameSegments.join(" ")}, ${forenameToInitials(lCapsForenameSegments.join(" "))}`;
         } else {
           // If we get here, there's no obvious indications of what's the forename and what's the surname, so we'll
           // take the best guess that only the final segment is the surname, which is the most-likely scenario for a
           // site aimed at British users like this one
-          formattedName = `${lNameSegments.at(-1)}, ${formatInitials(lNameSegments.slice(0, -1).join(" "))}`;
+          formattedName = `${lNameSegments.at(-1)}, ${forenameToInitials(lNameSegments.slice(0, -1).join(" "))}`;
         }
       }
     }
@@ -2405,8 +2374,8 @@ function updateLicense() {
     licenseUrlInput.removeAttr("disabled");
     licenseNameInput.focus();
   } else {
-    licenseNameInput.attr("disabled", "disabled");
-    licenseUrlInput.attr("disabled", "disabled");
+    licenseNameInput.attr("disabled", true);
+    licenseUrlInput.attr("disabled", true);
   }
 
 }
@@ -2538,7 +2507,7 @@ function updateROCrateDownloadEnabled() {
   if (allGood || debug)
     $("#rocrate-download").removeAttr("disabled");
   else
-    $("#rocrate-download").attr("disabled", "disabled");
+    $("#rocrate-download").attr("disabled", true);
 }
 
 function makeTextVersions(textHTML) {
@@ -2927,6 +2896,7 @@ function enableQuillEventsAndCallbacks() {
 function enableROCrateOnChangeTriggers() {
   $("#rocrate-cdxml").on("change", updateReactionScheme);
   $("input[name='rocrate-license']").on("change", updateLicense);
+  $("#num-contrib").on("change", setNumROCrateContribRow)
 }
 
 $(document).ready(function () {

@@ -1,4 +1,4 @@
-import { formatORCIDUrl } from "./esi.js";
+import { formatORCIDUrl } from "../utility.js";
 
 /**
  * Generates the text of a README file based on user input
