@@ -805,8 +805,7 @@
 
     <strong>About:</strong><br>
     <label for="rocrate-about" class="info-marker">You can customise the following text that describes the purpose
-      of
-      the dataset:</label>
+      of the dataset:</label>
     <div id="rocrate-about-container">
       <div class="ql-full" id="rocrate-about"
         placeholder="Enter full description of the dataset, describing its purpose">
@@ -826,8 +825,12 @@
       from the license options below or choose an alternative license in Other. You can visit <a
         href="https://spdx.org">spdx.org</a> to find out more about kinds of licenses that might be appropriate for
       your project. If your license requires attribution, you must enter bibliographic information about the
-      contributors to this dataset.</p>
+      contributors to this dataset below.</p>
     <ul class="no-bullet">
+      <li><input type="radio" name="rocrate-license" id="rocrate-license-none" class="small-right-margin" value="none"
+          checked>
+        <label for="rocrate-license-none">None (not recommended)</label>
+      </li>
       <li><input type="radio" name="rocrate-license" id="rocrate-license-cc0" class="small-right-margin"
           value="cc0-1.0">
         <label for="rocrate-license-cc0"><a href="https://spdx.org/licenses/CC0-1.0.html" target="_blank">CC0-1.0

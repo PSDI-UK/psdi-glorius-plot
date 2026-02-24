@@ -120,6 +120,11 @@ const DEFAULT_DATASET_ABOUT_TEXT = "This dataset enables users to visualise the 
 const MIN_NUM_CONTRIBS = 1, MAX_NUM_CONTRIBS = 10;
 
 const D_LICENSE_INFO = {
+  "none": {
+    name: "",
+    id: "",
+    url: ""
+  },
   "cc0-1.0": {
     name: "Creative Commons Zero v1.0 Universal",
     id: "CC0-1.0",
@@ -164,6 +169,7 @@ let exportChecks = {
 };
 
 // Stored valued for user-input values to revert to if they click the button to do so
+let lastLicenseVal = "none", lastLicenseName = "", lastLicenseUrl = "";
 let lastDatasetTitle, lastDatasetDesc, lastDatasetAbout, lastCitation;
 let userHasEditedCitation = false;
 
@@ -2363,13 +2369,27 @@ function updateLicense() {
   const license = $("input[name='rocrate-license']:checked").val();
   const licenseInfo = D_LICENSE_INFO[license];
 
+  // If switching from Other to a different license, store the entered values
+  if (lastLicenseVal === "other" && license !== "other") {
+    lastLicenseName = licenseNameInput.val();
+    lastLicenseUrl = licenseUrlInput.val();
+  }
+
   // Update the name and URL displayed
-  licenseNameInput.val(licenseInfo.name);
-  licenseUrlInput.val(licenseInfo.url);
+  if (license === "other") {
+    licenseNameInput.val(lastLicenseName);
+    licenseUrlInput.val(lastLicenseUrl);
+  } else {
+    licenseNameInput.val(licenseInfo.name);
+    licenseUrlInput.val(licenseInfo.url);
+  }
+
+  // Update the last license value for the next time this function is called
+  lastLicenseVal = license;
 
   // Determine whether or not to disable the license name and URL input based on whether or not the Other option is
   // selected
-  if (license == "other") {
+  if (license === "other") {
     licenseNameInput.removeAttr("disabled");
     licenseUrlInput.removeAttr("disabled");
     licenseNameInput.focus();
