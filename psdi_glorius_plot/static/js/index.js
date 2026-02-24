@@ -2704,7 +2704,7 @@ function enableOnChangeTriggers() {
   enableCanvasUpdate();
 
   $("#fan-select").on("change", toggleChartMode);
-  $("#dev-plot-select").on("change", setDeviationPlotMode);
+  $("#dev-plot-select").on("change", generateIfUpdating);
   $(".output-label-select").on("change", updateOutputLabelSelection);
   $("#color-select").on("change", updateColourSchemeSelection);
   $(".plot-select").on("change", updatePlotSelect);
@@ -2716,12 +2716,6 @@ function disableAutoUpdates() {
 
   // Re-enable any on change triggers aside from chart updating
   enableOnChangeTriggers();
-}
-
-function setDeviationPlotMode(e) {
-  document.documentElement.setAttribute("dev-calc-mode", e.target.value);
-  if (!autoUpdating)
-    calcDeviation();
 }
 
 function toggleChartMode(e) {
