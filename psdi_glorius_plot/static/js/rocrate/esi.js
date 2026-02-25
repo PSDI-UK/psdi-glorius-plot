@@ -11,10 +11,10 @@ function initPdfFonts(siteUrl) {
 
   var fonts = {
     Arial: {
-      normal: siteUrl + "static/fonts/Arial Regular.ttf",
-      bold: siteUrl + "static/fonts/Arial Bold.ttf",
-      italics: siteUrl + "static/fonts/Arial Italic.ttf",
-      bolditalics: siteUrl + "static/fonts/Arial Bold Italic.ttf"
+      normal: siteUrl + "static/fonts/Arial.ttf",
+      bold: siteUrl + "static/fonts/Arial-B.ttf",
+      italics: siteUrl + "static/fonts/Arial-I.ttf",
+      bolditalics: siteUrl + "static/fonts/Arial-BI.ttf"
     }
   };
 
