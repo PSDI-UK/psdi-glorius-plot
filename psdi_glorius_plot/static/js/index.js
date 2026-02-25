@@ -2600,6 +2600,9 @@ async function exportROCrate() {
       // Get a timestamp in the format YYYY-MM-DD-HHMMSS- so the filename will be unique
       let timestamp = rocrateInfo.timestamp.replace(/[TZ]/g, "-").replace(/:|(\.\d*)/g, "");
       saveBlob(blob, timestamp + ROCRATE_FILENAME_BASE);
+
+      // Set the current state of the form as "clean"
+      cleanDirtyForms();
     })
     .catch((error) => {
       let msg = "Failed to generate data package";
