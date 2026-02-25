@@ -198,8 +198,7 @@ export async function makeESI(rocrateInfo) {
     reactionSchemeImgInfo.image = await reactionSchemeImgPromise;
   }
 
-  const pdf = pdfMake.createPdf({ content: docContent, styles: docStyles, defaultStyle: defaultStyle }).getBlob();
-  return pdf;
+  return pdfMake.createPdf({ content: docContent, styles: docStyles, defaultStyle: defaultStyle }).getBlob();
 }
 
 export function formatESIBibInfo(lNamesAndORCIDs, contactEmail) {

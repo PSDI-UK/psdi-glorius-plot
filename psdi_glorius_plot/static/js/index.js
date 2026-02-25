@@ -2596,13 +2596,18 @@ async function exportROCrate() {
   rocrate.file(ROCRATE_PLOT_DIR + "glorius_plot.png", rocrateInfo.gloriusPlotPromise);
 
   rocrate.generateAsync({ type: "blob" })
-    .then(function (blob) {
-
-      // Get a timestamp in the format YYYY-MM-DD-HHMMSS-
-      let timestamp = (new Date()).toISOString();
-      timestamp = timestamp.replace(/[TZ]/g, "-").replace(/:|(\.\d*)/g, "");
-
+    .then((blob) => {
+      // Get a timestamp in the format YYYY-MM-DD-HHMMSS- so the filename will be unique
+      let timestamp = rocrateInfo.timestamp.replace(/[TZ]/g, "-").replace(/:|(\.\d*)/g, "");
       saveBlob(blob, timestamp + ROCRATE_FILENAME_BASE);
+    })
+    .catch((error) => {
+      let msg = "Failed to generate data package";
+      if (error)
+        msg += ". The error message was:\n\n" + error;
+      else
+        msg += " for an unknown reason.";
+      window.alert(msg);
     });
 }
 
