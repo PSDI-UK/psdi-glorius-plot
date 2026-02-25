@@ -34,8 +34,12 @@ export async function makeESI(rocrateInfo) {
     var reactionSchemeImgPromise = loadDataURL(rocrateInfo.reactionSchemeImg);
   }
 
-  // Load fonts for the PDF renderer
-  initPdfFonts(window.location.protocol + "//" + window.location.host + "/");
+  // Load fonts for the PDF renderer. We need to provide the absolute web address to them, so we figure that out
+  // relative to the page URL
+  let url = window.location.href, hash = window.location.hash;
+  if (hash && url.endsWith(hash))
+    url = url.slice(0, -hash.length);
+  initPdfFonts(url);
 
   const docStyles = {
     header: {
