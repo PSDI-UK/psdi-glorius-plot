@@ -1915,6 +1915,9 @@ function startROCrateExport(scroll = true) {
   roCrateFormUpdating = true;
   updateROCrateForm(true);
 
+  // Do initial check on if download should be enabled
+  updateROCrateDownloadEnabled();
+
   if (scroll)
     scrollToSection("#rocrate-export-title");
 }
@@ -2956,7 +2959,6 @@ $(document).ready(function () {
 
     // Open the ROCrate Export section and enable export even if checks don't pass
     startROCrateExport(false);
-    updateROCrateDownloadEnabled();
 
     // The plot title is updated on a bit of a lag, so we do a brief async wait then call for it to be set in the
     // RO-crate section too
