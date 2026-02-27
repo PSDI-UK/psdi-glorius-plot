@@ -7,6 +7,7 @@ functions to return rendered templates.
 
 
 from flask import Flask, render_template
+
 from psdi_glorius_plot.gui.env import get_env_kwargs
 
 
@@ -17,8 +18,16 @@ def index():
                            **get_env_kwargs())
 
 
+def documentation():
+    """Return the documentation page
+    """
+    return render_template("documentation.html",
+                           **get_env_kwargs())
+
+
 d_pages = {"/": index,
-           "/index.html": index}
+           "/index.html": index,
+           "/documentation.html": documentation}
 
 
 def init_get(app: Flask):

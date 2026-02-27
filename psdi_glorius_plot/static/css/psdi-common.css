@@ -267,15 +267,9 @@ input.button {
 }
 
 button:hover,
-input.button:hover,
-button:focus,
-input.button:focus {
-  background-color: var(--ifm-color-primary-lighter);
-}
-
-button:hover,
 input.button:hover {
-  cursor: pointer;
+  cursor          : pointer;
+  background-color: var(--ifm-color-primary-lighter);
 }
 
 *:has(> .max-width-box) {
