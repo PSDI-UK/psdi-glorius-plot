@@ -30,6 +30,7 @@ Documentation - {{ super() }}
   {% if service_mode %}Public web service{% else %}Local GUI{%endif %} mode -
   {% if production_mode %}Production{% else %}Development{%endif %} build <br>
   {% if tag %}<strong>Version:</strong> {{ tag }}<br>{% endif %}
+  {% if date %}<strong>Last revised:</strong> {{ date }}<br>{% endif %}
   {% if sha and not production_mode %}<strong>SHA of latest commit:</strong> {{ sha }}<br>{% endif %}
   <strong>Project source:</strong> <a
     href="https://github.com/PSDI-UK/psdi-glorius-plot">https://github.com/PSDI-UK/psdi-glorius-plot</a><br>

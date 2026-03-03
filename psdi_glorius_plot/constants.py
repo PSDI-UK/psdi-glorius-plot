@@ -47,6 +47,7 @@ DEBUG_EV = "DEBUG_MODE"
 TAG_EV = "TAG"
 TAG_SHA_EV = "TAG_SHA"
 SHA_EV = "SHA"
+DATE_EV = "DATE"
 
 
 # Logging and Formatting

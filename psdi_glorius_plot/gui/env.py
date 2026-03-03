@@ -7,6 +7,7 @@ This module handles setting up and storing the state of the environment for the 
 import os
 import sys
 from argparse import Namespace
+from datetime import date
 from subprocess import run
 from traceback import format_exc
 from typing import TypeVar
@@ -42,13 +43,16 @@ class SiteEnv:
                                                       default=False)
         """True if the app is running in debug mode, False if not"""
 
-        tag, sha = self._determine_tag_and_sha()
+        tag, sha, commit_date = self._determine_tag_sha_date()
 
         self.tag: str = tag
         """The latest tag in the repo"""
 
         self.sha: str = sha
         """The SHA of the latest commit, if the latest commit isn't tagged, otherwise an empty string"""
+
+        self.date: date = commit_date
+        """The date of the latest commit"""
 
         self._kwargs: dict[str, str] | None = None
         """Cached value for dict containing all env values"""
@@ -98,8 +102,8 @@ class SiteEnv:
 
         return value_type(ev_value)
 
-    def _determine_tag_and_sha(self) -> tuple[str, str]:
-        """Get latest tag and SHA of latest commit, if the latest commit differs from the latest tagged commit
+    def _determine_tag_sha_date(self) -> tuple[str, str, date]:
+        """Get latest tag, SHA, and date of latest commit, if the latest commit differs from the latest tagged commit
         """
 
         # Get the tag of the latest commit
@@ -162,7 +166,25 @@ class SiteEnv:
         if tag_sha == sha:
             sha = ""
 
-        return (tag, sha)
+        # Get the date of the latest commit
+        ev_commit_date = os.environ.get(const.DATE_EV)
+        if ev_commit_date:
+            commit_date: date | None = ev_commit_date
+        else:
+            try:
+                time_cmd = "git log -n 1 --pretty=reference | head -n 1 | gawk '{print($NF)}'"
+
+                time_out_bytes = run(time_cmd, shell=True, capture_output=True).stdout
+                time_str = str(time_out_bytes.decode()).strip()[:-1]
+                commit_date = date(*map(int, time_str.split("-")))
+
+            except Exception:
+                # Another failsafe block, same reason as before
+                print("ERROR: Could not determine date for most recent tag. Error was:\n" + format_exc(),
+                      file=sys.stderr)
+                commit_date = None
+
+        return (tag, sha, commit_date)
 
 
 _env: SiteEnv | None = None
