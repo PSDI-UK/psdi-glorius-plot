@@ -167,7 +167,7 @@ class SiteEnv:
             sha = ""
 
         # Get the date of the latest commit
-        ev_commit_date = os.environ.get(const.COMMIT_DATE_EV)
+        ev_commit_date = os.environ.get(const.DATE_EV)
         if ev_commit_date:
             commit_date: date | None = ev_commit_date
         else:
