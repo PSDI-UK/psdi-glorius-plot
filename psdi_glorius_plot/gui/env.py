@@ -132,10 +132,10 @@ class SiteEnv:
             tag_sha: str | None = ev_tag_sha
         else:
             try:
-                sha_cmd = f"git show {tag}" + " | head -n 1 | gawk '{print($2)}'"
+                cmd = f"git show {tag}" + " | head -n 1 | gawk '{print($2)}'"
 
-                sha_out_bytes = run(sha_cmd, shell=True, capture_output=True).stdout
-                tag_sha = str(sha_out_bytes.decode()).strip()
+                out_bytes = run(cmd, shell=True, capture_output=True).stdout
+                tag_sha = str(out_bytes.decode()).strip()
 
             except Exception:
                 # Another failsafe block, same reason as before
