@@ -337,6 +337,19 @@ input.rel-deviation-value {
   border-radius: 0 0 0.5rem 0.5rem;
 }
 
+/* RO-crate download button and loading spinner */
+.rocrate-download-and-spinner {
+  display       : flex;
+  flex-direction: row;
+  align-items   : center;
+}
+
+.loading-spinner {
+  color: var(--ifm-color-primary);
+  scale: 75%;
+}
+
+/* Classes to manually adjust margins etc. for individual elements */
 .no-left-margin {
   margin-left: 0 !important;
 }
