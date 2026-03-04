@@ -56,6 +56,14 @@ export async function makeESI(rocrateInfo) {
     font: "Arial",
     fontSize: 12
   };
+  const leftLabelLayout = {
+    hLineWidth: function () { return 0; },
+    vLineWidth: function () { return 0; },
+    paddingLeft: function () { return 0; },
+    paddingRight: function (colIndex) { return colIndex === 0 ? 24 : 16; },
+    paddingTop: function () { return 2; },
+    paddingBottom: function (rowIndex) { return rowIndex === 0 ? 4 : 2; }
+  }
 
   // Create the document contents, starting with the main header and the (always-present) Biblio Info section
   const docContent = [
@@ -86,10 +94,17 @@ export async function makeESI(rocrateInfo) {
   if (rocrateInfo.condDescTable) {
 
     // Format table cells individually
-    const condDescTableFormatted = rocrateInfo.condDescTable.arr.map((row) => {
+    const condDescTableFormatted = rocrateInfo.condDescTable.arr.map((row, i) => {
       return row.map((cell) => {
-        return formatFromHTML(cell);
-      })
+        let content = formatFromHTML(cell);
+        if (i == 0) {
+          content = {
+            text: content,
+            bold: true
+          }
+        }
+        return content;
+      });
     });
 
     docContent.push(
@@ -98,7 +113,7 @@ export async function makeESI(rocrateInfo) {
         style: "subheader"
       },
       {
-        layout: "noBorders",
+        layout: leftLabelLayout,
         table: {
           headerRows: 1,
           body: condDescTableFormatted
@@ -143,12 +158,20 @@ export async function makeESI(rocrateInfo) {
 
 
   // Format table cells individually
-  const sensitivityTableFormatted = rocrateInfo.sensitivityTable.arr.map((row) => {
+  const sensitivityTableFormatted = rocrateInfo.sensitivityTable.arr.map((row, i) => {
     return row.map((cell) => {
+      let content;
       if (typeof cell === "string" || cell instanceof String)
-        return formatFromHTML(cell);
+        content = formatFromHTML(cell);
       else
-        return cell.toString();
+        content = cell.toString();
+      if (i == 0) {
+        content = {
+          text: content,
+          bold: true
+        }
+      }
+      return content;
     })
   });
 
@@ -158,7 +181,7 @@ export async function makeESI(rocrateInfo) {
       style: "subheader"
     },
     {
-      layout: "noBorders",
+      layout: leftLabelLayout,
       table: {
         headerRows: 1,
         body: sensitivityTableFormatted
