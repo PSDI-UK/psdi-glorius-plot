@@ -87,14 +87,12 @@ export function formatReadmeBibInfo(lNamesAndSites, contactEmail) {
     if (!name)
       return;
 
-    text += `\n\n**Name**: ${name}`
-
-    if (!site)
-      return;
-
-    const url = formatORCIDUrl(site);
-
-    text += `\n\n- **Site**: ${url}`
+    if (site) {
+      const url = formatORCIDUrl(site);
+      text += `\n\n**Name**: [${name}](${url})`
+    } else {
+      text += `\n\n**Name**: ${name}`
+    }
 
   });
 
