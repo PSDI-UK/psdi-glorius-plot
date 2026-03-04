@@ -2546,6 +2546,9 @@ function makeTextVersions(textHTML) {
  */
 async function exportROCrate() {
 
+  // Show the spinner while working
+  $(".rocrate-download-and-spinner .loading-spinner").removeClass("hidden");
+
   // Set up a rocrateInfo object containing all info that will be needed to construct the various files in the rocrate
 
   // plotData will be modified when the Sensitivity Table is created to remove redundant information in it, so we create
@@ -2611,6 +2614,10 @@ async function exportROCrate() {
       else
         msg += " for an unknown reason.";
       window.alert(msg);
+    })
+    .finally(() => {
+      // Hide the spinner when done
+      $(".rocrate-download-and-spinner .loading-spinner").addClass("hidden");
     });
 }
 
