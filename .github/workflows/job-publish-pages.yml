@@ -43,7 +43,7 @@ jobs:
           pip install .
 
       - name: Render Static Content
-        run: psdi-glorius-plot-render
+        run: psdi-glorius-plot-render --service-mode
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
