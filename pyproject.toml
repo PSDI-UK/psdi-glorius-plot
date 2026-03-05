@@ -73,6 +73,7 @@ exclude = [
   "scripts/make-index-html.sh",
   "Dockerfile",
 ]
+artifacts = ["psdi_glorius_plot/static/**"]
 
 [tool.pytest.ini_options]
 pythonpath = ["."]
