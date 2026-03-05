@@ -89,11 +89,8 @@ def main():
 
             qualified_path = os.path.join(output_dir, stripped_path)
 
-            # Fix any relative links in the page, since the structure here will be a bit different
-            page_content = render_template(stripped_path, **get_env_kwargs())
-            page_content = page_content.replace("../", "./")
-
-            open(qualified_path, "w").write(page_content)
+            # Render the template and write it to the desired output location
+            open(qualified_path, "w").write(render_template(stripped_path, **get_env_kwargs()))
 
 
 if __name__ == "__main__":
