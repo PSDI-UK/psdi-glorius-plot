@@ -9,14 +9,15 @@ export function makeReadme(rocrateInfo) {
 
   // If a license is provided, add a line for it
   let licenseLine = "";
-  if (rocrateInfo.licenseURL) {
+  const licenseInfo = rocrateInfo.licenseInfo;
+  if (licenseInfo.url) {
     licenseLine = `
 
-**License:** [${rocrateInfo.licenseName || rocrateInfo.licenseURL}](${rocrateInfo.licenseURL})`;
-  } else if (rocrateInfo.licenseName) {
+**License:** [${licenseInfo.name || licenseInfo.url}](${licenseInfo.url})`;
+  } else if (licenseInfo.name) {
     licenseLine = `
 
-**License:** ${rocrateInfo.licenseName}`;
+**License:** ${licenseInfo.name}`;
   }
 
   // If Bibliographic info is provided, add a section header to it
@@ -52,9 +53,9 @@ export function makeReadme(rocrateInfo) {
 
 **Description**: ${rocrateInfo.desc.md}
 
-**Date Published**: ${rocrateInfo.timestamp}${licenseLine}
+**Date Published**: ${rocrateInfo.timestamp}
 
-**About**: ${rocrateInfo.about.md}${bibInfoText}
+**About**: ${rocrateInfo.about.md}${licenseLine}${bibInfoText}
 
 ## File Structure
 
