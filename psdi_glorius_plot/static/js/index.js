@@ -2252,8 +2252,10 @@ function useDefaultCitation(e) {
     userHasEditedCitation = false;
     $("#rocrate-revert-citation").removeAttr("disabled");
   }
-  const datasetTitle = getQuillEditorHTML("#rocrate-title-input")
-  const date = (new Date()).toISOString().slice(0, 9);
+  let datasetTitle = cleanTags(getQuillEditorHTML("#rocrate-title-input"));
+  if (!datasetTitle)
+    datasetTitle = "Data package";
+  const date = (new Date()).toISOString().slice(0, 10);
 
   const lNames = [];
   $(".rocrate-name-input").each((_, nameInput) => {
@@ -2638,10 +2640,12 @@ function makeBibInfo() {
   });
 
   const contactEmail = $("#rocrate-email-input").val();
+  const citationHtml = cleanTags(getQuillEditorHTML("#rocrate-citation"));
+  const citationMd = HTMLToMd(cleanTags(citationHtml));
 
   const bibInfo = {
-    readmeInfo: formatReadmeBibInfo(lNamesAndORCIDs, contactEmail),
-    esiInfo: formatESIBibInfo(lNamesAndORCIDs, contactEmail)
+    readmeInfo: formatReadmeBibInfo(lNamesAndORCIDs, contactEmail, citationMd),
+    esiInfo: formatESIBibInfo(lNamesAndORCIDs, contactEmail, citationHtml)
   };
   [bibInfo.authorInfoText, bibInfo.bibInfoText] = formatMetadataBibInfo(lNamesAndORCIDs);
 

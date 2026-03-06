@@ -78,7 +78,7 @@ export function makeReadme(rocrateInfo) {
  * @param {String} contactEmail The contact email provided by the user
  * @returns {String} The text of the section
  */
-export function formatReadmeBibInfo(lNamesAndSites, contactEmail) {
+export function formatReadmeBibInfo(lNamesAndSites, contactEmail, citation) {
 
   let text = "";
 
@@ -99,6 +99,10 @@ export function formatReadmeBibInfo(lNamesAndSites, contactEmail) {
 
   if (contactEmail) {
     text += `\n\n**Contact**: ${contactEmail}`
+  }
+
+  if (citation) {
+    text += `\n\n${citation}`
   }
 
   return text;
