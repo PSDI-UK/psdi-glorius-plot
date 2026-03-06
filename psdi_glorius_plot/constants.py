@@ -49,6 +49,8 @@ TAG_SHA_EV = "TAG_SHA"
 SHA_EV = "SHA"
 DATE_EV = "DATE"
 
+STATIC_URL_PATH_EV = "STATIC_URL_PATH"
+
 
 # Logging and Formatting
 # ----------------------
