@@ -257,7 +257,9 @@ export function formatESIBibInfo(lNamesAndORCIDs, contactEmail, citation) {
   }
 
   if (citation) {
-    lTextSegments.push("\n\n", formatFromHTML(citation));
+    if (lTextSegments.length > 0)
+      lTextSegments.push("\n\n");
+    lTextSegments.push(formatFromHTML(citation));
   }
 
   // If we have no content in the section, fill it with "N/A"
