@@ -12,6 +12,8 @@ from subprocess import run
 from traceback import format_exc
 from typing import TypeVar
 
+from flask import url_for
+
 from psdi_glorius_plot import constants as const
 from psdi_glorius_plot import log_utility
 
@@ -212,6 +214,11 @@ def update_env(args: Namespace | None = None):
     _env = SiteEnv(args)
 
 
+def get_url(page_url):
+    url = url_for("static", filename="../"+page_url)
+    return url.replace("static/...", "")
+
+
 def get_env_kwargs():
     """Get a dict of kwargs for the environment
     """
@@ -219,5 +226,8 @@ def get_env_kwargs():
     env = get_env()
 
     kwargs = env.kwargs
+
+    # Add a function to get a URL, taking into account the static URL path
+    kwargs["get_url"] = get_url
 
     return kwargs
