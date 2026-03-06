@@ -54,6 +54,11 @@ class SiteEnv:
         self.date: date = commit_date
         """The date of the latest commit"""
 
+        self.static_url_path: str = self._determine_value(ev=const.STATIC_URL_PATH_EV,
+                                                          arg="static_url_path",
+                                                          value_type=str,
+                                                          default="/static")
+
         self._kwargs: dict[str, str] | None = None
         """Cached value for dict containing all env values"""
 
