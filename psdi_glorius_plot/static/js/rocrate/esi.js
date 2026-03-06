@@ -224,7 +224,7 @@ export async function makeESI(rocrateInfo) {
   return pdfMake.createPdf({ content: docContent, styles: docStyles, defaultStyle: defaultStyle }).getBlob();
 }
 
-export function formatESIBibInfo(lNamesAndORCIDs, contactEmail) {
+export function formatESIBibInfo(lNamesAndORCIDs, contactEmail, citation) {
 
   const lFormattedNames = [];
   lNamesAndORCIDs.forEach(([name, orcId]) => {
@@ -237,13 +237,11 @@ export function formatESIBibInfo(lNamesAndORCIDs, contactEmail) {
   const lTextSegments = [];
 
   // Format differently depending on if we have, none, one, two, or three or more authors
-  if (lFormattedNames.length == 0) {
-    return ["N/A"]
-  } else if (lFormattedNames.length == 1) {
+  if (lFormattedNames.length == 1) {
     lTextSegments.push("Author: ", lFormattedNames[0], ".");
   } else if (lFormattedNames.length == 2) {
     lTextSegments.push("Authors: ", lFormattedNames[0], " and ", lFormattedNames[1], ".");
-  } else {
+  } else if (lFormattedNames.length > 2) {
     lTextSegments.push("Authors: ");
     for (let i = 0; i < lFormattedNames.length; ++i) {
       if (i < lFormattedNames.length - 1)
@@ -257,6 +255,14 @@ export function formatESIBibInfo(lNamesAndORCIDs, contactEmail) {
     lTextSegments.push(" Contact: ", { text: contactEmail, link: `mailto:${contactEmail}`, decoration: 'underline' },
       ".");
   }
+
+  if (citation) {
+    lTextSegments.push("\n\n", formatFromHTML(citation));
+  }
+
+  // If we have no content in the section, fill it with "N/A"
+  if (lTextSegments.length == 0)
+    return ["N/A"];
 
   return lTextSegments;
 }
