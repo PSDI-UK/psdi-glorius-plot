@@ -4,8 +4,7 @@
 
 ### New and Changed Functionality
 
-- Added option to select how data should be sorted when displayed on the plot
-- Added dropdown boxes to select how many rows and columns are desired
+- Added functionality requested for initial release, including advanced plot configuration and RO-crate output
 
 ### Miscellaneous Changes
 
