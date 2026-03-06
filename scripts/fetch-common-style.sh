@@ -101,3 +101,8 @@ if [ "$CLEAN_UP_ASSETS" != "true" ]; then
 
     chmod +x $PURGE_SCRIPT
 fi
+
+# Run the provided callback
+if [ ! -z "$CALLBACK" ]; then
+    exec $CALLBACK
+fi
