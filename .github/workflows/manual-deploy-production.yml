@@ -104,11 +104,13 @@ jobs:
     if: false
     name: Deploy to production
     needs: get-latest-release-tag
-    uses: ./.github/workflows/job-deploy-k8s.yml # use the callable deploy job
-    secrets: inherit # pass all secrets for the environment
+    uses: PSDI-UK/psdi-glorius-plot-deployment/.github/workflows/job-external-deployment.yaml@b68b1ee20d22421314fbf68e4c23d4e94df3a313
     with:
       container_tag: ${{ needs.get-latest-release-tag.outputs.tag }}
       environment: production
+    secrets:
+      deployment_app_id:  ${{ secrets.DEPLOYMENT_APP_ID }}
+      deployment_app_private_key: ${{ secrets.DEPLOYMENT_APP_PRIVATE_KEY }}
 
   # Run a simple test on prod to ensure nothing is broken
   test-prod:
