@@ -53,10 +53,14 @@ export function setFooterSource(s) {
 const LIGHT_MODE = "light";
 const DARK_MODE = "dark";
 
-// Load color mode from session storage and apply it
+// Load color mode from session storage and apply it if it's already been set, or else get the user's system preference
 let mode = sessionStorage.getItem("mode");
 if (!mode) {
-  mode = LIGHT_MODE;
+  const userPrefersDarkMode = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)');
+  if (userPrefersDarkMode && userPrefersDarkMode.matches)
+    mode = DARK_MODE;
+  else
+    mode = LIGHT_MODE;
 }
 document.documentElement.setAttribute("data-theme", mode);
 
