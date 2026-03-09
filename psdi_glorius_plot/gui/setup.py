@@ -41,15 +41,7 @@ def _patch_flask_warning():
 def _get_flask_kwargs() -> dict[str, Any]:
     """Get the kwargs we want to pass to the initialisation of the Flask app based on env settings"""
 
-    env = get_env()
-    flask_kwargs = {}
-
-    # Only set the static URL path to something custom in service mode, as in local mode it will always just be the
-    # Flask default
-    if env.service_mode:
-        flask_kwargs["static_url_path"] = env.static_url_path
-
-    return flask_kwargs
+    return {}
 
 
 def _init_app():

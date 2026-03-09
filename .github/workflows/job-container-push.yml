@@ -44,12 +44,12 @@ jobs:
           SHA=`git log -n 1 | head -n 1 | awk '{print($2)}'`
           TAG=`git tag --sort -version:refname | head -n 1`
           TAG_SHA=`git show $TAG | head -n 1 | awk '{print($2)}'`
-          STATIC_URL_PATH=/glorius-plot/static
-          echo "Building with TAG=$TAG, TAG_SHA=$TAG_SHA, SHA=$SHA, STATIC_URL_PATH=$STATIC_URL_PATH"
+          REL_URL_PATH=/glorius-plot
+          echo "Building with TAG=$TAG, TAG_SHA=$TAG_SHA, SHA=$SHA, REL_URL_PATH=$REL_URL_PATH"
           docker build \
             --build-arg SHA=$SHA \
             --build-arg TAG=$TAG \
             --build-arg TAG_SHA=$TAG_SHA \
-            --build-arg STATIC_URL_PATH=$STATIC_URL_PATH \
+            --build-arg REL_URL_PATH=$REL_URL_PATH \
             -t $IMAGE_NAME .
           docker push $IMAGE_NAME
