@@ -66,6 +66,11 @@ tr.direct-mode-only {
 
 /* General element styling */
 
+/* Anchors should always have the cursor change to a pointer when hovered if they're set up with any action */
+a[data-cc]:hover {
+  cursor: pointer;
+}
+
 /* Remove the space after paragraphs which are followed by lists or which are the last child of their parent */
 p:has(+ul, +ol),
 p:last-child {
