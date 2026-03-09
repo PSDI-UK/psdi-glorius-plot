@@ -1,5 +1,16 @@
 import "https://cdn.jsdelivr.net/gh/orestbida/cookieconsent@3.1.0/dist/cookieconsent.umd.js";
 
+// Value in sessionStorage to track state of cookie consent
+sessionStorage["analyticsAllowed"] = false;
+
+/**
+ * Get whether or not the user consents for analytics to be collected
+ * @returns {boolean}
+ */
+export function getAnalyticsAllowed() {
+  return sessionStorage["analyticsAllowed"];
+}
+
 CookieConsent.run({
 
   categories: {
@@ -51,6 +62,22 @@ CookieConsent.run({
             }
           ]
         }
+      }
+    }
+  },
+  onConsent: function () {
+    if (CookieConsent.acceptedCategory('analytics')) {
+      sessionStorage["analyticsAllowed"] = true;
+    } else {
+      sessionStorage["analyticsAllowed"] = false;
+    }
+  },
+  onChange: function ({ changedCategories, changedServices }) {
+    if (changedCategories.includes('analytics')) {
+      if (CookieConsent.acceptedCategory('analytics')) {
+        sessionStorage["analyticsAllowed"] = true;
+      } else {
+        sessionStorage["analyticsAllowed"] = false;
       }
     }
   }
