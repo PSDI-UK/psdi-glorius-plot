@@ -31,8 +31,8 @@ def main():
                         help="If set, will run the Flask server in debug mode, which will cause it to automatically "
                         "reload if code changes and show an interactive debugger in the case of errors")
 
-    parser.add_argument("--static-url-path", type=str, default=None,
-                        help="In service mode, will set the path to static content relative to the site root "
+    parser.add_argument("--rel-url-path", type=str, default="",
+                        help="In service mode, will set the path to content relative to the site root "
                         "directory. Has no effect if not in service mode.")
 
     parser.add_argument("--log-level", type=str, default=None,

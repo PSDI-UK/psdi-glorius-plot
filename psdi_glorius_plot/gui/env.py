@@ -56,10 +56,10 @@ class SiteEnv:
         self.date: date = commit_date
         """The date of the latest commit"""
 
-        self.static_url_path: str = self._determine_value(ev=const.STATIC_URL_PATH_EV,
-                                                          arg="static_url_path",
-                                                          value_type=str,
-                                                          default="/static")
+        self.rel_url_path: str = self._determine_value(ev=const.REL_URL_PATH_EV,
+                                                       arg="rel_url_path",
+                                                       value_type=str,
+                                                       default="")
 
         self._kwargs: dict[str, str] | None = None
         """Cached value for dict containing all env values"""
@@ -214,9 +214,18 @@ def update_env(args: Namespace | None = None):
     _env = SiteEnv(args)
 
 
+def custom_url_for(*args, **kwargs):
+    """Custom implementation of Flask's url_for which prepends the URL with a relative path"""
+    url = url_for(*args, **kwargs)
+    if url.startswith("/"):
+        url = url[1:]
+    return os.path.join(get_env().rel_url_path, url)
+
+
 def get_url(page_url):
     url = url_for("static", filename="../"+page_url)
-    return url.replace("static/...", "")
+    url = url.replace("/static/../", "")
+    return os.path.join(get_env().rel_url_path, url.replace("static/...", ""))
 
 
 def get_env_kwargs():
@@ -228,6 +237,7 @@ def get_env_kwargs():
     kwargs = env.kwargs
 
     # Add a function to get a URL, taking into account the static URL path
+    kwargs["url_for"] = custom_url_for
     kwargs["get_url"] = get_url
 
     return kwargs
