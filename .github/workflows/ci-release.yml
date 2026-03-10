@@ -55,11 +55,14 @@ jobs:
     if: false
 
     needs: [tag]
-    uses: ./.github/workflows/job-deploy-k8s.yml # use the callable deploy job
-    secrets: inherit # pass all secrets for the environment
+    uses: PSDI-UK/psdi-glorius-plot-deployment/.github/workflows/job-external-deployment.yaml@b68b1ee20d22421314fbf68e4c23d4e94df3a313
     with:
       container_tag: ${{ needs.tag.outputs.container_tag }}
       environment: staging
+    secrets:
+      deployment_app_id:  ${{ secrets.DEPLOYMENT_APP_ID }}
+      deployment_app_private_key: ${{ secrets.DEPLOYMENT_APP_PRIVATE_KEY }}
+      
 
   build:
     needs: [tag]
