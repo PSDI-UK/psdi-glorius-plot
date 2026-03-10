@@ -57,7 +57,7 @@ class SiteEnv:
         """The date of the latest commit"""
 
         self.rel_url_path: str = self._determine_value(ev=const.REL_URL_PATH_EV,
-                                                       arg="rel_url_path",
+                                                       arg=None,
                                                        value_type=str,
                                                        default="")
 
@@ -179,10 +179,11 @@ class SiteEnv:
             commit_date: date | None = ev_commit_date
         else:
             try:
-                time_cmd = "git log -n 1 --pretty=reference | head -n 1 | gawk '{print($NF)}'"
+                time_cmd = ("git log -n 1 --pretty=reference | head -n 1 | gawk '{print($NF)}' " +
+                            "| gawk '{print substr($0, 1, length($0)-1)}'")
 
                 time_out_bytes = run(time_cmd, shell=True, capture_output=True).stdout
-                time_str = str(time_out_bytes.decode()).strip()[:-1]
+                time_str = str(time_out_bytes.decode()).strip()
                 commit_date = date(*map(int, time_str.split("-")))
 
             except Exception:
