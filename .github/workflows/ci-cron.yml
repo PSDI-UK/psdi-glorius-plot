@@ -13,7 +13,7 @@ on:
 jobs:
   update-assets:
     name: Update common assets
-    runs-on: psdi-glorius-plot-runners
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6

@@ -32,7 +32,7 @@ jobs:
   tag:
     outputs:
       container_tag: ${{ steps.tag_version.outputs.new_tag }}
-    runs-on: psdi-glorius-plot-runners
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
       - name: Bump version and push tag
