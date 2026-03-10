@@ -228,7 +228,9 @@ def custom_url_for(*args, **kwargs):
 
 def get_url(page_url):
     url = url_for("static", filename="../"+page_url)
-    url = url.replace("/static/../", "")
+    url = url.replace("static/../", "")
+    if url.startswith("/"):
+        url = url[1:]
     url = os.path.join(get_env().rel_url_path, url.replace("static/...", ""))
     if not (url.startswith("/") or url.startswith("http://") or url.startswith("https://")):
         url = "/" + url
