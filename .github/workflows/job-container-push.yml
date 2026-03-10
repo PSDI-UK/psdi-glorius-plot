@@ -48,7 +48,7 @@ jobs:
           DATE=`git log -n 1 --pretty=reference | head -n 1 | gawk '{print($NF)}' \
                 | gawk '{print substr($0, 1, length($0)-1)}'`
           REL_URL_PATH=/glorius-plot
-          echo "Building with TAG=$TAG, TAG_SHA=$TAG_SHA, SHA=$SHA, REL_URL_PATH=$REL_URL_PATH"
+          echo "Building with TAG=$TAG, TAG_SHA=$TAG_SHA, SHA=$SHA, DATE=$DATE, REL_URL_PATH=$REL_URL_PATH"
           docker build \
             --build-arg SHA=$SHA \
             --build-arg TAG=$TAG \
