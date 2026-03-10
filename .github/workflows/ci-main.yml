@@ -28,10 +28,8 @@ jobs:
   container-push:
     uses: ./.github/workflows/job-container-push.yml
     needs: [test-all]
-    # When ready to enable this step, remove the following line and uncomment the proper condition below it
-    if: false
     # Proceed if test-all was successful or skipped
-    # if: always() &&  (needs.test-all.result == 'skipped' || needs.test-all.result == 'success')
+    if: always() &&  (needs.test-all.result == 'skipped' || needs.test-all.result == 'success')
     with:
       container_tag: ${{ github.sha }}
   # Deploy to Kubernetes Job
