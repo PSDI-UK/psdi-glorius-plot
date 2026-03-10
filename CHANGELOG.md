@@ -1,5 +1,15 @@
 # Changelog for PSDI Glorius Plot Generator
 
+## v0.2.1
+
+### Bugfixes
+
+- Fixed functionality for setting a custom deployment directory
+
+### Miscellaneous Changes
+
+- Changed workflows to use GitHub's runners
+
 ## v0.2.0
 
 ### New and Changed Functionality
