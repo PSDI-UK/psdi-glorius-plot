@@ -1,5 +1,11 @@
 # Changelog for PSDI Glorius Plot Generator
 
+## v0.2.2
+
+### Bugfixes
+
+- Fixed "Contact" link in page header to correct email address
+
 ## v0.2.1
 
 ### Bugfixes
