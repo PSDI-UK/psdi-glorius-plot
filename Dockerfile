@@ -48,8 +48,8 @@ ARG TAG_SHA
 ENV TAG_SHA=$TAG_SHA
 ARG SHA
 ENV SHA=$SHA
-ARG STATIC_URL_PATH
-ENV STATIC_URL_PATH=$STATIC_URL_PATH
+ARG REL_URL_PATH
+ENV REL_URL_PATH=$REL_URL_PATH
 
 # The PRODUCTION_MODE env var hides features from the GUI that are only useful to developers, such as the SHA of the
 # latest commit. This variable is injected into the container via the K8s deployment
