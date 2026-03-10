@@ -220,13 +220,19 @@ def custom_url_for(*args, **kwargs):
     url = url_for(*args, **kwargs)
     if url.startswith("/"):
         url = url[1:]
-    return os.path.join("/", get_env().rel_url_path, url)
+    url = os.path.join(get_env().rel_url_path, url)
+    if not (url.startswith("/") or url.startswith("http://") or url.startswith("https://")):
+        url = "/" + url
+    return url
 
 
 def get_url(page_url):
     url = url_for("static", filename="../"+page_url)
     url = url.replace("/static/../", "")
-    return os.path.join("/", get_env().rel_url_path, url.replace("static/...", ""))
+    url = os.path.join(get_env().rel_url_path, url.replace("static/...", ""))
+    if not (url.startswith("/") or url.startswith("http://") or url.startswith("https://")):
+        url = "/" + url
+    return url
 
 
 def get_env_kwargs():
