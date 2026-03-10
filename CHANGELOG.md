@@ -1,5 +1,11 @@
 # Changelog for PSDI Glorius Plot Generator
 
+## v0.2.3
+
+### Miscellaneous Changes
+
+- Enabled deployment of main branch to STFC hosting
+
 ## v0.2.2
 
 ### Bugfixes
