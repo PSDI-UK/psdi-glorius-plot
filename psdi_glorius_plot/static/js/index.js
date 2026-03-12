@@ -1709,7 +1709,7 @@ async function generatePlot() {
       plugins: [customCanvasBackgroundColorPlugin],
       options: {
         aspectRatio: getAspectRatio(),
-        events: ['mousemove', 'mouseout', 'touchstart', 'touchmove'],
+        events: [],
         responsive: false,
         scales: {
           r: plotROptions
