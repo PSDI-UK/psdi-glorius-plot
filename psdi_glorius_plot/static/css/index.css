@@ -192,6 +192,54 @@ ol.no-bullet {
   padding-left: 1rem;
 }
 
+/* Set up two-column display on screens that are wide enough */
+.multicol-on-big-screen {
+  display        : flex;
+  flex-direction : row;
+  justify-content: flex-start;
+  gap            : 1rem;
+  align-items    : flex-start;
+  margin         : 0;
+}
+
+.multicol-element {
+  flex: 0 1 auto;
+}
+
+.small-screen-only {
+  display: none;
+}
+
+@media (max-width: 700px) {
+  .multicol-on-big-screen {
+    flex-direction: column;
+    align-items   : stretch;
+  }
+
+  .multicol-on-big-screen .big-screen-only {
+    display: none;
+  }
+
+  .multicol-on-big-screen .small-screen-only {
+    display: default;
+  }
+}
+
+@media (max-width: 900px) {
+  .multicol-on-big-screen.m900 {
+    flex-direction: column;
+    align-items   : stretch;
+  }
+
+  .multicol-on-big-screen.m900 .big-screen-only {
+    display: none;
+  }
+
+  .multicol-on-big-screen.m900 .small-screen-only {
+    display: default;
+  }
+}
+
 /* Style the sensitivity table and related condition description table */
 .sensitivity-table,
 #rocrate-cond-desc-table {
@@ -416,6 +464,10 @@ details {
   margin-bottom : 0.5rem;
   padding       : 0.25rem;
   padding-bottom: 0;
+}
+
+.max-width-box>*:has(>details) {
+  display: inline-block;
 }
 
 details>summary+* {

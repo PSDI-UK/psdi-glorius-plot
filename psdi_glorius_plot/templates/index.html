@@ -519,140 +519,141 @@
       <h4>Plot Configuration</h4>
     </summary>
 
-    <p>
-      <label for="fan-select">Plot style: </label>
-      <select id="fan-select" class="trigger-chart-update">
-        <option value="radar">Radar</option>
-        <option value="fan">Fan</option>
-      </select>
-    </p>
-
-    <table id="plot-size-options" class="label-table">
-      <tr>
-        <td>
-          <label for="width-input" class="align-right">Plot width in pixels: </label>
-        </td>
-        <td>
-          <input type="number" step="50" value="600" min="200" max="4000" name="width-input" id="width-input"
-            class="trigger-chart-update small-input">
-        </td>
-        <td>
-          <label for="label-font-size-input" class="align-right">Condition label font size: </label>
-        </td>
-        <td>
-          <input type="number" name="label-font-size-input" id="label-font-size-input"
-            class="trigger-chart-update small-input" min="2" max="64" value="18">
-        </td>
-      </tr>
-      <tr>
-        <td>
-          <label for="height-input" class="align-right">Plot height in pixels: </label>
-        </td>
-        <td>
-          <input type="number" step="50" value="600" min="200" max="4000" name="height-input" id="height-input"
-            class="trigger-chart-update small-input">
-        </td>
-        <td>
-          <label for="axis-font-size-input" class="align-right">Axis label font size: </label>
-        </td>
-        <td>
-          <input type="number" name="axis-font-size-input" id="axis-font-size-input"
-            class="trigger-chart-update small-input" min="2" max="64" value="16">
-        </td>
-      </tr>
-      <tr>
-        <td>
-          <label for="lock-aspect-ratio" class="align-right">Lock aspect ratio:</label>
-        </td>
-        <td>
-          <input type="checkbox" name="lock-aspect-ratio" id="lock-aspect-ratio" checked>
-        </td>
-        <td>
-          <label for="scale-font-size" class="align-right">Scale font size with plot size:</label>
-        </td>
-        <td>
-          <input type="checkbox" name="scale-font-size" id="scale-font-size">
-        </td>
-      </tr>
-    </table>
-    <button type="button" id="reset-plot-dims" class="trigger-chart-update" title="Reset the plot height, plot width,
-    condition label font size, and axis label font size to their default values">Reset Size and Shape</button>
-
-    <br>
-    <br>
-
-    <table class="label-table">
-      <tr>
-        <td>
-          <label for="min-output-input">Minimum output:</label>
-        </td>
-        <td class="value-">
-          <input type="number" step="any" value="-100" name="min-output-input" id="min-output-input"
-            class="trigger-chart-update small-input">
-        </td>
-        <td>
-          <label for="band-width-input" class="small-left-margin">Band width: </label>
-        </td>
-        <td>
-          <input type="number" step="5" value="25" min="5" max="50" name="band-width-input" id="band-width-input"
-            class="trigger-chart-update small-input">
-        </td>
-      </tr>
-      <tr>
-        <td>
-          <label for="max-output-input" class="small-left-margin">Maximum output:</label>
-        </td>
-        <td>
-          <input type="number" step="any" value="50" name="max-output-input" id="max-output-input"
-            class="trigger-chart-update small-input">
-        </td>
-      </tr>
-      <tr>
-        <td>
-          <label for="color-select">Colour scheme:</label>
-        </td>
-        <td colspan="2">
-          <select name="color-select" id="color-select">
-            <option value="colourblind" selected>Colourblind-friendly</option>
-            <option value="classic">Classic</option>
-            <option value="greyscale">Greyscale</option>
-            <option value="custom">Custom</option>
+    <div class="multicol-on-big-screen m900">
+      <div class="multicol-element">
+        <p>
+          <label for="fan-select">Plot style: </label>
+          <select id="fan-select" class="trigger-chart-update">
+            <option value="radar">Radar</option>
+            <option value="fan">Fan</option>
           </select>
-        </td>
-        <td>
-          <label for="min-color-input">Color at lowest output:</label>
-        </td>
-        <td>
-          <input type="color" value="#F05200" name="min-color-input" id="min-color-input"
-            class="trigger-chart-update color-custom small-input">
-        </td>
-      </tr>
-      <tr>
-        <td class="empty-cell"></td>
-        <td colspan="2" class="empty-cell"></td>
-        <td>
-          <label for="max-color-input">Color at highest output:</label>
-        </td>
-        <td>
-          <input type="color" value="#0093F5" name="max-color-input" id="max-color-input"
-            class="trigger-chart-update color-custom small-input">
-        </td>
-      </tr>
-      <tr>
-        <td>
-          <label for="sort-option">Data arrangement:</label>
-        </td>
-        <td colspan="2">
-          <select name="sort-option" id="sort-option" class="trigger-chart-update">
-            <option value="1">Ascending</option>
-            <option value="-1">Descending</option>
-            <option value="0">As entered</option>
-          </select>
-        </td>
-        <td class="empty-cell"></td>
-        <td class="empty-cell"></td>
-      </tr>
-    </table>
+        </p>
+        <table id="plot-size-options" class="label-table">
+          <tr>
+            <td>
+              <label for="width-input" class="align-right">Plot width in pixels: </label>
+            </td>
+            <td>
+              <input type="number" step="50" value="600" min="200" max="4000" name="width-input" id="width-input"
+                class="trigger-chart-update small-input">
+            </td>
+            <td>
+              <label for="label-font-size-input" class="align-right">Condition label font size: </label>
+            </td>
+            <td>
+              <input type="number" name="label-font-size-input" id="label-font-size-input"
+                class="trigger-chart-update small-input" min="2" max="64" value="18">
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <label for="height-input" class="align-right">Plot height in pixels: </label>
+            </td>
+            <td>
+              <input type="number" step="50" value="600" min="200" max="4000" name="height-input" id="height-input"
+                class="trigger-chart-update small-input">
+            </td>
+            <td>
+              <label for="axis-font-size-input" class="align-right">Axis label font size: </label>
+            </td>
+            <td>
+              <input type="number" name="axis-font-size-input" id="axis-font-size-input"
+                class="trigger-chart-update small-input" min="2" max="64" value="16">
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <label for="lock-aspect-ratio" class="align-right">Lock aspect ratio:</label>
+            </td>
+            <td>
+              <input type="checkbox" name="lock-aspect-ratio" id="lock-aspect-ratio" checked>
+            </td>
+            <td>
+              <label for="scale-font-size" class="align-right">Scale font size with plot size:</label>
+            </td>
+            <td>
+              <input type="checkbox" name="scale-font-size" id="scale-font-size">
+            </td>
+          </tr>
+        </table>
+        <button type="button" id="reset-plot-dims" class="trigger-chart-update" title="Reset the plot height, plot width,
+        condition label font size, and axis label font size to their default values">Reset Size and Shape</button>
+      </div>
+      <div class="multicol-element">
+        <table class="label-table">
+          <tr>
+            <td>
+              <label for="min-output-input">Minimum output:</label>
+            </td>
+            <td class="value-">
+              <input type="number" step="any" value="-100" name="min-output-input" id="min-output-input"
+                class="trigger-chart-update small-input">
+            </td>
+            <td>
+              <label for="band-width-input" class="small-left-margin">Band width: </label>
+            </td>
+            <td>
+              <input type="number" step="5" value="25" min="5" max="50" name="band-width-input" id="band-width-input"
+                class="trigger-chart-update small-input">
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <label for="max-output-input" class="small-left-margin">Maximum output:</label>
+            </td>
+            <td>
+              <input type="number" step="any" value="50" name="max-output-input" id="max-output-input"
+                class="trigger-chart-update small-input">
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <label for="color-select">Colour scheme:</label>
+            </td>
+            <td colspan="2">
+              <select name="color-select" id="color-select">
+                <option value="colourblind" selected>Colourblind-friendly</option>
+                <option value="classic">Classic</option>
+                <option value="greyscale">Greyscale</option>
+                <option value="custom">Custom</option>
+              </select>
+            </td>
+            <td>
+              <label for="min-color-input">Color at lowest output:</label>
+            </td>
+            <td>
+              <input type="color" value="#F05200" name="min-color-input" id="min-color-input"
+                class="trigger-chart-update color-custom small-input">
+            </td>
+          </tr>
+          <tr>
+            <td class="empty-cell"></td>
+            <td colspan="2" class="empty-cell"></td>
+            <td>
+              <label for="max-color-input">Color at highest output:</label>
+            </td>
+            <td>
+              <input type="color" value="#0093F5" name="max-color-input" id="max-color-input"
+                class="trigger-chart-update color-custom small-input">
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <label for="sort-option">Data arrangement:</label>
+            </td>
+            <td colspan="2">
+              <select name="sort-option" id="sort-option" class="trigger-chart-update">
+                <option value="1">Ascending</option>
+                <option value="-1">Descending</option>
+                <option value="0">As entered</option>
+              </select>
+            </td>
+            <td class="empty-cell"></td>
+            <td class="empty-cell"></td>
+          </tr>
+        </table>
+      </div>
+    </div>
   </details>
 </form>
 
