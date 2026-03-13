@@ -143,6 +143,7 @@ textarea {
 #data-input,
 #plot-config,
 #rocrate-input {
+  display      : inline-block;
   border       : 1px solid var(--ifm-font-color-base);
   border-radius: 0.5rem;
   margin       : 1rem 0;
@@ -464,10 +465,6 @@ details {
   margin-bottom : 0.5rem;
   padding       : 0.25rem;
   padding-bottom: 0;
-}
-
-.max-width-box>*:has(>details) {
-  display: inline-block;
 }
 
 details>summary+* {
