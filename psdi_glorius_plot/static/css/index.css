@@ -104,6 +104,7 @@ textarea {
   border-radius: 0.5rem;
   margin       : 1rem 0;
   padding      : 0.5rem 1rem;
+  max-width    : 95vw;
 }
 
 /* Center sections horizontally */
