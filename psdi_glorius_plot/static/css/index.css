@@ -150,6 +150,14 @@ textarea {
   padding      : 0.5rem 1rem;
 }
 
+/* Center sections horizontally */
+*:has(>#plot-config),
+*:has(>#rocrate-input) {
+  display       : flex;
+  flex-direction: column;
+  align-items   : center;
+}
+
 #glorius-plot {
   width : 700px;
   border: 1px solid black;
@@ -209,6 +217,11 @@ ol.no-bullet {
   align-items    : flex-start;
 }
 
+.multicol-on-big-screen.wrap {
+  flex-wrap      : wrap;
+  justify-content: center;
+}
+
 .multicol-element {
   flex: 0 1 auto;
 }
@@ -218,7 +231,7 @@ ol.no-bullet {
 }
 
 @media (max-width: 700px) {
-  .multicol-on-big-screen {
+  .multicol-on-big-screen:not(.wrap) {
     flex-direction: column;
     align-items   : stretch;
   }
@@ -233,7 +246,7 @@ ol.no-bullet {
 }
 
 @media (max-width: 900px) {
-  .multicol-on-big-screen.m900 {
+  .multicol-on-big-screen.m900:not(.wrap) {
     flex-direction: column;
     align-items   : stretch;
   }
