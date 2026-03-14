@@ -293,9 +293,17 @@ ol.no-bullet {
   align-items    : center;
 }
 
-td.row-button-cell {
+.row-button-cell {
   align-items   : center;
   vertical-align: middle;
+}
+
+.row-button-cell:not(td) {
+  display: inline-block;
+}
+
+.rocrate-contrib-row>* {
+  display: inline-block;
 }
 
 .row-button-container {

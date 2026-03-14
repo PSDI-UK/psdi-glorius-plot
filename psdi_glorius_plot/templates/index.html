@@ -952,32 +952,31 @@
         </td>
       </tr>
     </table>
-    <table id="rocrate-contrib-table" class="label-table">
-      <tr class="rocrate-contrib-row" id="rcw-0">
-        <td class="rocrate-contrib-button-cell row-button-cell">
+    <div id="rocrate-contrib-table" class="label-table">
+      <div class="rocrate-contrib-row" id="rcw-0">
+        <div class="rocrate-contrib-button-cell row-button-cell">
           <div class="row-button-container">
             <button type="button" id="remove-rcb-0" class="remove-contrib fix-size-small" disabled
               title="Remove this contributor">-</button>
             <button type="button" id="add-rcb-0" class="add-contrib fix-size-small" title="Add a contributor">+</button>
           </div>
-        </td>
-        <td class="label-cell">
-          <label for="rni-0" class="rocrate-name-label" id="rnl-0">Name:</label>
-        </td>
-        <td class="input-cell">
-          <input type="text" name="rocrate-name-input" class="rocrate-name-input" id="rni-0">
-        </td>
-        <td class="button-cell">
-          <button type="button" class="rocrate-orcid-lookup" id="rob-0">ORCID Lookup</button>
-        </td>
-        <td class="label-cell">
-          <label for="roi-0" class="rocrate-orcid-label" id="rol-0">ORCID or other link:</label>
-        </td>
-        <td class="input-cell">
-          <input type="url" name="rocrate-orcid-input" class="rocrate-orcid-input" id="roi-0">
-        </td>
-      </tr>
-    </table>
+        </div>
+        <div class="rocrate-contrib-right-of-button">
+          <div class="multicol-on-big-screen m900 tiny-gap">
+            <div class="multicol-element">
+              <label for="rni-0" class="rocrate-name-label text-align-right" id="rnl-0"><strong>Name:</strong></label>
+              <input type="text" name="rocrate-name-input" class="rocrate-name-input" id="rni-0">
+              <button type="button" class="rocrate-orcid-lookup" id="rob-0">ORCID Lookup</button>
+            </div>
+            <div class="multicol-element">
+              <label for="roi-0" class="rocrate-orcid-label text-align-right" id="rol-0"><strong>ORCID or other
+                  link:</strong></label>
+              <input type="url" name="rocrate-orcid-input" class="rocrate-orcid-input" id="roi-0">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
 
     <br>
     <label for="rocrate-email-table" class="info-marker">Providing contact information enables a user to make
