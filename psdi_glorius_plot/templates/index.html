@@ -753,17 +753,23 @@
     <h5>About your experiment</h5>
 
     <strong>Standard Conditions</strong><br>
-    <label for="rocrate-cdxml" class="info-marker">Add a ChemDraw <code>.cdxml</code> file that depicts the chemical
-      process corresponding to your “Standard Conditions”. Including a <code>.cdxml</code> file enables chemical
-      information to be linked to your data.</label>
+    <div class="multicol-on-big-screen">
+      <div class="multicol-element">
+        <label for="rocrate-cdxml" class="info-marker">Add a ChemDraw <code>.cdxml</code> file that depicts the chemical
+          process corresponding to your “Standard Conditions”. Including a <code>.cdxml</code> file enables chemical
+          information to be linked to your data.</label>
+        <br>
+        <input type="file" name="rocrate-cdxml" id="rocrate-cdxml" accept=".cdxml"><br>
+      </div>
+      <div class="multicol-element">
+        <label for="rocrate-img" class="info-marker">Add a <code>.png</code> illustration of the reaction which will be
+          added to the supplementary information file. This can be generated from a <code>.cdxml</code> file using e.g.
+          the <a href="https://data-conversion.psdi.ac.uk/">PSDI Data Conversion Service</a>.</label>
+        <br>
+        <input type="file" name="rocrate-img" id="rocrate-img" accept=".png,.jpg,.jpeg">
+      </div>
+    </div>
     <br>
-    <input type="file" name="rocrate-cdxml" id="rocrate-cdxml" accept=".cdxml"><br>
-    <label for="rocrate-img" class="info-marker">Add a <code>.png</code> illustration of the reaction which will be
-      added to the supplementary information file. This can be generated from a <code>.cdxml</code> file using e.g.
-      the <a href="https://data-conversion.psdi.ac.uk/">PSDI Data Conversion Service</a>.</label>
-    <br>
-    <input type="file" name="rocrate-img" id="rocrate-img" accept=".png,.jpg,.jpeg">
-    <br><br>
     <label for="baseline-desc-container" class="info-marker">Add text to describe the experimental conditions that
       give the isolated yield (%) you reported for the “Standard Conditions” of your
       chemical process:</label>
