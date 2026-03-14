@@ -98,9 +98,7 @@ textarea {
 }
 
 /* Draw outlines around the appropriate sections */
-#data-input,
-#plot-config,
-#rocrate-input {
+.rounded-border {
   display      : inline-block;
   border       : 1px solid var(--ifm-font-color-base);
   border-radius: 0.5rem;
@@ -109,8 +107,7 @@ textarea {
 }
 
 /* Center sections horizontally */
-*:has(>#plot-config),
-*:has(>#rocrate-input) {
+*:has(>.center-section) {
   display       : flex;
   flex-direction: column;
   align-items   : center;
@@ -180,6 +177,10 @@ ol.no-bullet {
   justify-content: center;
 }
 
+.multicol-on-big-screen+* {
+  margin-top: 0;
+}
+
 .multicol-element {
   flex: 0 1 auto;
 }
@@ -192,6 +193,14 @@ ol.no-bullet {
   .multicol-on-big-screen:not(.wrap) {
     flex-direction: column;
     align-items   : stretch;
+  }
+
+  .multicol-on-big-screen>.multicol-element:not(:first-child) {
+    margin-top: 0;
+  }
+
+  .multicol-on-big-screen>.multicol-element:not(:last-child) {
+    margin-bottom: 0;
   }
 
   .multicol-on-big-screen .big-screen-only {
@@ -207,6 +216,14 @@ ol.no-bullet {
   .multicol-on-big-screen.m900:not(.wrap) {
     flex-direction: column;
     align-items   : stretch;
+  }
+
+  .multicol-on-big-screen.m900>.multicol-element:not(:first-child) {
+    margin-top: 0;
+  }
+
+  .multicol-on-big-screen.m900>.multicol-element:not(:last-child) {
+    margin-bottom: 0;
   }
 
   .multicol-on-big-screen.m900 .big-screen-only {

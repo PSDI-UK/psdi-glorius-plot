@@ -112,7 +112,7 @@
 
 <div class="multicol-on-big-screen wrap">
   <form class="multicol-element">
-    <details id="data-input" open>
+    <details id="data-input" class="rounded-border" open>
 
       <div class="hidden hidden-until-rocrate">
         <button type="button" class="returnToROCrateExport no-left-margin">↪ Return to data package export</button>
@@ -515,7 +515,7 @@
 </div>
 
 <form>
-  <details id="plot-config" open>
+  <details id="plot-config" class="rounded-border center-section" open>
 
     <summary class="large-marker">
       <h4>Plot Configuration</h4>
@@ -659,55 +659,67 @@
   </details>
 </form>
 
-<div id="export-options">
-  <h4>Save your progress</h4>
-  <label for="save-load-data-buttons" class="info-marker">Save your progress as a <code>.json</code> file or reload it.
-    To reload, select a file with the “Choose File” button below, then click the “Resume Work” button.
-  </label>
-  <table id="save-load-data-buttons">
-    <tr>
-      <td>
-        <button type="button" id="save-data" title="Save the input data and plot configuration in a .json file which
-        can be loaded later to resume or share work">
-          <img src="{{url_for('static', filename='img/icon-download.svg')}}" alt="Download icon" class="text-icon">
-          Save Progress
-        </button>
-      </td>
-      <td>
-        <button type="button" id="load-data" title="Load data from a previously-saved .json file
-        - select this file in the file selector to the right" disabled>
-          <img src="{{url_for('static', filename='img/icon-upload.svg')}}" alt="Upload icon" class="text-icon">
-          Resume Work
-        </button>
-      </td>
-      <td><input type="file" name="load-data-file" id="load-data-file" accept=".json"></td>
-    </tr>
-  </table>
+<div id="export-options" class="multicol-on-big-screen m900">
+  <details class="multicol-element rounded-border" open>
+    <summary class="large-marker">
+      <h4>Save your progress</h4>
+    </summary>
+    <label for="save-load-data-buttons" class="info-marker">Save your progress as a <code>.json</code> file or reload
+      it.
+      To reload, select a file with the “Choose File” button below, then click the “Resume Work” button.
+    </label>
+    <table id="save-load-data-buttons">
+      <tr>
+        <td>
+          <button type="button" id="save-data" title="Save the input data and plot configuration in a .json file which
+          can be loaded later to resume or share work">
+            <img src="{{url_for('static', filename='img/icon-download.svg')}}" alt="Download icon" class="text-icon">
+            Save Progress
+          </button>
+        </td>
+        <td>
+          <button type="button" id="load-data" title="Load data from a previously-saved .json file
+          - select this file in the file selector to the right" disabled>
+            <img src="{{url_for('static', filename='img/icon-upload.svg')}}" alt="Upload icon" class="text-icon">
+            Resume Work
+          </button>
+        </td>
+        <td><input type="file" name="load-data-file" id="load-data-file" accept=".json"></td>
+      </tr>
+    </table>
+  </details>
 
-  <br>
-  <h4>Export plot as an image</h4>
-  <label for="export-image-buttons" class="info-marker">You can export your Glorius Plot as a <code>.png</code> or
-    <code>.svg</code> file. <code>.png</code> has broader compatibility, while <code>.svg</code> allows the image to be
-    resized without losing detail.
-  </label>
-  <table id="export-image-buttons">
-    <tr>
-      <td>
-        <button type="button" id="export-image-png" title="Export the plot as a bitmapped .png image">
-          <img src="{{url_for('static', filename='img/icon-download.svg')}}" alt="Download icon" class="text-icon">
-          Download Plot as PNG</button>
-      </td>
-      <td>
-        <button type="button" id="export-image-svg" title="Export the plot as a vector .svg image (not yet implemented)"
-          disabled>
-          <img src="{{url_for('static', filename='img/icon-download.svg')}}" alt="Download icon" class="text-icon">
-          Download Plot as SVG</button>
-      </td>
-    </tr>
-  </table>
+  <details class="multicol-element rounded-border" open>
+    <summary class="large-marker">
+      <h4>Export plot as an image</h4>
+    </summary>
+    <label for="export-image-buttons" class="info-marker">You can export your Glorius Plot as a <code>.png</code> or
+      <code>.svg</code> file. <code>.png</code> has broader compatibility, while <code>.svg</code> allows the image to
+      be
+      resized without losing detail.
+    </label>
+    <table id="export-image-buttons">
+      <tr>
+        <td>
+          <button type="button" id="export-image-png" title="Export the plot as a bitmapped .png image">
+            <img src="{{url_for('static', filename='img/icon-download.svg')}}" alt="Download icon" class="text-icon">
+            Download Plot as PNG</button>
+        </td>
+        <td>
+          <button type="button" id="export-image-svg"
+            title="Export the plot as a vector .svg image (not yet implemented)" disabled>
+            <img src="{{url_for('static', filename='img/icon-download.svg')}}" alt="Download icon" class="text-icon">
+            Download Plot as SVG</button>
+        </td>
+      </tr>
+    </table>
+  </details>
+</div>
 
-  <br>
-  <h4>Export as a FAIR data package</h4>
+<details class="rounded-border" open>
+  <summary class="large-marker">
+    <h4>Export as a FAIR data package</h4>
+  </summary>
   <label for="export-data-package-buttons" class="info-marker">You can export a FAIR data package to accompany your
     Glorius plot by providing some additional information. The more information you can provide, the more useful the
     data package will be for others. If you choose not to add any additional information, a simple version of the data
@@ -721,10 +733,9 @@
         style="transform: translate(0, -6.25%);">
       Configure Data Package</button>
   </div>
-</div>
+</details>
 
-
-<details id="rocrate-input" class="hidden rocrate-export" open>
+<details id="rocrate-input" class="hidden rounded-border center-section rocrate-export" open>
   <summary class="large-marker">
     <h4 id="rocrate-export-title">Configure your data package</h4>
   </summary>
