@@ -173,6 +173,10 @@ ol.no-bullet {
   align-items    : flex-start;
 }
 
+.multicol-on-big-screen.tiny-gap {
+  gap: 2px;
+}
+
 .multicol-on-big-screen.wrap {
   flex-wrap      : wrap;
   justify-content: center;
@@ -415,6 +419,10 @@ input.rel-deviation-value {
   margin-left: 1rem !important;
 }
 
+.ml2 {
+  margin-left: 2rem !important;
+}
+
 .small-right-margin {
   margin-right: 0.25rem !important;
 }
@@ -423,16 +431,25 @@ input.rel-deviation-value {
   margin-right: 1rem !important;
 }
 
-.small-input {
+.w3 {
+  width: 3rem !important;
+}
+
+.w4 {
   width: 4rem !important;
 }
 
-.med-input {
+.w20 {
   width: 20rem !important;
 }
 
 .max-width-15 {
   max-width: 15rem;
+}
+
+.text-align-right {
+  text-align  : right;
+  margin-right: 0.5rem;
 }
 
 /* How to indicate text which has a tooltip on mouseover */

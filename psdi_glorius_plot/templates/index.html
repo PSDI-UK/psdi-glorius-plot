@@ -537,14 +537,14 @@
             </td>
             <td>
               <input type="number" step="50" value="600" min="200" max="4000" name="width-input" id="width-input"
-                class="trigger-chart-update small-input">
+                class="trigger-chart-update w4">
             </td>
             <td>
               <label for="label-font-size-input" class="align-right">Condition label font size: </label>
             </td>
             <td>
               <input type="number" name="label-font-size-input" id="label-font-size-input"
-                class="trigger-chart-update small-input" min="2" max="64" value="18">
+                class="trigger-chart-update w4" min="2" max="64" value="18">
             </td>
           </tr>
           <tr>
@@ -553,14 +553,14 @@
             </td>
             <td>
               <input type="number" step="50" value="600" min="200" max="4000" name="height-input" id="height-input"
-                class="trigger-chart-update small-input">
+                class="trigger-chart-update w4">
             </td>
             <td>
               <label for="axis-font-size-input" class="align-right">Axis label font size: </label>
             </td>
             <td>
-              <input type="number" name="axis-font-size-input" id="axis-font-size-input"
-                class="trigger-chart-update small-input" min="2" max="64" value="16">
+              <input type="number" name="axis-font-size-input" id="axis-font-size-input" class="trigger-chart-update w4"
+                min="2" max="64" value="16">
             </td>
           </tr>
           <tr>
@@ -589,14 +589,14 @@
             </td>
             <td class="value-">
               <input type="number" step="any" value="-100" name="min-output-input" id="min-output-input"
-                class="trigger-chart-update small-input">
+                class="trigger-chart-update w4">
             </td>
             <td>
               <label for="band-width-input" class="small-left-margin">Band width: </label>
             </td>
             <td>
               <input type="number" step="5" value="25" min="5" max="50" name="band-width-input" id="band-width-input"
-                class="trigger-chart-update small-input">
+                class="trigger-chart-update w4">
             </td>
           </tr>
           <tr>
@@ -605,7 +605,7 @@
             </td>
             <td>
               <input type="number" step="any" value="50" name="max-output-input" id="max-output-input"
-                class="trigger-chart-update small-input">
+                class="trigger-chart-update w4">
             </td>
           </tr>
           <tr>
@@ -625,7 +625,7 @@
             </td>
             <td>
               <input type="color" value="#F05200" name="min-color-input" id="min-color-input"
-                class="trigger-chart-update color-custom small-input">
+                class="trigger-chart-update color-custom w4">
             </td>
           </tr>
           <tr>
@@ -636,7 +636,7 @@
             </td>
             <td>
               <input type="color" value="#0093F5" name="max-color-input" id="max-color-input"
-                class="trigger-chart-update color-custom small-input">
+                class="trigger-chart-update color-custom w4">
             </td>
           </tr>
           <tr>
@@ -907,22 +907,16 @@
           value="other">
         <label for="rocrate-license-other">Other</label>
         <div id="rocrate-license-details">
-          <table class="label-table">
-            <tr>
-              <td class="label-cell">
-                <label for="rocrate-license-name">Name:</label>
-              </td>
-              <td class="input-cell">
-                <input type="text" id="rocrate-license-name" class="med-input med-right-margin" disabled>
-              </td>
-              <td class="label-cell">
-                <label for="rocrate-license-url">Link:</label>
-              </td>
-              <td class="input-cell">
-                <input type="text" id="rocrate-license-url" class="med-input" disabled>
-              </td>
-            </tr>
-          </table>
+          <div class="multicol-on-big-screen m900 tiny-gap ml2">
+            <div class="multicol-element">
+              <label for="rocrate-license-name" class="w3 text-align-right"><strong>Name:</strong></label>
+              <input type="text" id="rocrate-license-name" class="w20" disabled>
+            </div>
+            <div class="multicol-element">
+              <label for="rocrate-license-url" class="w3 text-align-right"><strong>Link:</strong></label>
+              <input type="text" id="rocrate-license-url" class="w20" disabled>
+            </div>
+          </div>
         </div>
       </li>
     </ul>
