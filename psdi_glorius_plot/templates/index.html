@@ -110,406 +110,408 @@
 
 {% block inner_content %}
 
-<form>
-  <details id="data-input" open>
+<div class="multicol-on-big-screen wrap">
+  <form class="multicol-element">
+    <details id="data-input" open>
 
-    <div class="hidden hidden-until-rocrate">
-      <button type="button" class="returnToROCrateExport no-left-margin">↪ Return to data package export</button>
-      <br><br>
-    </div>
+      <div class="hidden hidden-until-rocrate">
+        <button type="button" class="returnToROCrateExport no-left-margin">↪ Return to data package export</button>
+        <br><br>
+      </div>
 
-    <summary class="large-marker" open>
-      <h4>Data Input</h4>
-    </summary>
+      <summary class="large-marker" open>
+        <h4>Data Input</h4>
+      </summary>
 
-    <table class="title-table label-table">
-      <tr class="title-row">
-        <td class="label-cell">
-          <label for="title-input" id="title-label">Title:</label>
-        </td>
-        <td class="title-input-cell">
-          <div class="title-input-container">
-            <div id="title-input"></div>
-          </div>
-        </td>
-      </tr>
-    </table>
-
-    <table class="output-label-table label-table">
-      <tr class="output-label-row">
-        <td class="label-cell">
-          <label for="os-0" class="output-label">Outcome:</label>
-        </td>
-        <td class="output-label-select-cell">
-          <select name="output-label-select" class="output-label-select" id="os-0">
-            <option value="Isolated Yield (%)" selected>Isolated Yield (%)</option>
-            <option value="Spectroscopic Yield (%)">Spectroscopic Yield (%)</option>
-            <option value="Chromatographic Yield (%)">Chromatographic Yield (%)</option>
-            <option value="&lt;em&gt;ee&lt;/em&gt; (%)">ee (%)</option>
-            <option value="&lt;em&gt;de&lt;/em&gt; (%)">de (%)</option>
-            <option value="Other">Other</option>
-          </select>
-        </td>
-        <td class="output-label-value-cell hidden">
-          <div class="output-input-container">
-            <div id="ol-0">Isolated Yield (%)</div>
-          </div>
-        </td>
-      </tr>
-    </table>
-    <table id="table-options" class="label-table">
-      <tr>
-        <td>
-          <label for="num-condition">Test conditions: </label>
-        </td>
-        <td>
-          <select name="num-condition" id="num-condition">
-            <option value="3">3</option>
-            <option value="4">4</option>
-            <option value="5" selected>5</option>
-            <option value="6">6</option>
-            <option value="7">7</option>
-            <option value="8">8</option>
-            <option value="9">9</option>
-            <option value="10">10</option>
-            <option value="11">11</option>
-            <option value="12">12</option>
-          </select>
-        </td>
-        <td id="num-sample-cell">
-          <label for="num-sample" class="calc-mode-only med-left-margin">Number of experiments conducted for each test
-            condition:</label>
-        </td>
-        <td>
-          <select name="num-sample" id="num-sample" class="calc-mode-only">
-            <option value="1">1</option>
-            <option value="2">2</option>
-            <option value="3">3</option>
-            <option value="4">4</option>
-            <option value="5">5</option>
-            <option value="6">6</option>
-            <option value="7">7</option>
-            <option value="8">8</option>
-            <option value="9">9</option>
-            <option value="10">10</option>
-          </select>
-        </td>
-      </tr>
-    </table>
-
-    <table class="sensitivity-table">
-
-      <tr class="sensitivity-buttons calc-mode-only">
-
-        <td class="empty-cell"></td>
-        <td class="empty-cell"></td>
-        <td class="sample-button-cell">
-          <div class="sample-button-container">
-            <button type="button" id="remove-sb-0" class="remove-sample disabled fix-size-small" disabled="true"
-              title="Remove this column">-</button>
-            <button type="button" id="add-sb-0" class="add-sample fix-size-small" title="Add a column">+</button>
-          </div>
-        </td>
-        <td class="empty-cell button-mean-cell hidden"></td>
-        <th colspan="2" class="deviation-heading">Deviation from Standard Conditions</th>
-
-      </tr>
-
-      <tr class="sensitivity-header">
-
-        <th class="empty-heading"></th>
-
-        <th class="condition-label-heading">
-          Label
-        </th>
-
-        <th class="sample-heading calc-mode-only">Isolated Yield (%)</th>
-
-        <th class="mean-heading hidden">Mean Isolated Yield (%)</th>
-
-        <th class="abs-deviation-heading">(+/-)</th>
-
-        <th class="rel-deviation-heading col-selected-top">(%)</th>
-
-      </tr>
-
-      <tr class="baseline-row calc-mode-only">
-        <td class="empty-cell"></td>
-        <td class="baseline-label calc-mode-only">Standard Conditions</td>
-        <td class="baseline-value-cell calc-mode-only">
-          <div class="baseline-line-container">
-            <div class="baseline-input-line">
-              <input type="number" min="0" max="100" step="any" class="baseline-value trigger-chart-update">
+      <table class="title-table label-table">
+        <tr class="title-row">
+          <td class="label-cell">
+            <label for="title-input" id="title-label">Title:</label>
+          </td>
+          <td class="title-input-cell">
+            <div class="title-input-container">
+              <div id="title-input"></div>
             </div>
-          </div>
-        </td>
-        <td class="baseline-mean-cell hidden">
-          <input type="number" step="any" class="calc-mode-disabled mean-value trigger-chart-update" value="100"
-            disabled>
-        </td>
-        <td class="empty-cell baseline-abs-deviation-cell"></td>
-        <td class="empty-cell baseline-rel-deviation-cell col-selected"></td>
-      </tr>
+          </td>
+        </tr>
+      </table>
 
-      <tr class="condition-row">
-        <td class="condition-button-cell row-button-cell">
-          <div class="row-button-container">
-            <button type="button" id="remove-cb-0" class="remove-condition disabled fix-size-small"
-              title="Remove this row">-</button>
-            <button type="button" id="add-cb-0" class="add-condition fix-size-small" title="Add a row">+</button>
-          </div>
-        </td>
-        <td class="condition-label-cell">
-          <div class="condition-label-container">
-            <div class="condition-input" id="cl-0"></div>
-          </div>
-        </td>
-        <td class="sample-value-cell calc-mode-only">
-          <div class="sample-line-container">
-            <div class="sample-input-line">
-              <input type="number" min="0" max="100" step="any" class="sample-value trigger-deviation-update">
+      <table class="output-label-table label-table">
+        <tr class="output-label-row">
+          <td class="label-cell">
+            <label for="os-0" class="output-label">Outcome:</label>
+          </td>
+          <td class="output-label-select-cell">
+            <select name="output-label-select" class="output-label-select" id="os-0">
+              <option value="Isolated Yield (%)" selected>Isolated Yield (%)</option>
+              <option value="Spectroscopic Yield (%)">Spectroscopic Yield (%)</option>
+              <option value="Chromatographic Yield (%)">Chromatographic Yield (%)</option>
+              <option value="&lt;em&gt;ee&lt;/em&gt; (%)">ee (%)</option>
+              <option value="&lt;em&gt;de&lt;/em&gt; (%)">de (%)</option>
+              <option value="Other">Other</option>
+            </select>
+          </td>
+          <td class="output-label-value-cell hidden">
+            <div class="output-input-container">
+              <div id="ol-0">Isolated Yield (%)</div>
             </div>
-          </div>
-        </td>
-        <td class="mean-value-cell hidden">
-          <div class="mean-line-container">
-            <div class="mean-input-line">
-              <input type="number" step="any" class="mean-value trigger-chart-update" value="0" disabled>
-            </div>
-          </div>
-        </td>
-        <td class="abs-deviation-value-cell">
-          <div class="abs-deviation-line-container">
-            <div class="abs-deviation-input-line">
-              <input type="number" step="any" class="abs-deviation-value trigger-chart-update" value="0" disabled>
-            </div>
-          </div>
-        </td>
-        <td class="rel-deviation-value-cell col-selected">
-          <div class="rel-deviation-line-container">
-            <div class="rel-deviation-input-line">
-              <input type="number" step="any" class="rel-deviation-value trigger-chart-update" value="0" disabled>
-            </div>
-          </div>
-        </td>
-      </tr>
+          </td>
+        </tr>
+      </table>
+      <table id="table-options" class="label-table">
+        <tr>
+          <td>
+            <label for="num-condition">Test conditions: </label>
+          </td>
+          <td>
+            <select name="num-condition" id="num-condition">
+              <option value="3">3</option>
+              <option value="4">4</option>
+              <option value="5" selected>5</option>
+              <option value="6">6</option>
+              <option value="7">7</option>
+              <option value="8">8</option>
+              <option value="9">9</option>
+              <option value="10">10</option>
+              <option value="11">11</option>
+              <option value="12">12</option>
+            </select>
+          </td>
+          <td id="num-sample-cell">
+            <label for="num-sample" class="calc-mode-only med-left-margin">Number of experiments conducted for each test
+              condition:</label>
+          </td>
+          <td>
+            <select name="num-sample" id="num-sample" class="calc-mode-only">
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+              <option value="5">5</option>
+              <option value="6">6</option>
+              <option value="7">7</option>
+              <option value="8">8</option>
+              <option value="9">9</option>
+              <option value="10">10</option>
+            </select>
+          </td>
+        </tr>
+      </table>
 
-      <tr class="condition-row">
-        <td class="condition-button-cell row-button-cell">
-          <div class="row-button-container">
-            <button type="button" id="remove-cb-1" class="remove-condition disabled fix-size-small"
-              title="Remove this row">-</button>
-            <button type="button" id="add-cb-1" class="add-condition fix-size-small" title="Add a row">+</button>
-          </div>
-        </td>
-        <td class="condition-label-cell">
-          <div class="condition-label-container">
-            <div class="condition-input" id="cl-1"></div>
-          </div>
-        </td>
-        <td class="sample-value-cell calc-mode-only">
-          <div class="sample-line-container">
-            <div class="sample-input-line">
-              <input type="number" min="0" max="100" step="any" class="sample-value trigger-deviation-update">
-            </div>
-          </div>
-        </td>
-        <td class="mean-value-cell hidden">
-          <div class="mean-line-container">
-            <div class="mean-input-line">
-              <input type="number" step="any" class="mean-value trigger-chart-update" value="0" disabled>
-            </div>
-          </div>
-        </td>
-        <td class="abs-deviation-value-cell">
-          <div class="abs-deviation-line-container">
-            <div class="abs-deviation-input-line">
-              <input type="number" step="any" class="abs-deviation-value trigger-chart-update" value="0" disabled>
-            </div>
-          </div>
-        </td>
-        <td class="rel-deviation-value-cell col-selected">
-          <div class="rel-deviation-line-container">
-            <div class="rel-deviation-input-line">
-              <input type="number" step="any" class="rel-deviation-value trigger-chart-update" value="0" disabled>
-            </div>
-          </div>
-        </td>
-      </tr>
+      <table class="sensitivity-table">
 
-      <tr class="condition-row">
-        <td class="condition-button-cell row-button-cell">
-          <div class="row-button-container">
-            <button type="button" id="remove-cb-2" class="remove-condition disabled fix-size-small"
-              title="Remove this row">-</button>
-            <button type="button" id="add-cb-2" class="add-condition fix-size-small" title="Add a row">+</button>
-          </div>
-        </td>
-        <td class="condition-label-cell">
-          <div class="condition-label-container">
-            <div class="condition-input" id="cl-2"></div>
-          </div>
-        </td>
-        <td class="sample-value-cell calc-mode-only">
-          <div class="sample-line-container">
-            <div class="sample-input-line">
-              <input type="number" min="0" max="100" step="any" class="sample-value trigger-deviation-update">
-            </div>
-          </div>
-        </td>
-        <td class="mean-value-cell hidden">
-          <div class="mean-line-container">
-            <div class="mean-input-line">
-              <input type="number" step="any" class="mean-value trigger-chart-update" value="0" disabled>
-            </div>
-          </div>
-        </td>
-        <td class="abs-deviation-value-cell">
-          <div class="abs-deviation-line-container">
-            <div class="abs-deviation-input-line">
-              <input type="number" step="any" class="abs-deviation-value trigger-chart-update" value="0" disabled>
-            </div>
-          </div>
-        </td>
-        <td class="rel-deviation-value-cell col-selected">
-          <div class="rel-deviation-line-container">
-            <div class="rel-deviation-input-line">
-              <input type="number" step="any" class="rel-deviation-value trigger-chart-update" value="0" disabled>
-            </div>
-          </div>
-        </td>
-      </tr>
+        <tr class="sensitivity-buttons calc-mode-only">
 
-      <tr class="condition-row">
-        <td class="condition-button-cell row-button-cell">
-          <div class="row-button-container">
-            <button type="button" id="remove-cb-3" class="remove-condition disabled fix-size-small"
-              title="Remove this row">-</button>
-            <button type="button" id="add-cb-3" class="add-condition fix-size-small" title="Add a row">+</button>
-          </div>
-        </td>
-        <td class="condition-label-cell">
-          <div class="condition-label-container">
-            <div class="condition-input" id="cl-3"></div>
-          </div>
-        </td>
-        <td class="sample-value-cell calc-mode-only">
-          <div class="sample-line-container">
-            <div class="sample-input-line">
-              <input type="number" min="0" max="100" step="any" class="sample-value trigger-deviation-update">
+          <td class="empty-cell"></td>
+          <td class="empty-cell"></td>
+          <td class="sample-button-cell">
+            <div class="sample-button-container">
+              <button type="button" id="remove-sb-0" class="remove-sample disabled fix-size-small" disabled="true"
+                title="Remove this column">-</button>
+              <button type="button" id="add-sb-0" class="add-sample fix-size-small" title="Add a column">+</button>
             </div>
-          </div>
-        </td>
-        <td class="mean-value-cell hidden">
-          <div class="mean-line-container">
-            <div class="mean-input-line">
-              <input type="number" step="any" class="mean-value trigger-chart-update" value="0" disabled>
-            </div>
-          </div>
-        </td>
-        <td class="abs-deviation-value-cell">
-          <div class="abs-deviation-line-container">
-            <div class="abs-deviation-input-line">
-              <input type="number" step="any" class="abs-deviation-value trigger-chart-update" value="0" disabled>
-            </div>
-          </div>
-        </td>
-        <td class="rel-deviation-value-cell col-selected">
-          <div class="rel-deviation-line-container">
-            <div class="rel-deviation-input-line">
-              <input type="number" step="any" class="rel-deviation-value trigger-chart-update" value="0" disabled>
-            </div>
-          </div>
-        </td>
-      </tr>
+          </td>
+          <td class="empty-cell button-mean-cell hidden"></td>
+          <th colspan="2" class="deviation-heading">Deviation from Standard Conditions</th>
 
-      <tr class="condition-row">
-        <td class="condition-button-cell row-button-cell">
-          <div class="row-button-container">
-            <button type="button" id="remove-cb-4" class="remove-condition disabled fix-size-small"
-              title="Remove this row">-</button>
-            <button type="button" id="add-cb-4" class="add-condition fix-size-small" title="Add a row">+</button>
-          </div>
-        </td>
-        <td class="condition-label-cell">
-          <div class="condition-label-container">
-            <div class="condition-input" id="cl-4"></div>
-          </div>
-        </td>
-        <td class="sample-value-cell calc-mode-only">
-          <div class="sample-line-container">
-            <div class="sample-input-line">
-              <input type="number" min="0" max="100" step="any" class="sample-value trigger-deviation-update">
+        </tr>
+
+        <tr class="sensitivity-header">
+
+          <th class="empty-heading"></th>
+
+          <th class="condition-label-heading">
+            Label
+          </th>
+
+          <th class="sample-heading calc-mode-only">Isolated Yield (%)</th>
+
+          <th class="mean-heading hidden">Mean Isolated Yield (%)</th>
+
+          <th class="abs-deviation-heading">(+/-)</th>
+
+          <th class="rel-deviation-heading col-selected-top">(%)</th>
+
+        </tr>
+
+        <tr class="baseline-row calc-mode-only">
+          <td class="empty-cell"></td>
+          <td class="baseline-label calc-mode-only">Standard Conditions</td>
+          <td class="baseline-value-cell calc-mode-only">
+            <div class="baseline-line-container">
+              <div class="baseline-input-line">
+                <input type="number" min="0" max="100" step="any" class="baseline-value trigger-chart-update">
+              </div>
             </div>
-          </div>
-        </td>
-        <td class="mean-value-cell hidden">
-          <div class="mean-line-container">
-            <div class="mean-input-line">
-              <input type="number" step="any" class="mean-value trigger-chart-update" value="0" disabled>
+          </td>
+          <td class="baseline-mean-cell hidden">
+            <input type="number" step="any" class="calc-mode-disabled mean-value trigger-chart-update" value="100"
+              disabled>
+          </td>
+          <td class="empty-cell baseline-abs-deviation-cell"></td>
+          <td class="empty-cell baseline-rel-deviation-cell col-selected"></td>
+        </tr>
+
+        <tr class="condition-row">
+          <td class="condition-button-cell row-button-cell">
+            <div class="row-button-container">
+              <button type="button" id="remove-cb-0" class="remove-condition disabled fix-size-small"
+                title="Remove this row">-</button>
+              <button type="button" id="add-cb-0" class="add-condition fix-size-small" title="Add a row">+</button>
             </div>
-          </div>
-        </td>
-        <td class="abs-deviation-value-cell">
-          <div class="abs-deviation-line-container">
-            <div class="abs-deviation-input-line">
-              <input type="number" step="any" class="abs-deviation-value trigger-chart-update" value="0" disabled>
+          </td>
+          <td class="condition-label-cell">
+            <div class="condition-label-container">
+              <div class="condition-input" id="cl-0"></div>
             </div>
-          </div>
-        </td>
-        <td class="rel-deviation-value-cell col-selected">
-          <div class="rel-deviation-line-container">
-            <div class="rel-deviation-input-line">
-              <input type="number" step="any" class="rel-deviation-value trigger-chart-update" value="0" disabled>
+          </td>
+          <td class="sample-value-cell calc-mode-only">
+            <div class="sample-line-container">
+              <div class="sample-input-line">
+                <input type="number" min="0" max="100" step="any" class="sample-value trigger-deviation-update">
+              </div>
             </div>
-          </div>
-        </td>
-      </tr>
+          </td>
+          <td class="mean-value-cell hidden">
+            <div class="mean-line-container">
+              <div class="mean-input-line">
+                <input type="number" step="any" class="mean-value trigger-chart-update" value="0" disabled>
+              </div>
+            </div>
+          </td>
+          <td class="abs-deviation-value-cell">
+            <div class="abs-deviation-line-container">
+              <div class="abs-deviation-input-line">
+                <input type="number" step="any" class="abs-deviation-value trigger-chart-update" value="0" disabled>
+              </div>
+            </div>
+          </td>
+          <td class="rel-deviation-value-cell col-selected">
+            <div class="rel-deviation-line-container">
+              <div class="rel-deviation-input-line">
+                <input type="number" step="any" class="rel-deviation-value trigger-chart-update" value="0" disabled>
+              </div>
+            </div>
+          </td>
+        </tr>
 
-      <tr id="plot-select-row">
-        <td class="empty-button-cell"></td>
-        <td class="plot-select-label"><strong>Value to plot:</strong></td>
-        <td class="empty-cell mean-shown-only hidden"></td>
-        <td class="plot-select-cell plot-select-mean-cell">
-          <label class="plot-select-container" for="plot-mean">
-            <input type="radio" name="plot-select" class="plot-select trigger-chart-update" id="plot-mean" value="mean"
-              label="Plot the (mean) sample values">
-          </label>
-        </td>
-        <td class="plot-select-cell plot-select-abs-cell">
-          <label class="plot-select-container" for="plot-abs">
-            <input type="radio" name="plot-select" class="plot-select trigger-chart-update" id="plot-abs"
-              value="absolute" label="Plot the deviation from the standard conditions (+/-)">
-          </label>
-        </td>
-        <td class="plot-select-cell plot-select-rel-cell col-selected-bottom">
-          <label class="plot-select-container" for="plot-rel">
-            <input type="radio" name="plot-select" class="plot-select trigger-chart-update" id="plot-rel"
-              value="relative" checked label="Plot the deviation from the standard conditions (%)">
-          </label>
-        </td>
-      </tr>
+        <tr class="condition-row">
+          <td class="condition-button-cell row-button-cell">
+            <div class="row-button-container">
+              <button type="button" id="remove-cb-1" class="remove-condition disabled fix-size-small"
+                title="Remove this row">-</button>
+              <button type="button" id="add-cb-1" class="add-condition fix-size-small" title="Add a row">+</button>
+            </div>
+          </td>
+          <td class="condition-label-cell">
+            <div class="condition-label-container">
+              <div class="condition-input" id="cl-1"></div>
+            </div>
+          </td>
+          <td class="sample-value-cell calc-mode-only">
+            <div class="sample-line-container">
+              <div class="sample-input-line">
+                <input type="number" min="0" max="100" step="any" class="sample-value trigger-deviation-update">
+              </div>
+            </div>
+          </td>
+          <td class="mean-value-cell hidden">
+            <div class="mean-line-container">
+              <div class="mean-input-line">
+                <input type="number" step="any" class="mean-value trigger-chart-update" value="0" disabled>
+              </div>
+            </div>
+          </td>
+          <td class="abs-deviation-value-cell">
+            <div class="abs-deviation-line-container">
+              <div class="abs-deviation-input-line">
+                <input type="number" step="any" class="abs-deviation-value trigger-chart-update" value="0" disabled>
+              </div>
+            </div>
+          </td>
+          <td class="rel-deviation-value-cell col-selected">
+            <div class="rel-deviation-line-container">
+              <div class="rel-deviation-input-line">
+                <input type="number" step="any" class="rel-deviation-value trigger-chart-update" value="0" disabled>
+              </div>
+            </div>
+          </td>
+        </tr>
 
-    </table>
+        <tr class="condition-row">
+          <td class="condition-button-cell row-button-cell">
+            <div class="row-button-container">
+              <button type="button" id="remove-cb-2" class="remove-condition disabled fix-size-small"
+                title="Remove this row">-</button>
+              <button type="button" id="add-cb-2" class="add-condition fix-size-small" title="Add a row">+</button>
+            </div>
+          </td>
+          <td class="condition-label-cell">
+            <div class="condition-label-container">
+              <div class="condition-input" id="cl-2"></div>
+            </div>
+          </td>
+          <td class="sample-value-cell calc-mode-only">
+            <div class="sample-line-container">
+              <div class="sample-input-line">
+                <input type="number" min="0" max="100" step="any" class="sample-value trigger-deviation-update">
+              </div>
+            </div>
+          </td>
+          <td class="mean-value-cell hidden">
+            <div class="mean-line-container">
+              <div class="mean-input-line">
+                <input type="number" step="any" class="mean-value trigger-chart-update" value="0" disabled>
+              </div>
+            </div>
+          </td>
+          <td class="abs-deviation-value-cell">
+            <div class="abs-deviation-line-container">
+              <div class="abs-deviation-input-line">
+                <input type="number" step="any" class="abs-deviation-value trigger-chart-update" value="0" disabled>
+              </div>
+            </div>
+          </td>
+          <td class="rel-deviation-value-cell col-selected">
+            <div class="rel-deviation-line-container">
+              <div class="rel-deviation-input-line">
+                <input type="number" step="any" class="rel-deviation-value trigger-chart-update" value="0" disabled>
+              </div>
+            </div>
+          </td>
+        </tr>
 
-    <button type="button" id="fill-random" title="Fill the table with random data">Fill with random data</button>
-    <button type="button" id="fill-example" class="mouseover-tooltip" data-bs-toggle="tooltip"
-      data-bs-custom-class="tooltip-on-light" data-bs-placement="top" title="This fills the table with an example
-      dataset sourced from Table S9 of Zhang 𝘦𝘵 𝘢𝘭. (2024), “Solvent-Dependent Divergent Cyclization of
-      Bicyclo[1.1.0]butanes”, https://doi.org/10.1002/anie.202418239">Fill with example data</button>
-  </details>
-</form>
+        <tr class="condition-row">
+          <td class="condition-button-cell row-button-cell">
+            <div class="row-button-container">
+              <button type="button" id="remove-cb-3" class="remove-condition disabled fix-size-small"
+                title="Remove this row">-</button>
+              <button type="button" id="add-cb-3" class="add-condition fix-size-small" title="Add a row">+</button>
+            </div>
+          </td>
+          <td class="condition-label-cell">
+            <div class="condition-label-container">
+              <div class="condition-input" id="cl-3"></div>
+            </div>
+          </td>
+          <td class="sample-value-cell calc-mode-only">
+            <div class="sample-line-container">
+              <div class="sample-input-line">
+                <input type="number" min="0" max="100" step="any" class="sample-value trigger-deviation-update">
+              </div>
+            </div>
+          </td>
+          <td class="mean-value-cell hidden">
+            <div class="mean-line-container">
+              <div class="mean-input-line">
+                <input type="number" step="any" class="mean-value trigger-chart-update" value="0" disabled>
+              </div>
+            </div>
+          </td>
+          <td class="abs-deviation-value-cell">
+            <div class="abs-deviation-line-container">
+              <div class="abs-deviation-input-line">
+                <input type="number" step="any" class="abs-deviation-value trigger-chart-update" value="0" disabled>
+              </div>
+            </div>
+          </td>
+          <td class="rel-deviation-value-cell col-selected">
+            <div class="rel-deviation-line-container">
+              <div class="rel-deviation-input-line">
+                <input type="number" step="any" class="rel-deviation-value trigger-chart-update" value="0" disabled>
+              </div>
+            </div>
+          </td>
+        </tr>
 
-<div id="plot-display">
-  <button type="button" id="generate-plot" title="Regenerate the plot">Regenerate Plot</button>
-  <span id="auto-update" class="mouseover-tooltip" data-bs-toggle="tooltip" data-bs-custom-class="tooltip-on-light"
-    data-bs-placement="top" title="If the regeneration of the plot is causing slowdown, disable this and click the
-    “Regenerate Plot” button to the left as needed to manually generate it">
-    <input type="checkbox" name="auto-update-toggle" id="auto-update-toggle" checked>
-    <label for="auto-update-toggle">Auto-update</label>
-  </span>
+        <tr class="condition-row">
+          <td class="condition-button-cell row-button-cell">
+            <div class="row-button-container">
+              <button type="button" id="remove-cb-4" class="remove-condition disabled fix-size-small"
+                title="Remove this row">-</button>
+              <button type="button" id="add-cb-4" class="add-condition fix-size-small" title="Add a row">+</button>
+            </div>
+          </td>
+          <td class="condition-label-cell">
+            <div class="condition-label-container">
+              <div class="condition-input" id="cl-4"></div>
+            </div>
+          </td>
+          <td class="sample-value-cell calc-mode-only">
+            <div class="sample-line-container">
+              <div class="sample-input-line">
+                <input type="number" min="0" max="100" step="any" class="sample-value trigger-deviation-update">
+              </div>
+            </div>
+          </td>
+          <td class="mean-value-cell hidden">
+            <div class="mean-line-container">
+              <div class="mean-input-line">
+                <input type="number" step="any" class="mean-value trigger-chart-update" value="0" disabled>
+              </div>
+            </div>
+          </td>
+          <td class="abs-deviation-value-cell">
+            <div class="abs-deviation-line-container">
+              <div class="abs-deviation-input-line">
+                <input type="number" step="any" class="abs-deviation-value trigger-chart-update" value="0" disabled>
+              </div>
+            </div>
+          </td>
+          <td class="rel-deviation-value-cell col-selected">
+            <div class="rel-deviation-line-container">
+              <div class="rel-deviation-input-line">
+                <input type="number" step="any" class="rel-deviation-value trigger-chart-update" value="0" disabled>
+              </div>
+            </div>
+          </td>
+        </tr>
 
-  <canvas id="glorius-plot" class="white-bg"></canvas>
+        <tr id="plot-select-row">
+          <td class="empty-button-cell"></td>
+          <td class="plot-select-label"><strong>Value to plot:</strong></td>
+          <td class="empty-cell mean-shown-only hidden"></td>
+          <td class="plot-select-cell plot-select-mean-cell">
+            <label class="plot-select-container" for="plot-mean">
+              <input type="radio" name="plot-select" class="plot-select trigger-chart-update" id="plot-mean"
+                value="mean" label="Plot the (mean) sample values">
+            </label>
+          </td>
+          <td class="plot-select-cell plot-select-abs-cell">
+            <label class="plot-select-container" for="plot-abs">
+              <input type="radio" name="plot-select" class="plot-select trigger-chart-update" id="plot-abs"
+                value="absolute" label="Plot the deviation from the standard conditions (+/-)">
+            </label>
+          </td>
+          <td class="plot-select-cell plot-select-rel-cell col-selected-bottom">
+            <label class="plot-select-container" for="plot-rel">
+              <input type="radio" name="plot-select" class="plot-select trigger-chart-update" id="plot-rel"
+                value="relative" checked label="Plot the deviation from the standard conditions (%)">
+            </label>
+          </td>
+        </tr>
+
+      </table>
+
+      <button type="button" id="fill-random" title="Fill the table with random data">Fill with random data</button>
+      <button type="button" id="fill-example" class="mouseover-tooltip" data-bs-toggle="tooltip"
+        data-bs-custom-class="tooltip-on-light" data-bs-placement="top" title="This fills the table with an example
+        dataset sourced from Table S9 of Zhang 𝘦𝘵 𝘢𝘭. (2024), “Solvent-Dependent Divergent Cyclization of
+        Bicyclo[1.1.0]butanes”, https://doi.org/10.1002/anie.202418239">Fill with example data</button>
+    </details>
+  </form>
+
+  <div id="plot-display" class="multicol-element">
+    <button type="button" id="generate-plot" title="Regenerate the plot">Regenerate Plot</button>
+    <span id="auto-update" class="mouseover-tooltip" data-bs-toggle="tooltip" data-bs-custom-class="tooltip-on-light"
+      data-bs-placement="top" title="If the regeneration of the plot is causing slowdown, disable this and click the
+      “Regenerate Plot” button to the left as needed to manually generate it">
+      <input type="checkbox" name="auto-update-toggle" id="auto-update-toggle" checked>
+      <label for="auto-update-toggle">Auto-update</label>
+    </span>
+
+    <canvas id="glorius-plot" class="white-bg"></canvas>
+  </div>
 </div>
 
 <form>
