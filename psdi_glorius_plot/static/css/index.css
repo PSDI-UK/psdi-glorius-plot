@@ -732,7 +732,7 @@ details summary:active {
 
 #rocrate-title-input .ql-editor,
 #rocrate-desc-input .ql-editor {
-  width: 40rem;
+  width: calc(95vw - 8.5rem);
 }
 
 .announcement-panel {
