@@ -173,6 +173,10 @@ ol.no-bullet {
   align-items    : flex-start;
 }
 
+.w20-on-big-fr-on-small {
+  width: 20rem !important;
+}
+
 .multicol-on-big-screen.tiny-gap {
   gap: 2px;
 }
@@ -208,6 +212,10 @@ ol.no-bullet {
     margin-bottom: 0;
   }
 
+  .w20-on-big-fr-on-small {
+    width: calc(100% - 4rem) !important;
+  }
+
   .multicol-on-big-screen .big-screen-only {
     display: none;
   }
@@ -229,6 +237,10 @@ ol.no-bullet {
 
   .multicol-on-big-screen.m900>.multicol-element:not(:last-child) {
     margin-bottom: 0;
+  }
+
+  .m900 .w20-on-big-fr-on-small {
+    width: calc(100% - 4rem) !important;
   }
 
   .multicol-on-big-screen.m900 .big-screen-only {
