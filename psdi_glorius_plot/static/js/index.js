@@ -2088,7 +2088,7 @@ function addROCrateContribRow(e, updateAfter = true) {
 }
 
 function removeROCrateContribRow(e, updateAfter = true) {
-  const lRows = $("..rocrate-contrib-row");
+  const lRows = $(".rocrate-contrib-row");
   const targetRowIndex = getTargetIndex(e, getNumContribs() - 1);
 
   // Remove the row from the table

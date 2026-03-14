@@ -34,8 +34,8 @@
       service. To provide feedback, click the “Provide Feedback” link on the right side of the header, which will open
       up a form to submit it.
     </p>
-    <div class="multicol-container">
-      <div class="multicol-cell">
+    <div class="multicol">
+      <div class="multicol-element">
         <details>
           <summary class="info-marker"><strong>Instructions</strong></summary>
           <p>
@@ -64,7 +64,7 @@
           </p>
         </details>
       </div>
-      <div class="multicol-cell">
+      <div class="multicol-element">
         <details>
           <summary class="info-marker"><strong>Help with formatting and special symbols</strong> - what to do if text
             appears as a black bar on the chart
@@ -110,601 +110,616 @@
 
 {% block inner_content %}
 
-<form>
-  <details id="data-input" open>
+<div class="multicol-on-big-screen wrap">
+  <form class="multicol-element">
+    <details id="data-input" class="rounded-border" open>
 
-    <div class="hidden hidden-until-rocrate">
-      <button type="button" class="returnToROCrateExport no-left-margin">↪ Return to data package export</button>
-      <br><br>
-    </div>
+      <div class="hidden hidden-until-rocrate">
+        <button type="button" class="returnToROCrateExport no-left-margin">↪ Return to data package export</button>
+        <br><br>
+      </div>
 
-    <summary class="large-marker" open>
-      <h4>Data Input</h4>
-    </summary>
+      <summary class="large-marker" open>
+        <h4>Data Input</h4>
+      </summary>
 
-    <table class="title-table label-table">
-      <tr class="title-row">
-        <td class="label-cell">
-          <label for="title-input" id="title-label">Title:</label>
-        </td>
-        <td class="title-input-cell">
-          <div class="title-input-container">
-            <div id="title-input"></div>
-          </div>
-        </td>
-      </tr>
-    </table>
-
-    <table class="output-label-table label-table">
-      <tr class="output-label-row">
-        <td class="label-cell">
-          <label for="os-0" class="output-label">Outcome:</label>
-        </td>
-        <td class="output-label-select-cell">
-          <select name="output-label-select" class="output-label-select" id="os-0">
-            <option value="Isolated Yield (%)" selected>Isolated Yield (%)</option>
-            <option value="Spectroscopic Yield (%)">Spectroscopic Yield (%)</option>
-            <option value="Chromatographic Yield (%)">Chromatographic Yield (%)</option>
-            <option value="&lt;em&gt;ee&lt;/em&gt; (%)">ee (%)</option>
-            <option value="&lt;em&gt;de&lt;/em&gt; (%)">de (%)</option>
-            <option value="Other">Other</option>
-          </select>
-        </td>
-        <td class="output-label-value-cell hidden">
-          <div class="output-input-container">
-            <div id="ol-0">Isolated Yield (%)</div>
-          </div>
-        </td>
-      </tr>
-    </table>
-    <table id="table-options" class="label-table">
-      <tr>
-        <td>
-          <label for="num-condition">Test conditions: </label>
-        </td>
-        <td>
-          <select name="num-condition" id="num-condition">
-            <option value="3">3</option>
-            <option value="4">4</option>
-            <option value="5" selected>5</option>
-            <option value="6">6</option>
-            <option value="7">7</option>
-            <option value="8">8</option>
-            <option value="9">9</option>
-            <option value="10">10</option>
-            <option value="11">11</option>
-            <option value="12">12</option>
-          </select>
-        </td>
-        <td id="num-sample-cell">
-          <label for="num-sample" class="calc-mode-only med-left-margin">Number of experiments conducted for each test
-            condition:</label>
-        </td>
-        <td>
-          <select name="num-sample" id="num-sample" class="calc-mode-only">
-            <option value="1">1</option>
-            <option value="2">2</option>
-            <option value="3">3</option>
-            <option value="4">4</option>
-            <option value="5">5</option>
-            <option value="6">6</option>
-            <option value="7">7</option>
-            <option value="8">8</option>
-            <option value="9">9</option>
-            <option value="10">10</option>
-          </select>
-        </td>
-      </tr>
-    </table>
-
-    <table class="sensitivity-table">
-
-      <tr class="sensitivity-buttons calc-mode-only">
-
-        <td class="empty-cell"></td>
-        <td class="empty-cell"></td>
-        <td class="sample-button-cell">
-          <div class="sample-button-container">
-            <button type="button" id="remove-sb-0" class="remove-sample disabled fix-size-small" disabled="true"
-              title="Remove this column">-</button>
-            <button type="button" id="add-sb-0" class="add-sample fix-size-small" title="Add a column">+</button>
-          </div>
-        </td>
-        <td class="empty-cell button-mean-cell hidden"></td>
-        <th colspan="2" class="deviation-heading">Deviation from Standard Conditions</th>
-
-      </tr>
-
-      <tr class="sensitivity-header">
-
-        <th class="empty-heading"></th>
-
-        <th class="condition-label-heading">
-          Label
-        </th>
-
-        <th class="sample-heading calc-mode-only">Isolated Yield (%)</th>
-
-        <th class="mean-heading hidden">Mean Isolated Yield (%)</th>
-
-        <th class="abs-deviation-heading">(+/-)</th>
-
-        <th class="rel-deviation-heading col-selected-top">(%)</th>
-
-      </tr>
-
-      <tr class="baseline-row calc-mode-only">
-        <td class="empty-cell"></td>
-        <td class="baseline-label calc-mode-only">Standard Conditions</td>
-        <td class="baseline-value-cell calc-mode-only">
-          <div class="baseline-line-container">
-            <div class="baseline-input-line">
-              <input type="number" min="0" max="100" step="any" class="baseline-value trigger-chart-update">
+      <table class="title-table label-table">
+        <tr class="title-row">
+          <td class="label-cell">
+            <label for="title-input" id="title-label">Title:</label>
+          </td>
+          <td class="title-input-cell">
+            <div class="title-input-container">
+              <div id="title-input"></div>
             </div>
-          </div>
-        </td>
-        <td class="baseline-mean-cell hidden">
-          <input type="number" step="any" class="calc-mode-disabled mean-value trigger-chart-update" value="100"
-            disabled>
-        </td>
-        <td class="empty-cell baseline-abs-deviation-cell"></td>
-        <td class="empty-cell baseline-rel-deviation-cell col-selected"></td>
-      </tr>
+          </td>
+        </tr>
+      </table>
 
-      <tr class="condition-row">
-        <td class="condition-button-cell row-button-cell">
-          <div class="row-button-container">
-            <button type="button" id="remove-cb-0" class="remove-condition disabled fix-size-small"
-              title="Remove this row">-</button>
-            <button type="button" id="add-cb-0" class="add-condition fix-size-small" title="Add a row">+</button>
-          </div>
-        </td>
-        <td class="condition-label-cell">
-          <div class="condition-label-container">
-            <div class="condition-input" id="cl-0"></div>
-          </div>
-        </td>
-        <td class="sample-value-cell calc-mode-only">
-          <div class="sample-line-container">
-            <div class="sample-input-line">
-              <input type="number" min="0" max="100" step="any" class="sample-value trigger-deviation-update">
+      <table class="output-label-table label-table">
+        <tr class="output-label-row">
+          <td class="label-cell">
+            <label for="os-0" class="output-label">Outcome:</label>
+          </td>
+          <td class="output-label-select-cell">
+            <select name="output-label-select" class="output-label-select" id="os-0">
+              <option value="Isolated Yield (%)" selected>Isolated Yield (%)</option>
+              <option value="Spectroscopic Yield (%)">Spectroscopic Yield (%)</option>
+              <option value="Chromatographic Yield (%)">Chromatographic Yield (%)</option>
+              <option value="&lt;em&gt;ee&lt;/em&gt; (%)">ee (%)</option>
+              <option value="&lt;em&gt;de&lt;/em&gt; (%)">de (%)</option>
+              <option value="Other">Other</option>
+            </select>
+          </td>
+          <td class="output-label-value-cell hidden">
+            <div class="output-input-container">
+              <div id="ol-0">Isolated Yield (%)</div>
             </div>
-          </div>
-        </td>
-        <td class="mean-value-cell hidden">
-          <div class="mean-line-container">
-            <div class="mean-input-line">
-              <input type="number" step="any" class="mean-value trigger-chart-update" value="0" disabled>
-            </div>
-          </div>
-        </td>
-        <td class="abs-deviation-value-cell">
-          <div class="abs-deviation-line-container">
-            <div class="abs-deviation-input-line">
-              <input type="number" step="any" class="abs-deviation-value trigger-chart-update" value="0" disabled>
-            </div>
-          </div>
-        </td>
-        <td class="rel-deviation-value-cell col-selected">
-          <div class="rel-deviation-line-container">
-            <div class="rel-deviation-input-line">
-              <input type="number" step="any" class="rel-deviation-value trigger-chart-update" value="0" disabled>
-            </div>
-          </div>
-        </td>
-      </tr>
+          </td>
+        </tr>
+      </table>
+      <table id="table-options" class="label-table">
+        <tr>
+          <td>
+            <label for="num-condition">Test conditions: </label>
+          </td>
+          <td>
+            <select name="num-condition" id="num-condition">
+              <option value="3">3</option>
+              <option value="4">4</option>
+              <option value="5" selected>5</option>
+              <option value="6">6</option>
+              <option value="7">7</option>
+              <option value="8">8</option>
+              <option value="9">9</option>
+              <option value="10">10</option>
+              <option value="11">11</option>
+              <option value="12">12</option>
+            </select>
+          </td>
+          <td id="num-sample-cell">
+            <label for="num-sample" class="calc-mode-only max-width-15 med-left-margin">Number of experiments conducted
+              for each test condition:</label>
+          </td>
+          <td>
+            <select name="num-sample" id="num-sample" class="calc-mode-only">
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+              <option value="5">5</option>
+              <option value="6">6</option>
+              <option value="7">7</option>
+              <option value="8">8</option>
+              <option value="9">9</option>
+              <option value="10">10</option>
+            </select>
+          </td>
+        </tr>
+      </table>
 
-      <tr class="condition-row">
-        <td class="condition-button-cell row-button-cell">
-          <div class="row-button-container">
-            <button type="button" id="remove-cb-1" class="remove-condition disabled fix-size-small"
-              title="Remove this row">-</button>
-            <button type="button" id="add-cb-1" class="add-condition fix-size-small" title="Add a row">+</button>
-          </div>
-        </td>
-        <td class="condition-label-cell">
-          <div class="condition-label-container">
-            <div class="condition-input" id="cl-1"></div>
-          </div>
-        </td>
-        <td class="sample-value-cell calc-mode-only">
-          <div class="sample-line-container">
-            <div class="sample-input-line">
-              <input type="number" min="0" max="100" step="any" class="sample-value trigger-deviation-update">
-            </div>
-          </div>
-        </td>
-        <td class="mean-value-cell hidden">
-          <div class="mean-line-container">
-            <div class="mean-input-line">
-              <input type="number" step="any" class="mean-value trigger-chart-update" value="0" disabled>
-            </div>
-          </div>
-        </td>
-        <td class="abs-deviation-value-cell">
-          <div class="abs-deviation-line-container">
-            <div class="abs-deviation-input-line">
-              <input type="number" step="any" class="abs-deviation-value trigger-chart-update" value="0" disabled>
-            </div>
-          </div>
-        </td>
-        <td class="rel-deviation-value-cell col-selected">
-          <div class="rel-deviation-line-container">
-            <div class="rel-deviation-input-line">
-              <input type="number" step="any" class="rel-deviation-value trigger-chart-update" value="0" disabled>
-            </div>
-          </div>
-        </td>
-      </tr>
+      <table class="sensitivity-table">
 
-      <tr class="condition-row">
-        <td class="condition-button-cell row-button-cell">
-          <div class="row-button-container">
-            <button type="button" id="remove-cb-2" class="remove-condition disabled fix-size-small"
-              title="Remove this row">-</button>
-            <button type="button" id="add-cb-2" class="add-condition fix-size-small" title="Add a row">+</button>
-          </div>
-        </td>
-        <td class="condition-label-cell">
-          <div class="condition-label-container">
-            <div class="condition-input" id="cl-2"></div>
-          </div>
-        </td>
-        <td class="sample-value-cell calc-mode-only">
-          <div class="sample-line-container">
-            <div class="sample-input-line">
-              <input type="number" min="0" max="100" step="any" class="sample-value trigger-deviation-update">
-            </div>
-          </div>
-        </td>
-        <td class="mean-value-cell hidden">
-          <div class="mean-line-container">
-            <div class="mean-input-line">
-              <input type="number" step="any" class="mean-value trigger-chart-update" value="0" disabled>
-            </div>
-          </div>
-        </td>
-        <td class="abs-deviation-value-cell">
-          <div class="abs-deviation-line-container">
-            <div class="abs-deviation-input-line">
-              <input type="number" step="any" class="abs-deviation-value trigger-chart-update" value="0" disabled>
-            </div>
-          </div>
-        </td>
-        <td class="rel-deviation-value-cell col-selected">
-          <div class="rel-deviation-line-container">
-            <div class="rel-deviation-input-line">
-              <input type="number" step="any" class="rel-deviation-value trigger-chart-update" value="0" disabled>
-            </div>
-          </div>
-        </td>
-      </tr>
+        <tr class="sensitivity-buttons calc-mode-only">
 
-      <tr class="condition-row">
-        <td class="condition-button-cell row-button-cell">
-          <div class="row-button-container">
-            <button type="button" id="remove-cb-3" class="remove-condition disabled fix-size-small"
-              title="Remove this row">-</button>
-            <button type="button" id="add-cb-3" class="add-condition fix-size-small" title="Add a row">+</button>
-          </div>
-        </td>
-        <td class="condition-label-cell">
-          <div class="condition-label-container">
-            <div class="condition-input" id="cl-3"></div>
-          </div>
-        </td>
-        <td class="sample-value-cell calc-mode-only">
-          <div class="sample-line-container">
-            <div class="sample-input-line">
-              <input type="number" min="0" max="100" step="any" class="sample-value trigger-deviation-update">
+          <td class="empty-cell"></td>
+          <td class="empty-cell"></td>
+          <td class="sample-button-cell">
+            <div class="sample-button-container">
+              <button type="button" id="remove-sb-0" class="remove-sample disabled fix-size-small" disabled="true"
+                title="Remove this column">-</button>
+              <button type="button" id="add-sb-0" class="add-sample fix-size-small" title="Add a column">+</button>
             </div>
-          </div>
-        </td>
-        <td class="mean-value-cell hidden">
-          <div class="mean-line-container">
-            <div class="mean-input-line">
-              <input type="number" step="any" class="mean-value trigger-chart-update" value="0" disabled>
-            </div>
-          </div>
-        </td>
-        <td class="abs-deviation-value-cell">
-          <div class="abs-deviation-line-container">
-            <div class="abs-deviation-input-line">
-              <input type="number" step="any" class="abs-deviation-value trigger-chart-update" value="0" disabled>
-            </div>
-          </div>
-        </td>
-        <td class="rel-deviation-value-cell col-selected">
-          <div class="rel-deviation-line-container">
-            <div class="rel-deviation-input-line">
-              <input type="number" step="any" class="rel-deviation-value trigger-chart-update" value="0" disabled>
-            </div>
-          </div>
-        </td>
-      </tr>
+          </td>
+          <td class="empty-cell button-mean-cell hidden"></td>
+          <th colspan="2" class="deviation-heading">Deviation from Standard Conditions</th>
 
-      <tr class="condition-row">
-        <td class="condition-button-cell row-button-cell">
-          <div class="row-button-container">
-            <button type="button" id="remove-cb-4" class="remove-condition disabled fix-size-small"
-              title="Remove this row">-</button>
-            <button type="button" id="add-cb-4" class="add-condition fix-size-small" title="Add a row">+</button>
-          </div>
-        </td>
-        <td class="condition-label-cell">
-          <div class="condition-label-container">
-            <div class="condition-input" id="cl-4"></div>
-          </div>
-        </td>
-        <td class="sample-value-cell calc-mode-only">
-          <div class="sample-line-container">
-            <div class="sample-input-line">
-              <input type="number" min="0" max="100" step="any" class="sample-value trigger-deviation-update">
+        </tr>
+
+        <tr class="sensitivity-header">
+
+          <th class="empty-heading"></th>
+
+          <th class="condition-label-heading">
+            Label
+          </th>
+
+          <th class="sample-heading calc-mode-only">Isolated Yield (%)</th>
+
+          <th class="mean-heading hidden">Mean Isolated Yield (%)</th>
+
+          <th class="abs-deviation-heading">(+/-)</th>
+
+          <th class="rel-deviation-heading col-selected-top">(%)</th>
+
+        </tr>
+
+        <tr class="baseline-row calc-mode-only">
+          <td class="empty-cell"></td>
+          <td class="baseline-label calc-mode-only">Standard Conditions</td>
+          <td class="baseline-value-cell calc-mode-only">
+            <div class="baseline-line-container">
+              <div class="baseline-input-line">
+                <input type="number" min="0" max="100" step="any" class="baseline-value trigger-chart-update">
+              </div>
             </div>
-          </div>
-        </td>
-        <td class="mean-value-cell hidden">
-          <div class="mean-line-container">
-            <div class="mean-input-line">
-              <input type="number" step="any" class="mean-value trigger-chart-update" value="0" disabled>
+          </td>
+          <td class="baseline-mean-cell hidden">
+            <input type="number" step="any" class="calc-mode-disabled mean-value trigger-chart-update" value="100"
+              disabled>
+          </td>
+          <td class="empty-cell baseline-abs-deviation-cell"></td>
+          <td class="empty-cell baseline-rel-deviation-cell col-selected"></td>
+        </tr>
+
+        <tr class="condition-row">
+          <td class="condition-button-cell row-button-cell">
+            <div class="row-button-container">
+              <button type="button" id="remove-cb-0" class="remove-condition disabled fix-size-small"
+                title="Remove this row">-</button>
+              <button type="button" id="add-cb-0" class="add-condition fix-size-small" title="Add a row">+</button>
             </div>
-          </div>
-        </td>
-        <td class="abs-deviation-value-cell">
-          <div class="abs-deviation-line-container">
-            <div class="abs-deviation-input-line">
-              <input type="number" step="any" class="abs-deviation-value trigger-chart-update" value="0" disabled>
+          </td>
+          <td class="condition-label-cell">
+            <div class="condition-label-container">
+              <div class="condition-input" id="cl-0"></div>
             </div>
-          </div>
-        </td>
-        <td class="rel-deviation-value-cell col-selected">
-          <div class="rel-deviation-line-container">
-            <div class="rel-deviation-input-line">
-              <input type="number" step="any" class="rel-deviation-value trigger-chart-update" value="0" disabled>
+          </td>
+          <td class="sample-value-cell calc-mode-only">
+            <div class="sample-line-container">
+              <div class="sample-input-line">
+                <input type="number" min="0" max="100" step="any" class="sample-value trigger-deviation-update">
+              </div>
             </div>
-          </div>
-        </td>
-      </tr>
+          </td>
+          <td class="mean-value-cell hidden">
+            <div class="mean-line-container">
+              <div class="mean-input-line">
+                <input type="number" step="any" class="mean-value trigger-chart-update" value="0" disabled>
+              </div>
+            </div>
+          </td>
+          <td class="abs-deviation-value-cell">
+            <div class="abs-deviation-line-container">
+              <div class="abs-deviation-input-line">
+                <input type="number" step="any" class="abs-deviation-value trigger-chart-update" value="0" disabled>
+              </div>
+            </div>
+          </td>
+          <td class="rel-deviation-value-cell col-selected">
+            <div class="rel-deviation-line-container">
+              <div class="rel-deviation-input-line">
+                <input type="number" step="any" class="rel-deviation-value trigger-chart-update" value="0" disabled>
+              </div>
+            </div>
+          </td>
+        </tr>
 
-      <tr id="plot-select-row">
-        <td class="empty-button-cell"></td>
-        <td class="plot-select-label"><strong>Value to plot:</strong></td>
-        <td class="empty-cell mean-shown-only hidden"></td>
-        <td class="plot-select-cell plot-select-mean-cell">
-          <label class="plot-select-container" for="plot-mean">
-            <input type="radio" name="plot-select" class="plot-select trigger-chart-update" id="plot-mean" value="mean"
-              label="Plot the (mean) sample values">
-          </label>
-        </td>
-        <td class="plot-select-cell plot-select-abs-cell">
-          <label class="plot-select-container" for="plot-abs">
-            <input type="radio" name="plot-select" class="plot-select trigger-chart-update" id="plot-abs"
-              value="absolute" label="Plot the deviation from the standard conditions (+/-)">
-          </label>
-        </td>
-        <td class="plot-select-cell plot-select-rel-cell col-selected-bottom">
-          <label class="plot-select-container" for="plot-rel">
-            <input type="radio" name="plot-select" class="plot-select trigger-chart-update" id="plot-rel"
-              value="relative" checked label="Plot the deviation from the standard conditions (%)">
-          </label>
-        </td>
-      </tr>
+        <tr class="condition-row">
+          <td class="condition-button-cell row-button-cell">
+            <div class="row-button-container">
+              <button type="button" id="remove-cb-1" class="remove-condition disabled fix-size-small"
+                title="Remove this row">-</button>
+              <button type="button" id="add-cb-1" class="add-condition fix-size-small" title="Add a row">+</button>
+            </div>
+          </td>
+          <td class="condition-label-cell">
+            <div class="condition-label-container">
+              <div class="condition-input" id="cl-1"></div>
+            </div>
+          </td>
+          <td class="sample-value-cell calc-mode-only">
+            <div class="sample-line-container">
+              <div class="sample-input-line">
+                <input type="number" min="0" max="100" step="any" class="sample-value trigger-deviation-update">
+              </div>
+            </div>
+          </td>
+          <td class="mean-value-cell hidden">
+            <div class="mean-line-container">
+              <div class="mean-input-line">
+                <input type="number" step="any" class="mean-value trigger-chart-update" value="0" disabled>
+              </div>
+            </div>
+          </td>
+          <td class="abs-deviation-value-cell">
+            <div class="abs-deviation-line-container">
+              <div class="abs-deviation-input-line">
+                <input type="number" step="any" class="abs-deviation-value trigger-chart-update" value="0" disabled>
+              </div>
+            </div>
+          </td>
+          <td class="rel-deviation-value-cell col-selected">
+            <div class="rel-deviation-line-container">
+              <div class="rel-deviation-input-line">
+                <input type="number" step="any" class="rel-deviation-value trigger-chart-update" value="0" disabled>
+              </div>
+            </div>
+          </td>
+        </tr>
 
-    </table>
+        <tr class="condition-row">
+          <td class="condition-button-cell row-button-cell">
+            <div class="row-button-container">
+              <button type="button" id="remove-cb-2" class="remove-condition disabled fix-size-small"
+                title="Remove this row">-</button>
+              <button type="button" id="add-cb-2" class="add-condition fix-size-small" title="Add a row">+</button>
+            </div>
+          </td>
+          <td class="condition-label-cell">
+            <div class="condition-label-container">
+              <div class="condition-input" id="cl-2"></div>
+            </div>
+          </td>
+          <td class="sample-value-cell calc-mode-only">
+            <div class="sample-line-container">
+              <div class="sample-input-line">
+                <input type="number" min="0" max="100" step="any" class="sample-value trigger-deviation-update">
+              </div>
+            </div>
+          </td>
+          <td class="mean-value-cell hidden">
+            <div class="mean-line-container">
+              <div class="mean-input-line">
+                <input type="number" step="any" class="mean-value trigger-chart-update" value="0" disabled>
+              </div>
+            </div>
+          </td>
+          <td class="abs-deviation-value-cell">
+            <div class="abs-deviation-line-container">
+              <div class="abs-deviation-input-line">
+                <input type="number" step="any" class="abs-deviation-value trigger-chart-update" value="0" disabled>
+              </div>
+            </div>
+          </td>
+          <td class="rel-deviation-value-cell col-selected">
+            <div class="rel-deviation-line-container">
+              <div class="rel-deviation-input-line">
+                <input type="number" step="any" class="rel-deviation-value trigger-chart-update" value="0" disabled>
+              </div>
+            </div>
+          </td>
+        </tr>
 
-    <button type="button" id="fill-random" title="Fill the table with random data">Fill with random data</button>
-    <button type="button" id="fill-example" class="mouseover-tooltip" data-bs-toggle="tooltip"
-      data-bs-custom-class="tooltip-on-light" data-bs-placement="top" title="This fills the table with an example
-      dataset sourced from Table S9 of Zhang 𝘦𝘵 𝘢𝘭. (2024), “Solvent-Dependent Divergent Cyclization of
-      Bicyclo[1.1.0]butanes”, https://doi.org/10.1002/anie.202418239">Fill with example data</button>
-  </details>
-</form>
+        <tr class="condition-row">
+          <td class="condition-button-cell row-button-cell">
+            <div class="row-button-container">
+              <button type="button" id="remove-cb-3" class="remove-condition disabled fix-size-small"
+                title="Remove this row">-</button>
+              <button type="button" id="add-cb-3" class="add-condition fix-size-small" title="Add a row">+</button>
+            </div>
+          </td>
+          <td class="condition-label-cell">
+            <div class="condition-label-container">
+              <div class="condition-input" id="cl-3"></div>
+            </div>
+          </td>
+          <td class="sample-value-cell calc-mode-only">
+            <div class="sample-line-container">
+              <div class="sample-input-line">
+                <input type="number" min="0" max="100" step="any" class="sample-value trigger-deviation-update">
+              </div>
+            </div>
+          </td>
+          <td class="mean-value-cell hidden">
+            <div class="mean-line-container">
+              <div class="mean-input-line">
+                <input type="number" step="any" class="mean-value trigger-chart-update" value="0" disabled>
+              </div>
+            </div>
+          </td>
+          <td class="abs-deviation-value-cell">
+            <div class="abs-deviation-line-container">
+              <div class="abs-deviation-input-line">
+                <input type="number" step="any" class="abs-deviation-value trigger-chart-update" value="0" disabled>
+              </div>
+            </div>
+          </td>
+          <td class="rel-deviation-value-cell col-selected">
+            <div class="rel-deviation-line-container">
+              <div class="rel-deviation-input-line">
+                <input type="number" step="any" class="rel-deviation-value trigger-chart-update" value="0" disabled>
+              </div>
+            </div>
+          </td>
+        </tr>
 
-<div id="plot-display">
-  <button type="button" id="generate-plot" title="Regenerate the plot">Regenerate Plot</button>
-  <span id="auto-update" class="mouseover-tooltip" data-bs-toggle="tooltip" data-bs-custom-class="tooltip-on-light"
-    data-bs-placement="top" title="If the regeneration of the plot is causing slowdown, disable this and click the
-    “Regenerate Plot” button to the left as needed to manually generate it">
-    <input type="checkbox" name="auto-update-toggle" id="auto-update-toggle" checked>
-    <label for="auto-update-toggle">Auto-update</label>
-  </span>
+        <tr class="condition-row">
+          <td class="condition-button-cell row-button-cell">
+            <div class="row-button-container">
+              <button type="button" id="remove-cb-4" class="remove-condition disabled fix-size-small"
+                title="Remove this row">-</button>
+              <button type="button" id="add-cb-4" class="add-condition fix-size-small" title="Add a row">+</button>
+            </div>
+          </td>
+          <td class="condition-label-cell">
+            <div class="condition-label-container">
+              <div class="condition-input" id="cl-4"></div>
+            </div>
+          </td>
+          <td class="sample-value-cell calc-mode-only">
+            <div class="sample-line-container">
+              <div class="sample-input-line">
+                <input type="number" min="0" max="100" step="any" class="sample-value trigger-deviation-update">
+              </div>
+            </div>
+          </td>
+          <td class="mean-value-cell hidden">
+            <div class="mean-line-container">
+              <div class="mean-input-line">
+                <input type="number" step="any" class="mean-value trigger-chart-update" value="0" disabled>
+              </div>
+            </div>
+          </td>
+          <td class="abs-deviation-value-cell">
+            <div class="abs-deviation-line-container">
+              <div class="abs-deviation-input-line">
+                <input type="number" step="any" class="abs-deviation-value trigger-chart-update" value="0" disabled>
+              </div>
+            </div>
+          </td>
+          <td class="rel-deviation-value-cell col-selected">
+            <div class="rel-deviation-line-container">
+              <div class="rel-deviation-input-line">
+                <input type="number" step="any" class="rel-deviation-value trigger-chart-update" value="0" disabled>
+              </div>
+            </div>
+          </td>
+        </tr>
 
-  <canvas id="glorius-plot" class="white-bg"></canvas>
+        <tr id="plot-select-row">
+          <td class="empty-button-cell"></td>
+          <td class="plot-select-label"><strong>Value to plot:</strong></td>
+          <td class="empty-cell mean-shown-only hidden"></td>
+          <td class="plot-select-cell plot-select-mean-cell">
+            <label class="plot-select-container" for="plot-mean">
+              <input type="radio" name="plot-select" class="plot-select trigger-chart-update" id="plot-mean"
+                value="mean" label="Plot the (mean) sample values">
+            </label>
+          </td>
+          <td class="plot-select-cell plot-select-abs-cell">
+            <label class="plot-select-container" for="plot-abs">
+              <input type="radio" name="plot-select" class="plot-select trigger-chart-update" id="plot-abs"
+                value="absolute" label="Plot the deviation from the standard conditions (+/-)">
+            </label>
+          </td>
+          <td class="plot-select-cell plot-select-rel-cell col-selected-bottom">
+            <label class="plot-select-container" for="plot-rel">
+              <input type="radio" name="plot-select" class="plot-select trigger-chart-update" id="plot-rel"
+                value="relative" checked label="Plot the deviation from the standard conditions (%)">
+            </label>
+          </td>
+        </tr>
+
+      </table>
+
+      <button type="button" id="fill-random" title="Fill the table with random data">Fill with random data</button>
+      <button type="button" id="fill-example" class="mouseover-tooltip" data-bs-toggle="tooltip"
+        data-bs-custom-class="tooltip-on-light" data-bs-placement="top" title="This fills the table with an example
+        dataset sourced from Table S9 of Zhang 𝘦𝘵 𝘢𝘭. (2024), “Solvent-Dependent Divergent Cyclization of
+        Bicyclo[1.1.0]butanes”, https://doi.org/10.1002/anie.202418239">Fill with example data</button>
+    </details>
+  </form>
+
+  <div id="plot-display" class="multicol-element">
+    <canvas id="glorius-plot" class="white-bg"></canvas>
+
+    <button type="button" id="generate-plot" title="Regenerate the plot">Regenerate Plot</button>
+    <span id="auto-update" class="mouseover-tooltip" data-bs-toggle="tooltip" data-bs-custom-class="tooltip-on-light"
+      data-bs-placement="top" title="If the regeneration of the plot is causing slowdown, disable this and click the
+      “Regenerate Plot” button to the left as needed to manually generate it">
+      <input type="checkbox" name="auto-update-toggle" id="auto-update-toggle" checked>
+      <label for="auto-update-toggle">Auto-update</label>
+    </span>
+  </div>
 </div>
 
 <form>
-  <details id="plot-config" open>
+  <details id="plot-config" class="rounded-border center-section" open>
 
     <summary class="large-marker">
       <h4>Plot Configuration</h4>
     </summary>
 
-    <p>
-      <label for="fan-select">Plot style: </label>
-      <select id="fan-select" class="trigger-chart-update">
-        <option value="radar">Radar</option>
-        <option value="fan">Fan</option>
-      </select>
-    </p>
-
-    <table id="plot-size-options" class="label-table">
-      <tr>
-        <td>
-          <label for="width-input" class="align-right">Plot width in pixels: </label>
-        </td>
-        <td>
-          <input type="number" step="50" value="600" min="200" max="4000" name="width-input" id="width-input"
-            class="trigger-chart-update small-input">
-        </td>
-        <td>
-          <label for="label-font-size-input" class="align-right">Condition label font size: </label>
-        </td>
-        <td>
-          <input type="number" name="label-font-size-input" id="label-font-size-input"
-            class="trigger-chart-update small-input" min="2" max="64" value="18">
-        </td>
-      </tr>
-      <tr>
-        <td>
-          <label for="height-input" class="align-right">Plot height in pixels: </label>
-        </td>
-        <td>
-          <input type="number" step="50" value="600" min="200" max="4000" name="height-input" id="height-input"
-            class="trigger-chart-update small-input">
-        </td>
-        <td>
-          <label for="axis-font-size-input" class="align-right">Axis label font size: </label>
-        </td>
-        <td>
-          <input type="number" name="axis-font-size-input" id="axis-font-size-input"
-            class="trigger-chart-update small-input" min="2" max="64" value="16">
-        </td>
-      </tr>
-      <tr>
-        <td>
-          <label for="lock-aspect-ratio" class="align-right">Lock aspect ratio:</label>
-        </td>
-        <td>
-          <input type="checkbox" name="lock-aspect-ratio" id="lock-aspect-ratio" checked>
-        </td>
-        <td>
-          <label for="scale-font-size" class="align-right">Scale font size with plot size:</label>
-        </td>
-        <td>
-          <input type="checkbox" name="scale-font-size" id="scale-font-size">
-        </td>
-      </tr>
-    </table>
-    <button type="button" id="reset-plot-dims" class="trigger-chart-update" title="Reset the plot height, plot width,
-    condition label font size, and axis label font size to their default values">Reset Size and Shape</button>
-
-    <br>
-    <br>
-
-    <table class="label-table">
-      <tr>
-        <td>
-          <label for="min-output-input">Minimum output:</label>
-        </td>
-        <td class="value-">
-          <input type="number" step="any" value="-100" name="min-output-input" id="min-output-input"
-            class="trigger-chart-update small-input">
-        </td>
-        <td>
-          <label for="band-width-input" class="small-left-margin">Band width: </label>
-        </td>
-        <td>
-          <input type="number" step="5" value="25" min="5" max="50" name="band-width-input" id="band-width-input"
-            class="trigger-chart-update small-input">
-        </td>
-      </tr>
-      <tr>
-        <td>
-          <label for="max-output-input" class="small-left-margin">Maximum output:</label>
-        </td>
-        <td>
-          <input type="number" step="any" value="50" name="max-output-input" id="max-output-input"
-            class="trigger-chart-update small-input">
-        </td>
-      </tr>
-      <tr>
-        <td>
-          <label for="color-select">Colour scheme:</label>
-        </td>
-        <td colspan="2">
-          <select name="color-select" id="color-select">
-            <option value="colourblind" selected>Colourblind-friendly</option>
-            <option value="classic">Classic</option>
-            <option value="greyscale">Greyscale</option>
-            <option value="custom">Custom</option>
+    <div class="multicol-on-big-screen m900">
+      <div class="multicol-element">
+        <p>
+          <label for="fan-select">Plot style: </label>
+          <select id="fan-select" class="trigger-chart-update">
+            <option value="radar">Radar</option>
+            <option value="fan">Fan</option>
           </select>
-        </td>
-        <td>
-          <label for="min-color-input">Color at lowest output:</label>
-        </td>
-        <td>
-          <input type="color" value="#F05200" name="min-color-input" id="min-color-input"
-            class="trigger-chart-update color-custom small-input">
-        </td>
-      </tr>
-      <tr>
-        <td class="empty-cell"></td>
-        <td colspan="2" class="empty-cell"></td>
-        <td>
-          <label for="max-color-input">Color at highest output:</label>
-        </td>
-        <td>
-          <input type="color" value="#0093F5" name="max-color-input" id="max-color-input"
-            class="trigger-chart-update color-custom small-input">
-        </td>
-      </tr>
-      <tr>
-        <td>
-          <label for="sort-option">Data arrangement:</label>
-        </td>
-        <td colspan="2">
-          <select name="sort-option" id="sort-option" class="trigger-chart-update">
-            <option value="1">Ascending</option>
-            <option value="-1">Descending</option>
-            <option value="0">As entered</option>
-          </select>
-        </td>
-        <td class="empty-cell"></td>
-        <td class="empty-cell"></td>
-      </tr>
-    </table>
+        </p>
+        <table id="plot-size-options" class="label-table">
+          <tr>
+            <td>
+              <label for="width-input" class="align-right">Plot width in pixels: </label>
+            </td>
+            <td>
+              <input type="number" step="50" value="600" min="200" max="4000" name="width-input" id="width-input"
+                class="trigger-chart-update w4">
+            </td>
+            <td>
+              <label for="label-font-size-input" class="align-right">Condition label font size: </label>
+            </td>
+            <td>
+              <input type="number" name="label-font-size-input" id="label-font-size-input"
+                class="trigger-chart-update w4" min="2" max="64" value="18">
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <label for="height-input" class="align-right">Plot height in pixels: </label>
+            </td>
+            <td>
+              <input type="number" step="50" value="600" min="200" max="4000" name="height-input" id="height-input"
+                class="trigger-chart-update w4">
+            </td>
+            <td>
+              <label for="axis-font-size-input" class="align-right">Axis label font size: </label>
+            </td>
+            <td>
+              <input type="number" name="axis-font-size-input" id="axis-font-size-input" class="trigger-chart-update w4"
+                min="2" max="64" value="16">
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <label for="lock-aspect-ratio" class="align-right">Lock aspect ratio:</label>
+            </td>
+            <td>
+              <input type="checkbox" name="lock-aspect-ratio" id="lock-aspect-ratio" checked>
+            </td>
+            <td>
+              <label for="scale-font-size" class="align-right">Scale font size with plot size:</label>
+            </td>
+            <td>
+              <input type="checkbox" name="scale-font-size" id="scale-font-size">
+            </td>
+          </tr>
+        </table>
+        <button type="button" id="reset-plot-dims" class="trigger-chart-update" title="Reset the plot height, plot width,
+        condition label font size, and axis label font size to their default values">Reset Size and Shape</button>
+      </div>
+      <div class="multicol-element">
+        <table class="label-table">
+          <tr>
+            <td>
+              <label for="min-output-input">Minimum output:</label>
+            </td>
+            <td class="value-">
+              <input type="number" step="any" value="-100" name="min-output-input" id="min-output-input"
+                class="trigger-chart-update w4">
+            </td>
+            <td>
+              <label for="band-width-input" class="small-left-margin">Band width: </label>
+            </td>
+            <td>
+              <input type="number" step="5" value="25" min="5" max="50" name="band-width-input" id="band-width-input"
+                class="trigger-chart-update w4">
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <label for="max-output-input" class="small-left-margin">Maximum output:</label>
+            </td>
+            <td>
+              <input type="number" step="any" value="50" name="max-output-input" id="max-output-input"
+                class="trigger-chart-update w4">
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <label for="color-select">Colour scheme:</label>
+            </td>
+            <td colspan="2">
+              <select name="color-select" id="color-select">
+                <option value="colourblind" selected>Colourblind-friendly</option>
+                <option value="classic">Classic</option>
+                <option value="greyscale">Greyscale</option>
+                <option value="custom">Custom</option>
+              </select>
+            </td>
+            <td>
+              <label for="min-color-input">Color at lowest output:</label>
+            </td>
+            <td>
+              <input type="color" value="#F05200" name="min-color-input" id="min-color-input"
+                class="trigger-chart-update color-custom w4">
+            </td>
+          </tr>
+          <tr>
+            <td class="empty-cell"></td>
+            <td colspan="2" class="empty-cell"></td>
+            <td>
+              <label for="max-color-input">Color at highest output:</label>
+            </td>
+            <td>
+              <input type="color" value="#0093F5" name="max-color-input" id="max-color-input"
+                class="trigger-chart-update color-custom w4">
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <label for="sort-option">Data arrangement:</label>
+            </td>
+            <td colspan="2">
+              <select name="sort-option" id="sort-option" class="trigger-chart-update">
+                <option value="1">Ascending</option>
+                <option value="-1">Descending</option>
+                <option value="0">As entered</option>
+              </select>
+            </td>
+            <td class="empty-cell"></td>
+            <td class="empty-cell"></td>
+          </tr>
+        </table>
+      </div>
+    </div>
   </details>
 </form>
 
-<div id="export-options">
-  <h4>Save your progress</h4>
-  <label for="save-load-data-buttons" class="info-marker">Save your progress as a <code>.json</code> file or reload it.
-    To reload, select a file with the “Choose File” button below, then click the “Resume Work” button.
-  </label>
-  <table id="save-load-data-buttons">
-    <tr>
-      <td>
-        <button type="button" id="save-data" title="Save the input data and plot configuration in a .json file which
-        can be loaded later to resume or share work">
-          <img src="{{url_for('static', filename='img/icon-download.svg')}}" alt="Download icon" class="text-icon">
-          Save Progress
-        </button>
-      </td>
-      <td>
-        <button type="button" id="load-data" title="Load data from a previously-saved .json file
-        - select this file in the file selector to the right" disabled>
-          <img src="{{url_for('static', filename='img/icon-upload.svg')}}" alt="Upload icon" class="text-icon">
-          Resume Work
-        </button>
-      </td>
-      <td><input type="file" name="load-data-file" id="load-data-file" accept=".json"></td>
-    </tr>
-  </table>
+<div id="export-options" class="multicol-on-big-screen m900">
+  <details class="multicol-element rounded-border" open>
+    <summary class="large-marker">
+      <h4>Save your progress</h4>
+    </summary>
+    <label for="save-load-data-buttons" class="info-marker">Save your progress as a <code>.json</code> file or reload
+      it.
+      To reload, select a file with the “Choose File” button below, then click the “Resume Work” button.
+    </label>
+    <table id="save-load-data-buttons">
+      <tr>
+        <td>
+          <button type="button" id="save-data" title="Save the input data and plot configuration in a .json file which
+          can be loaded later to resume or share work">
+            <img src="{{url_for('static', filename='img/icon-download.svg')}}" alt="Download icon" class="text-icon">
+            Save Progress
+          </button>
+        </td>
+        <td>
+          <button type="button" id="load-data" title="Load data from a previously-saved .json file
+          - select this file in the file selector to the right" disabled>
+            <img src="{{url_for('static', filename='img/icon-upload.svg')}}" alt="Upload icon" class="text-icon">
+            Resume Work
+          </button>
+        </td>
+        <td><input type="file" name="load-data-file" id="load-data-file" accept=".json"></td>
+      </tr>
+    </table>
+  </details>
 
-  <br>
-  <h4>Export plot as an image</h4>
-  <label for="export-image-buttons" class="info-marker">You can export your Glorius Plot as a <code>.png</code> or
-    <code>.svg</code> file. <code>.png</code> has broader compatibility, while <code>.svg</code> allows the image to be
-    resized without losing detail.
-  </label>
-  <table id="export-image-buttons">
-    <tr>
-      <td>
-        <button type="button" id="export-image-png" title="Export the plot as a bitmapped .png image">
-          <img src="{{url_for('static', filename='img/icon-download.svg')}}" alt="Download icon" class="text-icon">
-          Download Plot as PNG</button>
-      </td>
-      <td>
-        <button type="button" id="export-image-svg" title="Export the plot as a vector .svg image (not yet implemented)"
-          disabled>
-          <img src="{{url_for('static', filename='img/icon-download.svg')}}" alt="Download icon" class="text-icon">
-          Download Plot as SVG</button>
-      </td>
-    </tr>
-  </table>
+  <details class="multicol-element rounded-border" open>
+    <summary class="large-marker">
+      <h4>Export plot as an image</h4>
+    </summary>
+    <label for="export-image-buttons" class="info-marker">You can export your Glorius Plot as a <code>.png</code> or
+      <code>.svg</code> file. <code>.png</code> has broader compatibility, while <code>.svg</code> allows the image to
+      be
+      resized without losing detail.
+    </label>
+    <table id="export-image-buttons">
+      <tr>
+        <td>
+          <button type="button" id="export-image-png" title="Export the plot as a bitmapped .png image">
+            <img src="{{url_for('static', filename='img/icon-download.svg')}}" alt="Download icon" class="text-icon">
+            Download Plot as PNG</button>
+        </td>
+        <td>
+          <button type="button" id="export-image-svg"
+            title="Export the plot as a vector .svg image (not yet implemented)" disabled>
+            <img src="{{url_for('static', filename='img/icon-download.svg')}}" alt="Download icon" class="text-icon">
+            Download Plot as SVG</button>
+        </td>
+      </tr>
+    </table>
+  </details>
+</div>
 
-  <br>
-  <h4>Export as a FAIR data package</h4>
+<details class="rounded-border" open>
+  <summary class="large-marker">
+    <h4>Export as a FAIR data package</h4>
+  </summary>
   <label for="export-data-package-buttons" class="info-marker">You can export a FAIR data package to accompany your
     Glorius plot by providing some additional information. The more information you can provide, the more useful the
     data package will be for others. If you choose not to add any additional information, a simple version of the data
@@ -718,10 +733,9 @@
         style="transform: translate(0, -6.25%);">
       Configure Data Package</button>
   </div>
-</div>
+</details>
 
-
-<details id="rocrate-input" class="hidden rocrate-export" open>
+<details id="rocrate-input" class="hidden rounded-border center-section rocrate-export" open>
   <summary class="large-marker">
     <h4 id="rocrate-export-title">Configure your data package</h4>
   </summary>
@@ -739,17 +753,23 @@
     <h5>About your experiment</h5>
 
     <strong>Standard Conditions</strong><br>
-    <label for="rocrate-cdxml" class="info-marker">Add a ChemDraw <code>.cdxml</code> file that depicts the chemical
-      process corresponding to your “Standard Conditions”. Including a <code>.cdxml</code> file enables chemical
-      information to be linked to your data.</label>
+    <div class="multicol-on-big-screen">
+      <div class="multicol-element">
+        <label for="rocrate-cdxml" class="info-marker">Add a ChemDraw <code>.cdxml</code> file that depicts the chemical
+          process corresponding to your “Standard Conditions”. Including a <code>.cdxml</code> file enables chemical
+          information to be linked to your data.</label>
+        <br>
+        <input type="file" name="rocrate-cdxml" id="rocrate-cdxml" accept=".cdxml"><br>
+      </div>
+      <div class="multicol-element">
+        <label for="rocrate-img" class="info-marker">Add a <code>.png</code> illustration of the reaction which will be
+          added to the supplementary information file. This can be generated from a <code>.cdxml</code> file using e.g.
+          the <a href="https://data-conversion.psdi.ac.uk/">PSDI Data Conversion Service</a>.</label>
+        <br>
+        <input type="file" name="rocrate-img" id="rocrate-img" accept=".png,.jpg,.jpeg">
+      </div>
+    </div>
     <br>
-    <input type="file" name="rocrate-cdxml" id="rocrate-cdxml" accept=".cdxml"><br>
-    <label for="rocrate-img" class="info-marker">Add a <code>.png</code> illustration of the reaction which will be
-      added to the supplementary information file. This can be generated from a <code>.cdxml</code> file using e.g.
-      the <a href="https://data-conversion.psdi.ac.uk/">PSDI Data Conversion Service</a>.</label>
-    <br>
-    <input type="file" name="rocrate-img" id="rocrate-img" accept=".png,.jpg,.jpeg">
-    <br><br>
     <label for="baseline-desc-container" class="info-marker">Add text to describe the experimental conditions that
       give the isolated yield (%) you reported for the “Standard Conditions” of your
       chemical process:</label>
@@ -887,22 +907,16 @@
           value="other">
         <label for="rocrate-license-other">Other</label>
         <div id="rocrate-license-details">
-          <table class="label-table">
-            <tr>
-              <td class="label-cell">
-                <label for="rocrate-license-name">Name:</label>
-              </td>
-              <td class="input-cell">
-                <input type="text" id="rocrate-license-name" class="med-input med-right-margin" disabled>
-              </td>
-              <td class="label-cell">
-                <label for="rocrate-license-url">Link:</label>
-              </td>
-              <td class="input-cell">
-                <input type="text" id="rocrate-license-url" class="med-input" disabled>
-              </td>
-            </tr>
-          </table>
+          <div class="multicol-on-big-screen m900 tiny-gap ml2">
+            <div class="multicol-element">
+              <label for="rocrate-license-name" class="w3 text-align-right"><strong>Name:</strong></label>
+              <input type="text" id="rocrate-license-name" class="w20-on-big-fr-on-small" disabled>
+            </div>
+            <div class="multicol-element">
+              <label for="rocrate-license-url" class="w3 text-align-right"><strong>Link:</strong></label>
+              <input type="text" id="rocrate-license-url" class="w20-on-big-fr-on-small" disabled>
+            </div>
+          </div>
         </div>
       </li>
     </ul>
@@ -938,32 +952,31 @@
         </td>
       </tr>
     </table>
-    <table id="rocrate-contrib-table" class="label-table">
-      <tr class="rocrate-contrib-row" id="rcw-0">
-        <td class="rocrate-contrib-button-cell row-button-cell">
+    <div id="rocrate-contrib-table" class="label-table">
+      <div class="rocrate-contrib-row" id="rcw-0">
+        <div class="rocrate-contrib-button-cell row-button-cell">
           <div class="row-button-container">
             <button type="button" id="remove-rcb-0" class="remove-contrib fix-size-small" disabled
               title="Remove this contributor">-</button>
             <button type="button" id="add-rcb-0" class="add-contrib fix-size-small" title="Add a contributor">+</button>
           </div>
-        </td>
-        <td class="label-cell">
-          <label for="rni-0" class="rocrate-name-label" id="rnl-0">Name:</label>
-        </td>
-        <td class="input-cell">
-          <input type="text" name="rocrate-name-input" class="rocrate-name-input" id="rni-0">
-        </td>
-        <td class="button-cell">
-          <button type="button" class="rocrate-orcid-lookup" id="rob-0">ORCID Lookup</button>
-        </td>
-        <td class="label-cell">
-          <label for="roi-0" class="rocrate-orcid-label" id="rol-0">ORCID or other link:</label>
-        </td>
-        <td class="input-cell">
-          <input type="url" name="rocrate-orcid-input" class="rocrate-orcid-input" id="roi-0">
-        </td>
-      </tr>
-    </table>
+        </div>
+        <div class="rocrate-contrib-right-of-button">
+          <div class="multicol-on-big-screen m900 tiny-gap">
+            <div class="multicol-element">
+              <label for="rni-0" class="rocrate-name-label text-align-right" id="rnl-0"><strong>Name:</strong></label>
+              <input type="text" name="rocrate-name-input" class="rocrate-name-input" id="rni-0">
+              <button type="button" class="rocrate-orcid-lookup" id="rob-0">ORCID Lookup</button>
+            </div>
+            <div class="multicol-element">
+              <label for="roi-0" class="rocrate-orcid-label text-align-right" id="rol-0"><strong>ORCID or other
+                  link:</strong></label>
+              <input type="url" name="rocrate-orcid-input" class="rocrate-orcid-input" id="roi-0">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
 
     <br>
     <label for="rocrate-email-table" class="info-marker">Providing contact information enables a user to make
