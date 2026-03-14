@@ -502,6 +502,8 @@
   </form>
 
   <div id="plot-display" class="multicol-element">
+    <canvas id="glorius-plot" class="white-bg"></canvas>
+
     <button type="button" id="generate-plot" title="Regenerate the plot">Regenerate Plot</button>
     <span id="auto-update" class="mouseover-tooltip" data-bs-toggle="tooltip" data-bs-custom-class="tooltip-on-light"
       data-bs-placement="top" title="If the regeneration of the plot is causing slowdown, disable this and click the
@@ -509,8 +511,6 @@
       <input type="checkbox" name="auto-update-toggle" id="auto-update-toggle" checked>
       <label for="auto-update-toggle">Auto-update</label>
     </span>
-
-    <canvas id="glorius-plot" class="white-bg"></canvas>
   </div>
 </div>
 

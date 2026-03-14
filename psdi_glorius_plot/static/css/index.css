@@ -114,9 +114,21 @@ textarea {
   align-items   : center;
 }
 
+#data-input {
+  margin-bottom: 0;
+}
+
 #glorius-plot {
   width : 700px;
   border: 1px solid black;
+}
+
+*:has(>#data-input) {
+  margin-bottom: 1rem;
+}
+
+#plot-display {
+  margin-top: 1rem;
 }
 
 .hidden {
@@ -184,6 +196,8 @@ ol.no-bullet {
 .multicol-on-big-screen.wrap {
   flex-wrap      : wrap;
   justify-content: center;
+  column-gap     : 1rem;
+  row-gap        : 0;
 }
 
 .multicol-on-big-screen+* {
