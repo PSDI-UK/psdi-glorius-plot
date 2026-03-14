@@ -193,6 +193,13 @@ ol.no-bullet {
   padding-left: 1rem;
 }
 
+/* Two-column display on all screens */
+.multicol {
+  display              : grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap           : 1rem;
+}
+
 /* Set up two-column display on screens that are wide enough */
 .multicol-on-big-screen {
   display        : flex;
@@ -200,7 +207,6 @@ ol.no-bullet {
   justify-content: flex-start;
   gap            : 1rem;
   align-items    : flex-start;
-  margin         : 0;
 }
 
 .multicol-element {
@@ -453,12 +459,6 @@ input.rel-deviation-value {
 }
 
 /* Style the details and summary boxes */
-
-.multicol-container {
-  display              : grid;
-  grid-template-columns: 1fr 1fr;
-  column-gap           : 2rem;
-}
 
 details {
   border        : 1px solid var(--ifm-font-color-base);
