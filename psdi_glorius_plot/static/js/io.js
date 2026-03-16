@@ -5,13 +5,20 @@ import { renderingComplete } from "./formatted-labels.js";
  * Export the chart in the desired format
  * @param {string} format 
  */
-export async function exportImage(chartSelector, format) {
+export async function exportImage(chartSelector, format, spinnerSelector = null) {
 
+  if (spinnerSelector) {
+    $(spinnerSelector).removeClass("hidden");
+  }
+
+  let renderFailed = false;
   await renderingComplete().catch(reason => {
-    $(".rocrate-download-and-spinner .loading-spinner").addClass("hidden");
+    renderFailed = true;
+    $(spinnerSelector).addClass("hidden");
     alert("Error rendering plot: " + reason);
-    return
   });
+  if (renderFailed)
+    return;
 
   // Set the form as clean when the user downloads the image
   cleanDirtyForms();
@@ -22,6 +29,11 @@ export async function exportImage(chartSelector, format) {
     let link = document.createElement('a');
     link.href = objectURL;
     link.download = "glorius_plot." + format;
+
+    if (spinnerSelector) {
+      $(spinnerSelector).addClass("hidden");
+    }
+
     link.click();
 
   }, "image/" + format);

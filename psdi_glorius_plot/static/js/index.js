@@ -2551,11 +2551,14 @@ async function exportROCrate() {
   // Show the spinner while working
   $(".rocrate-download-and-spinner .loading-spinner").removeClass("hidden");
 
+  let renderFailed = false;
   await renderingComplete().catch(reason => {
+    renderFailed = true;
     $(".rocrate-download-and-spinner .loading-spinner").addClass("hidden");
     alert("Error rendering plot: " + reason);
-    return
   });
+  if (renderFailed)
+    return;
 
   // Set up a rocrateInfo object containing all info that will be needed to construct the various files in the rocrate
 
@@ -2700,7 +2703,8 @@ function enableButtons() {
 
   $("#generate-plot").on("click", generatePlot);
 
-  $("#export-image-png").on("click", () => exportImage(CHART_SELECTOR, "png"));
+  $("#export-image-png").on("click", () => exportImage(CHART_SELECTOR, "png",
+    "#export-image-buttons .loading-spinner"));
   $("#export-rocrate-start").on("click", startROCrateExport);
 
   $("#save-data").on("click", () => saveObject(getPlotData(), "glorius_plot_data.json"));
