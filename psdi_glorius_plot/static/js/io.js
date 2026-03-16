@@ -1,12 +1,26 @@
 import { cleanDirtyForms } from "./dirty-forms.js";
+import { renderingComplete } from "./formatted-labels.js";
 
 /**
  * Export the chart in the desired format
  * @param {string} format 
  */
-export function exportImage(chartSelector, format) {
+export async function exportImage(chartSelector, format, spinnerSelector = null) {
 
-  // Set the form as clean the user downloads the image
+  if (spinnerSelector) {
+    $(spinnerSelector).removeClass("hidden");
+  }
+
+  let renderFailed = false;
+  await renderingComplete().catch(reason => {
+    renderFailed = true;
+    $(spinnerSelector).addClass("hidden");
+    alert("Error rendering plot: " + reason);
+  });
+  if (renderFailed)
+    return;
+
+  // Set the form as clean when the user downloads the image
   cleanDirtyForms();
 
   $(chartSelector)[0].toBlob((blob) => {
@@ -15,6 +29,11 @@ export function exportImage(chartSelector, format) {
     let link = document.createElement('a');
     link.href = objectURL;
     link.download = "glorius_plot." + format;
+
+    if (spinnerSelector) {
+      $(spinnerSelector).addClass("hidden");
+    }
+
     link.click();
 
   }, "image/" + format);

@@ -21,6 +21,7 @@ const MAX_ELAPSED = 500;
 
 let compatibilityMode = "unknown";
 let currentRenderBatch = 0;
+let numAwaitingRender = 0;
 
 const dQuillEditors = {};
 
@@ -164,7 +165,7 @@ export function enableQuillEvents(alwaysCallback, otherCallbacks) {
  * available
  */
 export async function waitForMathJax() {
-  await new Promise(resolve => {
+  return new Promise(resolve => {
 
     let interval;
     let elapsed = 0;
@@ -240,6 +241,7 @@ export function incrementRenderBatch() {
 export async function drawFormatted(ctx, labelHTML, x, y, fontSize, hAlign, renderBatch) {
   if (labelHTML == "")
     return;
+  ++numAwaitingRender;
 
   const adaptor = MathJax.startup.adaptor;
   const mathJaxSVG = await MathJax.tex2svgPromise(HTMLToTex(labelHTML));
@@ -272,7 +274,28 @@ export async function drawFormatted(ctx, labelHTML, x, y, fontSize, hAlign, rend
     }
   }
 
-  drawMathJaxSVG(ctx, svgHTML, x, y, fontSize, hAlign, renderBatch);
+  let DOMURL = window.URL || window.webkitURL || window;
+  let img1 = new Image();
+  let svg = new Blob([svgHTML], { type: 'image/svg+xml' });
+  let url = DOMURL.createObjectURL(svg);
+  let scale = MATHJAX_BASE_FONT_SCALING * fontSize / MATHJAX_DEFAULT_FONT_SIZE;
+
+  // Keep track of the render batch where this was triggered, and only draw it if it's loaded in the same batch
+  img1.renderBatch = renderBatch;
+
+  img1.onload = function () {
+    --numAwaitingRender;
+    if (img1.renderBatch == currentRenderBatch) {
+      let w = img1.naturalWidth * scale;
+      let h = img1.naturalHeight * scale;
+      let finalX = x;
+      if (hAlign == "center")
+        finalX -= w / 2;
+      ctx.drawImage(img1, finalX, y, w, h);
+    }
+    DOMURL.revokeObjectURL(url);
+  }
+  img1.src = url;
 }
 
 /**
@@ -329,26 +352,23 @@ export function HTMLToMd(s) {
   return s;
 }
 
-async function drawMathJaxSVG(ctx, svgHTML, x = 0, y = 0, fontsize = 16, hAlign = "left", renderBatch) {
-  let DOMURL = window.URL || window.webkitURL || window;
-  let img1 = new Image();
-  let svg = new Blob([svgHTML], { type: 'image/svg+xml' });
-  let url = DOMURL.createObjectURL(svg);
-  let scale = MATHJAX_BASE_FONT_SCALING * fontsize / MATHJAX_DEFAULT_FONT_SIZE;
+export async function renderingComplete(max_wait = 10000) {
+  return new Promise((resolve, reject) => {
 
-  // Keep track of the render batch where this was triggered, and only draw it if it's loaded in the same batch
-  img1.renderBatch = renderBatch;
+    let interval;
+    let elapsed = 0;
 
-  img1.onload = function () {
-    if (img1.renderBatch == currentRenderBatch) {
-      let w = img1.naturalWidth * scale;
-      let h = img1.naturalHeight * scale;
-      let finalX = x;
-      if (hAlign == "center")
-        finalX -= w / 2;
-      ctx.drawImage(img1, finalX, y, w, h);
-    }
-    DOMURL.revokeObjectURL(url);
-  }
-  img1.src = url;
+    const checkForRenderingComplete = function () {
+      elapsed += T_WAIT;
+      if (numAwaitingRender == 0) {
+        clearInterval(interval);
+        resolve();
+      } else if (elapsed >= max_wait) {
+        clearInterval(interval);
+        reject("Maximum wait time exceeded for rendering to complete");
+      }
+    };
+
+    interval = setInterval(checkForRenderingComplete, T_WAIT);
+  });
 }

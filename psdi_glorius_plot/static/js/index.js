@@ -11,7 +11,7 @@ import { clamp, forenameToInitials, getWebKitMode, surnameToCapitalized } from "
 import {
   addQuillEditor, getQuillEditor, getQuillEditorHTML, setQuillEditor, removeQuillEditor, updateQuillContents,
   disableQuillToolbar, enableQuillEvents, removeGlobalTags, cleanTags, stripTags, waitForMathJax, drawFormatted,
-  incrementRenderBatch, HTMLToMd,
+  incrementRenderBatch, HTMLToMd, renderingComplete
 } from "./formatted-labels.js"
 import { formatReadmeBibInfo, makeReadme } from "./rocrate/readme.js";
 import { formatMetadataBibInfo, makeMetadata } from "./rocrate/metadata.js";
@@ -2551,6 +2551,15 @@ async function exportROCrate() {
   // Show the spinner while working
   $(".rocrate-download-and-spinner .loading-spinner").removeClass("hidden");
 
+  let renderFailed = false;
+  await renderingComplete().catch(reason => {
+    renderFailed = true;
+    $(".rocrate-download-and-spinner .loading-spinner").addClass("hidden");
+    alert("Error rendering plot: " + reason);
+  });
+  if (renderFailed)
+    return;
+
   // Set up a rocrateInfo object containing all info that will be needed to construct the various files in the rocrate
 
   // plotData will be modified when the Sensitivity Table is created to remove redundant information in it, so we create
@@ -2694,7 +2703,8 @@ function enableButtons() {
 
   $("#generate-plot").on("click", generatePlot);
 
-  $("#export-image-png").on("click", () => exportImage(CHART_SELECTOR, "png"));
+  $("#export-image-png").on("click", () => exportImage(CHART_SELECTOR, "png",
+    "#export-image-buttons .loading-spinner"));
   $("#export-rocrate-start").on("click", startROCrateExport);
 
   $("#save-data").on("click", () => saveObject(getPlotData(), "glorius_plot_data.json"));
