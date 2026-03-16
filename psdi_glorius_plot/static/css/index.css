@@ -7,6 +7,10 @@
   --abs-dev-mode-display     : none;
   --non-none-dev-mode-display: inline;
   --none-dev-mode-display    : none;
+
+  --font-color-faded                 : color-mix(in srgb, var(--ifm-font-color-base), var(--ifm-background-color) 75%);
+  --background-color-shaded          : color-mix(in srgb, var(--ifm-background-color), var(--ifm-font-color-base) 20%);
+  --background-color-secondary-shaded: color-mix(in srgb, var(--ifm-background-color-secondary), var(--ifm-font-color-base) 20%);
 }
 
 [chart-mode="fan"] {
@@ -23,11 +27,6 @@
 }
 
 /* General element styling */
-
-/* Anchors should always have the cursor change to a pointer when hovered if they're set up with any action */
-a[data-cc]:hover {
-  cursor: pointer;
-}
 
 /* Remove the space after paragraphs which are followed by lists or which are the last child of their parent */
 p:has(+ul, +ol),
@@ -98,13 +97,21 @@ textarea {
 }
 
 /* Draw outlines around the appropriate sections */
+.square-border,
+.rounded-border {
+  border: 1px solid var(--ifm-font-color-base)
+}
+
 .rounded-border {
   display      : inline-block;
-  border       : 1px solid var(--ifm-font-color-base);
   border-radius: 0.5rem;
   margin       : 1rem 0;
   padding      : 0.5rem 1rem;
   max-width    : 95vw;
+}
+
+.faded-border {
+  border-color: var(--font-color-faded);
 }
 
 /* Center sections horizontally */
@@ -121,10 +128,6 @@ textarea {
 #glorius-plot {
   width : 700px;
   border: 1px solid black;
-}
-
-*:has(>#data-input) {
-  margin-bottom: 1rem;
 }
 
 #plot-display {
@@ -180,9 +183,10 @@ ol.no-bullet {
 .multicol-on-big-screen {
   display        : flex;
   flex-direction : row;
-  justify-content: flex-start;
+  justify-content: stretch;
   gap            : 1rem;
   align-items    : flex-start;
+  width          : 100%;
 }
 
 .w20-on-big-fr-on-small {
@@ -195,7 +199,8 @@ ol.no-bullet {
 
 .multicol-on-big-screen.wrap {
   flex-wrap      : wrap;
-  justify-content: center;
+  justify-content: flex-start;
+  align-items    : end;
   column-gap     : 1rem;
   row-gap        : 0;
 }
@@ -205,7 +210,8 @@ ol.no-bullet {
 }
 
 .multicol-element {
-  flex: 0 1 auto;
+  /* Flex basis is arbitray here as long as it's smaller than the smallest element */
+  flex: 1 0 1rem;
 }
 
 .small-screen-only {
@@ -262,6 +268,33 @@ ol.no-bullet {
   }
 
   .multicol-on-big-screen.m900 .small-screen-only {
+    display: default;
+  }
+}
+
+@media (max-width: 950px) {
+  .multicol-on-big-screen.m950:not(.wrap) {
+    flex-direction: column;
+    align-items   : stretch;
+  }
+
+  .multicol-on-big-screen.m950>.multicol-element:not(:first-child) {
+    margin-top: 0;
+  }
+
+  .multicol-on-big-screen.m950>.multicol-element:not(:last-child) {
+    margin-bottom: 0;
+  }
+
+  .m950 .w20-on-big-fr-on-small {
+    width: calc(100% - 4rem) !important;
+  }
+
+  .multicol-on-big-screen.m950 .big-screen-only {
+    display: none;
+  }
+
+  .multicol-on-big-screen.m950 .small-screen-only {
     display: default;
   }
 }
@@ -477,6 +510,14 @@ input.rel-deviation-value {
   width: 20rem !important;
 }
 
+.full-width:not(.allow-overflow-x) {
+  width: 100% !important;
+}
+
+.allow-overflow-x {
+  max-width: max-content !important;
+}
+
 .max-width-15 {
   max-width: 15rem;
 }
@@ -595,11 +636,11 @@ details[open]>summary.info-marker::before {
 }
 
 details summary:hover {
-  background-color: color-mix(in srgb, var(--ifm-background-color), var(--ifm-font-color-base) 20%);
+  background-color: var(--background-color-shaded);
 }
 
 .secondary details summary:hover {
-  background-color: color-mix(in srgb, var(--ifm-background-color-secondary), var(--ifm-font-color-base) 20%);
+  background-color: var(--background-color-secondary-shaded);
 }
 
 details summary:active {
