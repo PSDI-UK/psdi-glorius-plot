@@ -233,7 +233,7 @@ ol.no-bullet {
   }
 
   .w20-on-big-fr-on-small {
-    width: calc(100% - 4rem) !important;
+    width: calc(100% - 6rem) !important;
   }
 
   .multicol-on-big-screen .big-screen-only {
