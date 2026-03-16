@@ -111,8 +111,8 @@
 {% block inner_content %}
 
 <div class="multicol-on-big-screen wrap full-width">
-  <form class="multicol-element full-width">
-    <details id="data-input" class="rounded-border full-width" open>
+  <form class="multicol-element full-width allow-overflow-x">
+    <details id="data-input" class="rounded-border full-width allow-overflow-x" open>
 
       <div class="hidden hidden-until-rocrate">
         <button type="button" class="returnToROCrateExport no-left-margin">↪ Return to data package export</button>
@@ -503,8 +503,7 @@
 
   <div id="plot-display" class="multicol-element">
     <div class="full-width">
-      <canvas id="glorius-plot" class="white-bg center-section"></canvas>
-      <div id="plot-controls" class="center-section">
+      <div id="plot-controls" class="center-section hidden">
         <button type="button" id="generate-plot" title="Regenerate the plot">Regenerate Plot</button>
         <span id="auto-update" class="mouseover-tooltip" data-bs-toggle="tooltip"
           data-bs-custom-class="tooltip-on-light" data-bs-placement="top" title="If the regeneration of the plot is
@@ -514,6 +513,7 @@
           <label for="auto-update-toggle">Auto-update</label>
         </span>
       </div>
+      <canvas id="glorius-plot" class="white-bg center-section"></canvas>
     </div>
   </div>
 </div>

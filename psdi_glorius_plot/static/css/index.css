@@ -130,10 +130,6 @@ textarea {
   border: 1px solid black;
 }
 
-*:has(>#data-input) {
-  margin-bottom: 1rem;
-}
-
 #plot-display {
   margin-top: 1rem;
 }
@@ -203,7 +199,7 @@ ol.no-bullet {
 
 .multicol-on-big-screen.wrap {
   flex-wrap      : wrap;
-  justify-content: center;
+  justify-content: flex-start;
   align-items    : end;
   column-gap     : 1rem;
   row-gap        : 0;
@@ -514,8 +510,12 @@ input.rel-deviation-value {
   width: 20rem !important;
 }
 
-.full-width {
+.full-width:not(.allow-overflow-x) {
   width: 100% !important;
+}
+
+.allow-overflow-x {
+  max-width: max-content !important;
 }
 
 .max-width-15 {
