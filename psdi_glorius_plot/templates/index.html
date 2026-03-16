@@ -681,14 +681,14 @@
             Save Progress
           </button>
         </td>
-        <td>
+        <td class="square-border faded-border">
           <button type="button" id="load-data" title="Load data from a previously-saved .json file
           - select this file in the file selector to the right" disabled>
             <img src="{{url_for('static', filename='img/icon-upload.svg')}}" alt="Upload icon" class="text-icon">
             Resume Work
           </button>
+          <input type="file" name="load-data-file" id="load-data-file" class="small-left-margin" accept=".json">
         </td>
-        <td><input type="file" name="load-data-file" id="load-data-file" accept=".json"></td>
       </tr>
     </table>
   </details>

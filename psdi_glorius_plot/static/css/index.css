@@ -7,6 +7,10 @@
   --abs-dev-mode-display     : none;
   --non-none-dev-mode-display: inline;
   --none-dev-mode-display    : none;
+
+  --font-color-faded                 : color-mix(in srgb, var(--ifm-font-color-base), var(--ifm-background-color) 75%);
+  --background-color-shaded          : color-mix(in srgb, var(--ifm-background-color), var(--ifm-font-color-base) 20%);
+  --background-color-secondary-shaded: color-mix(in srgb, var(--ifm-background-color-secondary), var(--ifm-font-color-base) 20%);
 }
 
 [chart-mode="fan"] {
@@ -23,11 +27,6 @@
 }
 
 /* General element styling */
-
-/* Anchors should always have the cursor change to a pointer when hovered if they're set up with any action */
-a[data-cc]:hover {
-  cursor: pointer;
-}
 
 /* Remove the space after paragraphs which are followed by lists or which are the last child of their parent */
 p:has(+ul, +ol),
@@ -98,13 +97,21 @@ textarea {
 }
 
 /* Draw outlines around the appropriate sections */
+.square-border,
+.rounded-border {
+  border: 1px solid var(--ifm-font-color-base)
+}
+
 .rounded-border {
   display      : inline-block;
-  border       : 1px solid var(--ifm-font-color-base);
   border-radius: 0.5rem;
   margin       : 1rem 0;
   padding      : 0.5rem 1rem;
   max-width    : 95vw;
+}
+
+.faded-border {
+  border-color: var(--font-color-faded);
 }
 
 /* Center sections horizontally */
@@ -629,11 +636,11 @@ details[open]>summary.info-marker::before {
 }
 
 details summary:hover {
-  background-color: color-mix(in srgb, var(--ifm-background-color), var(--ifm-font-color-base) 20%);
+  background-color: var(--background-color-shaded);
 }
 
 .secondary details summary:hover {
-  background-color: color-mix(in srgb, var(--ifm-background-color-secondary), var(--ifm-font-color-base) 20%);
+  background-color: var(--background-color-secondary-shaded);
 }
 
 details summary:active {
