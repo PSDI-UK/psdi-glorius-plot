@@ -11,7 +11,7 @@ import { clamp, forenameToInitials, getWebKitMode, surnameToCapitalized } from "
 import {
   addQuillEditor, getQuillEditor, getQuillEditorHTML, setQuillEditor, removeQuillEditor, updateQuillContents,
   disableQuillToolbar, enableQuillEvents, removeGlobalTags, cleanTags, stripTags, waitForMathJax, drawFormatted,
-  incrementRenderBatch, HTMLToMd,
+  incrementRenderBatch, HTMLToMd, renderingComplete
 } from "./formatted-labels.js"
 import { formatReadmeBibInfo, makeReadme } from "./rocrate/readme.js";
 import { formatMetadataBibInfo, makeMetadata } from "./rocrate/metadata.js";
@@ -2550,6 +2550,12 @@ async function exportROCrate() {
 
   // Show the spinner while working
   $(".rocrate-download-and-spinner .loading-spinner").removeClass("hidden");
+
+  await renderingComplete().catch(reason => {
+    $(".rocrate-download-and-spinner .loading-spinner").addClass("hidden");
+    alert("Error rendering plot: " + reason);
+    return
+  });
 
   // Set up a rocrateInfo object containing all info that will be needed to construct the various files in the rocrate
 

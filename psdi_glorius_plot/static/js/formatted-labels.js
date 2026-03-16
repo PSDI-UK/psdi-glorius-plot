@@ -21,6 +21,7 @@ const MAX_ELAPSED = 500;
 
 let compatibilityMode = "unknown";
 let currentRenderBatch = 0;
+let numAwaitingRender = 0;
 
 const dQuillEditors = {};
 
@@ -164,7 +165,7 @@ export function enableQuillEvents(alwaysCallback, otherCallbacks) {
  * available
  */
 export async function waitForMathJax() {
-  await new Promise(resolve => {
+  return new Promise(resolve => {
 
     let interval;
     let elapsed = 0;
@@ -338,8 +339,10 @@ async function drawMathJaxSVG(ctx, svgHTML, x = 0, y = 0, fontsize = 16, hAlign 
 
   // Keep track of the render batch where this was triggered, and only draw it if it's loaded in the same batch
   img1.renderBatch = renderBatch;
+  ++numAwaitingRender;
 
   img1.onload = function () {
+    --numAwaitingRender;
     if (img1.renderBatch == currentRenderBatch) {
       let w = img1.naturalWidth * scale;
       let h = img1.naturalHeight * scale;
@@ -351,4 +354,25 @@ async function drawMathJaxSVG(ctx, svgHTML, x = 0, y = 0, fontsize = 16, hAlign 
     DOMURL.revokeObjectURL(url);
   }
   img1.src = url;
+}
+
+export async function renderingComplete(max_wait = 10000) {
+  return new Promise((resolve, reject) => {
+
+    let interval;
+    let elapsed = 0;
+
+    const checkForRenderingComplete = function () {
+      elapsed += T_WAIT;
+      if (numAwaitingRender == 0 || elapsed >= max_wait) {
+        clearInterval(interval);
+        resolve();
+      } else if (elapsed >= max_wait) {
+        clearInterval(interval);
+        reject("Maximum wait time exceeded for rendering to complete");
+      }
+    };
+
+    interval = setInterval(checkForRenderingComplete, T_WAIT);
+  });
 }

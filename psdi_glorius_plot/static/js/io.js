@@ -1,12 +1,19 @@
 import { cleanDirtyForms } from "./dirty-forms.js";
+import { renderingComplete } from "./formatted-labels.js";
 
 /**
  * Export the chart in the desired format
  * @param {string} format 
  */
-export function exportImage(chartSelector, format) {
+export async function exportImage(chartSelector, format) {
 
-  // Set the form as clean the user downloads the image
+  await renderingComplete().catch(reason => {
+    $(".rocrate-download-and-spinner .loading-spinner").addClass("hidden");
+    alert("Error rendering plot: " + reason);
+    return
+  });
+
+  // Set the form as clean when the user downloads the image
   cleanDirtyForms();
 
   $(chartSelector)[0].toBlob((blob) => {
