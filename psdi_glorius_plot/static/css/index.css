@@ -180,9 +180,10 @@ ol.no-bullet {
 .multicol-on-big-screen {
   display        : flex;
   flex-direction : row;
-  justify-content: flex-start;
+  justify-content: stretch;
   gap            : 1rem;
   align-items    : flex-start;
+  width          : 100%;
 }
 
 .w20-on-big-fr-on-small {
@@ -205,7 +206,8 @@ ol.no-bullet {
 }
 
 .multicol-element {
-  flex: 0 1 auto;
+  /* Flex basis is arbitray here as long as it's smaller than the smallest element */
+  flex: 1 0 1rem;
 }
 
 .small-screen-only {
@@ -475,6 +477,10 @@ input.rel-deviation-value {
 
 .w20 {
   width: 20rem !important;
+}
+
+.full-width {
+  width: 100% !important;
 }
 
 .max-width-15 {
