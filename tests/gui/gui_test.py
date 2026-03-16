@@ -48,6 +48,7 @@ TIMEOUT_SHORT = 1
 TIMESTEP = 0.1
 
 PLOT_GENERATION_TIME = 0.3
+SLOW_PLOT_GENERATION_TIME = 2.0
 
 DOWNLOAD_LOCATION = "/tmp"
 EX_PLOT_FILENAME = "glorius_plot.png"
@@ -818,9 +819,6 @@ def test_download_plot(driver: WebDriver):
     # Wait a moment after the page loads so the plot can be generated
     time.sleep(PLOT_GENERATION_TIME)
 
-    # Turn off auto-updating while we do this
-    wait_for_element(driver, "//input[@id='auto-update-toggle']").click()
-
     download_button = wait_for_element(driver, "//button[@id='export-image-png']")
     download_button.click()
     _wait_for_download(qualified_download_filename)
@@ -835,10 +833,8 @@ def test_download_plot(driver: WebDriver):
                                               "//*[@id='title-input']//*[contains(@class,'ql-editor')]")
     title_input_element.send_keys("Example very very very very very long title")
 
-    # Generate it again, using the button to manually re-generate (since auto-updates are turned off)
-    generate_plot_button = wait_for_element(driver, "//button[@id='generate-plot']")
-    generate_plot_button.click()
-    time.sleep(PLOT_GENERATION_TIME)
+    # Give extra time to generate the plot with labels
+    time.sleep(SLOW_PLOT_GENERATION_TIME)
 
     # Download it again
     scroll_element_into_view(driver, download_button).click()
@@ -861,10 +857,8 @@ def test_download_plot(driver: WebDriver):
     for label_input_element in l_label_input_elements:
         label_input_element.send_keys("Label")
 
-    # Generate it again, using the button to manually re-generate (since auto-updates are turned off)
-    generate_plot_button = wait_for_element(driver, "//button[@id='generate-plot']")
-    generate_plot_button.click()
-    time.sleep(PLOT_GENERATION_TIME)
+    # Give extra time to generate the plot with labels
+    time.sleep(SLOW_PLOT_GENERATION_TIME)
 
     # Download it again
     scroll_element_into_view(driver, download_button).click()
@@ -880,8 +874,7 @@ def test_download_plot(driver: WebDriver):
     # Now, fill the table with example data, wait for the plot to be re-generated, and download again
     wait_for_element(driver, "//button[@id='fill-example']").click()
     assert wait_for_condition(lambda: _get_num_condition_rows(driver) == 10)
-    scroll_element_into_view(driver, generate_plot_button).click()
-    time.sleep(PLOT_GENERATION_TIME)
+    time.sleep(SLOW_PLOT_GENERATION_TIME)
 
     scroll_element_into_view(driver, download_button).click()
     _wait_for_download(qualified_download_filename)
