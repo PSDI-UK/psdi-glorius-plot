@@ -189,6 +189,10 @@ ol.no-bullet {
   width          : 100%;
 }
 
+.multicol-on-big-screen.tiny-col-gap {
+  column-gap: 2px;
+}
+
 .multicol-on-big-screen.tiny-row-gap {
   row-gap: 2px;
 }
@@ -215,7 +219,7 @@ ol.no-bullet {
 }
 
 .left-justify .multicol-element {
-  /* If we want to left-justify, we don't to grow elements */
+  /* If we want to left-justify, we don't want to grow elements */
   flex: 0 1 auto;
 }
 
@@ -225,6 +229,14 @@ ol.no-bullet {
 
 .w20-on-big-fr-on-small {
   width: 20rem !important;
+}
+
+#save-data-container {
+  flex: 0 1 max-content;
+}
+
+#load-data-container {
+  flex: 0 1 max-content;
 }
 
 @media (max-width: 700px) {
@@ -257,7 +269,9 @@ ol.no-bullet {
     display: default;
   }
 
-  .left-justify .multicol-element {
+  .left-justify .multicol-element,
+  .left-justify #save-data-container,
+  .left-justify #load-data-container {
     flex: 1 0 1rem;
   }
 }
@@ -292,7 +306,9 @@ ol.no-bullet {
     display: default;
   }
 
-  .m900.left-justify .multicol-element {
+  .m900.left-justify .multicol-element,
+  .m900.left-justify #save-data-container,
+  .m900.left-justify #load-data-container {
     flex: 1 0 1rem;
   }
 }
@@ -328,6 +344,12 @@ ol.no-bullet {
   }
 
   .m950.left-justify .multicol-element {
+    flex: 1 0 1rem;
+  }
+
+  .m950.left-justify .multicol-element,
+  .m950.left-justify #save-data-container,
+  .m950.left-justify #load-data-container {
     flex: 1 0 1rem;
   }
 }
