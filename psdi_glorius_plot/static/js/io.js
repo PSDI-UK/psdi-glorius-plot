@@ -45,7 +45,11 @@ export async function exportImage(chartSelector, format, spinnerSelector = null)
  * @param {string} filename 
  */
 export function saveObject(obj, filename) {
-  let blob = new Blob([JSON.stringify(obj)], { type: "text/plain;charset=utf-8" });
+  saveText(JSON.stringify(obj), filename);
+}
+
+export function saveText(text, filename) {
+  let blob = new Blob([text], { type: "text/plain;charset=utf-8" });
   saveBlob(blob, filename);
 }
 

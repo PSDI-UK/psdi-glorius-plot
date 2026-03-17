@@ -6,7 +6,7 @@
 
 import { initDirtyForms, cleanDirtyForms, checkIsDirty } from "./dirty-forms.js";
 import { mixHexes } from "./color-mixing.js"
-import { exportImage, loadObject, makeCsv, saveBlob, saveObject } from "./io.js"
+import { exportImage, loadObject, makeCsv, saveBlob, saveObject, saveText } from "./io.js"
 import { clamp, forenameToInitials, getWebKitMode, surnameToCapitalized } from "./utility.js"
 import {
   addQuillEditor, getQuillEditor, getQuillEditorHTML, setQuillEditor, removeQuillEditor, updateQuillContents,
@@ -1800,10 +1800,26 @@ function generateIfUpdating() {
  * Generates the image as .svg for export
  */
 async function exportSvg() {
+  $("#export-image-buttons .loading-spinner").removeClass("hidden");
+
   const ctx = C2S(getWidth(), getHeight());
   generatePlot(ctx);
-  await renderingComplete();
+
+  let renderFailed = false;
+  await renderingComplete().catch(reason => {
+    renderFailed = true;
+    alert("Error rendering plot: " + reason);
+  });
+  if (renderFailed) {
+    $("#export-image-buttons .loading-spinner").addClass("hidden");
+    return;
+  }
+
   const serializedSvg = ctx.getSerializedSvg(true);
+
+  $("#export-image-buttons .loading-spinner").addClass("hidden");
+
+  saveText(serializedSvg, "glorius_plot.svg");
 }
 
 /**
