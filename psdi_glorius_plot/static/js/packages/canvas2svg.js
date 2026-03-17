@@ -1204,16 +1204,6 @@
   ctx.prototype.globalCompositeOperation = function () { };
   ctx.prototype.setTransform = function () { };
 
-  //add options for alternative namespace
-  if (typeof window === "object") {
-    window.C2S = ctx;
-  }
-
-  // CommonJS/Browserify
-  if (typeof module === "object" && typeof module.exports === "object") {
-    module.exports = ctx;
-  }
-
   // Extra code needed to get canvas2svg to work with ChartJS, per https://stackoverflow.com/a/47943363
 
   ctx.prototype.getContext = function (contextId) {
@@ -1233,6 +1223,16 @@
 
   ctx.prototype.addEventListener = function (type, listener, eventListenerOptions) {
     console.log("canvas2svg.addEventListener() not implemented.")
+  }
+
+  //add options for alternative namespace
+  if (typeof window === "object") {
+    window.C2S = ctx;
+  }
+
+  // CommonJS/Browserify
+  if (typeof module === "object" && typeof module.exports === "object") {
+    module.exports = ctx;
   }
 
 }());
