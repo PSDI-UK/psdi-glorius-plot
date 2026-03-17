@@ -158,7 +158,7 @@ const ROCRATE_PLOT_DIR = ROCRATE_DATA_DIR + "plot/"
 let tooltipList;
 
 // Globals relating to plot generation
-let autoUpdating = false, radarChart = null;
+let autoUpdating = false, gloriusPlot = null;
 let lastAspectRatio, lastLabelFontSizeWidthRatio, lastLabelFontSizeHeightRatio,
   lastAxisFontSizeWidthRatio, lastAxisFontSizeHeightRatio;
 let initWidth, initHeight, initLabelFontSize, initAxisFontSize;
@@ -1312,7 +1312,7 @@ function calcDeviation() {
 /**
  * Generate the plot using all the provided data
  */
-async function generatePlot() {
+async function generatePlot(context = null) {
 
   // Increment the render batch, so text from previous renders won't load, and store the value of the previous batch
   let renderBatch = incrementRenderBatch();
@@ -1698,9 +1698,20 @@ async function generatePlot() {
     color: COLOR_TRANSPARENT,
   }
 
-  if (radarChart === null) {
+  let plot;
+
+  if (gloriusPlot === null || context !== null) {
     // Generate the plot for the first time
-    radarChart = new Chart(CHART_ID, {
+
+    // If the context wasn't provided, use the default on the page. If it was, make a custom plot for that context
+    let usingDefaultContext = true;
+    if (context === null) {
+      context = CHART_ID;
+    } else {
+      usingDefaultContext = false;
+    }
+
+    plot = new Chart(context, {
       type: "radar",
       data: {
         labels: lOutputConditionLabels,
@@ -1724,24 +1735,29 @@ async function generatePlot() {
         animation: false
       }
     })
+
+    if (usingDefaultContext) {
+      gloriusPlot = plot;
+    }
   } else {
-    radarChart.data = {
+    plot = gloriusPlot;
+    plot.data = {
       labels: lOutputConditionLabels,
       datasets: lDatasets,
     }
-    radarChart.options.aspectRatio = getAspectRatio();
-    radarChart.options.scales.r = plotROptions;
-    radarChart.options.plugins.legend = plotLegendOptions;
-    radarChart.options.plugins.title = plotTitleOptions;
-    radarChart.resize(getWidth(), getHeight());
-    radarChart.update();
+    plot.options.aspectRatio = getAspectRatio();
+    plot.options.scales.r = plotROptions;
+    plot.options.plugins.legend = plotLegendOptions;
+    plot.options.plugins.title = plotTitleOptions;
+    plot.resize(getWidth(), getHeight());
+    plot.update();
   }
 
   // Manually draw formatted title, legend, and labels
   await waitForMathJax();
-  const ctx = radarChart.ctx;
+  const ctx = plot.ctx;
 
-  const titleBlock = radarChart.titleBlock;
+  const titleBlock = plot.titleBlock;
   drawFormatted(ctx, titleHTML,
     (titleBlock.left + titleBlock.right) / 2, titleBlock.top + titleBlock.options.padding + 0.125 * labelFontSize,
     labelFontSize, "center", renderBatch);
@@ -1749,7 +1765,7 @@ async function generatePlot() {
   // Font sizing ends up being different in WebKit-based browsers, so we need to use different alignment here since
   // this is left-aligned and we need to make sure the label is close to the box
   let legendLeftOffset, legendTopOffset;
-  const legendHitBox = radarChart.legend.legendHitBoxes[0];
+  const legendHitBox = plot.legend.legendHitBoxes[0];
   if (legendHitBox) {
     if (getWebKitMode()) {
       legendLeftOffset = 1.5 * alignmentFontSize - 0.0325 * legendHitBox.width;
@@ -1762,7 +1778,7 @@ async function generatePlot() {
       legendHitBox.left + legendLeftOffset, legendHitBox.top + legendTopOffset, labelFontSize, "left", renderBatch);
   }
 
-  const lPointLabelItems = radarChart.scales.r._pointLabelItems;
+  const lPointLabelItems = plot.scales.r._pointLabelItems;
   for (let i = 0; i < lConditionData.length; ++i) {
     const conditionData = lConditionData[i];
     const labelData = lPointLabelItems[conditionData.displayIndex];
@@ -1778,6 +1794,16 @@ async function generatePlot() {
 function generateIfUpdating() {
   if (autoUpdating)
     generatePlot();
+}
+
+/**
+ * Generates the image as .svg for export
+ */
+async function exportSvg() {
+  const ctx = C2S(getWidth(), getHeight());
+  generatePlot(ctx);
+  await renderingComplete();
+  const serializedSvg = ctx.getSerializedSvg(true);
 }
 
 /**
@@ -2705,6 +2731,7 @@ function enableButtons() {
 
   $("#export-image-png").on("click", () => exportImage(CHART_SELECTOR, "png",
     "#export-image-buttons .loading-spinner"));
+  $("#export-image-svg").on("click", exportSvg);
   $("#export-rocrate-start").on("click", startROCrateExport);
 
   $("#save-data").on("click", () => saveObject(getPlotData(), "glorius_plot_data.json"));
