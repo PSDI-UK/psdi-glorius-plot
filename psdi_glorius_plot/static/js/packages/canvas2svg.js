@@ -10,8 +10,7 @@
  *
  *  Copyright (c) 2014 Gliffy Inc.
  * 
- *  Modified by Bryan Gillis to include code by sspecht to get this to work with ChartJS:
- *  https://stackoverflow.com/a/47943363
+ *  Modified by Bryan Gillis to include extra code and patches needed to get it working with ChartJS
  */
 
 ; (function () {
@@ -1226,9 +1225,191 @@
     console.log("canvas2svg.addEventListener() not implemented.")
   }
 
+  // Patches for known issue with save and restore from
+  // https://github.com/gliffy/canvas2svg/issues/44#issuecomment-1961132569
+
+  const save = ctx.prototype.save;
+  ctx.prototype.save = function () {
+    /**
+     * @PATCH Keep the path as `__currentElement` so that `ctx.fill()` triggering `__applyCurrentDefaultPath`
+     * won't error
+     */
+    if (this.__currentElement.nodeName === "path") {
+      !this.prevented && (this.prevented = 0);
+      this.prevented += 1;
+      return;
+    }
+
+    save.call(this)
+  };
+
+  const restore = ctx.prototype.restore;
+  ctx.prototype.restore = function () {
+    /** @PATCH Check if this `ctx.restore()` was prevented */
+    if (this.__currentElement.nodeName === "path" && this.prevented) {
+      this.prevented -= 1;
+      return;
+    }
+
+    restore.call(this)
+  };
+
+  // Patch to draw lines
+  function patch_linedata(data, width) {
+
+    let dw = width / 2;
+
+    let segments = data.map((_, idx) => [data[idx], data[idx + 1]]);
+    --segments.length;
+
+    let angles = segments.map(([a, b]) => {
+
+      let dx = b[0] - a[0];
+      let dy = b[1] - a[1];
+
+      return Math.atan(dy / dx);
+    });
+
+    let upline = new Array(segments.length * 2);
+    let downline = new Array(segments.length * 2);
+    for (let i = 0; i < segments.length; ++i) {
+
+      let langle = Math.PI - (angles[i] + Math.PI / 2);
+
+      let dx = Math.cos(langle) * dw;
+      let dy = - Math.sin(langle) * dw;
+
+      for (let j = 0; j < segments[i].length; ++j) {
+        let point = segments[i][j];
+        upline[2 * i + j] = [point[0] + dx, point[1] + dy];
+        downline[2 * i + j] = [point[0] - dx, point[1] - dy];
+      }
+    }
+
+    function merge_segments(line) {
+
+      let result = new Array(line.length / 2 + 1);
+
+      result[0] = line[0];
+      result[result.length - 1] = line[line.length - 1];
+
+      for (let i = 1; i < line.length / 2; ++i) {
+
+        let seg1 = [line[(i - 1) * 2], line[(i - 1) * 2 + 1]];
+        let seg2 = [line[i * 2], line[i * 2 + 1]];
+
+        // y = ax + b
+        function calcParams(seg) {
+
+          let dx = seg[1][0] - seg[0][0];
+          let dy = seg[1][1] - seg[0][1];
+
+          let a = dy / dx;
+          let b = seg[0][1] - a * seg[0][0];
+
+          return [a, b];
+        }
+
+        let [a1, b1] = calcParams(seg1);
+        let [a2, b2] = calcParams(seg2);
+
+        if (a1 === a2 || Number.isNaN(a1 - b2)) {
+          result[i] = seg2[0];
+          continue;
+        }
+
+        if (a1 === Number.POSITIVE_INFINITY || a1 === Number.NEGATIVE_INFINITY) {
+          let x = seg1[0][0];
+          let y = a2 * x + b2;
+          result[i] = [x, y];
+          continue;
+        }
+        if (a2 === Number.POSITIVE_INFINITY || a2 === Number.NEGATIVE_INFINITY) {
+          let x = seg2[0][0];
+          let y = a1 * x + b1;
+          result[i] = [x, y];
+          continue;
+        }
+
+        let x = -(b1 - b2) / (a1 - a2);
+        let y = a1 * x + b1;
+
+        result[i] = [x, y];
+      }
+
+      return result;
+    }
+
+    upline = merge_segments(upline);
+    downline = merge_segments(downline);
+
+    if (upline[0][0] < downline[0][0])
+      downline.unshift(upline[0]);
+    else
+      upline.unshift(downline[0]);
+
+    let last_up = upline[upline.length - 1];
+    let last_down = downline[downline.length - 1];
+    if (last_up[0] > last_down[0])
+      downline.push(last_up);
+    else
+      upline.push(last_down);
+
+    return {
+      upline,
+      downline
+    }
+  }
+  function patch_line(line_cfg,
+    config,
+    scales
+  ) {
+
+    let data = line_cfg.data.map((point) => [
+      scales.x.getPixelForValue(point[0]),
+      scales.y.getPixelForValue(point[1])
+    ]);
+
+    let { upline, downline } = patch_linedata(data, line_cfg.borderWidth ?? 3); // 3 is default for line/scatter
+
+    function px2val(data) {
+
+      return data.map(point => [
+        scales.x.getValueForPixel(point[0]),
+        scales.y.getValueForPixel(point[1])
+      ]);
+    }
+
+    let upline_cfg = Object.assign({}, line_cfg, {
+      data: px2val(upline),
+      pointRadius: 0,
+      fill: {
+        target: '+1',
+        above: line_cfg.borderColor,
+        below: line_cfg.borderColor,
+      }
+    });
+
+    let downline_cfg = Object.assign({}, line_cfg, {
+      data: px2val(downline),
+      pointRadius: 0,
+      fill: {}
+    });
+
+    config.data.datasets.push(upline_cfg, downline_cfg);
+  }
+  function patch_graph(config, scales) {
+
+    let lines = config.data.datasets.filter(d => d.showLine === true);
+
+    for (let line of lines)
+      patch_line(line, config, scales);
+  }
+
   //add options for alternative namespace
   if (typeof window === "object") {
     window.C2S = ctx;
+    window.patch_graph = patch_graph;
   }
 
   // CommonJS/Browserify

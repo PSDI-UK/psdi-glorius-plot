@@ -1703,15 +1703,7 @@ async function generatePlot(context = null) {
   if (gloriusPlot === null || context !== null) {
     // Generate the plot for the first time
 
-    // If the context wasn't provided, use the default on the page. If it was, make a custom plot for that context
-    let usingDefaultContext = true;
-    if (context === null) {
-      context = CHART_ID;
-    } else {
-      usingDefaultContext = false;
-    }
-
-    plot = new Chart(context, {
+    let config = {
       type: "radar",
       data: {
         labels: lOutputConditionLabels,
@@ -1734,7 +1726,21 @@ async function generatePlot(context = null) {
         },
         animation: false
       }
-    })
+    };
+
+    // If the context wasn't provided, use the default on the page. If it was, make a custom plot for that context
+    let usingDefaultContext = true;
+    if (context === null) {
+      context = CHART_ID;
+    } else {
+      usingDefaultContext = false;
+      // Apply patch so ChartJS's lines can be rendered in SVG as regions
+      const tmpContext = C2S(getWidth(), getHeight());
+      const tmpChart = new Chart(tmpContext, config);
+      patch_graph(config, tmpChart.scales);
+    }
+
+    plot = new Chart(context, config);
 
     if (usingDefaultContext) {
       gloriusPlot = plot;
