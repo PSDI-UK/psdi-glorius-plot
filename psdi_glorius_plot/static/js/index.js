@@ -1887,7 +1887,7 @@ function fillExample() {
   cleanDirtyForms();
 
   // Clear all tooltips after generating, since clicking the button interferes with the normal trigger to clear its
-  // tooltip. This needs to be delayed slightly since after clicking the alert, the tooltip handler things the mouse
+  // tooltip. This needs to be delayed slightly since after clicking the alert, the tooltip handler thinks the mouse
   // will still be over the button
   setTimeout(clearTooltips, 100);
 }
