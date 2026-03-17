@@ -1203,6 +1203,7 @@
   ctx.prototype.putImageData = function () { };
   ctx.prototype.globalCompositeOperation = function () { };
   ctx.prototype.setTransform = function () { };
+  ctx.prototype.resetTransform = function () { };
 
   // Extra code needed to get canvas2svg to work with ChartJS, per https://stackoverflow.com/a/47943363
 
