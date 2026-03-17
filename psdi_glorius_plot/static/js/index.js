@@ -173,6 +173,28 @@ let lastLicenseVal = "none", lastLicenseName = "", lastLicenseUrl = "";
 let lastDatasetTitle, lastDatasetDesc, lastDatasetAbout, lastCitation;
 let userHasEditedCitation = false;
 
+function loadScript(scriptUrl) {
+  const script = document.createElement('script');
+  script.src = scriptUrl;
+  document.body.appendChild(script);
+
+  return new Promise((res, rej) => {
+    script.onload = function () {
+      res();
+    }
+    script.onerror = function () {
+      rej();
+    }
+  });
+}
+
+const backupPath2D = Path2D;
+Path2D = null;
+loadScript("https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js")
+  .finally(() => {
+    Path2D = backupPath2D;
+  });
+
 /**
  * A ChartJS plugin which allows a custom background color for the plot
  */
@@ -1734,10 +1756,6 @@ async function generatePlot(context = null) {
       context = CHART_ID;
     } else {
       usingDefaultContext = false;
-      // Apply patch so ChartJS's lines can be rendered in SVG as regions
-      const tmpContext = C2S(getWidth(), getHeight());
-      const tmpChart = new Chart(tmpContext, config);
-      patch_graph(config, tmpChart.scales);
     }
 
     plot = new Chart(context, config);
@@ -3025,6 +3043,7 @@ $(document).ready(function () {
   L_DIMS.forEach(dim => initNumDimControls(dim));
   enableOnChangeTriggers(), enableToggles(), enableButtons(), enableNavigation();
 
+  // TODO: Wait for first enable of auto updates until ChartJS is loaded
   enableDeviationCalc(), enableAutoUpdates(), enableCanvasUpdate();
 
   enableROCrateOnChangeTriggers();
