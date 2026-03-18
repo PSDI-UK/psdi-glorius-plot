@@ -1138,6 +1138,19 @@
           parent.appendChild(group);
         }
       }
+    } else if (image.svgHTML) {
+      // SVG image passed along with its source
+      svgImage = this.__createElement("g");
+      svgImage.innerHTML = image.svgHTML;
+
+      svgImage.setAttribute("transform", `translate(${dx},${dy}) scale(${image.scale})`);
+
+      // Remove elements of the source which can't be contained here
+      let svgNode = svgImage.childNodes[0];
+      svgNode.removeAttribute("xmlns");
+      svgNode.removeAttribute("xmlns:xlink");
+
+      parent.appendChild(svgImage);
     } else if (image.nodeName === "CANVAS" || image.nodeName === "IMG") {
       //canvas or image
       svgImage = this.__createElement("image");
