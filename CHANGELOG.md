@@ -1,6 +1,6 @@
 # Changelog for PSDI Glorius Plot Generator
 
-## v0.3
+## v0.3.0
 
 ### New and Changed Functionality
 
