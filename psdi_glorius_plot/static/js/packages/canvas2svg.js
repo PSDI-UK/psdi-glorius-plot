@@ -10,7 +10,8 @@
  *
  *  Copyright (c) 2014 Gliffy Inc.
  * 
- *  Modified by Bryan Gillis to include extra code and patches needed to get it working with ChartJS
+ *  Modified by Bryan Gillis to include extra code and patches needed to get it working with ChartJS and improve
+ *  embedding of SVGs for formatted text passed by the Glorius Plot Generator
  */
 
 ; (function () {
