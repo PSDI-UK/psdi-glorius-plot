@@ -173,27 +173,26 @@ let lastLicenseVal = "none", lastLicenseName = "", lastLicenseUrl = "";
 let lastDatasetTitle, lastDatasetDesc, lastDatasetAbout, lastCitation;
 let userHasEditedCitation = false;
 
+/**
+ * Loads a script as if it were loaded in the webpage
+ * @param {String} scriptUrl 
+ * @returns Promise
+ */
 function loadScript(scriptUrl) {
   const script = document.createElement('script');
   script.src = scriptUrl;
   document.body.appendChild(script);
 
-  return new Promise((res, rej) => {
+  return new Promise((resolve, reject) => {
     script.onload = function () {
-      res();
+      resolve();
     }
     script.onerror = function () {
-      rej();
+      console.error("Remote script " + scriptUrl + " could not be loaded");
+      reject();
     }
   });
 }
-
-const backupPath2D = Path2D;
-Path2D = null;
-loadScript("https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js")
-  .finally(() => {
-    Path2D = backupPath2D;
-  });
 
 /**
  * A ChartJS plugin which allows a custom background color for the plot
@@ -3044,7 +3043,7 @@ $(document).ready(function () {
   enableOnChangeTriggers(), enableToggles(), enableButtons(), enableNavigation();
 
   // TODO: Wait for first enable of auto updates until ChartJS is loaded
-  enableDeviationCalc(), enableAutoUpdates(), enableCanvasUpdate();
+  enableDeviationCalc(), enableCanvasUpdate();
 
   enableROCrateOnChangeTriggers();
   postContribRowUpdate();
@@ -3064,4 +3063,16 @@ $(document).ready(function () {
       useDefaultCitation();
     }, 100);
   }
+
+  // To work around an incompatibility between new versions of ChartJS and canvas2svg, we temporarily disable the
+  // browser's Path2D functionality to force ChartJS to load into its backwards-compatibility mode which canvas2svg can
+  // handle. We wait on the first generation of the plot until ChartJS is loaded.
+  // WARNING: Anything which relies on Path2D should wait for this to finish before running
+  const backupPath2D = Path2D;
+  Path2D = null;
+  loadScript("https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js")
+    .finally(() => {
+      Path2D = backupPath2D;
+      enableAutoUpdates();
+    });
 });
