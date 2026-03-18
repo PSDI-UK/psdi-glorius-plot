@@ -6,7 +6,7 @@
 
 import { initDirtyForms, cleanDirtyForms, checkIsDirty } from "./dirty-forms.js";
 import { mixHexes } from "./color-mixing.js"
-import { exportImage, loadObject, makeCsv, saveBlob, saveObject } from "./io.js"
+import { exportImage, loadObject, makeCsv, saveBlob, saveObject, saveText } from "./io.js"
 import { clamp, forenameToInitials, getWebKitMode, surnameToCapitalized } from "./utility.js"
 import {
   addQuillEditor, getQuillEditor, getQuillEditorHTML, setQuillEditor, removeQuillEditor, updateQuillContents,
@@ -158,7 +158,7 @@ const ROCRATE_PLOT_DIR = ROCRATE_DATA_DIR + "plot/"
 let tooltipList;
 
 // Globals relating to plot generation
-let autoUpdating = false, radarChart = null;
+let autoUpdating = false, gloriusPlot = null;
 let lastAspectRatio, lastLabelFontSizeWidthRatio, lastLabelFontSizeHeightRatio,
   lastAxisFontSizeWidthRatio, lastAxisFontSizeHeightRatio;
 let initWidth, initHeight, initLabelFontSize, initAxisFontSize;
@@ -172,6 +172,27 @@ let lastColorVal = "colourblind", lastCustomColorMin = null, lastCustomColorMax 
 let lastLicenseVal = "none", lastLicenseName = "", lastLicenseUrl = "";
 let lastDatasetTitle, lastDatasetDesc, lastDatasetAbout, lastCitation;
 let userHasEditedCitation = false;
+
+/**
+ * Loads a script as if it were loaded in the webpage
+ * @param {String} scriptUrl 
+ * @returns Promise
+ */
+function loadScript(scriptUrl) {
+  const script = document.createElement('script');
+  script.src = scriptUrl;
+  document.body.appendChild(script);
+
+  return new Promise((resolve, reject) => {
+    script.onload = function () {
+      resolve();
+    }
+    script.onerror = function () {
+      console.error("Remote script " + scriptUrl + " could not be loaded");
+      reject();
+    }
+  });
+}
 
 /**
  * A ChartJS plugin which allows a custom background color for the plot
@@ -1312,7 +1333,7 @@ function calcDeviation() {
 /**
  * Generate the plot using all the provided data
  */
-async function generatePlot() {
+async function generatePlot(context = null) {
 
   // Increment the render batch, so text from previous renders won't load, and store the value of the previous batch
   let renderBatch = incrementRenderBatch();
@@ -1698,9 +1719,12 @@ async function generatePlot() {
     color: COLOR_TRANSPARENT,
   }
 
-  if (radarChart === null) {
+  let plot;
+
+  if (gloriusPlot === null || context !== null) {
     // Generate the plot for the first time
-    radarChart = new Chart(CHART_ID, {
+
+    let config = {
       type: "radar",
       data: {
         labels: lOutputConditionLabels,
@@ -1723,25 +1747,40 @@ async function generatePlot() {
         },
         animation: false
       }
-    })
+    };
+
+    // If the context wasn't provided, use the default on the page. If it was, make a custom plot for that context
+    let usingDefaultContext = true;
+    if (context === null) {
+      context = CHART_ID;
+    } else {
+      usingDefaultContext = false;
+    }
+
+    plot = new Chart(context, config);
+
+    if (usingDefaultContext) {
+      gloriusPlot = plot;
+    }
   } else {
-    radarChart.data = {
+    plot = gloriusPlot;
+    plot.data = {
       labels: lOutputConditionLabels,
       datasets: lDatasets,
     }
-    radarChart.options.aspectRatio = getAspectRatio();
-    radarChart.options.scales.r = plotROptions;
-    radarChart.options.plugins.legend = plotLegendOptions;
-    radarChart.options.plugins.title = plotTitleOptions;
-    radarChart.resize(getWidth(), getHeight());
-    radarChart.update();
+    plot.options.aspectRatio = getAspectRatio();
+    plot.options.scales.r = plotROptions;
+    plot.options.plugins.legend = plotLegendOptions;
+    plot.options.plugins.title = plotTitleOptions;
+    plot.resize(getWidth(), getHeight());
+    plot.update();
   }
 
   // Manually draw formatted title, legend, and labels
   await waitForMathJax();
-  const ctx = radarChart.ctx;
+  const ctx = plot.ctx;
 
-  const titleBlock = radarChart.titleBlock;
+  const titleBlock = plot.titleBlock;
   drawFormatted(ctx, titleHTML,
     (titleBlock.left + titleBlock.right) / 2, titleBlock.top + titleBlock.options.padding + 0.125 * labelFontSize,
     labelFontSize, "center", renderBatch);
@@ -1749,7 +1788,7 @@ async function generatePlot() {
   // Font sizing ends up being different in WebKit-based browsers, so we need to use different alignment here since
   // this is left-aligned and we need to make sure the label is close to the box
   let legendLeftOffset, legendTopOffset;
-  const legendHitBox = radarChart.legend.legendHitBoxes[0];
+  const legendHitBox = plot.legend.legendHitBoxes[0];
   if (legendHitBox) {
     if (getWebKitMode()) {
       legendLeftOffset = 1.5 * alignmentFontSize - 0.0325 * legendHitBox.width;
@@ -1762,7 +1801,7 @@ async function generatePlot() {
       legendHitBox.left + legendLeftOffset, legendHitBox.top + legendTopOffset, labelFontSize, "left", renderBatch);
   }
 
-  const lPointLabelItems = radarChart.scales.r._pointLabelItems;
+  const lPointLabelItems = plot.scales.r._pointLabelItems;
   for (let i = 0; i < lConditionData.length; ++i) {
     const conditionData = lConditionData[i];
     const labelData = lPointLabelItems[conditionData.displayIndex];
@@ -1778,6 +1817,32 @@ async function generatePlot() {
 function generateIfUpdating() {
   if (autoUpdating)
     generatePlot();
+}
+
+/**
+ * Generates the image as .svg for export
+ */
+async function exportSvg() {
+  $("#export-image-buttons .loading-spinner").removeClass("hidden");
+
+  const ctx = C2S(getWidth(), getHeight());
+  generatePlot(ctx);
+
+  let renderFailed = false;
+  await renderingComplete().catch(reason => {
+    renderFailed = true;
+    alert("Error rendering plot: " + reason);
+  });
+  if (renderFailed) {
+    $("#export-image-buttons .loading-spinner").addClass("hidden");
+    return;
+  }
+
+  const serializedSvg = ctx.getSerializedSvg(true);
+
+  $("#export-image-buttons .loading-spinner").addClass("hidden");
+
+  saveText(serializedSvg, "glorius_plot.svg");
 }
 
 /**
@@ -2705,6 +2770,7 @@ function enableButtons() {
 
   $("#export-image-png").on("click", () => exportImage(CHART_SELECTOR, "png",
     "#export-image-buttons .loading-spinner"));
+  $("#export-image-svg").on("click", exportSvg);
   $("#export-rocrate-start").on("click", startROCrateExport);
 
   $("#save-data").on("click", () => saveObject(getPlotData(), "glorius_plot_data.json"));
@@ -2976,7 +3042,8 @@ $(document).ready(function () {
   L_DIMS.forEach(dim => initNumDimControls(dim));
   enableOnChangeTriggers(), enableToggles(), enableButtons(), enableNavigation();
 
-  enableDeviationCalc(), enableAutoUpdates(), enableCanvasUpdate();
+  // TODO: Wait for first enable of auto updates until ChartJS is loaded
+  enableDeviationCalc(), enableCanvasUpdate();
 
   enableROCrateOnChangeTriggers();
   postContribRowUpdate();
@@ -2996,4 +3063,16 @@ $(document).ready(function () {
       useDefaultCitation();
     }, 100);
   }
+
+  // To work around an incompatibility between new versions of ChartJS and canvas2svg, we temporarily disable the
+  // browser's Path2D functionality to force ChartJS to load into its backwards-compatibility mode which canvas2svg can
+  // handle. We wait on the first generation of the plot until ChartJS is loaded.
+  // WARNING: Anything which relies on Path2D should wait for this to finish before running
+  const backupPath2D = Path2D;
+  Path2D = null;
+  loadScript("https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js")
+    .finally(() => {
+      Path2D = backupPath2D;
+      enableAutoUpdates();
+    });
 });

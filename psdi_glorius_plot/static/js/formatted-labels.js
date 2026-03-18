@@ -276,9 +276,10 @@ export async function drawFormatted(ctx, labelHTML, x, y, fontSize, hAlign, rend
 
   let DOMURL = window.URL || window.webkitURL || window;
   let img1 = new Image();
+  img1.svgHTML = svgHTML;
   let svg = new Blob([svgHTML], { type: 'image/svg+xml' });
   let url = DOMURL.createObjectURL(svg);
-  let scale = MATHJAX_BASE_FONT_SCALING * fontSize / MATHJAX_DEFAULT_FONT_SIZE;
+  img1.scale = MATHJAX_BASE_FONT_SCALING * fontSize / MATHJAX_DEFAULT_FONT_SIZE;
 
   // Keep track of the render batch where this was triggered, and only draw it if it's loaded in the same batch
   img1.renderBatch = renderBatch;
@@ -286,8 +287,8 @@ export async function drawFormatted(ctx, labelHTML, x, y, fontSize, hAlign, rend
   img1.onload = function () {
     --numAwaitingRender;
     if (img1.renderBatch == currentRenderBatch) {
-      let w = img1.naturalWidth * scale;
-      let h = img1.naturalHeight * scale;
+      let w = img1.naturalWidth * img1.scale;
+      let h = img1.naturalHeight * img1.scale;
       let finalX = x;
       if (hAlign == "center")
         finalX -= w / 2;
