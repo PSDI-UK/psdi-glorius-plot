@@ -776,8 +776,18 @@ details summary:active {
   bottom: calc(var(--ql-height) - 2px);
 }
 
+.ql-toolbar.ql-snow.visible {
+  display: block;
+}
+
 .symbol-palette {
   bottom: calc(2rem + var(--ql-height) - 2px);
+  width : 20rem;
+}
+
+.symbol-palette.visible {
+  display              : grid;
+  grid-template-columns: repeat(auto-fit, 1fr);
 }
 
 .ql-toolbar.ql-snow .ql-formats {
@@ -786,9 +796,19 @@ details summary:active {
 
 .ql-toolbar.ql-snow .ql-formats button,
 .symbol-palette button {
-  color : var(--ifm-font-color-base);
-  margin: 0px;
+  background: none;
+  border    : none;
+  cursor    : pointer;
+  display   : inline-block;
+  float     : left;
+  height    : 24px;
+  padding   : 3px 5px;
+  width     : 28px;
+  color     : var(--ifm-font-color-base);
+  margin    : 0px;
 }
+
+
 
 .ql-toolbar.ql-snow .ql-formats button:hover .ql-stroke,
 .ql-toolbar.ql-snow .ql-formats button .ql-stroke {
@@ -801,8 +821,7 @@ details summary:active {
 }
 
 .ql-toolbar.ql-snow .ql-formats button:hover.ql-active,
-.ql-toolbar.ql-snow .ql-formats button.ql-active,
-.symbol-palette button.ql-active {
+.ql-toolbar.ql-snow .ql-formats button.ql-active {
   color: #06c;
 }
 
@@ -831,11 +850,6 @@ details summary:active {
 .symbol-palette .button-text {
   font-weight: bold;
   translate  : 0 -2px;
-}
-
-.ql-toolbar.ql-snow.visible,
-.symbol-palette.visible {
-  display: block;
 }
 
 .ql-editor {

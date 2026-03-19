@@ -41,10 +41,15 @@ export function addQuillEditor(selector, placeholder = "") {
   // Add a toolbar before this element if one doesn't already exist, and a symbol palette before that
   const prevEl = el.prev();
   if (prevEl.length == 0 || !prevEl.hasClass("ql-toolbar")) {
+
     const newToolbar = $($("#quill-toolbar")[0].content.children[0].cloneNode(true));
     el.before(newToolbar);
+
     const newSymbolPalette = $($("#symbol-palette")[0].content.children[0].cloneNode(true));
     newToolbar.before(newSymbolPalette);
+
+    // Connect an event to the symbol button on the toolbar to toggle the visibility of the symbol palette
+    newToolbar.find(".insert-symbol").on("click", toggleSymbolPalette);
   }
 
   // Disable Quill's tab binding so the user can tab out of Quill's input boxes
@@ -140,7 +145,35 @@ export function enableQuillToolbar(selector) {
 }
 
 export function disableQuillToolbar(selector) {
-  $(selector).parent().find(".ql-toolbar").removeClass("visible");
+  const toolbar = $(selector).parent().find(".ql-toolbar");
+  toolbar.removeClass("visible");
+
+  // Also make sure to disable the symbol palette whenever the toolbar is disabled
+  disableSymbolPalette(selector);
+  toolbar.find(".insert-symbol").removeClass("ql-active");
+}
+
+export function enableSymbolPalette(selector) {
+  $(selector).parent().find(".symbol-palette").addClass("visible");
+}
+
+export function disableSymbolPalette(selector) {
+  $(selector).parent().find(".symbol-palette").removeClass("visible");
+}
+
+export function toggleSymbolPalette(e) {
+
+  const symbolButton = $(e.delegateTarget);
+  const symbolPalette = symbolButton.parents(":has(>.ql-toolbar)").find(".symbol-palette");
+
+  if (symbolPalette.hasClass("visible")) {
+    symbolButton.removeClass("ql-active");
+    symbolPalette.removeClass("visible");
+  }
+  else {
+    symbolButton.addClass("ql-active");
+    symbolPalette.addClass("visible");
+  }
 }
 
 export function enableQuillEvents(alwaysCallback, otherCallbacks) {
