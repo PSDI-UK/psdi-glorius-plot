@@ -19,6 +19,91 @@
 
 {% block hero_title %}PSDI Glorius Plot Generator{% endblock %}
 
+<!-- Templates used in this page -->
+<template id="quillTemplates">
+  <div class="toolbar" hidden>
+    <button type="button" class="ql-bold"></button>
+    <button type="button" class="ql-italic"></button>
+    <button type="button" class="ql-underline"></button>
+    <button type="button" class="ql-script" value="sub"></button>
+    <button type="button" class="ql-script" value="super"></button>
+    <button type="button" class="insertSymbolButton">Ω</button>
+  </div>
+
+  <div class="symbolPalette" hidden>
+    <button type="button" tabindex="0">°</button>
+    <button type="button" tabindex="0">Å</button>
+    <button type="button" tabindex="0">→</button>
+    <button type="button" tabindex="0">⟹</button>
+    <button type="button" tabindex="0">+</button>
+    <button type="button" tabindex="0">-</button>
+    <button type="button" tabindex="0">×</button>
+    <button type="button" tabindex="0">÷</button>
+    <button type="button" tabindex="0">±</button>
+    <button type="button" tabindex="0">∓</button>
+    <button type="button" tabindex="0">=</button>
+    <button type="button" tabindex="0">≠</button>
+    <button type="button" tabindex="0">&lt;</button>
+    <button type="button" tabindex="0">></button>
+    <button type="button" tabindex="0">≤</button>
+    <button type="button" tabindex="0">≥</button>
+    <button type="button" tabindex="0">≲</button>
+    <button type="button" tabindex="0">≳</button>
+    <button type="button" tabindex="0">≪</button>
+    <button type="button" tabindex="0">≫</button>
+    <button type="button" tabindex="0">α</button>
+    <button type="button" tabindex="0">β</button>
+    <button type="button" tabindex="0">γ</button>
+    <button type="button" tabindex="0">δ</button>
+    <button type="button" tabindex="0">ε</button>
+    <button type="button" tabindex="0">ζ</button>
+    <button type="button" tabindex="0">η</button>
+    <button type="button" tabindex="0">θ</button>
+    <button type="button" tabindex="0">ι</button>
+    <button type="button" tabindex="0">κ</button>
+    <button type="button" tabindex="0">λ</button>
+    <button type="button" tabindex="0">μ</button>
+    <button type="button" tabindex="0">ν</button>
+    <button type="button" tabindex="0">ξ</button>
+    <button type="button" tabindex="0">ο</button>
+    <button type="button" tabindex="0">π</button>
+    <button type="button" tabindex="0">ρ</button>
+    <button type="button" tabindex="0">ς</button>
+    <button type="button" tabindex="0">σ</button>
+    <button type="button" tabindex="0">τ</button>
+    <button type="button" tabindex="0">υ</button>
+    <button type="button" tabindex="0">φ</button>
+    <button type="button" tabindex="0">χ</button>
+    <button type="button" tabindex="0">ψ</button>
+    <button type="button" tabindex="0">ω</button>
+    <button type="button" tabindex="0">Α</button>
+    <button type="button" tabindex="0">Β</button>
+    <button type="button" tabindex="0">Γ</button>
+    <button type="button" tabindex="0">Δ</button>
+    <button type="button" tabindex="0">Ε</button>
+    <button type="button" tabindex="0">Ζ</button>
+    <button type="button" tabindex="0">Η</button>
+    <button type="button" tabindex="0">Θ</button>
+    <button type="button" tabindex="0">Ι</button>
+    <button type="button" tabindex="0">Κ</button>
+    <button type="button" tabindex="0">Λ</button>
+    <button type="button" tabindex="0">Μ</button>
+    <button type="button" tabindex="0">Ν</button>
+    <button type="button" tabindex="0">Ξ</button>
+    <button type="button" tabindex="0">Ο</button>
+    <button type="button" tabindex="0">Π</button>
+    <button type="button" tabindex="0">Ρ</button>
+    <button type="button" tabindex="0">Σ</button>
+    <button type="button" tabindex="0">Τ</button>
+    <button type="button" tabindex="0">Υ</button>
+    <button type="button" tabindex="0">Φ</button>
+    <button type="button" tabindex="0">Χ</button>
+    <button type="button" tabindex="0">Ψ</button>
+    <button type="button" tabindex="0">Ω</button>
+  </div>
+
+</template>
+
 {% block content_before_main %}
 <div class="secondary mathjax_ignore" id="instructions">
   <div class="max-width-box">

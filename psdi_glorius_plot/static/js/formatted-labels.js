@@ -9,7 +9,7 @@
 const FULL_CLASS = "ql-full";
 
 const QUILL_THEME = "snow";
-const QUILL_TOOLBAR = ['bold', 'italic', 'underline', { 'script': 'sub' }, { 'script': 'super' }];
+const QUILL_TOOLBAR_TEMPLATE = "#quillTemplates.toolbar";
 
 const MATHJAX_DEFAULT_FONT_SIZE = 16;
 const MATHJAX_BASE_FONT_SCALING = 1.125;
