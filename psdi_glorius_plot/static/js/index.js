@@ -2776,8 +2776,8 @@ function enableButtons() {
   $("#export-rocrate-start").on("click", startROCrateExport);
 
   $("#save-data").on("click", () => saveObject(getPlotData(), "glorius_plot_data.json"));
-  $("#load-data").on("click", loadPlotData);
-  $("#load-data-file").on("change", checkPlotDataFile);
+  $("#load-data").on("click", () => $("#load-data-file").click());
+  $("#load-data-file").on("change", loadPlotData);
 
   $("#reset-plot-dims").on("click", resetPlotDims);
 

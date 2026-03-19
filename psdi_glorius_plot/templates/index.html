@@ -671,22 +671,23 @@
     <label class="info-marker">Save your progress as a <code>.json</code> file or reload
       it. To reload, select a file with the “Choose File” button below, then click the “Resume Work” button.
     </label>
-    <div id="save-load-data-buttons" class="multicol-on-big-screen left-justify tiny-col-gap tiny-row-gap">
-      <div id="save-data-container" class="multicol-element">
+    <div id="save-load-data-buttons">
+      <span id="save-data-container">
         <button type="button" id="save-data" title="Save the input data and plot configuration in a .json file which
           can be loaded later to resume or share work">
           <img src="{{url_for('static', filename='img/icon-download.svg')}}" alt="Download icon" class="text-icon">
           Save Progress
         </button>
-      </div>
-      <div id="load-data-container" class="multicol-element square-border faded-border">
-        <button type="button" id="load-data" title="Load data from a previously-saved .json file
-          - select this file in the file selector to the right" disabled>
+      </span>
+      <span id="load-data-container">
+        <button type="button" id="load-data" title="Load data from a previously-saved .json file">
           <img src="{{url_for('static', filename='img/icon-upload.svg')}}" alt="Upload icon" class="text-icon">
           Resume Work
         </button>
-        <input type="file" name="load-data-file" id="load-data-file" class="small-left-margin" accept=".json">
-      </div>
+        <!-- We use a hidden file select which gets triggered when the user clicks the button, and then changing this
+         triggers loading the file -->
+        <input type="file" name="load-data-file" id="load-data-file" class="hidden" accept=".json">
+      </span>
     </div>
   </details>
 
