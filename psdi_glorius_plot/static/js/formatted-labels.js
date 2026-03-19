@@ -38,11 +38,13 @@ export function addQuillEditor(selector, placeholder = "") {
     placeholder = el.attr("placeholder").replaceAll(/\s+/gmu, " ");
   }
 
-  // Add a toolbar before this element if one doesn't already exist
+  // Add a toolbar before this element if one doesn't already exist, and a symbol palette before that
   const prevEl = el.prev();
   if (prevEl.length == 0 || !prevEl.hasClass("ql-toolbar")) {
-    const newToolbar = $("#quillToolbar")[0].content.cloneNode(true);
+    const newToolbar = $($("#quillToolbar")[0].content.children[0].cloneNode(true));
     el.before(newToolbar);
+    const newSymbolPalette = $($("#symbolPalette")[0].content.children[0].cloneNode(true));
+    newToolbar.before(newSymbolPalette);
   }
 
   // Disable Quill's tab binding so the user can tab out of Quill's input boxes
