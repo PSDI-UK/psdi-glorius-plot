@@ -814,6 +814,11 @@ details summary:active {
   background-color: var(--ifm-background-color);
 }
 
+.ql-toolbar.ql-snow .button-text {
+  font-weight: bold;
+  translate  : 0 -2px;
+}
+
 .ql-toolbar.ql-snow.visible {
   display: block;
 }
