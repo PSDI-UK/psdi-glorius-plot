@@ -2752,7 +2752,8 @@ function enableAutoUpdates() {
   // Disable deviation calculation, since that will be handled by the plot generation now
   disableDeviationCalc();
 
-  $(".trigger-chart-update, .trigger-deviation-update").on("change", generatePlot);
+  // Call generatePlot with no arguments so we don't pass something that isn't a context as the first argument
+  $(".trigger-chart-update, .trigger-deviation-update").on("change", () => generatePlot());
   autoUpdating = true;
   updateCanvasShape();
   generatePlot();
@@ -2766,7 +2767,8 @@ function enableButtons() {
   $("#fill-random").on("click", fillRandom);
   $("#fill-example").on("click", fillExample);
 
-  $("#generate-plot").on("click", generatePlot);
+  // Call generatePlot with no arguments so we don't pass something that isn't a context as the first argument
+  $("#generate-plot").on("click", () => generatePlot());
 
   $("#export-image-png").on("click", () => exportImage(CHART_SELECTOR, "png",
     "#export-image-buttons .loading-spinner"));
