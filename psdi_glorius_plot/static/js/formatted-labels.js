@@ -41,9 +41,9 @@ export function addQuillEditor(selector, placeholder = "") {
   // Add a toolbar before this element if one doesn't already exist, and a symbol palette before that
   const prevEl = el.prev();
   if (prevEl.length == 0 || !prevEl.hasClass("ql-toolbar")) {
-    const newToolbar = $($("#quillToolbar")[0].content.children[0].cloneNode(true));
+    const newToolbar = $($("#quill-toolbar")[0].content.children[0].cloneNode(true));
     el.before(newToolbar);
-    const newSymbolPalette = $($("#symbolPalette")[0].content.children[0].cloneNode(true));
+    const newSymbolPalette = $($("#symbol-palette")[0].content.children[0].cloneNode(true));
     newToolbar.before(newSymbolPalette);
   }
 

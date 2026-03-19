@@ -762,22 +762,32 @@ details summary:active {
   height: var(--ql-height);
 }
 
-.ql-toolbar.ql-snow {
+.ql-toolbar.ql-snow,
+.symbol-palette {
   display            : none;
   border             : 1px solid #3A3A3A;
   border-bottom-width: 2px;
   position           : absolute;
-  bottom             : calc(var(--ql-height) - 2px);
   z-index            : 1;
   background         : var(--ifm-background-color);
+}
+
+.ql-toolbar.ql-snow {
+  bottom: calc(var(--ql-height) - 2px);
+}
+
+.symbol-palette {
+  bottom: calc(2rem + var(--ql-height) - 2px);
 }
 
 .ql-toolbar.ql-snow .ql-formats {
   margin-right: 0.25rem;
 }
 
-.ql-toolbar.ql-snow .ql-formats button {
-  color: var(--ifm-font-color-base);
+.ql-toolbar.ql-snow .ql-formats button,
+.symbol-palette button {
+  color : var(--ifm-font-color-base);
+  margin: 0px;
 }
 
 .ql-toolbar.ql-snow .ql-formats button:hover .ql-stroke,
@@ -791,7 +801,8 @@ details summary:active {
 }
 
 .ql-toolbar.ql-snow .ql-formats button:hover.ql-active,
-.ql-toolbar.ql-snow .ql-formats button.ql-active {
+.ql-toolbar.ql-snow .ql-formats button.ql-active,
+.symbol-palette button.ql-active {
   color: #06c;
 }
 
@@ -805,26 +816,26 @@ details summary:active {
   fill: #06c;
 }
 
-.ql-toolbar.ql-snow .ql-formats button:hover {
+.ql-toolbar.ql-snow .ql-formats button:hover,
+.symbol-palette button:hover {
   color           : var(--ifm-font-color-base);
   background-color: var(--ifm-color-secondary);
 }
 
-.ql-toolbar.ql-snow .ql-formats button:active {
+.ql-toolbar.ql-snow .ql-formats button:active,
+.symbol-palette button:active {
   background-color: var(--ifm-background-color);
 }
 
-.ql-toolbar.ql-snow .button-text {
+.ql-toolbar.ql-snow .button-text,
+.symbol-palette .button-text {
   font-weight: bold;
   translate  : 0 -2px;
 }
 
-.ql-toolbar.ql-snow.visible {
+.ql-toolbar.ql-snow.visible,
+.symbol-palette.visible {
   display: block;
-}
-
-.ql-toolbar.ql-snow button {
-  margin: 0px;
 }
 
 .ql-editor {
