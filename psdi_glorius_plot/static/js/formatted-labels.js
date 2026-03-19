@@ -9,7 +9,6 @@
 const FULL_CLASS = "ql-full";
 
 const QUILL_THEME = "snow";
-const QUILL_TOOLBAR_TEMPLATE = "#quillTemplates.toolbar";
 
 const MATHJAX_DEFAULT_FONT_SIZE = 16;
 const MATHJAX_BASE_FONT_SCALING = 1.125;
@@ -28,7 +27,7 @@ const dQuillEditors = {};
 /**
  * Initialise a Quill editor
  */
-export function addQuillEditor(selector, placeholder = "", toolbar = QUILL_TOOLBAR) {
+export function addQuillEditor(selector, placeholder = "") {
 
   // Determine some options from the element's attributes
   const el = $(selector);
@@ -37,6 +36,13 @@ export function addQuillEditor(selector, placeholder = "", toolbar = QUILL_TOOLB
     // Clean any whitespace in the placeholder text to be single spaces, since this may have linebreaks in it to avoid
     // long lines in the HTML
     placeholder = el.attr("placeholder").replaceAll(/\s+/gmu, " ");
+  }
+
+  // Add a toolbar before this element if one doesn't already exist
+  const prevEl = el.prev();
+  if (prevEl.length == 0 || !prevEl.hasClass("ql-toolbar")) {
+    const newToolbar = $("#quillToolbar")[0].content.cloneNode(true);
+    el.before(newToolbar);
   }
 
   // Disable Quill's tab binding so the user can tab out of Quill's input boxes
@@ -74,7 +80,7 @@ export function addQuillEditor(selector, placeholder = "", toolbar = QUILL_TOOLB
       keyboard: {
         bindings: bindings
       },
-      toolbar: toolbar
+      toolbar: `.ql-toolbar:has(+${selector})`
     },
     placeholder: placeholder,
     theme: QUILL_THEME
