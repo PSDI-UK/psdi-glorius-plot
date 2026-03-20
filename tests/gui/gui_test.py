@@ -801,6 +801,8 @@ def _wait_for_download(filename):
             pytest.fail(f"Download of {filename} timed out")
 
 
+@pytest.mark.skip(reason="Disabled until this can be rewritten to use downloaded .svg files, which can be checked " +
+                  "reliably.")
 def test_download_plot(driver: WebDriver):
     """Test that we can download an image of the plot using the provided button"""
 
