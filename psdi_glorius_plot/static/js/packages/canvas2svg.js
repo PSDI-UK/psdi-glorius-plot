@@ -972,6 +972,11 @@
     textElement.appendChild(this.__document.createTextNode(text));
     this.__currentElement = textElement;
     this.__applyStyleToCurrentElement(action);
+
+    // Check for any fully transparent text, and skip adding it to keep the resulting file smaller
+    if (this.fillStyle.length == 9 && this.fillStyle.endsWith("00"))
+      return;
+
     parent.appendChild(this.__wrapTextLink(font, textElement));
   };
 

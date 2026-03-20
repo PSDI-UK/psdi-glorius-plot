@@ -6,7 +6,7 @@
   const version = "{{tag[1:]}}";
   let debug;
 </script>
-{% if not production_mode %}
+{% if debug_mode %}
 <script>debug = true;</script>
 {% else %}
 <script>debug = false;</script>
@@ -914,8 +914,10 @@
           Resume Work
         </button>
         <!-- We use a hidden file select which gets triggered when the user clicks the button, and then changing this
-         triggers loading the file -->
-        <input type="file" name="load-data-file" id="load-data-file" class="hidden" accept=".json">
+         triggers loading the file. For running unit tests, this can't really be automated, so we don't hide it if test
+         mode is enabled -->
+        <input type="file" name="load-data-file" id="load-data-file" class="{% if not test_mode %}hidden{% endif %}"
+          accept=".json">
       </span>
     </div>
   </details>
