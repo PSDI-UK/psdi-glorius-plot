@@ -46,7 +46,7 @@ class SiteEnv:
         """True if the app is running in debug mode, False if not"""
 
         self.test_mode: bool = self._determine_value(ev=const.TEST_EV,
-                                                     arg="test",
+                                                     arg=None,
                                                      value_type=bool,
                                                      default=False)
         """True if the app is running in test mode, False if not"""
