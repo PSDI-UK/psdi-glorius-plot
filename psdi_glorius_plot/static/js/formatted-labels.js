@@ -26,8 +26,17 @@ const dQuillEditors = {};
 
 /**
  * Initialise a Quill editor
+ * @param {String} selector 
+ * @param {String} placeholder 
  */
 export function addQuillEditor(selector, placeholder = "") {
+
+  // Check that the selector is an ID
+  if (!selector.startsWith("#") || selector.includes(" ") || selector.includes(".")) {
+    console.error(`Selector "${selector}" is invalid for initialising a Quill editor. The selector must only be an ` +
+      `ID in the format "#editor-ID"`);
+    return;
+  }
 
   // Determine some options from the element's attributes
   const el = $(selector);
