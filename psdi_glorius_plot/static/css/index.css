@@ -799,11 +799,20 @@ details summary:active {
   float     : left;
   height    : 1.5rem;
   padding   : 0.1875rem 0.3125rem;
-  width     : 1.75rem;
   color     : var(--ifm-font-color-base);
   margin    : 0;
 }
 
+
+.ql-toolbar.ql-snow .ql-formats button {
+  width: 1.75rem;
+}
+
+.symbol-palette button {
+  width     : 1.5rem;
+  padding   : 0.1875rem 0;
+  text-align: center;
+}
 
 
 .ql-toolbar.ql-snow .ql-formats button:hover .ql-stroke,
@@ -842,10 +851,12 @@ details summary:active {
   background-color: var(--ifm-background-color);
 }
 
-.ql-toolbar.ql-snow .button-text,
-.symbol-palette .button-text {
+.button-text {
+  translate: 0 -2px;
+}
+
+.ql-toolbar.ql-snow .button-text {
   font-weight: bold;
-  translate  : 0 -2px;
 }
 
 .ql-editor {
