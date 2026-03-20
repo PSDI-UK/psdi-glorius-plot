@@ -780,14 +780,10 @@ details summary:active {
   display: block;
 }
 
-.symbol-palette {
-  bottom: calc(2rem + var(--ql-height) - 3px);
-  width : 20rem;
-}
-
 .symbol-palette.visible {
+  bottom               : calc(2rem + var(--ql-height) - 3px);
   display              : grid;
-  grid-template-columns: repeat(auto-fit, 1.5rem);
+  grid-template-columns: repeat(10, 1.5rem);
 }
 
 .ql-toolbar.ql-snow .ql-formats {
@@ -799,13 +795,13 @@ details summary:active {
   background: none;
   border    : none;
   cursor    : pointer;
-  display   : inline-block;
+  display   : block;
   float     : left;
-  height    : 24px;
-  padding   : 3px 5px;
-  width     : 28px;
+  height    : 1.5rem;
+  padding   : 0.1875rem 0.3125rem;
+  width     : 1.75rem;
   color     : var(--ifm-font-color-base);
-  margin    : 0px;
+  margin    : 0;
 }
 
 
