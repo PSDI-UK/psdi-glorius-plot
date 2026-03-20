@@ -6,7 +6,7 @@
   const version = "{{tag[1:]}}";
   let debug;
 </script>
-{% if not production_mode %}
+{% if debug_mode %}
 <script>debug = true;</script>
 {% else %}
 <script>debug = false;</script>
