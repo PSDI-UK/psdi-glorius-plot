@@ -796,8 +796,19 @@ def test_plot_sizing(driver: WebDriver):
 
 def _wait_for_download(filename, timeout=TIMEOUT_SHORT):
     time_elapsed = 0
-    while not os.path.isfile(filename):
+    file_exists = False
+    last_filesize = 0
+    new_filesize = 0
+    # Continue waiting while any of the following conditions are true:
+    # - The file doesn't exist
+    # - The file exists, but its size is zero
+    # - The file exists, but its size is different from the last time it was checked
+    while not file_exists or new_filesize == 0 or new_filesize != last_filesize:
+        file_exists = os.path.isfile(filename)
+        last_filesize = new_filesize
         time.sleep(TIMESTEP)
+        if file_exists:
+            new_filesize = os.path.getsize(filename)
         time_elapsed += TIMESTEP
         if time_elapsed > timeout:
             pytest.fail(f"Download of {filename} timed out")
