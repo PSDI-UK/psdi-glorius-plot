@@ -58,8 +58,9 @@ SAVE_FILENAME = "glorius_plot_data.json"
 
 origin = os.environ.get("ORIGIN", DEFAULT_ORIGIN)
 
-# Run tests in production mode
+# Run tests in production mode and test mode
 os.environ[const.PRODUCTION_EV] = "true"
+os.environ[const.TEST_EV] = "true"
 
 
 @pytest.fixture(scope="module", autouse=True)

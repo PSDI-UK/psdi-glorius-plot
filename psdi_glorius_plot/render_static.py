@@ -45,7 +45,8 @@ def main():
 
     parser.add_argument("--debug", action="store_true",
                         help="If set, will run the Flask server in debug mode, which will cause it to automatically "
-                        "reload if code changes and show an interactive debugger in the case of errors")
+                        "reload if code changes and show an interactive debugger in the case of errors. Will also set "
+                        "the renderer into debug mode for more convenient testing.")
 
     parser.add_argument("--log-level", type=str, default=None,
                         help="The desired level to log at. Allowed values are: 'DEBUG', 'INFO', 'WARNING', 'ERROR, "
