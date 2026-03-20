@@ -49,6 +49,7 @@ export function addQuillEditor(selector, placeholder = "") {
 
   // Add a toolbar before this element if one doesn't already exist, and a symbol palette before that
   const prevEl = el.prev();
+  let toolbar, symbolPalette;
   if (prevEl.length == 0 || !prevEl.hasClass("ql-toolbar")) {
 
     const newToolbar = $($("#quill-toolbar")[0].content.children[0].cloneNode(true));
@@ -57,12 +58,21 @@ export function addQuillEditor(selector, placeholder = "") {
     const newSymbolPalette = $($("#symbol-palette")[0].content.children[0].cloneNode(true));
     newToolbar.before(newSymbolPalette);
 
-    // Connect an event to the symbol button on the toolbar to toggle the visibility of the symbol palette
-    newToolbar.find(".insert-symbol").on("click", toggleSymbolPalette);
-
-    // And connect events to all buttons in the symbol palette to insert their respective symbols
-    newSymbolPalette.find("button").on("click", insertSymbol);
+    toolbar = newToolbar;
+    symbolPalette = newSymbolPalette;
+  } else {
+    // A toolbar already exists, so disconnect any events for it and the symbol palette so we don't duplicate them
+    toolbar = prevEl;
+    symbolPalette = toolbar.prev();
+    toolbar.find(".insert-symbol").off("click");
+    symbolPalette.find("button").off("click");
   }
+
+  // Connect an event to the symbol button on the toolbar to toggle the visibility of the symbol palette
+  toolbar.find(".insert-symbol").on("click", toggleSymbolPalette);
+
+  // And connect events to all buttons in the symbol palette to insert their respective symbols
+  symbolPalette.find("button").on("click", insertSymbol);
 
   // Disable Quill's tab binding so the user can tab out of Quill's input boxes
   let bindings = {
