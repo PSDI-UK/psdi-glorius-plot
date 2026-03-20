@@ -944,8 +944,6 @@ def test_dirty_forms(driver: WebDriver):
         Alert(driver).text
 
 
-@pytest.mark.skip(reason="Change to load data entry has made the file input invisible. Skipping until I figure out " +
-                  "how to use the new interface in a test")
 def test_save_load_data(driver: WebDriver):
     """Test that we can save and load data entered in the plot"""
 
@@ -1038,8 +1036,6 @@ def test_save_load_data(driver: WebDriver):
 
     # Now load the saved data
     wait_for_element(driver, "//input[@id='load-data-file']").send_keys(qualified_save_filename)
-    load_button = wait_for_element(driver, "//button[@id='load-data']")
-    load_button.click()
     time.sleep(PLOT_GENERATION_TIME)
 
     # Check that all data we entered before has now been reloaded
