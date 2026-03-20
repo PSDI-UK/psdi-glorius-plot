@@ -762,23 +762,58 @@ details summary:active {
   height: var(--ql-height);
 }
 
+.ql-toolbar.ql-snow,
+.symbol-palette {
+  display   : none;
+  border    : 1px solid #3A3A3A;
+  position  : absolute;
+  z-index   : 1;
+  background: var(--ifm-background-color);
+}
+
 .ql-toolbar.ql-snow {
-  display            : none;
-  border             : 1px solid #3A3A3A;
   border-bottom-width: 2px;
-  position           : absolute;
   bottom             : calc(var(--ql-height) - 2px);
-  z-index            : 1;
-  background         : var(--ifm-background-color);
+}
+
+.ql-toolbar.ql-snow.visible {
+  display: block;
+}
+
+.symbol-palette.visible {
+  bottom               : calc(2rem + var(--ql-height) - 3px);
+  display              : grid;
+  grid-template-columns: repeat(10, 1.5rem);
 }
 
 .ql-toolbar.ql-snow .ql-formats {
   margin-right: 0.25rem;
 }
 
-.ql-toolbar.ql-snow .ql-formats button {
-  color: var(--ifm-font-color-base);
+.ql-toolbar.ql-snow .ql-formats button,
+.symbol-palette button {
+  background: none;
+  border    : none;
+  cursor    : pointer;
+  display   : block;
+  float     : left;
+  height    : 1.5rem;
+  padding   : 0.1875rem 0.3125rem;
+  color     : var(--ifm-font-color-base);
+  margin    : 0;
 }
+
+
+.ql-toolbar.ql-snow .ql-formats button {
+  width: 1.75rem;
+}
+
+.symbol-palette button {
+  width     : 1.5rem;
+  padding   : 0.1875rem 0;
+  text-align: center;
+}
+
 
 .ql-toolbar.ql-snow .ql-formats button:hover .ql-stroke,
 .ql-toolbar.ql-snow .ql-formats button .ql-stroke {
@@ -805,21 +840,23 @@ details summary:active {
   fill: #06c;
 }
 
-.ql-toolbar.ql-snow .ql-formats button:hover {
+.ql-toolbar.ql-snow .ql-formats button:hover,
+.symbol-palette button:hover {
   color           : var(--ifm-font-color-base);
   background-color: var(--ifm-color-secondary);
 }
 
-.ql-toolbar.ql-snow .ql-formats button:active {
+.ql-toolbar.ql-snow .ql-formats button:active,
+.symbol-palette button:active {
   background-color: var(--ifm-background-color);
 }
 
-.ql-toolbar.ql-snow.visible {
-  display: block;
+.button-text {
+  translate: 0 -2px;
 }
 
-.ql-toolbar.ql-snow button {
-  margin: 0px;
+.ql-toolbar.ql-snow .button-text {
+  font-weight: bold;
 }
 
 .ql-editor {

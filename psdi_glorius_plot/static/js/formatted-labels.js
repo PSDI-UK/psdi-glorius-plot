@@ -9,7 +9,6 @@
 const FULL_CLASS = "ql-full";
 
 const QUILL_THEME = "snow";
-const QUILL_TOOLBAR = ['bold', 'italic', 'underline', { 'script': 'sub' }, { 'script': 'super' }];
 
 const MATHJAX_DEFAULT_FONT_SIZE = 16;
 const MATHJAX_BASE_FONT_SCALING = 1.125;
@@ -27,8 +26,17 @@ const dQuillEditors = {};
 
 /**
  * Initialise a Quill editor
+ * @param {String} selector 
+ * @param {String} placeholder 
  */
-export function addQuillEditor(selector, placeholder = "", toolbar = QUILL_TOOLBAR) {
+export function addQuillEditor(selector, placeholder = "") {
+
+  // Check that the selector is an ID
+  if (!selector.startsWith("#") || selector.includes(" ") || selector.includes(".")) {
+    console.error(`Selector "${selector}" is invalid for initialising a Quill editor. The selector must only be an ` +
+      `ID in the format "#editor-ID"`);
+    return;
+  }
 
   // Determine some options from the element's attributes
   const el = $(selector);
@@ -38,6 +46,33 @@ export function addQuillEditor(selector, placeholder = "", toolbar = QUILL_TOOLB
     // long lines in the HTML
     placeholder = el.attr("placeholder").replaceAll(/\s+/gmu, " ");
   }
+
+  // Add a toolbar before this element if one doesn't already exist, and a symbol palette before that
+  const prevEl = el.prev();
+  let toolbar, symbolPalette;
+  if (prevEl.length == 0 || !prevEl.hasClass("ql-toolbar")) {
+
+    const newToolbar = $($("#quill-toolbar")[0].content.children[0].cloneNode(true));
+    el.before(newToolbar);
+
+    const newSymbolPalette = $($("#symbol-palette")[0].content.children[0].cloneNode(true));
+    newToolbar.before(newSymbolPalette);
+
+    toolbar = newToolbar;
+    symbolPalette = newSymbolPalette;
+  } else {
+    // A toolbar already exists, so disconnect any events for it and the symbol palette so we don't duplicate them
+    toolbar = prevEl;
+    symbolPalette = toolbar.prev();
+    toolbar.find(".insert-symbol").off("click");
+    symbolPalette.find("button").off("click");
+  }
+
+  // Connect an event to the symbol button on the toolbar to toggle the visibility of the symbol palette
+  toolbar.find(".insert-symbol").on("click", toggleSymbolPalette);
+
+  // And connect events to all buttons in the symbol palette to insert their respective symbols
+  symbolPalette.find("button").on("click", insertSymbol);
 
   // Disable Quill's tab binding so the user can tab out of Quill's input boxes
   let bindings = {
@@ -74,7 +109,7 @@ export function addQuillEditor(selector, placeholder = "", toolbar = QUILL_TOOLB
       keyboard: {
         bindings: bindings
       },
-      toolbar: toolbar
+      toolbar: `.ql-toolbar:has(+${selector})`
     },
     placeholder: placeholder,
     theme: QUILL_THEME
@@ -132,7 +167,62 @@ export function enableQuillToolbar(selector) {
 }
 
 export function disableQuillToolbar(selector) {
-  $(selector).parent().find(".ql-toolbar").removeClass("visible");
+  const toolbar = $(selector).parent().find(".ql-toolbar");
+  toolbar.removeClass("visible");
+
+  // Also make sure to disable the symbol palette whenever the toolbar is disabled
+  disableSymbolPalette(selector);
+  toolbar.find(".insert-symbol").removeClass("ql-active");
+}
+
+function disableSymbolPalette(selector) {
+  const parent = $(selector).parent();
+  parent.find(".insert-symbol").removeClass("ql-active");
+  parent.find(".symbol-palette").removeClass("visible");
+}
+
+function toggleSymbolPalette(e) {
+
+  const openPaletteButton = $(e.delegateTarget);
+  const symbolPalette = openPaletteButton.parents(":has(>.ql-toolbar)").find(".symbol-palette");
+
+  if (symbolPalette.hasClass("visible")) {
+    openPaletteButton.removeClass("ql-active");
+    symbolPalette.removeClass("visible");
+  }
+  else {
+    openPaletteButton.addClass("ql-active");
+    symbolPalette.addClass("visible");
+  }
+}
+
+/**
+ * Called by a button press from the symbol palette to insert a symbol in the associated quill editor
+ * @param {Event} e 
+ */
+function insertSymbol(e) {
+  const symbolButton = $(e.delegateTarget);
+
+  // Get the symbol we want to insert
+  const symbol = symbolButton.find(".button-text").text();
+
+  // Get the quill editor we'll be inserting it into
+  const selector = "#" + symbolButton.parents(":has(>.ql-container)").find(".ql-container").attr("id");
+  const quill = getQuillEditor(selector);
+
+  // Find where in the editor we want to insert it. If a selection, delete the contents first. If no selection or
+  // cursor in the input, insert the symbol at the end
+  let index = quill.getLength() - 1;
+  const range = quill.getSelection();
+  if (range) {
+    index = range.index;
+    if (range.length > 0)
+      quill.deleteText(index, range.length, "user");
+  }
+  quill.insertText(index, symbol, "user");
+
+  // Set the selection after the inserted symbol
+  quill.setSelection(index + 1);
 }
 
 export function enableQuillEvents(alwaysCallback, otherCallbacks) {
