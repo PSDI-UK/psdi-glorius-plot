@@ -933,10 +933,11 @@ function navigateToRowButtons(e) {
 
   targetButton[0].focus();
 
-  // If we moved away from a Quill editor, disable its toolbar
+  // If we moved away from a Quill editor, disable its toolbar and symbol palette
   const quillEl = currentCell.find(".condition-input");
   if (quillEl) {
-    disableQuillToolbar("#" + quillEl.attr("id"));
+    const selector = "#" + quillEl.attr("id");
+    disableQuillToolbar(selector);
   }
 }
 

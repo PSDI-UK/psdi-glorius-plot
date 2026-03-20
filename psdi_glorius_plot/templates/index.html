@@ -20,6 +20,235 @@
 {% block hero_title %}PSDI Glorius Plot Generator{% endblock %}
 
 {% block content_before_main %}
+
+<!-- Templates used in this page -->
+<template id="quill-toolbar">
+  <div role="toolbar" class="ql-toolbar ql-snow">
+    <span class="ql-formats">
+      <button type="button" class="ql-bold"></button>
+      <button type="button" class="ql-italic"></button>
+      <button type="button" class="ql-underline"></button>
+      <button type="button" class="ql-script" value="sub"></button>
+      <button type="button" class="ql-script" value="super"></button>
+      <button type="button" class="insert-symbol">
+        <div class="button-text">Ω</div>
+      </button>
+    </span>
+  </div>
+</template>
+
+<template id="symbol-palette">
+  <div class="symbol-palette">
+    <button type="button">
+      <div class="button-text">°</div>
+    </button>
+    <button type="button">
+      <div class="button-text">Å</div>
+    </button>
+    <button type="button">
+      <div class="button-text">→</div>
+    </button>
+    <button type="button">
+      <div class="button-text">⟹</div>
+    </button>
+    <button type="button">
+      <div class="button-text">+</div>
+    </button>
+    <button type="button">
+      <div class="button-text">-</div>
+    </button>
+    <button type="button">
+      <div class="button-text">×</div>
+    </button>
+    <button type="button">
+      <div class="button-text">÷</div>
+    </button>
+    <button type="button">
+      <div class="button-text">±</div>
+    </button>
+    <button type="button">
+      <div class="button-text">∓</div>
+    </button>
+    <button type="button">
+      <div class="button-text">=</div>
+    </button>
+    <button type="button">
+      <div class="button-text">≠</div>
+    </button>
+    <button type="button">
+      <div class="button-text">&lt;</div>
+    </button>
+    <button type="button">
+      <div class="button-text">></div>
+    </button>
+    <button type="button">
+      <div class="button-text">≤</div>
+    </button>
+    <button type="button">
+      <div class="button-text">≥</div>
+    </button>
+    <button type="button">
+      <div class="button-text">≲</div>
+    </button>
+    <button type="button">
+      <div class="button-text">≳</div>
+    </button>
+    <button type="button">
+      <div class="button-text">≪</div>
+    </button>
+    <button type="button">
+      <div class="button-text">≫</div>
+    </button>
+    <button type="button">
+      <div class="button-text">α</div>
+    </button>
+    <button type="button">
+      <div class="button-text">β</div>
+    </button>
+    <button type="button">
+      <div class="button-text">γ</div>
+    </button>
+    <button type="button">
+      <div class="button-text">δ</div>
+    </button>
+    <button type="button">
+      <div class="button-text">ε</div>
+    </button>
+    <button type="button">
+      <div class="button-text">ζ</div>
+    </button>
+    <button type="button">
+      <div class="button-text">η</div>
+    </button>
+    <button type="button">
+      <div class="button-text">θ</div>
+    </button>
+    <button type="button">
+      <div class="button-text">ι</div>
+    </button>
+    <button type="button">
+      <div class="button-text">κ</div>
+    </button>
+    <button type="button">
+      <div class="button-text">λ</div>
+    </button>
+    <button type="button">
+      <div class="button-text">μ</div>
+    </button>
+    <button type="button">
+      <div class="button-text">ν</div>
+    </button>
+    <button type="button">
+      <div class="button-text">ξ</div>
+    </button>
+    <button type="button">
+      <div class="button-text">ο</div>
+    </button>
+    <button type="button">
+      <div class="button-text">π</div>
+    </button>
+    <button type="button">
+      <div class="button-text">ρ</div>
+    </button>
+    <button type="button">
+      <div class="button-text">ς</div>
+    </button>
+    <button type="button">
+      <div class="button-text">σ</div>
+    </button>
+    <button type="button">
+      <div class="button-text">τ</div>
+    </button>
+    <button type="button">
+      <div class="button-text">υ</div>
+    </button>
+    <button type="button">
+      <div class="button-text">φ</div>
+    </button>
+    <button type="button">
+      <div class="button-text">χ</div>
+    </button>
+    <button type="button">
+      <div class="button-text">ψ</div>
+    </button>
+    <button type="button">
+      <div class="button-text">ω</div>
+    </button>
+    <button type="button">
+      <div class="button-text">Α</div>
+    </button>
+    <button type="button">
+      <div class="button-text">Β</div>
+    </button>
+    <button type="button">
+      <div class="button-text">Γ</div>
+    </button>
+    <button type="button">
+      <div class="button-text">Δ</div>
+    </button>
+    <button type="button">
+      <div class="button-text">Ε</div>
+    </button>
+    <button type="button">
+      <div class="button-text">Ζ</div>
+    </button>
+    <button type="button">
+      <div class="button-text">Η</div>
+    </button>
+    <button type="button">
+      <div class="button-text">Θ</div>
+    </button>
+    <button type="button">
+      <div class="button-text">Ι</div>
+    </button>
+    <button type="button">
+      <div class="button-text">Κ</div>
+    </button>
+    <button type="button">
+      <div class="button-text">Λ</div>
+    </button>
+    <button type="button">
+      <div class="button-text">Μ</div>
+    </button>
+    <button type="button">
+      <div class="button-text">Ν</div>
+    </button>
+    <button type="button">
+      <div class="button-text">Ξ</div>
+    </button>
+    <button type="button">
+      <div class="button-text">Ο</div>
+    </button>
+    <button type="button">
+      <div class="button-text">Π</div>
+    </button>
+    <button type="button">
+      <div class="button-text">Ρ</div>
+    </button>
+    <button type="button">
+      <div class="button-text">Σ</div>
+    </button>
+    <button type="button">
+      <div class="button-text">Τ</div>
+    </button>
+    <button type="button">
+      <div class="button-text">Υ</div>
+    </button>
+    <button type="button">
+      <div class="button-text">Φ</div>
+    </button>
+    <button type="button">
+      <div class="button-text">Χ</div>
+    </button>
+    <button type="button">
+      <div class="button-text">Ψ</div>
+    </button>
+    <button type="button">
+      <div class="button-text">Ω</div>
+    </button>
+  </div>
+</template>
+
 <div class="secondary mathjax_ignore" id="instructions">
   <div class="max-width-box">
     <p>
@@ -70,9 +299,16 @@
             appears as a black bar on the chart
           </summary>
           <p>
+            Most text inputs here support advanced formatting, which will be rendered on the plot just as it appears in
+            the editor. If you choose to export a data package, appropriate formatted text will be rendered in the
+            contained images and files, as much as supported by their various formats (e.g. Markdown doesn't support
+            underline, so underlines won't appear in <code>.md</code> files, but other formatting will still be
+            present).
+          </p>
+          <p>
             <strong>Basic formatting:</strong> You can format text entered in the Title and various other fields by
             clicking on the formatting buttons in the toolbar that appears above the text-input boxes when they're
-            selected, either by clicking the box then entering text, or by selecting text and then clicking the buttons.
+            selected, either by clicking a button then entering text, or by selecting text and then clicking a button.
             If the text is longer than the box can fit in one line, a scrollbar will appear at the right side of the box
             allowing you to scroll up and down lines of text.
           </p>
@@ -83,16 +319,9 @@
             “\lt” respectively.
           </p>
           <p>
-            <strong>Special symbols:</strong> A toolbar option to insert special symbols is still under development. For
-            the time being, you can copy and paste desired symbols from the following lists:
-          </p>
-          <ul>
-            <li>Mathematical and numerical symbols: ° Å → ⟹ + - × ÷ ± ∓ = ≠ &lt; &gt; ≤ ≥ ≲ ≳ ≪ ≫</li>
-            <li>Lowercase Greek: α β γ δ ε ζ η θ ι κ λ μ ν ξ ο π ρ ς σ τ υ φ χ ψ ω</li>
-            <li>Uppercase Greek: Α Β Γ Δ Ε Ζ Η Θ Ι Κ Λ Μ Ν Ξ Ο Π Ρ Σ Τ Υ Φ Χ Ψ Ω</li>
-          </ul>
-          <p>If you need a symbol not listed here, you can search for it at <a
-              href="https://unicodeplus.com/">UnicodePlus</a> and copy it from there.
+            <strong>Special symbols:</strong> Click the “<strong>Ω</strong>” button in the toolbar to open a palette to
+            select a special symbol to insert. If you need a symbol not listed here, you can search for it at a site
+            such as <a href="https://unicodeplus.com/">UnicodePlus</a> and copy it from there.
           </p>
           <p>
             <strong>Advanced formatting:</strong> If you're familiar with LaTeX markup, you can use it to directly set
