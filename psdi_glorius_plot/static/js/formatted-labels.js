@@ -50,6 +50,9 @@ export function addQuillEditor(selector, placeholder = "") {
 
     // Connect an event to the symbol button on the toolbar to toggle the visibility of the symbol palette
     newToolbar.find(".insert-symbol").on("click", toggleSymbolPalette);
+
+    // And connect events to all buttons in the symbol palette to insert their respective symbols
+    newSymbolPalette.find("button").on("click", insertSymbol);
   }
 
   // Disable Quill's tab binding so the user can tab out of Quill's input boxes
@@ -153,27 +156,54 @@ export function disableQuillToolbar(selector) {
   toolbar.find(".insert-symbol").removeClass("ql-active");
 }
 
-export function enableSymbolPalette(selector) {
-  $(selector).parent().find(".symbol-palette").addClass("visible");
+function disableSymbolPalette(selector) {
+  const parent = $(selector).parent();
+  parent.find(".insert-symbol").removeClass("ql-active");
+  parent.find(".symbol-palette").removeClass("visible");
 }
 
-export function disableSymbolPalette(selector) {
-  $(selector).parent().find(".symbol-palette").removeClass("visible");
-}
+function toggleSymbolPalette(e) {
 
-export function toggleSymbolPalette(e) {
-
-  const symbolButton = $(e.delegateTarget);
-  const symbolPalette = symbolButton.parents(":has(>.ql-toolbar)").find(".symbol-palette");
+  const openPaletteButton = $(e.delegateTarget);
+  const symbolPalette = openPaletteButton.parents(":has(>.ql-toolbar)").find(".symbol-palette");
 
   if (symbolPalette.hasClass("visible")) {
-    symbolButton.removeClass("ql-active");
+    openPaletteButton.removeClass("ql-active");
     symbolPalette.removeClass("visible");
   }
   else {
-    symbolButton.addClass("ql-active");
+    openPaletteButton.addClass("ql-active");
     symbolPalette.addClass("visible");
   }
+}
+
+/**
+ * Called by a button press from the symbol palette to insert a symbol in the associated quill editor
+ * @param {Event} e 
+ */
+function insertSymbol(e) {
+  const symbolButton = $(e.delegateTarget);
+
+  // Get the symbol we want to insert
+  const symbol = symbolButton.find(".button-text").text();
+
+  // Get the quill editor we'll be inserting it into
+  const selector = "#" + symbolButton.parents(":has(>.ql-container)").find(".ql-container").attr("id");
+  const quill = getQuillEditor(selector);
+
+  // Find where in the editor we want to insert it. If a selection, delete the contents first. If no selection or
+  // cursor in the input, insert the symbol at the end
+  let index = quill.getLength() - 1;
+  const range = quill.getSelection();
+  if (range) {
+    index = range.index;
+    if (range.length > 0)
+      quill.deleteText(index, range.length, "user");
+  }
+  quill.insertText(index, symbol, "user");
+
+  // Set the selection after the inserted symbol
+  quill.setSelection(index + 1);
 }
 
 export function enableQuillEvents(alwaysCallback, otherCallbacks) {
