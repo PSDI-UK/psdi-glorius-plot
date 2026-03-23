@@ -25,12 +25,12 @@
 <template id="quill-toolbar">
   <div role="toolbar" class="ql-toolbar ql-snow">
     <span class="ql-formats">
-      <button type="button" class="ql-bold"></button>
-      <button type="button" class="ql-italic"></button>
-      <button type="button" class="ql-underline"></button>
-      <button type="button" class="ql-script" value="sub"></button>
-      <button type="button" class="ql-script" value="super"></button>
-      <button type="button" class="insert-symbol">
+      <button type="button" title="Bold" class="ql-bold"></button>
+      <button type="button" title="Italics" class="ql-italic"></button>
+      <button type="button" title="Underline" class="ql-underline"></button>
+      <button type="button" title="Subscript" class="ql-script" value="sub"></button>
+      <button type="button" title="Superscript" class="ql-script" value="super"></button>
+      <button type="button" title="Insert special symbol" class="insert-symbol">
         <div class="button-text">Ω</div>
       </button>
     </span>
@@ -38,212 +38,212 @@
 </template>
 
 <template id="symbol-palette">
-  <div class="symbol-palette">
-    <button type="button">
+  <div role="toolbar" class="symbol-palette">
+    <button type="button" title="Degree">
       <div class="button-text">°</div>
     </button>
-    <button type="button">
-      <div class="button-text">Å</div>
+    <button type="button" title="Angstrom">
+      <div class="button-text">Å</div>
     </button>
-    <button type="button">
+    <button type="button" title="Rightwards arrow">
       <div class="button-text">→</div>
     </button>
-    <button type="button">
+    <button type="button" title="Long rightwards double arrow">
       <div class="button-text">⟹</div>
     </button>
-    <button type="button">
+    <button type="button" title="Plus">
       <div class="button-text">+</div>
     </button>
-    <button type="button">
+    <button type="button" title="Minus">
       <div class="button-text">-</div>
     </button>
-    <button type="button">
+    <button type="button" title="Multiplication">
       <div class="button-text">×</div>
     </button>
-    <button type="button">
+    <button type="button" title="Division">
       <div class="button-text">÷</div>
     </button>
-    <button type="button">
+    <button type="button" title="Plus-minus">
       <div class="button-text">±</div>
     </button>
-    <button type="button">
+    <button type="button" title="Minus-plus">
       <div class="button-text">∓</div>
     </button>
-    <button type="button">
+    <button type="button" title="Equals">
       <div class="button-text">=</div>
     </button>
-    <button type="button">
+    <button type="button" title="Not equals">
       <div class="button-text">≠</div>
     </button>
-    <button type="button">
+    <button type="button" title="Less-than">
       <div class="button-text">&lt;</div>
     </button>
-    <button type="button">
+    <button type="button" title="Greater-than">
       <div class="button-text">></div>
     </button>
-    <button type="button">
+    <button type="button" title="Less-than or equal to">
       <div class="button-text">≤</div>
     </button>
-    <button type="button">
+    <button type="button" title="Greater-than or equal to">
       <div class="button-text">≥</div>
     </button>
-    <button type="button">
+    <button type="button" title="Less-than or equivalent to">
       <div class="button-text">≲</div>
     </button>
-    <button type="button">
+    <button type="button" title="Greater-than or equivalent to">
       <div class="button-text">≳</div>
     </button>
-    <button type="button">
+    <button type="button" title="Much less-than">
       <div class="button-text">≪</div>
     </button>
-    <button type="button">
+    <button type="button" title="Much greater-than">
       <div class="button-text">≫</div>
     </button>
-    <button type="button">
+    <button type="button" title="Greek small alpha">
       <div class="button-text">α</div>
     </button>
-    <button type="button">
+    <button type="button" title="Greek small beta">
       <div class="button-text">β</div>
     </button>
-    <button type="button">
+    <button type="button" title="Greek small gamma">
       <div class="button-text">γ</div>
     </button>
-    <button type="button">
+    <button type="button" title="Greek small delta">
       <div class="button-text">δ</div>
     </button>
-    <button type="button">
+    <button type="button" title="Greek small epsilon">
       <div class="button-text">ε</div>
     </button>
-    <button type="button">
+    <button type="button" title="Greek small zeta">
       <div class="button-text">ζ</div>
     </button>
-    <button type="button">
+    <button type="button" title="Greek small eta">
       <div class="button-text">η</div>
     </button>
-    <button type="button">
+    <button type="button" title="Greek small theta">
       <div class="button-text">θ</div>
     </button>
-    <button type="button">
+    <button type="button" title="Greek small iota">
       <div class="button-text">ι</div>
     </button>
-    <button type="button">
+    <button type="button" title="Greek small kappa">
       <div class="button-text">κ</div>
     </button>
-    <button type="button">
+    <button type="button" title="Greek small lamda">
       <div class="button-text">λ</div>
     </button>
-    <button type="button">
+    <button type="button" title="Greek small mu">
       <div class="button-text">μ</div>
     </button>
-    <button type="button">
+    <button type="button" title="Greek small nu">
       <div class="button-text">ν</div>
     </button>
-    <button type="button">
+    <button type="button" title="Greek small xi">
       <div class="button-text">ξ</div>
     </button>
-    <button type="button">
+    <button type="button" title="Greek small omicron">
       <div class="button-text">ο</div>
     </button>
-    <button type="button">
+    <button type="button" title="Greek small pi">
       <div class="button-text">π</div>
     </button>
-    <button type="button">
+    <button type="button" title="Greek small rho">
       <div class="button-text">ρ</div>
     </button>
-    <button type="button">
+    <button type="button" title="Greek small final sigma">
       <div class="button-text">ς</div>
     </button>
-    <button type="button">
+    <button type="button" title="Greek small sigma">
       <div class="button-text">σ</div>
     </button>
-    <button type="button">
+    <button type="button" title="Greek small tau">
       <div class="button-text">τ</div>
     </button>
-    <button type="button">
+    <button type="button" title="Greek small upsilon">
       <div class="button-text">υ</div>
     </button>
-    <button type="button">
+    <button type="button" title="Greek small phi">
       <div class="button-text">φ</div>
     </button>
-    <button type="button">
+    <button type="button" title="Greek small chi">
       <div class="button-text">χ</div>
     </button>
-    <button type="button">
+    <button type="button" title="Greek small psi">
       <div class="button-text">ψ</div>
     </button>
-    <button type="button">
+    <button type="button" title="Greek small omega">
       <div class="button-text">ω</div>
     </button>
-    <button type="button">
+    <button type="button" title="Greek capital Alpha">
       <div class="button-text">Α</div>
     </button>
-    <button type="button">
+    <button type="button" title="Greek capital Beta">
       <div class="button-text">Β</div>
     </button>
-    <button type="button">
+    <button type="button" title="Greek capital Gamma">
       <div class="button-text">Γ</div>
     </button>
-    <button type="button">
+    <button type="button" title="Greek capital Delta">
       <div class="button-text">Δ</div>
     </button>
-    <button type="button">
+    <button type="button" title="Greek capital Epsilon">
       <div class="button-text">Ε</div>
     </button>
-    <button type="button">
+    <button type="button" title="Greek capital Zeta">
       <div class="button-text">Ζ</div>
     </button>
-    <button type="button">
+    <button type="button" title="Greek capital Eta">
       <div class="button-text">Η</div>
     </button>
-    <button type="button">
+    <button type="button" title="Greek capital Theta">
       <div class="button-text">Θ</div>
     </button>
-    <button type="button">
+    <button type="button" title="Greek capital Iota">
       <div class="button-text">Ι</div>
     </button>
-    <button type="button">
+    <button type="button" title="Greek capital Kappa">
       <div class="button-text">Κ</div>
     </button>
-    <button type="button">
+    <button type="button" title="Greek capital Lamda">
       <div class="button-text">Λ</div>
     </button>
-    <button type="button">
+    <button type="button" title="Greek capital Mu">
       <div class="button-text">Μ</div>
     </button>
-    <button type="button">
+    <button type="button" title="Greek capital Nu">
       <div class="button-text">Ν</div>
     </button>
-    <button type="button">
+    <button type="button" title="Greek capital Xi">
       <div class="button-text">Ξ</div>
     </button>
-    <button type="button">
+    <button type="button" title="Greek capital Omicron">
       <div class="button-text">Ο</div>
     </button>
-    <button type="button">
+    <button type="button" title="Greek capital Pi">
       <div class="button-text">Π</div>
     </button>
-    <button type="button">
+    <button type="button" title="Greek capital Rho">
       <div class="button-text">Ρ</div>
     </button>
-    <button type="button">
+    <button type="button" title="Greek capital Sigma">
       <div class="button-text">Σ</div>
     </button>
-    <button type="button">
+    <button type="button" title="Greek capital Tau">
       <div class="button-text">Τ</div>
     </button>
-    <button type="button">
+    <button type="button" title="Greek capital Upsilon">
       <div class="button-text">Υ</div>
     </button>
-    <button type="button">
+    <button type="button" title="Greek capital Phi">
       <div class="button-text">Φ</div>
     </button>
-    <button type="button">
+    <button type="button" title="Greek capital Chi">
       <div class="button-text">Χ</div>
     </button>
-    <button type="button">
+    <button type="button" title="Greek capital Psi">
       <div class="button-text">Ψ</div>
     </button>
-    <button type="button">
+    <button type="button" title="Greek capital Omega">
       <div class="button-text">Ω</div>
     </button>
   </div>
@@ -342,16 +342,17 @@
 
 {% block inner_content %}
 
-<div class="multicol-on-big-screen wrap full-width">
-  <form class="multicol-element full-width allow-overflow-x">
-    <details id="data-input" class="rounded-border full-width allow-overflow-x" open>
+<div class="multicol-on-big-screen wrap col-if-details-closed full-width">
+  <form class="multicol-element align-start-if-open full-width allow-overflow-x">
+    <details id="data-input" class="rounded-border full-width allow-overflow-x col-if-closed-trigger" open>
 
       <div class="hidden hidden-until-rocrate">
-        <button type="button" class="returnToROCrateExport no-left-margin">↪ Return to data package export</button>
+        <button type="button" title="Return to data package export section"
+          class="returnToROCrateExport no-left-margin">↪ Return to data package export</button>
         <br><br>
       </div>
 
-      <summary class="large-marker" open>
+      <summary class="large-marker mw-32" open>
         <h4>Data Input</h4>
       </summary>
 
@@ -985,7 +986,8 @@
   </p>
   <form>
 
-    <button type="button" id="returnToDataInput" class="no-left-margin">↩ Return to data input</button>
+    <button type="button" title="Return to the Data Input section" id="returnToDataInput" class="no-left-margin">↩
+      Return to data input</button>
 
     <br><br>
     <h5>About your experiment</h5>
@@ -1110,8 +1112,12 @@
       </div>
     </div>
 
-    <button type="button" id="rocrate-default-title-desc" class="no-left-margin">Use defaults</button>
-    <button type="button" id="rocrate-revert-title-desc" class="no-left-margin" disabled>Revert</button>
+    <button type="button" id="rocrate-default-title-desc" class="no-left-margin"
+      title="Use default values for the Title, Description, and About sections, based on the plot title">Use
+      defaults</button>
+    <button type="button" id="rocrate-revert-title-desc" class="no-left-margin"
+      title="Revert to previously-entered values, before using defaults or before the last revert"
+      disabled>Revert</button>
 
     <br><br>
     <strong>License:</strong>
@@ -1201,10 +1207,11 @@
         </div>
         <div class="rocrate-contrib-right-of-button">
           <div class="multicol-on-big-screen m900 tiny-row-gap">
-            <div class="multicol-element">
+            <div class="multicol-element nowrap">
               <label for="rni-0" class="rocrate-name-label text-align-right" id="rnl-0"><strong>Name:</strong></label>
               <input type="text" name="rocrate-name-input" class="rocrate-name-input" id="rni-0">
-              <button type="button" class="rocrate-orcid-lookup" id="rob-0">ORCID Lookup</button>
+              <button type="button" class="rocrate-orcid-lookup" id="rob-0"
+                title="Search for this name on the ORCID site to find the appropriate ORCID">ORCID Lookup</button>
             </div>
             <div class="multicol-element">
               <label for="roi-0" class="rocrate-orcid-label text-align-right" id="rol-0"><strong>ORCID or other
@@ -1236,8 +1243,11 @@
     <div id="rocrate-citation-container">
       <div class="ql-full" id="rocrate-citation" name="rocrate-citation"></div>
     </div>
-    <button type="button" id="rocrate-default-citation" class="no-left-margin">Use default</button>
-    <button type="button" id="rocrate-revert-citation" class="no-left-margin" disabled>Revert</button>
+    <button type="button" id="rocrate-default-citation" class="no-left-margin" title="Auto-generate a citation, based
+    on the provided contributor names (check that the surnames are detected correctly)">Use default</button>
+    <button type="button" id="rocrate-revert-citation" class="no-left-margin"
+      title="Revert to previously-entered citation value, before using default or before the last revert"
+      disabled>Revert</button>
 
     <br><br>
     <h5 id="rocrate-file-structure">File Structure</h5>
@@ -1272,7 +1282,8 @@
 
     <span class="rocrate-download-and-spinner">
       <button type="button" id="rocrate-download">
-        <img src="{{url_for('static', filename='img/icon-download.svg')}}" alt="Download icon" class="text-icon">
+        <img src="{{url_for('static', filename='img/icon-download.svg')}}" alt="Download icon" class="text-icon"
+          title="Download data package">
         Download Data Package
       </button>
       <span class="loading-spinner spinner-border hidden"></span>
