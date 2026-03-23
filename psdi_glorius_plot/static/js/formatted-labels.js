@@ -4,7 +4,7 @@
  * @author Bryan Gillis
  */
 
-import { LRUCache } from 'https://unpkg.com/lru-cache@11.2.7/dist/esm/index.min.js'
+import { LRUCache } from './packages/lru-cache.min.js'
 
 const htmlToSvgCache = new LRUCache({ max: 20 });
 
