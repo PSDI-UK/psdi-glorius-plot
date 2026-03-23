@@ -6,7 +6,7 @@
 
 import { LRUCache } from 'https://unpkg.com/lru-cache@11.2.7/dist/esm/index.min.js'
 
-const htmlToSvgCache = new LRUCache({ max: 100 });
+const htmlToSvgCache = new LRUCache({ max: 20 });
 
 // Constants
 
