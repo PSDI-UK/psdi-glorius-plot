@@ -5,6 +5,7 @@
 ### New and Changed Functionality
 
 - Enabled .svg output
+- Added button to formatted text toolbar to insert special symbols
 
 ### Miscellaneous Changes
 
