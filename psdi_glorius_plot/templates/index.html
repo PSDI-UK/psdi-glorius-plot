@@ -347,7 +347,8 @@
     <details id="data-input" class="rounded-border full-width allow-overflow-x" open>
 
       <div class="hidden hidden-until-rocrate">
-        <button type="button" class="returnToROCrateExport no-left-margin">↪ Return to data package export</button>
+        <button type="button" title="Return to data package export section"
+          class="returnToROCrateExport no-left-margin">↪ Return to data package export</button>
         <br><br>
       </div>
 
@@ -985,7 +986,8 @@
   </p>
   <form>
 
-    <button type="button" id="returnToDataInput" class="no-left-margin">↩ Return to data input</button>
+    <button type="button" title="Return to the Data Input section" id="returnToDataInput" class="no-left-margin">↩
+      Return to data input</button>
 
     <br><br>
     <h5>About your experiment</h5>
@@ -1110,8 +1112,12 @@
       </div>
     </div>
 
-    <button type="button" id="rocrate-default-title-desc" class="no-left-margin">Use defaults</button>
-    <button type="button" id="rocrate-revert-title-desc" class="no-left-margin" disabled>Revert</button>
+    <button type="button" id="rocrate-default-title-desc" class="no-left-margin"
+      title="Use default values for the Title, Description, and About sections, based on the plot title">Use
+      defaults</button>
+    <button type="button" id="rocrate-revert-title-desc" class="no-left-margin"
+      title="Revert to previously-entered values, before using defaults or before the last revert"
+      disabled>Revert</button>
 
     <br><br>
     <strong>License:</strong>
@@ -1204,7 +1210,8 @@
             <div class="multicol-element">
               <label for="rni-0" class="rocrate-name-label text-align-right" id="rnl-0"><strong>Name:</strong></label>
               <input type="text" name="rocrate-name-input" class="rocrate-name-input" id="rni-0">
-              <button type="button" class="rocrate-orcid-lookup" id="rob-0">ORCID Lookup</button>
+              <button type="button" class="rocrate-orcid-lookup" id="rob-0"
+                title="Search for this name on the ORCID site to find the appropriate ORCID">ORCID Lookup</button>
             </div>
             <div class="multicol-element">
               <label for="roi-0" class="rocrate-orcid-label text-align-right" id="rol-0"><strong>ORCID or other
@@ -1236,8 +1243,11 @@
     <div id="rocrate-citation-container">
       <div class="ql-full" id="rocrate-citation" name="rocrate-citation"></div>
     </div>
-    <button type="button" id="rocrate-default-citation" class="no-left-margin">Use default</button>
-    <button type="button" id="rocrate-revert-citation" class="no-left-margin" disabled>Revert</button>
+    <button type="button" id="rocrate-default-citation" class="no-left-margin" title="Auto-generate a citation, based
+    on the provided contributor names (check that the surnames are detected correctly)">Use default</button>
+    <button type="button" id="rocrate-revert-citation" class="no-left-margin"
+      title="Revert to previously-entered citation value, before using default or before the last revert"
+      disabled>Revert</button>
 
     <br><br>
     <h5 id="rocrate-file-structure">File Structure</h5>
@@ -1272,7 +1282,8 @@
 
     <span class="rocrate-download-and-spinner">
       <button type="button" id="rocrate-download">
-        <img src="{{url_for('static', filename='img/icon-download.svg')}}" alt="Download icon" class="text-icon">
+        <img src="{{url_for('static', filename='img/icon-download.svg')}}" alt="Download icon" class="text-icon"
+          title="Download data package">
         Download Data Package
       </button>
       <span class="loading-spinner spinner-border hidden"></span>
