@@ -364,6 +364,9 @@ export async function drawFormatted(ctx, labelHTML, x, y, fontSize, hAlign, rend
     }
   }
 
+  // Strip unneeded information from the svg source to speed loading
+  svgHTML = svgHTML.replaceAll(/ data-\S*?=".*?"/g, "");
+
   let DOMURL = window.URL || window.webkitURL || window;
   let img1 = new Image();
   img1.svgHTML = svgHTML;
