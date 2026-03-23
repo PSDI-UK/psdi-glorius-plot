@@ -582,6 +582,10 @@ input.rel-deviation-value {
   margin-right: 0.5rem;
 }
 
+.nowrap {
+  white-space: nowrap;
+}
+
 /* How to indicate text which has a tooltip on mouseover */
 .mouseover-tooltip::before {
   display         : inline-flex;
