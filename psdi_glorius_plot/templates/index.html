@@ -342,9 +342,9 @@
 
 {% block inner_content %}
 
-<div class="multicol-on-big-screen wrap full-width">
-  <form class="multicol-element full-width allow-overflow-x">
-    <details id="data-input" class="rounded-border full-width allow-overflow-x" open>
+<div class="multicol-on-big-screen wrap col-if-details-closed full-width">
+  <form class="multicol-element align-start-if-open full-width allow-overflow-x">
+    <details id="data-input" class="rounded-border full-width allow-overflow-x col-if-closed-trigger" open>
 
       <div class="hidden hidden-until-rocrate">
         <button type="button" title="Return to data package export section"
@@ -352,7 +352,7 @@
         <br><br>
       </div>
 
-      <summary class="large-marker" open>
+      <summary class="large-marker mw-32" open>
         <h4>Data Input</h4>
       </summary>
 
