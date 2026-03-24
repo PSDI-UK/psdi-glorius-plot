@@ -52,18 +52,8 @@ input:disabled {
 
 /* Button styling */
 
-button:disabled {
-  background-color: var(--psdi-bg-color-secondary);
-  border-color    : rgba(118, 118, 118, 0.3);
-  color           : gray
-}
-
 button:disabled .text-icon {
   filter: invert(50%);
-}
-
-button:disabled:hover {
-  cursor: default;
 }
 
 /* Button with a fixed small size */
@@ -80,11 +70,6 @@ button.fix-size-small {
   fill  : var(--ifm-font-color-base);
   stroke: var(--ifm-font-color-base);
   filter: invert(100%);
-}
-
-
-[data-theme='dark'] .text-icon {
-  filter: invert(0%);
 }
 
 :root {
