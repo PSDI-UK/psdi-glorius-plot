@@ -10,13 +10,13 @@
         <img src="{{url_for('static', filename='img/psdi-logo-lighttext.png')}}" alt="PSDI logo"
           class="dm-only">
       </a>
-      <a class="navbar__title" href="./">
+      <a class="navbar__title" href="{{get_url("index.html")}}">
         <h5>Glorius Plot Generator</h5>
       </a>
     </div>
   </div>
   <div class="navbar__items navbar__items--right">
-    <!-- This file contains the links that will appear in the top-right of the header bar for .html files in the index.htm page. --> <a href="{{get_url("index.html")}}" class="navbar__item navbar__link">Home</a> <a href="{{get_url("documentation.html")}}" class="navbar__item navbar__link">Documentation</a> <a href="https://psdi-uk.github.io/psdi-organic-toolkit/" class="navbar__item navbar__link">Organic Toolkit Home</a> <a href="https://forms.office.com/e/z2qpfyKXb8" class="navbar__item navbar__link" id="feedback-link">Provide Feedback</a> <a href="mailto: psdi@soton.ac.uk" class="navbar__item navbar__link" id="contact-link">Contact</a> <a data-cc="show-preferencesModal" class="navbar__item navbar__link" id="contact-link">Manage Cookie Preferences</a>
+    <!-- This file contains the links that will appear in the top-right of the header bar for .html files in the index.htm page. --> <a href="{{get_url("index.html")}}" class="navbar__item navbar__link">Home</a> <a href="{{get_url("documentation.html")}}" class="navbar__item navbar__link">Documentation</a> <a href="https://psdi-uk.github.io/psdi-organic-toolkit/" class="navbar__item navbar__link">Organic Toolkit Home</a> <a href="https://forms.office.com/e/z2qpfyKXb8" class="navbar__item navbar__link" id="feedback-link">Provide Feedback</a> <a href="mailto:support@psdi.ac.uk" class="navbar__item navbar__link" id="contact-link">Contact</a> <a href="javascript:void(0)" data-cc="show-preferencesModal" class="navbar__item navbar__link" id="contact-link">Manage Cookie Preferences</a>
     <button class="clean-btn color-mode-toggle" title="Switch between dark and light mode"
       aria-label="Lightmode/darkmode toggle button">
       <img src="{{url_for('static', filename='img/colormode-toggle-lm.svg')}}" alt="Lightmode toggle icon"

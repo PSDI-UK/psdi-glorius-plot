@@ -45,6 +45,12 @@ class SiteEnv:
                                                       default=False)
         """True if the app is running in debug mode, False if not"""
 
+        self.test_mode: bool = self._determine_value(ev=const.TEST_EV,
+                                                     arg=None,
+                                                     value_type=bool,
+                                                     default=False)
+        """True if the app is running in test mode, False if not"""
+
         tag, sha, commit_date = self._determine_tag_sha_date()
 
         self.tag: str = tag
@@ -56,10 +62,10 @@ class SiteEnv:
         self.date: date = commit_date
         """The date of the latest commit"""
 
-        self.static_url_path: str = self._determine_value(ev=const.STATIC_URL_PATH_EV,
-                                                          arg="static_url_path",
-                                                          value_type=str,
-                                                          default="/static")
+        self.rel_url_path: str = self._determine_value(ev=const.REL_URL_PATH_EV,
+                                                       arg=None,
+                                                       value_type=str,
+                                                       default="")
 
         self._kwargs: dict[str, str] | None = None
         """Cached value for dict containing all env values"""
@@ -179,10 +185,11 @@ class SiteEnv:
             commit_date: date | None = ev_commit_date
         else:
             try:
-                time_cmd = "git log -n 1 --pretty=reference | head -n 1 | gawk '{print($NF)}'"
+                time_cmd = ("git log -n 1 --pretty=reference | head -n 1 | gawk '{print($NF)}' " +
+                            "| gawk '{print substr($0, 1, length($0)-1)}'")
 
                 time_out_bytes = run(time_cmd, shell=True, capture_output=True).stdout
-                time_str = str(time_out_bytes.decode()).strip()[:-1]
+                time_str = str(time_out_bytes.decode()).strip()
                 commit_date = date(*map(int, time_str.split("-")))
 
             except Exception:
@@ -214,9 +221,26 @@ def update_env(args: Namespace | None = None):
     _env = SiteEnv(args)
 
 
+def custom_url_for(*args, **kwargs):
+    """Custom implementation of Flask's url_for which prepends the URL with a relative path"""
+    url = url_for(*args, **kwargs)
+    if url.startswith("/"):
+        url = url[1:]
+    url = os.path.join(get_env().rel_url_path, url)
+    if not (url.startswith("/") or url.startswith("http://") or url.startswith("https://")):
+        url = "/" + url
+    return url
+
+
 def get_url(page_url):
     url = url_for("static", filename="../"+page_url)
-    return url.replace("static/...", "")
+    url = url.replace("static/../", "")
+    if url.startswith("/"):
+        url = url[1:]
+    url = os.path.join(get_env().rel_url_path, url.replace("static/...", ""))
+    if not (url.startswith("/") or url.startswith("http://") or url.startswith("https://")):
+        url = "/" + url
+    return url
 
 
 def get_env_kwargs():
@@ -228,6 +252,7 @@ def get_env_kwargs():
     kwargs = env.kwargs
 
     # Add a function to get a URL, taking into account the static URL path
+    kwargs["url_for"] = custom_url_for
     kwargs["get_url"] = get_url
 
     return kwargs

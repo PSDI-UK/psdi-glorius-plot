@@ -48,16 +48,19 @@ TIMEOUT_SHORT = 1
 TIMESTEP = 0.1
 
 PLOT_GENERATION_TIME = 0.3
+SLOW_PLOT_GENERATION_TIME = 2.0
 
 DOWNLOAD_LOCATION = "/tmp"
-EX_PLOT_FILENAME = "glorius_plot.png"
+EX_PLOT_PNG_FILENAME = "glorius_plot.png"
+EX_PLOT_SVG_FILENAME = "glorius_plot.svg"
 
 SAVE_FILENAME = "glorius_plot_data.json"
 
 origin = os.environ.get("ORIGIN", DEFAULT_ORIGIN)
 
-# Run tests in production mode
+# Run tests in production mode and test mode
 os.environ[const.PRODUCTION_EV] = "true"
+os.environ[const.TEST_EV] = "true"
 
 
 @pytest.fixture(scope="module", autouse=True)
@@ -791,25 +794,38 @@ def test_plot_sizing(driver: WebDriver):
     assert _get_axis_fontsize(driver) == init_axis_fontsize*scale
 
 
-def _wait_for_download(filename):
+def _wait_for_download(filename, timeout=TIMEOUT_SHORT):
     time_elapsed = 0
-    while not os.path.isfile(filename):
+    file_exists = False
+    last_filesize = 0
+    new_filesize = 0
+    # Continue waiting while any of the following conditions are true:
+    # - The file doesn't exist
+    # - The file exists, but its size is zero
+    # - The file exists, but its size is different from the last time it was checked
+    while not file_exists or new_filesize == 0 or new_filesize != last_filesize:
+        file_exists = os.path.isfile(filename)
+        last_filesize = new_filesize
         time.sleep(TIMESTEP)
+        if file_exists:
+            new_filesize = os.path.getsize(filename)
         time_elapsed += TIMESTEP
-        if time_elapsed > TIMEOUT_SHORT:
+        if time_elapsed > timeout:
             pytest.fail(f"Download of {filename} timed out")
 
 
 def test_download_plot(driver: WebDriver):
     """Test that we can download an image of the plot using the provided button"""
 
-    qualified_download_filename = os.path.join(DOWNLOAD_LOCATION, EX_PLOT_FILENAME)
+    qualified_download_png_filename = os.path.join(DOWNLOAD_LOCATION, EX_PLOT_PNG_FILENAME)
+    qualified_download_svg_filename = os.path.join(DOWNLOAD_LOCATION, EX_PLOT_SVG_FILENAME)
 
-    # If the downloaded file already exists, remove it
-    try:
-        os.remove(qualified_download_filename)
-    except FileNotFoundError:
-        pass
+    # If the downloaded files already exists, remove them
+    for filename in [qualified_download_png_filename, qualified_download_svg_filename]:
+        try:
+            os.remove(filename)
+        except FileNotFoundError:
+            pass
 
     # Load the home page and wait for the page cover to be removed
     driver.get(f"{origin}/")
@@ -818,16 +834,24 @@ def test_download_plot(driver: WebDriver):
     # Wait a moment after the page loads so the plot can be generated
     time.sleep(PLOT_GENERATION_TIME)
 
-    # Turn off auto-updating while we do this
-    wait_for_element(driver, "//input[@id='auto-update-toggle']").click()
+    png_download_button = wait_for_element(driver, "//button[@id='export-image-png']")
+    png_download_button.click()
+    _wait_for_download(qualified_download_png_filename)
 
-    download_button = wait_for_element(driver, "//button[@id='export-image-png']")
-    download_button.click()
-    _wait_for_download(qualified_download_filename)
+    # Note the filesize of the downloaded plot, check it's non-zero, then delete it
+    empty_png_plot_filesize = os.path.getsize(qualified_download_png_filename)
+    assert empty_png_plot_filesize > 0
+    os.remove(qualified_download_png_filename)
 
-    # Note the filesize of the downloaded plot, then delete it
-    empty_plot_filesize = os.path.getsize(qualified_download_filename)
-    os.remove(qualified_download_filename)
+    # Now do the same with the svg version of the plot
+
+    svg_download_button = wait_for_element(driver, "//button[@id='export-image-svg']")
+    svg_download_button.click()
+    _wait_for_download(qualified_download_svg_filename, TIMEOUT_LONG)
+
+    empty_svg_plot_filesize = os.path.getsize(qualified_download_svg_filename)
+    assert empty_svg_plot_filesize > 0
+    os.remove(qualified_download_svg_filename)
 
     # Add a title to the plot now, so we can test if they seem to appear on the downloaded plot
 
@@ -835,23 +859,16 @@ def test_download_plot(driver: WebDriver):
                                               "//*[@id='title-input']//*[contains(@class,'ql-editor')]")
     title_input_element.send_keys("Example very very very very very long title")
 
-    # Generate it again, using the button to manually re-generate (since auto-updates are turned off)
-    generate_plot_button = wait_for_element(driver, "//button[@id='generate-plot']")
-    generate_plot_button.click()
-    time.sleep(PLOT_GENERATION_TIME)
-
     # Download it again
-    scroll_element_into_view(driver, download_button).click()
-    _wait_for_download(qualified_download_filename)
+    scroll_element_into_view(driver, svg_download_button).click()
+    _wait_for_download(qualified_download_svg_filename, TIMEOUT_LONG)
 
     # Note the filesize of the new downloaded plot, then delete it as well
-    title_plot_filesize = os.path.getsize(qualified_download_filename)
-    os.remove(qualified_download_filename)
+    title_plot_filesize = os.path.getsize(qualified_download_svg_filename)
+    os.remove(qualified_download_svg_filename)
 
-    # Check that the file size of the plot with the title is larger than for the empty plot - due to how PNG enconding
-    # works, a more complicated image will have a larger file size. If this isn't the case, it indicates something is
-    # going wrong with generating the plot
-    assert title_plot_filesize > empty_plot_filesize
+    # Check that the file size of the plot with the title is larger than for the empty plot
+    assert title_plot_filesize > empty_svg_plot_filesize
 
     # Add labels to plot now, so we can test if they seem to appear on the downloaded plot
 
@@ -861,18 +878,13 @@ def test_download_plot(driver: WebDriver):
     for label_input_element in l_label_input_elements:
         label_input_element.send_keys("Label")
 
-    # Generate it again, using the button to manually re-generate (since auto-updates are turned off)
-    generate_plot_button = wait_for_element(driver, "//button[@id='generate-plot']")
-    generate_plot_button.click()
-    time.sleep(PLOT_GENERATION_TIME)
-
     # Download it again
-    scroll_element_into_view(driver, download_button).click()
-    _wait_for_download(qualified_download_filename)
+    scroll_element_into_view(driver, svg_download_button).click()
+    _wait_for_download(qualified_download_svg_filename, TIMEOUT_LONG)
 
     # Note the filesize of the new downloaded plot, then delete it as well
-    label_plot_filesize = os.path.getsize(qualified_download_filename)
-    os.remove(qualified_download_filename)
+    label_plot_filesize = os.path.getsize(qualified_download_svg_filename)
+    os.remove(qualified_download_svg_filename)
 
     # Check that the file size of the plot with the labels is now even larger than just the title
     assert label_plot_filesize > title_plot_filesize
@@ -880,15 +892,13 @@ def test_download_plot(driver: WebDriver):
     # Now, fill the table with example data, wait for the plot to be re-generated, and download again
     wait_for_element(driver, "//button[@id='fill-example']").click()
     assert wait_for_condition(lambda: _get_num_condition_rows(driver) == 10)
-    scroll_element_into_view(driver, generate_plot_button).click()
-    time.sleep(PLOT_GENERATION_TIME)
 
-    scroll_element_into_view(driver, download_button).click()
-    _wait_for_download(qualified_download_filename)
+    scroll_element_into_view(driver, svg_download_button).click()
+    _wait_for_download(qualified_download_svg_filename, TIMEOUT_LONG)
 
     # Note the filesize of the new downloaded plot, then delete it as well
-    example_plot_filesize = os.path.getsize(qualified_download_filename)
-    os.remove(qualified_download_filename)
+    example_plot_filesize = os.path.getsize(qualified_download_svg_filename)
+    os.remove(qualified_download_svg_filename)
 
     # Check that the file size of the example plot is even larger than the labeled plot, since it's even more
     # complicated
@@ -1037,8 +1047,6 @@ def test_save_load_data(driver: WebDriver):
 
     # Now load the saved data
     wait_for_element(driver, "//input[@id='load-data-file']").send_keys(qualified_save_filename)
-    load_button = wait_for_element(driver, "//button[@id='load-data']")
-    load_button.click()
     time.sleep(PLOT_GENERATION_TIME)
 
     # Check that all data we entered before has now been reloaded

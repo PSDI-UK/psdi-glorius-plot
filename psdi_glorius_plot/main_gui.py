@@ -29,11 +29,8 @@ def main():
 
     parser.add_argument("--debug", action="store_true",
                         help="If set, will run the Flask server in debug mode, which will cause it to automatically "
-                        "reload if code changes and show an interactive debugger in the case of errors")
-
-    parser.add_argument("--static-url-path", type=str, default=None,
-                        help="In service mode, will set the path to static content relative to the site root "
-                        "directory. Has no effect if not in service mode.")
+                        "reload if code changes and show an interactive debugger in the case of errors. Will also set "
+                        "the renderer into debug mode for more convenient testing.")
 
     parser.add_argument("--log-level", type=str, default=None,
                         help="The desired level to log at. Allowed values are: 'DEBUG', 'INFO', 'WARNING', 'ERROR, "

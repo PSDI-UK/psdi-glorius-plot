@@ -16,7 +16,7 @@ jobs:
   check-branch:
     # Check that this job is being run on the release branch
     name: Check this is release branch
-    runs-on: psdi-glorius-plot-runners
+    runs-on: ubuntu-latest
     steps:
       - name: Check branch (success)
         if: github.ref == 'refs/heads/release'
@@ -30,7 +30,7 @@ jobs:
   get-latest-release-tag:
     # run on our self hosted github runners enabling access to STFC infrastructure
     name: Get latest release tag
-    runs-on: psdi-glorius-plot-runners
+    runs-on: ubuntu-latest
     needs: check-branch
     outputs:
       tag: ${{ steps.get-tag.outputs.TARGET_TAG }}
@@ -48,7 +48,7 @@ jobs:
   build-python:
     needs: get-latest-release-tag
     name: Build distribution 📦
-    runs-on: psdi-glorius-plot-runners
+    runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v6
@@ -104,11 +104,13 @@ jobs:
     if: false
     name: Deploy to production
     needs: get-latest-release-tag
-    uses: ./.github/workflows/job-deploy-k8s.yml # use the callable deploy job
-    secrets: inherit # pass all secrets for the environment
+    uses: PSDI-UK/psdi-glorius-plot-deployment/.github/workflows/job-external-deployment.yaml@bf95f7bc0840247a40dbd8aef2aaa7ee2baad1fe
     with:
       container_tag: ${{ needs.get-latest-release-tag.outputs.tag }}
       environment: production
+    secrets:
+      deployment_app_id: ${{ secrets.DEPLOYMENT_APP_ID }}
+      deployment_app_private_key: ${{ secrets.DEPLOYMENT_APP_PRIVATE_KEY }}
 
   # Run a simple test on prod to ensure nothing is broken
   test-prod:

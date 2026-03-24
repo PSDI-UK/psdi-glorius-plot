@@ -510,6 +510,11 @@ a {
 .content_knG7 a:hover,
 a:hover {
   text-decoration: none;
+  cursor         : pointer;
+}
+
+a.no-pointer {
+  cursor: default;
 }
 
 /* For links which contain longer text content, don't underline any text in paragraphs,
