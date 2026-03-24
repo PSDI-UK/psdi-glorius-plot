@@ -173,6 +173,7 @@
 
   --ifm-font-color-base        : var(--psdi-dark-text-color-body);
   --ifm-hero-text-color        : var(--psdi-light-text-color-body);
+  --psdi-primary-text-color    : var(--psdi-light-text-color-body);
   --ifm-heading-color          : var(--psdi-dark-text-color-heading);
   --psdi-heading-color-inverse : var(--psdi-light-text-color-heading);
   --ifm-font-color-secondary   : var(--psdi-text-color-secondary-body);
@@ -213,6 +214,7 @@
 
   --ifm-font-color-base        : var(--psdi-light-text-color-body);
   --ifm-hero-text-color        : var(--psdi-light-text-color-body);
+  --psdi-primary-text-color    : var(--psdi-dark-text-color-body);
   --ifm-heading-color          : var(--psdi-light-text-color-heading);
   --psdi-heading-color-inverse : var(--psdi-light-text-color-heading);
   --ifm-font-color-secondary   : var(--psdi-dm-text-color-secondary-body);
@@ -291,18 +293,31 @@ input.button {
   font-size       : var(--ifm-font-size-base);
   font-weight     : var(--ifm-font-weight-base);
   color           : var(--ifm-hero-text-color);
-  background-color: var(--ifm-color-primary);
+  background-color: var(--ifm-bg-color-primary);
   letter-spacing  : var(--psdi-letter-spacing-base);
   line-height     : var(--ifm-line-height-base);
   border-radius   : 0.25rem;
   margin          : 0.25rem;
 }
 
+button:disabled,
+input.button:disabled {
+  background-color: var(--ifm-color-secondary);
+  border-color    : rgba(118, 118, 118, 0.3);
+  color           : gray
+}
+
 button:hover,
 input.button:hover,
 button:focus,
 input.button:focus {
-  background-color: var(--ifm-color-primary-lighter);
+  background-color: var(--ifm-bg-color-primary-lighter);
+}
+
+button:disabled:hover,
+input.button:disabled:hover {
+  background-color: var(--ifm-color-secondary);
+  cursor          : default;
 }
 
 button:hover,
