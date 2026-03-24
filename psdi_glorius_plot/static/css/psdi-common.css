@@ -492,11 +492,20 @@ p {
 
 .hero,
 .footer {
-  color: var(--ifm-hero-text-color);
+  color           : var(--ifm-hero-text-color);
+  background-color: var(--ifm-bg-color-primary);
 }
 
-.hero {
-  background-color: var(--ifm-bg-color-primary);
+[data-theme='dark'] .hero,
+[data-theme='dark'] .footer {
+  border-width    : 1px;
+  border-width    : 1px;
+  border-color    : var(--ifm-hero-text-color);
+  border-top-style: solid;
+}
+
+[data-theme='dark'] .hero {
+  border-bottom-style: solid;
 }
 
 .hero .max-width-box {
@@ -634,9 +643,7 @@ a svg {
 }
 
 .footer {
-  background-color: var(--ifm-bg-color-primary);
-  color           : var(--ifm-hero-text-color);
-  padding         : 0.5rem 2rem 0.5rem 2rem;
+  padding: 0.5rem 2rem 0.5rem 2rem;
 }
 
 .footer .max-width-box {
