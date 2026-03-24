@@ -35,22 +35,38 @@
   --psdi-dm-bg-color-default          : #0a0a19;
 
   /* Primary color (light mode) - used for Hero panel and footer */
-  --psdi-bg-color-primary         : #041e42;
-  --psdi-bg-color-primary-dark    : #041b3b;
-  --psdi-bg-color-primary-darker  : #031938;
-  --psdi-bg-color-primary-darkest : #03152e;
-  --psdi-bg-color-primary-light   : #052756;
-  --psdi-bg-color-primary-lighter : #06326a;
-  --psdi-bg-color-primary-lightest: #07477f;
+  --psdi-color-primary         : #041e42;
+  --psdi-color-primary-dark    : #041b3b;
+  --psdi-color-primary-darker  : #031938;
+  --psdi-color-primary-darkest : #03152e;
+  --psdi-color-primary-light   : #052756;
+  --psdi-color-primary-lighter : #06326a;
+  --psdi-color-primary-lightest: #07477f;
+
+  --psdi-bg-color-primary         : var(--psdi-color-primary);
+  --psdi-bg-color-primary-dark    : var(--psdi-color-primary-dark);
+  --psdi-bg-color-primary-darker  : var(--psdi-color-primary-darker);
+  --psdi-bg-color-primary-darkest : var(--psdi-color-primary-darkest);
+  --psdi-bg-color-primary-light   : var(--psdi-color-primary-light);
+  --psdi-bg-color-primary-lighter : var(--psdi-color-primary-lighter);
+  --psdi-bg-color-primary-lightest: var(--psdi-color-primary-lightest);
 
   /* Primary color (dark mode) */
-  --psdi-dm-bg-color-primary         : #96caf4;
-  --psdi-dm-bg-color-primary-dark    : #72b8f0;
-  --psdi-dm-bg-color-primary-darker  : #61afee;
-  --psdi-dm-bg-color-primary-darkest : #2b94e9;
-  --psdi-dm-bg-color-primary-light   : #badcf8;
-  --psdi-dm-bg-color-primary-lighter : #cbe5fa;
-  --psdi-dm-bg-color-primary-lightest: #ffffff;
+  --psdi-dm-color-primary         : #96caf4;
+  --psdi-dm-color-primary-dark    : #72b8f0;
+  --psdi-dm-color-primary-darker  : #61afee;
+  --psdi-dm-color-primary-darkest : #2b94e9;
+  --psdi-dm-color-primary-light   : #badcf8;
+  --psdi-dm-color-primary-lighter : #cbe5fa;
+  --psdi-dm-color-primary-lightest: #ffffff;
+
+  --psdi-dm-bg-color-primary         : var(--psdi-color-primary);
+  --psdi-dm-bg-color-primary-dark    : var(--psdi-color-primary-dark);
+  --psdi-dm-bg-color-primary-darker  : var(--psdi-color-primary-darker);
+  --psdi-dm-bg-color-primary-darkest : var(--psdi-color-primary-darkest);
+  --psdi-dm-bg-color-primary-light   : var(--psdi-color-primary-light);
+  --psdi-dm-bg-color-primary-lighter : var(--psdi-color-primary-lighter);
+  --psdi-dm-bg-color-primary-lightest: var(--psdi-color-primary-lightest);
 
   /* Secondary color (light mode) */
   --psdi-text-color-secondary-body   : var(--psdi-dark-text-color-body);
@@ -135,13 +151,21 @@
   /* Define light mode here first, as default */
   --ifm-background-color: var(--psdi-bg-color-default);
 
-  --ifm-color-primary         : var(--psdi-bg-color-primary);
-  --ifm-color-primary-dark    : var(--psdi-bg-color-primary-dark);
-  --ifm-color-primary-darker  : var(--psdi-bg-color-primary-darker);
-  --ifm-color-primary-darkest : var(--psdi-bg-color-primary-darkest);
-  --ifm-color-primary-light   : var(--psdi-bg-color-primary-light);
-  --ifm-color-primary-lighter : var(--psdi-bg-color-primary-lighter);
-  --ifm-color-primary-lightest: var(--psdi-bg-color-primary-lightest);
+  --ifm-color-primary         : var(--psdi-color-primary);
+  --ifm-color-primary-dark    : var(--psdi-color-primary-dark);
+  --ifm-color-primary-darker  : var(--psdi-color-primary-darker);
+  --ifm-color-primary-darkest : var(--psdi-color-primary-darkest);
+  --ifm-color-primary-light   : var(--psdi-color-primary-light);
+  --ifm-color-primary-lighter : var(--psdi-color-primary-lighter);
+  --ifm-color-primary-lightest: var(--psdi-color-primary-lightest);
+
+  --ifm-bg-color-primary         : var(--psdi-bg-color-primary);
+  --ifm-bg-color-primary-dark    : var(--psdi-bg-color-primary-dark);
+  --ifm-bg-color-primary-darker  : var(--psdi-bg-color-primary-darker);
+  --ifm-bg-color-primary-darkest : var(--psdi-bg-color-primary-darkest);
+  --ifm-bg-color-primary-light   : var(--psdi-bg-color-primary-light);
+  --ifm-bg-color-primary-lighter : var(--psdi-bg-color-primary-lighter);
+  --ifm-bg-color-primary-lightest: var(--psdi-bg-color-primary-lightest);
 
   --ifm-color-secondary           : var(--psdi-bg-color-secondary);
   --ifm-color-secondary-dark      : var(--psdi-bg-color-secondary-dark);
@@ -167,22 +191,30 @@
   /* Set dark mode colors here */
   --ifm-background-color: var(--psdi-dm-bg-color-default);
 
-  --ifm-color-primary         : var(--psdi-dm-bg-color-primary);
-  --ifm-color-primary-dark    : var(--psdi-dm-bg-color-primary-dark);
-  --ifm-color-primary-darker  : var(--psdi-dm-bg-color-primary-darker);
-  --ifm-color-primary-darkest : var(--psdi-dm-bg-color-primary-darkest);
-  --ifm-color-primary-light   : var(--psdi-dm-bg-color-primary-light);
-  --ifm-color-primary-lighter : var(--psdi-dm-bg-color-primary-lighter);
-  --ifm-color-primary-lightest: var(--psdi-dm-bg-color-primary-lightest);
+  --ifm-color-primary         : var(--psdi-dm-color-primary);
+  --ifm-color-primary-dark    : var(--psdi-dm-color-primary-dark);
+  --ifm-color-primary-darker  : var(--psdi-dm-color-primary-darker);
+  --ifm-color-primary-darkest : var(--psdi-dm-color-primary-darkest);
+  --ifm-color-primary-light   : var(--psdi-dm-color-primary-light);
+  --ifm-color-primary-lighter : var(--psdi-dm-color-primary-lighter);
+  --ifm-color-primary-lightest: var(--psdi-dm-color-primary-lightest);
+
+  --ifm-bg-color-primary         : var(--psdi-dm-bg-color-primary);
+  --ifm-bg-color-primary-dark    : var(--psdi-dm-bg-color-primary-dark);
+  --ifm-bg-color-primary-darker  : var(--psdi-dm-bg-color-primary-darker);
+  --ifm-bg-color-primary-darkest : var(--psdi-dm-bg-color-primary-darkest);
+  --ifm-bg-color-primary-light   : var(--psdi-dm-bg-color-primary-light);
+  --ifm-bg-color-primary-lighter : var(--psdi-dm-bg-color-primary-lighter);
+  --ifm-bg-color-primary-lightest: var(--psdi-dm-bg-color-primary-lightest);
 
   --ifm-color-secondary           : var(--psdi-dm-bg-color-secondary);
   --ifm-color-secondary-dark      : var(--psdi-dm-bg-color-secondary-dark);
   --ifm-background-color-secondary: var(--psdi-dm-bg-color-secondary);
 
   --ifm-font-color-base        : var(--psdi-light-text-color-body);
-  --ifm-hero-text-color        : var(--psdi-dark-text-color-body);
+  --ifm-hero-text-color        : var(--psdi-light-text-color-body);
   --ifm-heading-color          : var(--psdi-light-text-color-heading);
-  --psdi-heading-color-inverse : var(--psdi-dark-text-color-heading);
+  --psdi-heading-color-inverse : var(--psdi-light-text-color-heading);
   --ifm-font-color-secondary   : var(--psdi-dm-text-color-secondary-body);
   --ifm-heading-color-secondary: var(--psdi-dark-text-color-heading);
   --psdi-font-color-faint      : gray;
@@ -244,7 +276,7 @@ input {
 }
 
 option:checked {
-  background-color: var(--ifm-color-primary);
+  background-color: var(--ifm-bg-color-primary);
   color           : var(--ifm-hero-text-color);
 }
 
@@ -449,7 +481,7 @@ p {
 }
 
 .hero {
-  background-color: var(--ifm-color-primary);
+  background-color: var(--ifm-bg-color-primary);
 }
 
 .hero .max-width-box {
@@ -587,7 +619,7 @@ a svg {
 }
 
 .footer {
-  background-color: var(--ifm-color-primary);
+  background-color: var(--ifm-bg-color-primary);
   color           : var(--ifm-hero-text-color);
   padding         : 0.5rem 2rem 0.5rem 2rem;
 }
