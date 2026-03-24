@@ -261,6 +261,11 @@ export function enableQuillEvents(alwaysCallback, otherCallbacks) {
 export async function waitForMathJax() {
   return new Promise(resolve => {
 
+    // Check if it's already available before doing anything else
+    if (MathJax.tex2svg)
+      resolve();
+
+    // Check on an interval until it's ready
     let interval;
     let elapsed = 0;
 
