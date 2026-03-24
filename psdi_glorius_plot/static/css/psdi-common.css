@@ -32,7 +32,7 @@
   /* Default color (dark mode) */
   --psdi-dm-text-color-default-body   : var(--psdi-light-text-color-body);
   --psdi-dm-text-color-default-heading: var(--psdi-light-text-color-heading);
-  --psdi-dm-bg-color-default          : #000000;
+  --psdi-dm-bg-color-default          : #0a0a19;
 
   /* Primary color (light mode) - used for Hero panel and footer */
   --psdi-bg-color-primary         : #041e42;
@@ -64,15 +64,15 @@
   --psdi-bg-color-secondary-lightest : #ffffff;
 
   /* Secondary color (dark mode) */
-  --psdi-dm-text-color-secondary-body   : var(--psdi-dark-text-color-body);
-  --psdi-dm-text-color-secondary-heading: var(--psdi-dark-text-color-heading);
-  --psdi-dm-bg-color-secondary          : #bbbbbb;
-  --psdi-dm-bg-color-secondary-dark     : #a8a8a8;
-  --psdi-dm-bg-color-secondary-darker   : #9f9f9f;
-  --psdi-dm-bg-color-secondary-darkest  : #838383;
-  --psdi-dm-bg-color-secondary-light    : #cecece;
-  --psdi-dm-bg-color-secondary-lighter  : #d7d7d7;
-  --psdi-dm-bg-color-secondary-lightest : #f3f3f3;
+  --psdi-dm-text-color-secondary-body   : var(--psdi-light-text-color-body);
+  --psdi-dm-text-color-secondary-heading: var(--psdi-light-text-color-heading);
+  --psdi-dm-bg-color-secondary          : #181823;
+  --psdi-dm-bg-color-secondary-dark     : #12121e;
+  --psdi-dm-bg-color-secondary-darker   : #0c0c19;
+  --psdi-dm-bg-color-secondary-darkest  : #060613;
+  --psdi-dm-bg-color-secondary-light    : #1e1e29;
+  --psdi-dm-bg-color-secondary-lighter  : #24242f;
+  --psdi-dm-bg-color-secondary-lightest : #2a2a35;
 
   /* Success color */
   --ifm-color-success         : #5aa2ae;
