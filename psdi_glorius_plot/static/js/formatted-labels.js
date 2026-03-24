@@ -470,11 +470,6 @@ export function HTMLToMd(s) {
 export async function renderingComplete(max_wait = 10000) {
   return new Promise((resolve, reject) => {
 
-    // Check if it's already available before doing anything else
-    if (numAwaitingRender == 0)
-      resolve();
-
-    // Check on an interval until it's ready
     let interval;
     let elapsed = 0;
 
