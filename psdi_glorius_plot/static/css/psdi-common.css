@@ -423,10 +423,6 @@ body>* {
   width          : 2rem;
 }
 
-[data-theme='dark'] #psdi-header .clean-btn {
-  background-color: black;
-}
-
 #psdi-header .clean-btn:hover {
   background: var(--ifm-background-color-secondary);
 }
