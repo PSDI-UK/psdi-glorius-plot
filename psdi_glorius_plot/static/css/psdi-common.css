@@ -344,7 +344,7 @@ button:disabled,
 input.button:disabled,
 input[type="button"]:disabled,
 input[type="file"]:disabled::file-selector-button {
-  background-color: var(--psdi-dm-bg-color-input-disabled);
+  background-color: var(--ifm-input-disabled-border-color);
   border-color    : rgba(118, 118, 118, 0.3);
   color           : gray
 }
@@ -353,7 +353,7 @@ button:disabled:hover,
 input.button:disabled:hover,
 input[type="button"]:disabled:hover,
 input[type="file"]:disabled::file-selector-button:hover {
-  background-color: var(--psdi-dm-bg-color-input-disabled);
+  background-color: var(--ifm-input-disabled-border-color);
   cursor          : default;
 }
 
