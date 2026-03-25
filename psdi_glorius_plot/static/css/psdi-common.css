@@ -185,7 +185,7 @@
 
   --ifm-font-color-base        : var(--psdi-dark-text-color-body);
   --ifm-hero-text-color        : var(--psdi-light-text-color-body);
-  --psdi-primary-text-color    : var(--psdi-light-text-color-body);
+  --ifm-font-color-primary     : var(--psdi-light-text-color-body);
   --ifm-heading-color          : var(--psdi-dark-text-color-heading);
   --psdi-heading-color-inverse : var(--psdi-light-text-color-heading);
   --ifm-font-color-secondary   : var(--psdi-text-color-secondary-body);
@@ -230,7 +230,7 @@
 
   --ifm-font-color-base        : var(--psdi-light-text-color-body);
   --ifm-hero-text-color        : var(--psdi-light-text-color-body);
-  --psdi-primary-text-color    : var(--psdi-dark-text-color-body);
+  --ifm-font-color-primary     : var(--psdi-dark-text-color-body);
   --ifm-heading-color          : var(--psdi-light-text-color-heading);
   --psdi-heading-color-inverse : var(--psdi-light-text-color-heading);
   --ifm-font-color-secondary   : var(--psdi-dm-text-color-secondary-body);

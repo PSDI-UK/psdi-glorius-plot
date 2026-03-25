@@ -705,13 +705,19 @@ details summary:active {
 }
 
 .tooltip-on-light {
-  --bs-tooltip-bg   : var(--ifm-color-primary);
+  --bs-tooltip-bg   : var(--ifm-bg-color-primary);
   --bs-tooltip-color: var(--ifm-hero-text-color);
 }
 
 .tooltip-on-dark {
-  --bs-tooltip-bg   : var(--ifm-background-color);
+  --bs-tooltip-bg   : var(--ifm-bg-color-primary);
   --bs-tooltip-color: var(--ifm-font-color-base);
+}
+
+[data-theme='dark'] .tooltip-on-light,
+[data-theme='dark'] .tooltip-on-dark {
+  --bs-tooltip-bg   : var(--ifm-color-primary);
+  --bs-tooltip-color: var(--ifm-font-color-primary);
 }
 
 /* Canvas styling */
