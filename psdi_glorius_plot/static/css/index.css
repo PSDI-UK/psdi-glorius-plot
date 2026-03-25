@@ -42,14 +42,6 @@ input.rel-deviation-value,
   text-align: right;
 }
 
-input:disabled {
-  background-color: var(--psdi-bg-color-secondary);
-}
-
-[data-theme='dark'] input:disabled {
-  background-color: var(--psdi-dm-bg-color-secondary-dark);
-}
-
 /* Button styling */
 
 button:disabled .text-icon {
@@ -426,16 +418,6 @@ ol.no-bullet {
   padding-right: 0.125rem;
 }
 
-input[type="text"],
-input[type="email"],
-input[type="url"] {
-  border: 2px inset #767676;
-}
-
-input[type="radio"]:hover {
-  cursor: pointer;
-}
-
 input.condition-label {
   max-width: 10.5rem;
 }
@@ -723,13 +705,19 @@ details summary:active {
 }
 
 .tooltip-on-light {
-  --bs-tooltip-bg   : var(--ifm-color-primary);
+  --bs-tooltip-bg   : var(--ifm-bg-color-primary);
   --bs-tooltip-color: var(--ifm-hero-text-color);
 }
 
 .tooltip-on-dark {
-  --bs-tooltip-bg   : var(--ifm-background-color);
+  --bs-tooltip-bg   : var(--ifm-bg-color-primary);
   --bs-tooltip-color: var(--ifm-font-color-base);
+}
+
+[data-theme='dark'] .tooltip-on-light,
+[data-theme='dark'] .tooltip-on-dark {
+  --bs-tooltip-bg   : var(--ifm-color-primary);
+  --bs-tooltip-color: var(--ifm-font-color-primary);
 }
 
 /* Canvas styling */
@@ -774,7 +762,7 @@ details summary:active {
   border    : 1px solid #3A3A3A;
   position  : absolute;
   z-index   : 1;
-  background: var(--ifm-background-color);
+  background: var(--ifm-input-bg-color);
 }
 
 .ql-toolbar.ql-snow {
@@ -866,10 +854,11 @@ details summary:active {
 }
 
 .ql-editor {
-  border     : 2px inset #767676;
-  font-family: 'Fira Sans', sans-serif;
-  font-size  : var(--ifm-font-size-base);
-  min-width  : 10.5rem;
+  background-color: var(--ifm-input-bg-color);
+  border          : 2px inset var(--ifm-input-border-color);
+  font-family     : 'Fira Sans', sans-serif;
+  font-size       : var(--ifm-font-size-base);
+  min-width       : 10.5rem;
 }
 
 .ql-editor.ql-blank::before {
