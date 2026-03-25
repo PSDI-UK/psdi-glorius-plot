@@ -752,10 +752,6 @@ details summary:active {
   height: 2rem;
 }
 
-.ql-editor {
-  height: var(--ql-height);
-}
-
 .ql-toolbar.ql-snow,
 .symbol-palette {
   display   : none;
@@ -859,6 +855,8 @@ details summary:active {
   font-family     : 'Fira Sans', sans-serif;
   font-size       : var(--ifm-font-size-base);
   min-width       : 10.5rem;
+  height          : var(--ql-height);
+  scrollbar-color : var(--ifm-hero-text-color) var(--ifm-bg-color-primary);
 }
 
 .ql-editor.ql-blank::before {
