@@ -42,14 +42,6 @@ input.rel-deviation-value,
   text-align: right;
 }
 
-input:disabled {
-  background-color: var(--psdi-bg-color-secondary);
-}
-
-[data-theme='dark'] input:disabled {
-  background-color: var(--psdi-dm-bg-color-secondary-dark);
-}
-
 /* Button styling */
 
 button:disabled .text-icon {
@@ -866,10 +858,11 @@ details summary:active {
 }
 
 .ql-editor {
-  border     : 2px inset #767676;
-  font-family: 'Fira Sans', sans-serif;
-  font-size  : var(--ifm-font-size-base);
-  min-width  : 10.5rem;
+  background-color: var(--ifm-input-bg-color);
+  border          : 2px inset var(--ifm-input-border-color);
+  font-family     : 'Fira Sans', sans-serif;
+  font-size       : var(--ifm-font-size-base);
+  min-width       : 10.5rem;
 }
 
 .ql-editor.ql-blank::before {

@@ -28,11 +28,17 @@
   --psdi-text-color-default-body   : var(--psdi-dark-text-color-body);
   --psdi-text-color-default-heading: var(--psdi-dark-text-color-heading);
   --psdi-bg-color-default          : #ffffff;
+  --psdi-bg-color-input            : #ffffff;
+  --psdi-bg-color-input-disabled   : #ffffff;
+  --psdi-bg-color-input-border     : #767676;
 
   /* Default color (dark mode) */
   --psdi-dm-text-color-default-body   : var(--psdi-light-text-color-body);
   --psdi-dm-text-color-default-heading: var(--psdi-light-text-color-heading);
   --psdi-dm-bg-color-default          : #0a0a19;
+  --psdi-dm-bg-color-input            : #050505;
+  --psdi-dm-bg-color-input-disabled   : #323232;
+  --psdi-dm-bg-color-input-border     : #a0a0a0;
 
   /* Primary color (light mode) - used for Hero panel and footer */
   --psdi-color-primary         : #041e42;
@@ -149,7 +155,10 @@
 
   /* Set specific colors to used based on light/dark-mode */
   /* Define light mode here first, as default */
-  --ifm-background-color: var(--psdi-bg-color-default);
+  --ifm-background-color       : var(--psdi-bg-color-default);
+  --ifm-input-bg-color         : var(--psdi-bg-color-input);
+  --ifm-input-disabled-bg-color: var(--psdi-bg-color-input-disabled);
+  --ifm-input-border-color     : var(--psdi-bg-color-input-border);
 
   --ifm-color-primary         : var(--psdi-color-primary);
   --ifm-color-primary-dark    : var(--psdi-color-primary-dark);
@@ -190,7 +199,10 @@
 [data-theme='dark'] {
 
   /* Set dark mode colors here */
-  --ifm-background-color: var(--psdi-dm-bg-color-default);
+  --ifm-background-color       : var(--psdi-dm-bg-color-default);
+  --ifm-input-bg-color         : var(--psdi-dm-bg-color-input);
+  --ifm-input-disabled-bg-color: var(--psdi-dm-bg-color-input-disabled);
+  --ifm-input-border-color     : var(--psdi-dm-bg-color-input-border);
 
   --ifm-color-primary         : var(--psdi-dm-color-primary);
   --ifm-color-primary-dark    : var(--psdi-dm-color-primary-dark);
@@ -271,10 +283,16 @@ input {
   font-family     : var(--ifm-font-family-base);
   font-size       : var(--ifm-font-size-base);
   font-weight     : var(--ifm-font-weight-base);
-  background-color: var(--ifm-background-color);
+  background-color: var(--ifm-input-bg-color);
   color           : var(--ifm-font-color-base);
   letter-spacing  : var(--psdi-letter-spacing-base);
   line-height     : var(--ifm-line-height-base);
+}
+
+select:disabled,
+option:disabled,
+input:disabled {
+  background-color: var(--ifm-input-disabled-bg-color);
 }
 
 option:checked {
@@ -302,7 +320,7 @@ input.button {
 
 button:disabled,
 input.button:disabled {
-  background-color: var(--ifm-color-secondary);
+  background-color: var(--psdi-dm-bg-color-input-disabled);
   border-color    : rgba(118, 118, 118, 0.3);
   color           : gray
 }
