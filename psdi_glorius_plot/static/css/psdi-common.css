@@ -312,7 +312,8 @@ input::placeholder {
 }
 
 button,
-input.button {
+input.button,
+input#file-upload-button {
   font-family     : var(--ifm-font-family-base);
   font-size       : var(--ifm-font-size-base);
   font-weight     : var(--ifm-font-weight-base);
@@ -324,13 +325,6 @@ input.button {
   margin          : 0.25rem;
 }
 
-button:disabled,
-input.button:disabled {
-  background-color: var(--psdi-dm-bg-color-input-disabled);
-  border-color    : rgba(118, 118, 118, 0.3);
-  color           : gray
-}
-
 button:hover,
 input.button:hover,
 button:focus,
@@ -338,15 +332,22 @@ input.button:focus {
   background-color: var(--ifm-bg-color-primary-lighter);
 }
 
-button:disabled:hover,
-input.button:disabled:hover {
-  background-color: var(--ifm-color-secondary);
-  cursor          : default;
-}
-
 button:hover,
 input.button:hover {
   cursor: pointer;
+}
+
+button:disabled,
+input.button:disabled {
+  background-color: var(--psdi-dm-bg-color-input-disabled);
+  border-color    : rgba(118, 118, 118, 0.3);
+  color           : gray
+}
+
+button:disabled:hover,
+input.button:disabled:hover {
+  background-color: var(--psdi-dm-bg-color-input-disabled);
+  cursor          : default;
 }
 
 *:has(> .max-width-box) {
