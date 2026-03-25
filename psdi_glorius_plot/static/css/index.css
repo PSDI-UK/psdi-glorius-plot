@@ -418,16 +418,6 @@ ol.no-bullet {
   padding-right: 0.125rem;
 }
 
-input[type="text"],
-input[type="email"],
-input[type="url"] {
-  border: 2px inset #767676;
-}
-
-input[type="radio"]:hover {
-  cursor: pointer;
-}
-
 input.condition-label {
   max-width: 10.5rem;
 }

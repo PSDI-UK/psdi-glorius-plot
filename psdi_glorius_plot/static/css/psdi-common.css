@@ -294,16 +294,15 @@ input {
   line-height     : var(--ifm-line-height-base);
 }
 
+input[type="radio"]:hover {
+  cursor: pointer;
+}
+
 select:disabled,
 option:disabled,
 input:disabled {
   background-color: var(--ifm-input-disabled-bg-color);
   border-color    : var(--ifm-input-disabled-border-color);
-}
-
-option:checked {
-  background-color: var(--ifm-bg-color-primary);
-  color           : var(--ifm-hero-text-color);
 }
 
 input::placeholder {
@@ -313,7 +312,7 @@ input::placeholder {
 
 button,
 input.button,
-input#file-upload-button {
+input[type="button"] {
   font-family     : var(--ifm-font-family-base);
   font-size       : var(--ifm-font-size-base);
   font-weight     : var(--ifm-font-weight-base);
@@ -327,27 +326,35 @@ input#file-upload-button {
 
 button:hover,
 input.button:hover,
+input[type="button"]:hover {
+  background-color: var(--ifm-bg-color-primary-lighter);
+  cursor          : pointer;
+}
+
 button:focus,
-input.button:focus {
+input.button:focus,
+input[type="button"]:focus {
   background-color: var(--ifm-bg-color-primary-lighter);
 }
 
-button:hover,
-input.button:hover {
-  cursor: pointer;
-}
-
 button:disabled,
-input.button:disabled {
+input.button:disabled,
+input[type="button"]:disabled {
   background-color: var(--psdi-dm-bg-color-input-disabled);
   border-color    : rgba(118, 118, 118, 0.3);
   color           : gray
 }
 
 button:disabled:hover,
-input.button:disabled:hover {
+input.button:disabled:hover,
+input[type="button"]:disabled:hover {
   background-color: var(--psdi-dm-bg-color-input-disabled);
   cursor          : default;
+}
+
+option:checked {
+  background-color: var(--ifm-bg-color-primary);
+  color           : var(--ifm-hero-text-color);
 }
 
 *:has(> .max-width-box) {
