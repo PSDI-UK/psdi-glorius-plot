@@ -43,13 +43,15 @@
   --psdi-dm-bg-color-input-disabled-border: #a0a0a04d;
 
   /* Primary color (light mode) - used for Hero panel and footer */
-  --psdi-color-primary         : #041e42;
-  --psdi-color-primary-dark    : #041b3b;
-  --psdi-color-primary-darker  : #031938;
-  --psdi-color-primary-darkest : #03152e;
-  --psdi-color-primary-light   : #042452;
-  --psdi-color-primary-lighter : #04316b;
-  --psdi-color-primary-lightest: #00437d;
+  --psdi-color-primary           : #041e42;
+  --psdi-color-primary-dark      : #041b3b;
+  --psdi-color-primary-darker    : #031938;
+  --psdi-color-primary-darkest   : #03152e;
+  --psdi-color-primary-light     : #042452;
+  --psdi-color-primary-lighter   : #04316b;
+  --psdi-color-primary-lightest  : #00437d;
+  --psdi-color-primary-lightestp1: #005198;
+  --psdi-color-primary-lightestp2: #005cad;
 
   --psdi-bg-color-primary         : var(--psdi-color-primary);
   --psdi-bg-color-primary-dark    : var(--psdi-color-primary-dark);
@@ -68,13 +70,13 @@
   --psdi-dm-color-primary-lighter : #cbe5fa;
   --psdi-dm-color-primary-lightest: #ffffff;
 
-  --psdi-dm-bg-color-primary         : var(--psdi-color-primary);
-  --psdi-dm-bg-color-primary-dark    : var(--psdi-color-primary-dark);
-  --psdi-dm-bg-color-primary-darker  : var(--psdi-color-primary-darker);
-  --psdi-dm-bg-color-primary-darkest : var(--psdi-color-primary-darkest);
-  --psdi-dm-bg-color-primary-light   : var(--psdi-color-primary-light);
-  --psdi-dm-bg-color-primary-lighter : var(--psdi-color-primary-lighter);
-  --psdi-dm-bg-color-primary-lightest: var(--psdi-color-primary-lightest);
+  --psdi-dm-bg-color-primary         : var(--psdi-color-primary-lighter);
+  --psdi-dm-bg-color-primary-dark    : var(--psdi-color-primary-light);
+  --psdi-dm-bg-color-primary-darker  : var(--psdi-color-primary);
+  --psdi-dm-bg-color-primary-darkest : var(--psdi-color-primary-dark);
+  --psdi-dm-bg-color-primary-light   : var(--psdi-color-primary-lightest);
+  --psdi-dm-bg-color-primary-lighter : var(--psdi-color-primary-lightestp1);
+  --psdi-dm-bg-color-primary-lightest: var(--psdi-color-primary-lightestp2);
 
   /* Secondary color (light mode) */
   --psdi-text-color-secondary-body   : var(--psdi-dark-text-color-body);
@@ -317,7 +319,7 @@ input[type="file"]::file-selector-button {
   font-family     : var(--ifm-font-family-base);
   font-size       : var(--ifm-font-size-base);
   color           : var(--ifm-hero-text-color);
-  background-color: var(--ifm-bg-color-primary-light);
+  background-color: var(--ifm-bg-color-primary);
   letter-spacing  : var(--psdi-letter-spacing-base);
   line-height     : var(--ifm-line-height-base);
   border-radius   : 0.25rem;
@@ -328,7 +330,7 @@ button:hover,
 input.button:hover,
 input[type="button"]:hover,
 input[type="file"]::file-selector-button:hover {
-  background-color: var(--ifm-bg-color-primary-lightest);
+  background-color: var(--ifm-bg-color-primary-lighter);
   cursor          : pointer;
 }
 
@@ -336,6 +338,13 @@ button:focus,
 input.button:focus,
 input[type="button"]:focus,
 input[type="file"]:focus::file-selector-button {
+  background-color: var(--ifm-bg-color-primary-lighter);
+}
+
+button:active,
+input.button:active,
+input[type="button"]:active,
+input[type="file"]:active::file-selector-button {
   background-color: var(--ifm-bg-color-primary-lightest);
 }
 
