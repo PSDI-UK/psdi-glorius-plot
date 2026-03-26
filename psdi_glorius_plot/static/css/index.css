@@ -862,7 +862,7 @@ details summary:active {
 .ql-editor.ql-blank::before {
   font-family: var(--ifm-font-family-base);
   font-size  : var(--ifm-font-size-base);
-  color      : color-mix(in srgb, var(--ifm-font-color-base), transparent 40%);
+  color      : var(--ifm-font-color-base-f2);
 }
 
 .condition-input .ql-editor {

@@ -19,10 +19,25 @@
 
   /* Background and text colors */
 
-  --psdi-dark-text-color-body    : #000000;
-  --psdi-dark-text-color-heading : #041E42;
+  --psdi-dark-text-color-body   : #000000;
+  --psdi-dark-text-color-body-f1: #000000c0;
+  --psdi-dark-text-color-body-f2: #00000080;
+  --psdi-dark-text-color-body-f3: #00000040;
+
+  --psdi-dark-text-color-heading   : #041E42;
+  --psdi-dark-text-color-heading-f1: #041E42c0;
+  --psdi-dark-text-color-heading-f2: #041E4280;
+  --psdi-dark-text-color-heading-f3: #041E4240;
+
   --psdi-light-text-color-body   : #ffffff;
-  --psdi-light-text-color-heading: #ffffff;
+  --psdi-light-text-color-body-f1: #ffffffc0;
+  --psdi-light-text-color-body-f2: #ffffff80;
+  --psdi-light-text-color-body-f3: #ffffff40;
+
+  --psdi-light-text-color-heading   : #ffffff;
+  --psdi-light-text-color-heading-f1: #ffffff;
+  --psdi-light-text-color-heading-f2: #ffffff;
+  --psdi-light-text-color-heading-f3: #ffffff;
 
   /* Default color (light mode) */
   --psdi-text-color-default-body       : var(--psdi-dark-text-color-body);
@@ -79,26 +94,22 @@
   --psdi-dm-bg-color-primary-lightest: var(--psdi-color-primary-lightestp2);
 
   /* Secondary color (light mode) */
-  --psdi-text-color-secondary-body   : var(--psdi-dark-text-color-body);
-  --psdi-text-color-secondary-heading: var(--psdi-dark-text-color-heading);
-  --psdi-bg-color-secondary          : #e5e1e6;
-  --psdi-bg-color-secondary-dark     : #cfc8d1;
-  --psdi-bg-color-secondary-darker   : #c5bcc7;
-  --psdi-bg-color-secondary-darkest  : #a497a8;
-  --psdi-bg-color-secondary-light    : #f0edf0;
-  --psdi-bg-color-secondary-lighter  : #fbfafb;
-  --psdi-bg-color-secondary-lightest : #ffffff;
+  --psdi-bg-color-secondary         : #e5e1e6;
+  --psdi-bg-color-secondary-dark    : #cfc8d1;
+  --psdi-bg-color-secondary-darker  : #c5bcc7;
+  --psdi-bg-color-secondary-darkest : #a497a8;
+  --psdi-bg-color-secondary-light   : #f0edf0;
+  --psdi-bg-color-secondary-lighter : #fbfafb;
+  --psdi-bg-color-secondary-lightest: #ffffff;
 
   /* Secondary color (dark mode) */
-  --psdi-dm-text-color-secondary-body   : var(--psdi-light-text-color-body);
-  --psdi-dm-text-color-secondary-heading: var(--psdi-light-text-color-heading);
-  --psdi-dm-bg-color-secondary          : #181823;
-  --psdi-dm-bg-color-secondary-dark     : #12121e;
-  --psdi-dm-bg-color-secondary-darker   : #0c0c19;
-  --psdi-dm-bg-color-secondary-darkest  : #060613;
-  --psdi-dm-bg-color-secondary-light    : #1e1e29;
-  --psdi-dm-bg-color-secondary-lighter  : #24242f;
-  --psdi-dm-bg-color-secondary-lightest : #2a2a35;
+  --psdi-dm-bg-color-secondary         : #181823;
+  --psdi-dm-bg-color-secondary-dark    : #12121e;
+  --psdi-dm-bg-color-secondary-darker  : #0c0c19;
+  --psdi-dm-bg-color-secondary-darkest : #060613;
+  --psdi-dm-bg-color-secondary-light   : #1e1e29;
+  --psdi-dm-bg-color-secondary-lighter : #24242f;
+  --psdi-dm-bg-color-secondary-lightest: #2a2a35;
 
   /* Success color */
   --ifm-color-success         : #5aa2ae;
@@ -148,10 +159,6 @@
   --ifm-button-background-color-dark: var(--psdi-bg-color-secondary-dark);
   --ifm-button-color                : var(--psdi-dark-text-color-heading);
 
-  /* Border colors */
-  --psdi-border-color-light: #f5f6f7;
-  --psdi-border-color-dark : #111111;
-
   /* Link styling */
   --ifm-link-color             : inherit;
   --ifm-link-hover-color       : inherit;
@@ -185,16 +192,40 @@
   --ifm-color-secondary-dark      : var(--psdi-bg-color-secondary-dark);
   --ifm-background-color-secondary: var(--psdi-bg-color-secondary);
 
-  --ifm-font-color-base        : var(--psdi-dark-text-color-body);
-  --ifm-hero-text-color        : var(--psdi-light-text-color-body);
-  --ifm-font-color-primary     : var(--psdi-light-text-color-body);
-  --ifm-heading-color          : var(--psdi-dark-text-color-heading);
-  --psdi-heading-color-inverse : var(--psdi-light-text-color-heading);
-  --ifm-font-color-secondary   : var(--psdi-text-color-secondary-body);
-  --ifm-heading-color-secondary: var(--psdi-dark-text-color-heading);
-  --psdi-font-color-faint      : gray;
+  --ifm-font-color-base   : var(--psdi-dark-text-color-body);
+  --ifm-font-color-base-f1: var(--psdi-dark-text-color-body-f1);
+  --ifm-font-color-base-f2: var(--psdi-dark-text-color-body-f2);
+  --ifm-font-color-base-f3: var(--psdi-dark-text-color-body-f3);
 
-  --psdi-border-color: var(--psdi-border-color-light);
+  --ifm-hero-text-color   : var(--psdi-light-text-color-body);
+  --ifm-hero-text-color-f1: var(--psdi-light-text-color-body-f1);
+  --ifm-hero-text-color-f2: var(--psdi-light-text-color-body-f2);
+  --ifm-hero-text-color-f3: var(--psdi-light-text-color-body-f3);
+
+  --ifm-font-color-primary   : var(--psdi-light-text-color-body);
+  --ifm-font-color-primary-f1: var(--psdi-light-text-color-body-f1);
+  --ifm-font-color-primary-f2: var(--psdi-light-text-color-body-f2);
+  --ifm-font-color-primary-f3: var(--psdi-light-text-color-body-f3);
+
+  --ifm-heading-color   : var(--psdi-dark-text-color-heading);
+  --ifm-heading-color-f1: var(--psdi-dark-text-color-heading-f1);
+  --ifm-heading-color-f2: var(--psdi-dark-text-color-heading-f2);
+  --ifm-heading-color-f3: var(--psdi-dark-text-color-heading-f3);
+
+  --ifm-hero-heading-color   : var(--psdi-light-text-color-heading);
+  --ifm-hero-heading-color-f1: var(--psdi-light-text-color-heading-f1);
+  --ifm-hero-heading-color-f2: var(--psdi-light-text-color-heading-f2);
+  --ifm-hero-heading-color-f3: var(--psdi-light-text-color-heading-f3);
+
+  --ifm-font-color-secondary   : var(--psdi-dark-text-color-body);
+  --ifm-font-color-secondary-f1: var(--psdi-dark-text-color-body-f1);
+  --ifm-font-color-secondary-f2: var(--psdi-dark-text-color-body-f2);
+  --ifm-font-color-secondary-f3: var(--psdi-dark-text-color-body-f3);
+
+  --ifm-heading-color-secondary   : var(--psdi-dark-text-color-heading);
+  --ifm-heading-color-secondary-f1: var(--psdi-dark-text-color-heading-f1);
+  --ifm-heading-color-secondary-f2: var(--psdi-dark-text-color-heading-f2);
+  --ifm-heading-color-secondary-f3: var(--psdi-dark-text-color-heading-f3);
 
   --lm-display: inherit;
   --dm-display: none;
@@ -230,16 +261,40 @@
   --ifm-color-secondary-dark      : var(--psdi-dm-bg-color-secondary-dark);
   --ifm-background-color-secondary: var(--psdi-dm-bg-color-secondary);
 
-  --ifm-font-color-base        : var(--psdi-light-text-color-body);
-  --ifm-hero-text-color        : var(--psdi-light-text-color-body);
-  --ifm-font-color-primary     : var(--psdi-dark-text-color-body);
-  --ifm-heading-color          : var(--psdi-light-text-color-heading);
-  --psdi-heading-color-inverse : var(--psdi-light-text-color-heading);
-  --ifm-font-color-secondary   : var(--psdi-dm-text-color-secondary-body);
-  --ifm-heading-color-secondary: var(--psdi-dark-text-color-heading);
-  --psdi-font-color-faint      : gray;
+  --ifm-font-color-base   : var(--psdi-light-text-color-body);
+  --ifm-font-color-base-f1: var(--psdi-light-text-color-body-f1);
+  --ifm-font-color-base-f2: var(--psdi-light-text-color-body-f2);
+  --ifm-font-color-base-f3: var(--psdi-light-text-color-body-f3);
 
-  --psdi-border-color: var(--psdi-border-color-dark);
+  --ifm-hero-text-color   : var(--psdi-light-text-color-body);
+  --ifm-hero-text-color-f1: var(--psdi-light-text-color-body-f1);
+  --ifm-hero-text-color-f2: var(--psdi-light-text-color-body-f2);
+  --ifm-hero-text-color-f3: var(--psdi-light-text-color-body-f3);
+
+  --ifm-font-color-primary   : var(--psdi-dark-text-color-body);
+  --ifm-font-color-primary-f1: var(--psdi-dark-text-color-body-f1);
+  --ifm-font-color-primary-f2: var(--psdi-dark-text-color-body-f2);
+  --ifm-font-color-primary-f3: var(--psdi-dark-text-color-body-f3);
+
+  --ifm-heading-color   : var(--psdi-light-text-color-heading);
+  --ifm-heading-color-f1: var(--psdi-light-text-color-heading-f1);
+  --ifm-heading-color-f2: var(--psdi-light-text-color-heading-f2);
+  --ifm-heading-color-f3: var(--psdi-light-text-color-heading-f3);
+
+  --ifm-hero-heading-color   : var(--psdi-light-text-color-heading);
+  --ifm-hero-heading-color-f1: var(--psdi-light-text-color-heading-f1);
+  --ifm-hero-heading-color-f2: var(--psdi-light-text-color-heading-f2);
+  --ifm-hero-heading-color-f3: var(--psdi-light-text-color-heading-f3);
+
+  --ifm-font-color-secondary   : var(--psdi-light-text-color-body);
+  --ifm-font-color-secondary-f1: var(--psdi-light-text-color-body-f1);
+  --ifm-font-color-secondary-f2: var(--psdi-light-text-color-body-f2);
+  --ifm-font-color-secondary-f3: var(--psdi-light-text-color-body-f3);
+
+  --ifm-heading-color-secondary   : var(--psdi-light-text-color-heading);
+  --ifm-heading-color-secondary-f1: var(--psdi-light-text-color-heading-f1);
+  --ifm-heading-color-secondary-f2: var(--psdi-light-text-color-heading-f2);
+  --ifm-heading-color-secondary-f3: var(--psdi-light-text-color-heading-f3);
 
   --lm-display: none;
   --dm-display: inherit;
@@ -308,7 +363,7 @@ input:disabled {
 }
 
 input::placeholder {
-  color     : var(--psdi-font-color-faint);
+  color     : var(--ifm-font-color-base-f2);
   font-style: italic;
 }
 
@@ -410,7 +465,6 @@ body>* {
   flex-direction  : column;
   align-items     : center;
   padding         : 0;
-  border-bottom   : 1px solid var(--psdi-border-color);
   height          : auto !important;
 }
 
@@ -537,15 +591,9 @@ p {
   background-color: var(--ifm-bg-color-primary);
 }
 
-[data-theme='dark'] .hero,
-[data-theme='dark'] .footer {
-  border-width    : 1px;
-  border-width    : 1px;
-  border-color    : var(--ifm-hero-text-color);
-  border-top-style: solid;
-}
-
-[data-theme='dark'] .hero {
+[data-theme='dark'] :is(.header, .hero, .footer, .content, .secondary):has(.header, +.hero, +.footer, +.content, +.secondary) {
+  border-width       : 1px;
+  border-color       : var(--ifm-hero-text-color-f1);
   border-bottom-style: solid;
 }
 
@@ -580,7 +628,7 @@ p {
 .footer h4,
 .footer h5,
 .footer h6 {
-  color: var(--psdi-heading-color-inverse);
+  color: var(--ifm-hero-heading-color);
 }
 
 .secondary {
@@ -737,7 +785,7 @@ a svg {
 }
 
 .footer__title {
-  color          : var(--psdi-heading-color-inverse);
+  color          : var(--ifm-hero-heading-color);
   font-weight    : bold;
   display        : flex;
   flex-direction : column;
