@@ -577,7 +577,7 @@ input.rel-deviation-value {
   align-items     : center;
   content         : "i";
   background-color: var(--ifm-color-info);
-  color           : var(--psdi-light-text-color-body);
+  color           : var(--ifm-hero-text-color);
   font-family     : serif;
   font-weight     : bold;
   width           : 1rem;
@@ -643,7 +643,7 @@ details>summary:before,
   padding      : 0;
   font-size    : var(--marker-height);
   line-height  : var(--marker-height);
-  color        : var(--psdi-light-text-color-body);
+  color        : var(--ifm-hero-text-color);
   font-family  : serif;
   font-weight  : bold;
   width        : var(--marker-height);
@@ -862,7 +862,7 @@ details summary:active {
 .ql-editor.ql-blank::before {
   font-family: var(--ifm-font-family-base);
   font-size  : var(--ifm-font-size-base);
-  color      : color-mix(in srgb, var(--ifm-font-color-base), transparent 40%);
+  color      : var(--ifm-font-color-base-f2);
 }
 
 .condition-input .ql-editor {

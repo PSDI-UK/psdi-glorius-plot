@@ -20,6 +20,97 @@
 {% block hero_title %}PSDI Glorius Plot Generator{% endblock %}
 
 {% block content_before_main %}
+<div class="secondary mathjax_ignore" id="instructions">
+  <div class="max-width-box">
+    <p>
+      This service enables users to visualise the sensitivity of a given chemical transformation to user-defined
+      reaction conditions. The output plots are closely based on an
+      <a href="https://onlinelibrary.wiley.com/doi/10.1002/anie.201901935" target="_blank">original concept from the
+        Glorius research group</a>.
+    </p>
+    <p>
+      This service is still a work in progress, and feedback is very welcome, whether feature requests, bug reports, or
+      even highlighting a feature you find particularly useful so we know not to remove it when streamlining the
+      service. To provide feedback, click the “Provide Feedback” link on the right side of the header, which will open
+      up a form to submit it.
+    </p>
+    <div class="multicol">
+      <div class="multicol-element">
+        <details>
+          <summary class="info-marker"><strong>Instructions</strong></summary>
+          <p>
+            Select the reaction outcome of interest (e.g., commonly reaction yield, <em>ee</em> or <em>de</em>) and
+            define the number of experimental parameters, or “test conditions”, that you have used in your sensitivity
+            analysis. If you have conducted repeat reactions for each test condition, then select the number of
+            experiments that
+            were carried out.
+          </p>
+          <p>
+            Fill in the reaction outcome table. This can be navigated by keyboard with tab to move horizontally, enter
+            to move vertically (holding shift to move in reverse), and escape to select the add/remove row buttons.
+          </p>
+          <ul>
+            <li>Input the value of the reaction outcome (yield, <em>ee</em> or <em>de</em>) for your optimised “standard
+              conditions”.</li>
+            <li>Add labels to define each test condition that was used in your sensitivity analysis, and add the value
+              of the reaction outcome for each test reaction.</li>
+            <li>Select the “value to plot”. Values of the reaction outcome can be plotted directly, or deviation of the
+              outcome from the standard conditions may be used.</li>
+          </ul>
+          <p>
+            Tools for customisation of the plot are available beneath the plotting window. These can be use to change
+            the plot style to "fan" mode (a circular bar chart, which is recommended for better readability), resize the
+            plot and labels, adjust the colour scheme, and adjust how the data is ordered on the plot.
+          </p>
+        </details>
+      </div>
+      <div class="multicol-element">
+        <details>
+          <summary class="info-marker"><strong>Help with formatting and special symbols</strong> - what to do if text
+            appears as a black bar on the chart
+          </summary>
+          <p>
+            Most text inputs here support advanced formatting, which will be rendered on the plot just as it appears in
+            the editor. If you choose to export a data package, appropriate formatted text will be rendered in the
+            contained images and files, as much as supported by their various formats (e.g. Markdown doesn't support
+            underline, so underlines won't appear in <code>.md</code> files, but other formatting will still be
+            present).
+          </p>
+          <p>
+            <strong>Basic formatting:</strong> You can format text entered in the Title and various other fields by
+            clicking on the formatting buttons in the toolbar that appears above the text-input boxes when they're
+            selected, either by clicking a button then entering text, or by selecting text and then clicking a button.
+            If the text is longer than the box can fit in one line, a scrollbar will appear at the right side of the box
+            allowing you to scroll up and down lines of text.
+          </p>
+          <p>This formatting is done through a LaTeX equation rendering engine, which results in some unavoidable quirks
+            such as it always putting spaces around mathematical operators. If the renderer fails to parse the text, it
+            will appear as a black bar on the chart. The most common cause of this is less-than and greater-than
+            symbols, which get interpreted as HTML tags. This can by worked around by replacing them with “\gt” and
+            “\lt” respectively.
+          </p>
+          <p>
+            <strong>Special symbols:</strong> Click the “<strong>Ω</strong>” button in the toolbar to open a palette to
+            select a special symbol to insert. If you need a symbol not listed here, you can search for it at a site
+            such as <a href="https://unicodeplus.com/">UnicodePlus</a> and copy the character from there (note that this
+            site displays the characters in bold and that formatting will be copied over, so if you don't want it,
+            either choose to paste without formatting (ctrl+shift+v on Windows and Linux, not supported on MacOS) or
+            remove the formatting afterwards).
+          </p>
+          <p>
+            <strong>Advanced formatting:</strong> If you're familiar with LaTeX markup, you can use it to directly set
+            the text that will appear on the chart, or you can use <a href="https://latexeditor.lagrida.com/">a LaTeX
+              equation editor</a> to help. Malformed LaTeX markup will appear as red on the chart, or may result in the
+            renderer failing entirely, resulting in the text appearing as a black bar on the chart.
+          </p>
+        </details>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block inner_content %}
 
 <!-- Templates used in this page -->
 <template id="quill-toolbar">
@@ -248,99 +339,6 @@
     </button>
   </div>
 </template>
-
-<div class="secondary mathjax_ignore" id="instructions">
-  <div class="max-width-box">
-    <p>
-      This service enables users to visualise the sensitivity of a given chemical transformation to user-defined
-      reaction conditions. The output plots are closely based on an
-      <a href="https://onlinelibrary.wiley.com/doi/10.1002/anie.201901935" target="_blank">original concept from the
-        Glorius research group</a>.
-    </p>
-    <p>
-      This service is still a work in progress, and feedback is very welcome, whether feature requests, bug reports, or
-      even highlighting a feature you find particularly useful so we know not to remove it when streamlining the
-      service. To provide feedback, click the “Provide Feedback” link on the right side of the header, which will open
-      up a form to submit it.
-    </p>
-    <div class="multicol">
-      <div class="multicol-element">
-        <details>
-          <summary class="info-marker"><strong>Instructions</strong></summary>
-          <p>
-            Select the reaction outcome of interest (e.g., commonly reaction yield, <em>ee</em> or <em>de</em>) and
-            define the number of experimental parameters, or “test conditions”, that you have used in your sensitivity
-            analysis. If you have conducted repeat reactions for each test condition, then select the number of
-            experiments that
-            were carried out.
-          </p>
-          <p>
-            Fill in the reaction outcome table. This can be navigated by keyboard with tab to move horizontally, enter
-            to move vertically (holding shift to move in reverse), and escape to select the add/remove row buttons.
-          </p>
-          <ul>
-            <li>Input the value of the reaction outcome (yield, <em>ee</em> or <em>de</em>) for your optimised “standard
-              conditions”.</li>
-            <li>Add labels to define each test condition that was used in your sensitivity analysis, and add the value
-              of the reaction outcome for each test reaction.</li>
-            <li>Select the “value to plot”. Values of the reaction outcome can be plotted directly, or deviation of the
-              outcome from the standard conditions may be used.</li>
-          </ul>
-          <p>
-            Tools for customisation of the plot are available beneath the plotting window. These can be use to change
-            the plot style to "fan" mode (a circular bar chart, which is recommended for better readability), resize the
-            plot and labels, adjust the colour scheme, and adjust how the data is ordered on the plot.
-          </p>
-        </details>
-      </div>
-      <div class="multicol-element">
-        <details>
-          <summary class="info-marker"><strong>Help with formatting and special symbols</strong> - what to do if text
-            appears as a black bar on the chart
-          </summary>
-          <p>
-            Most text inputs here support advanced formatting, which will be rendered on the plot just as it appears in
-            the editor. If you choose to export a data package, appropriate formatted text will be rendered in the
-            contained images and files, as much as supported by their various formats (e.g. Markdown doesn't support
-            underline, so underlines won't appear in <code>.md</code> files, but other formatting will still be
-            present).
-          </p>
-          <p>
-            <strong>Basic formatting:</strong> You can format text entered in the Title and various other fields by
-            clicking on the formatting buttons in the toolbar that appears above the text-input boxes when they're
-            selected, either by clicking a button then entering text, or by selecting text and then clicking a button.
-            If the text is longer than the box can fit in one line, a scrollbar will appear at the right side of the box
-            allowing you to scroll up and down lines of text.
-          </p>
-          <p>This formatting is done through a LaTeX equation rendering engine, which results in some unavoidable quirks
-            such as it always putting spaces around mathematical operators. If the renderer fails to parse the text, it
-            will appear as a black bar on the chart. The most common cause of this is less-than and greater-than
-            symbols, which get interpreted as HTML tags. This can by worked around by replacing them with “\gt” and
-            “\lt” respectively.
-          </p>
-          <p>
-            <strong>Special symbols:</strong> Click the “<strong>Ω</strong>” button in the toolbar to open a palette to
-            select a special symbol to insert. If you need a symbol not listed here, you can search for it at a site
-            such as <a href="https://unicodeplus.com/">UnicodePlus</a> and copy the character from there (note that this
-            site displays the characters in bold and that formatting will be copied over, so if you don't want it,
-            either choose to paste without formatting (ctrl+shift+v on Windows and Linux, not supported on MacOS) or
-            remove the formatting afterwards).
-          </p>
-          <p>
-            <strong>Advanced formatting:</strong> If you're familiar with LaTeX markup, you can use it to directly set
-            the text that will appear on the chart, or you can use <a href="https://latexeditor.lagrida.com/">a LaTeX
-              equation editor</a> to help. Malformed LaTeX markup will appear as red on the chart, or may result in the
-            renderer failing entirely, resulting in the text appearing as a black bar on the chart.
-          </p>
-        </details>
-      </div>
-    </div>
-  </div>
-</div>
-
-{% endblock %}
-
-{% block inner_content %}
 
 <div class="multicol-on-big-screen wrap col-if-details-closed full-width">
   <form class="multicol-element align-start-if-open full-width allow-overflow-x">
