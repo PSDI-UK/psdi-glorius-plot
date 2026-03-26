@@ -329,9 +329,11 @@ body {
   z-index   : 99999;
 }
 
-select,
-option,
-input {
+input[type="radio"]:hover {
+  cursor: pointer;
+}
+
+:is(select, option, input) {
   font-family     : var(--ifm-font-family-base);
   font-size       : var(--ifm-font-size-base);
   font-weight     : var(--ifm-font-weight-base);
@@ -342,13 +344,7 @@ input {
   line-height     : var(--ifm-line-height-base);
 }
 
-input[type="radio"]:hover {
-  cursor: pointer;
-}
-
-select:disabled,
-option:disabled,
-input:disabled {
+:is(select, option, input):disabled {
   background-color: var(--ifm-input-disabled-bg-color);
   border-color    : var(--ifm-input-disabled-border-color);
 }
@@ -358,10 +354,7 @@ input::placeholder {
   font-style: italic;
 }
 
-button,
-input.button,
-input[type="button"],
-input[type="file"]::file-selector-button {
+:is(button, input.button, input[type="button"], input[type="file"]::file-selector-button) {
   font-family     : var(--ifm-font-family-base);
   font-size       : var(--ifm-font-size-base);
   color           : var(--ifm-hero-text-color);
@@ -372,41 +365,26 @@ input[type="file"]::file-selector-button {
   margin          : 0.25rem;
 }
 
-button:hover,
-input.button:hover,
-input[type="button"]:hover,
-input[type="file"]::file-selector-button:hover {
+:is(button, input.button, input[type="button"], input[type="file"]::file-selector-button):hover {
   background-color: var(--ifm-bg-color-button-hover);
   cursor          : pointer;
 }
 
-button:focus,
-input.button:focus,
-input[type="button"]:focus,
-input[type="file"]:focus::file-selector-button {
+:is(button, input.button, input[type="button"], input[type="file"]::file-selector-button):focus {
   background-color: var(--ifm-bg-color-button-hover);
 }
 
-button:active,
-input.button:active,
-input[type="button"]:active,
-input[type="file"]:active::file-selector-button {
+:is(button, input.button, input[type="button"], input[type="file"]::file-selector-button):active {
   background-color: var(--ifm-bg-color-button-active);
 }
 
-button:disabled,
-input.button:disabled,
-input[type="button"]:disabled,
-input[type="file"]:disabled::file-selector-button {
+:is(button, input.button, input[type="button"], input[type="file"]::file-selector-button):disabled {
   background-color: var(--ifm-input-disabled-border-color);
   border-color    : rgba(118, 118, 118, 0.3);
   color           : gray
 }
 
-button:disabled:hover,
-input.button:disabled:hover,
-input[type="button"]:disabled:hover,
-input[type="file"]:disabled::file-selector-button:hover {
+:is(button, input.button, input[type="button"], input[type="file"]::file-selector-button):disabled:hover {
   background-color: var(--ifm-input-disabled-border-color);
   cursor          : default;
 }
@@ -582,7 +560,8 @@ p {
   background-color: var(--ifm-color-primary);
 }
 
-[data-theme='dark'] :is(.header, .hero, .footer, .content, .secondary):has(.header, +.hero, +.footer, +.content, +.secondary) {
+[data-theme='dark'] :is(.header, .hero, .footer, .content, .secondary):has(.header, +.hero, +.footer, +.content,
+  +.secondary) {
   border-width       : 1px;
   border-color       : var(--ifm-hero-text-color-f1);
   border-bottom-style: solid;
@@ -607,18 +586,7 @@ p {
   background-color: var(--ifm-background-color-secondary);
 }
 
-.hero h1,
-.hero h2,
-.hero h3,
-.hero h4,
-.hero h5,
-.hero h6,
-.footer h1,
-.footer h2,
-.footer h3,
-.footer h4,
-.footer h5,
-.footer h6 {
+:is(.hero, .footer) :is(h1, h2, h3, h4, h5, h6) {
   color: var(--ifm-hero-heading-color);
 }
 
@@ -626,12 +594,7 @@ p {
   color: var(--ifm-font-color-secondary);
 }
 
-.secondary h1,
-.secondary h2,
-.secondary h3,
-.secondary h4,
-.secondary h5,
-.secondary h6 {
+:is(.secondary) :is(h1, h2, h3, h4, h5, h6) {
   color: var(--ifm-heading-color-secondary);
 }
 
@@ -655,30 +618,15 @@ a.no-pointer {
 
 /* For links which contain longer text content, don't underline any text in paragraphs,
    but do underline (and remove on hover) in the headings */
-a:has(>h1),
-a:has(>h2),
-a:has(>h3),
-a:has(>h4),
-a:has(>h5),
-a:has(>h6) {
+a:has(>h1, >h2, >h3, >h4, >h5, >h6) {
   text-decoration: none;
 }
 
-a h1,
-a h2,
-a h3,
-a h4,
-a h5,
-a h6 {
+a :is(>h1, >h2, >h3, >h4, >h5, >h6) {
   text-decoration: underline;
 }
 
-a:hover h1,
-a:hover h2,
-a:hover h3,
-a:hover h4,
-a:hover h5,
-a:hover h6 {
+a:hover :is(>h1, >h2, >h3, >h4, >h5, >h6) {
   text-decoration: none;
 }
 
