@@ -622,11 +622,11 @@ a:has(>h1, >h2, >h3, >h4, >h5, >h6) {
   text-decoration: none;
 }
 
-a :is(>h1, >h2, >h3, >h4, >h5, >h6) {
+a :is(h1, h2, h3, h4, h5, h6) {
   text-decoration: underline;
 }
 
-a:hover :is(>h1, >h2, >h3, >h4, >h5, >h6) {
+a:hover :is(h1, h2, h3, h4, h5, h6) {
   text-decoration: none;
 }
 
