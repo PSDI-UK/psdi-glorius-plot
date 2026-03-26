@@ -47,9 +47,9 @@
   --psdi-color-primary-dark    : #041b3b;
   --psdi-color-primary-darker  : #031938;
   --psdi-color-primary-darkest : #03152e;
-  --psdi-color-primary-light   : #052756;
-  --psdi-color-primary-lighter : #06326a;
-  --psdi-color-primary-lightest: #07477f;
+  --psdi-color-primary-light   : #042452;
+  --psdi-color-primary-lighter : #04316b;
+  --psdi-color-primary-lightest: #00437d;
 
   --psdi-bg-color-primary         : var(--psdi-color-primary);
   --psdi-bg-color-primary-dark    : var(--psdi-color-primary-dark);
@@ -316,9 +316,8 @@ input[type="button"],
 input[type="file"]::file-selector-button {
   font-family     : var(--ifm-font-family-base);
   font-size       : var(--ifm-font-size-base);
-  font-weight     : var(--ifm-font-weight-base);
   color           : var(--ifm-hero-text-color);
-  background-color: var(--ifm-bg-color-primary);
+  background-color: var(--ifm-bg-color-primary-light);
   letter-spacing  : var(--psdi-letter-spacing-base);
   line-height     : var(--ifm-line-height-base);
   border-radius   : 0.25rem;
@@ -329,7 +328,7 @@ button:hover,
 input.button:hover,
 input[type="button"]:hover,
 input[type="file"]::file-selector-button:hover {
-  background-color: var(--ifm-bg-color-primary-lighter);
+  background-color: var(--ifm-bg-color-primary-lightest);
   cursor          : pointer;
 }
 
@@ -337,7 +336,7 @@ button:focus,
 input.button:focus,
 input[type="button"]:focus,
 input[type="file"]:focus::file-selector-button {
-  background-color: var(--ifm-bg-color-primary-lighter);
+  background-color: var(--ifm-bg-color-primary-lightest);
 }
 
 button:disabled,
