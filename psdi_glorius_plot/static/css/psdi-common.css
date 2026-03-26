@@ -1,21 +1,32 @@
 @import url('https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&family=Oswald:wght@200..700&display=swap');
 
 :root {
-  /* PSDI Common Style Definition                                            */
-  /* ----------------------------                                            */
-  /*                                                                         */
-  /* This file defines the common PSDI style scheme. The variable            */
-  /* definitions here can be modified to alter this scheme, and they will be */
-  /* included and used appropriately by the various builders.                */
+  /* PSDI Common Style Definition
+     ----------------------------                                            
+                                                                             
+     This file defines the common PSDI style scheme. The variable definitions here can be modified to alter this scheme,
+     and they will be included and used appropriately by the various builders.
+     
+     Stylesheets for specific projects can use the variables defined her. For proper results, only the "--ifm-*"
+     variables should be used in style declarations - the "--psdi-*" variables are used to define possible values for
+     the former to take depending on the mode (light or dark mode). Using these directly will result in locking a style
+     into one of these modes.
+
+     The "--ifm-" prefix refers to Infima, so that these variables are compatible with the Infima CSS framework used by
+     Docusaurus (https://docusaurus.community/knowledge/design/css/variables/). Not all of the "--ifm-*" variables
+     defined here are actually used by the Infima framework; the prefix is used for all variables here for a consistent
+     naming scheme to be compatible with Infima where supported and also distinguish them from the "--psdi-*" variables
+     used to define the underlying palette for light and dark modes.
+  */
 
 
   /* Font */
-  --ifm-font-size-base      : 1rem;
-  --ifm-line-height-base    : 1.5;
-  --ifm-font-family-base    : Lato, Helvetica, Verdana, Arial, Lucida, sans-serif;
-  --ifm-heading-font-family : Oswald, Helvetica, Verdana, Arial, Lucida, sans-serif;
-  --ifm-font-weight-base    : normal;
-  --psdi-letter-spacing-base: normal;
+  --ifm-font-size-base     : 1rem;
+  --ifm-line-height-base   : 1.5;
+  --ifm-font-family-base   : Lato, Helvetica, Verdana, Arial, Lucida, sans-serif;
+  --ifm-heading-font-family: Oswald, Helvetica, Verdana, Arial, Lucida, sans-serif;
+  --ifm-font-weight-base   : normal;
+  --ifm-letter-spacing-base: normal;
 
   /* Background and text colors */
 
@@ -336,7 +347,7 @@ body {
   font-weight     : var(--ifm-font-weight-base);
   background-color: var(--ifm-background-color);
   color           : var(--ifm-font-color-base);
-  letter-spacing  : var(--psdi-letter-spacing-base);
+  letter-spacing  : var(--ifm-letter-spacing-base);
   line-height     : var(--ifm-line-height-base);
   display         : flex;
   flex-direction  : column;
@@ -365,7 +376,7 @@ input {
   background-color: var(--ifm-input-bg-color);
   border          : 2px inset var(--ifm-input-border-color);
   color           : var(--ifm-font-color-base);
-  letter-spacing  : var(--psdi-letter-spacing-base);
+  letter-spacing  : var(--ifm-letter-spacing-base);
   line-height     : var(--ifm-line-height-base);
 }
 
@@ -393,7 +404,7 @@ input[type="file"]::file-selector-button {
   font-size       : var(--ifm-font-size-base);
   color           : var(--ifm-hero-text-color);
   background-color: var(--ifm-bg-color-button);
-  letter-spacing  : var(--psdi-letter-spacing-base);
+  letter-spacing  : var(--ifm-letter-spacing-base);
   line-height     : var(--ifm-line-height-base);
   border-radius   : 0.25rem;
   margin          : 0.25rem;
