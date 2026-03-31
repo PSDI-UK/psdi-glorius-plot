@@ -396,7 +396,8 @@ input::placeholder {
   font-style: italic;
 }
 
-:is(button, input.button, input[type="button"], input[type="file"]::file-selector-button):not(.clean-btn) {
+:is(button, input.button, input[type="button"]):not(.clean-btn),
+input[type="file"]::file-selector-button {
   font-family     : var(--ifm-font-family-base);
   font-size       : var(--ifm-font-size-base);
   color           : var(--ifm-hero-text-color);
@@ -407,39 +408,44 @@ input::placeholder {
   margin          : 0.25rem;
 }
 
-:is(button, input.button, input[type="button"], input[type="file"]::file-selector-button):not(.clean-btn):hover,
-:is(button, input.button, input[type="button"], input[type="file"]::file-selector-button):not(.clean-btn):focus {
+:is(button, input.button, input[type="button"]):not(.clean-btn):hover,
+input[type="file"]::file-selector-button:hover,
+:is(button, input.button, input[type="button"]):not(.clean-btn):focus,
+input[type="file"]::file-selector-button:focus {
   background-color: var(--ifm-bg-color-button-hover);
   cursor          : pointer;
 }
 
-:is(button, input.button, input[type="button"], input[type="file"]::file-selector-button):not(.clean-btn):active {
+:is(button, input.button, input[type="button"]):not(.clean-btn):active,
+input[type="file"]::file-selector-button:active {
   background-color: var(--ifm-bg-color-button-active);
 }
 
-:is(button, input.button, input[type="button"], input[type="file"]::file-selector-button):not(.clean-btn):disabled {
+:is(button, input.button, input[type="button"]):not(.clean-btn):disabled,
+input[type="file"]:disabled::file-selector-button {
   background-color: var(--ifm-bg-color-button-disabled);
   border-color    : var(--ifm-border-color-button-disabled);
   color           : var(--ifm-color-button-disabled);
 }
 
-:is(button, input.button, input[type="button"], input[type="file"]::file-selector-button):not(.clean-btn):disabled:hover {
+:is(button, input.button, input[type="button"]):not(.clean-btn):disabled:hover,
+input[type="file"]:disabled::file-selector-button:hover {
   background-color: var(--ifm-bg-color-button-disabled);
   cursor          : default;
 }
 
-:is(button, input.button, input[type="button"], input[type="file"]::file-selector-button).cancel:not(:disabled) {
+:is(button, input.button, input[type="button"]).cancel:not(:disabled) {
   color           : var(--ifm-color-button-cancel);
   background-color: var(--ifm-bg-color-button-cancel);
   border-color    : var(--ifm-border-color-button-cancel);
 }
 
-:is(button, input.button, input[type="button"], input[type="file"]::file-selector-button).cancel:not(:disabled):hover,
-:is(button, input.button, input[type="button"], input[type="file"]::file-selector-button).cancel:not(:disabled):focus {
+:is(button, input.button, input[type="button"]).cancel:not(:disabled):hover,
+:is(button, input.button, input[type="button"]).cancel:not(:disabled):focus {
   background-color: var(--ifm-bg-color-button-cancel-hover);
 }
 
-:is(button, input.button, input[type="button"], input[type="file"]::file-selector-button).cancel:not(:disabled):active {
+:is(button, input.button, input[type="button"]).cancel:not(:disabled):active {
   background-color: var(--ifm-bg-color-button-cancel-active);
 }
 
