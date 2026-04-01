@@ -12,7 +12,7 @@ Release date: 2025-08-18
 
 This project provides the code for a Flask-hosted web app to generate a Glorius-style radar plot of reaction sensitivity for the user. It publishes a service to https://organic-toolkit.psdi.ac.uk/glorius-plot
 
-For internal testing, the main branch of this project is published to https://psdi-uk.github.io/psdi-glorius-plot
+For internal testing, the main branch of this project is published to https://organic-toolkit-dev.psdi.ac.uk/glorius-plot, with a staging deployment at https://organic-toolkit-staging.psdi.ac.uk/glorius-plot
 
 ## Table of Contents
 
