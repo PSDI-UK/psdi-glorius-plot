@@ -28,10 +28,8 @@ jobs:
   container-push:
     uses: ./.github/workflows/job-container-push.yml
     needs: [test-all]
-    # When ready to enable this step, remove the following line and uncomment the proper condition below it
-    if: false
     # Proceed if test-all was successful or skipped
-    # if: always() &&  (needs.test-all.result == 'skipped' || needs.test-all.result == 'success')
+    if: always() &&  (needs.test-all.result == 'skipped' || needs.test-all.result == 'success')
     with:
       container_tag: ${{ github.sha }}
   # Deploy to Kubernetes Job
@@ -43,9 +41,11 @@ jobs:
     needs: [container-push]
     # Proceed if test-all was successful or skipped
     if: always() && (needs.container-push.result == 'success')
-    uses: ./.github/workflows/job-deploy-k8s.yml # use the callable deploy job
-    secrets: inherit # pass all secrets for the environment
+    uses: PSDI-UK/psdi-glorius-plot-deployment/.github/workflows/job-external-deployment.yaml@bf95f7bc0840247a40dbd8aef2aaa7ee2baad1fe
     with:
       # container_tag
       container_tag: ${{ github.sha }}
       environment: development
+    secrets:
+      deployment_app_id: ${{ secrets.DEPLOYMENT_APP_ID }}
+      deployment_app_private_key: ${{ secrets.DEPLOYMENT_APP_PRIVATE_KEY }}

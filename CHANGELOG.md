@@ -1,5 +1,21 @@
 # Changelog for PSDI Glorius Plot Generator
 
+## v0.3.0
+
+### New and Changed Functionality
+
+- Enabled .svg output
+- Added button to formatted text toolbar to insert special symbols
+
+### Stylistic Changes
+
+- Reworked layout to better take use of available screen space on various screen widths
+- Implemented new PSDI dark mode styling (auto-enabled if the user's system prefers dark mode)
+
+### Miscellaneous Changes
+
+- Enabled deployment to STFC-hosted infrastructure
+
 ## v0.2.2
 
 ### Bugfixes

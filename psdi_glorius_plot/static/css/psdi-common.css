@@ -1,78 +1,130 @@
 @import url('https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&family=Oswald:wght@200..700&display=swap');
 
 :root {
-  /* PSDI Common Style Definition                                            */
-  /* ----------------------------                                            */
-  /*                                                                         */
-  /* This file defines the common PSDI style scheme. The variable            */
-  /* definitions here can be modified to alter this scheme, and they will be */
-  /* included and used appropriately by the various builders.                */
+  /* PSDI Common Style Definition
+     ----------------------------                                            
+                                                                             
+     This file defines the common PSDI style scheme. The variable definitions here can be modified to alter this scheme,
+     and they will be included and used appropriately by the various builders.
+     
+     Stylesheets for specific projects can use the variables defined her. For proper results, only the "--ifm-*"
+     variables should be used in style declarations - the "--psdi-*" variables are used to define possible values for
+     the former to take depending on the mode (light or dark mode). Using these directly will result in locking a style
+     into one of these modes.
+
+     The "--ifm-" prefix refers to Infima, so that these variables are compatible with the Infima CSS framework used by
+     Docusaurus (https://docusaurus.community/knowledge/design/css/variables/). Not all of the "--ifm-*" variables
+     defined here are actually used by the Infima framework; the prefix is used for all variables here for a consistent
+     naming scheme to be compatible with Infima where supported and also distinguish them from the "--psdi-*" variables
+     used to define the underlying palette for light and dark modes.
+  */
 
 
   /* Font */
-  --ifm-font-size-base      : 1rem;
-  --ifm-line-height-base    : 1.5;
-  --ifm-font-family-base    : Lato, Helvetica, Verdana, Arial, Lucida, sans-serif;
-  --ifm-heading-font-family : Oswald, Helvetica, Verdana, Arial, Lucida, sans-serif;
-  --ifm-font-weight-base    : normal;
-  --psdi-letter-spacing-base: normal;
+  --ifm-font-size-base     : 1rem;
+  --ifm-line-height-base   : 1.5;
+  --ifm-font-family-base   : Lato, Helvetica, Verdana, Arial, Lucida, sans-serif;
+  --ifm-heading-font-family: Oswald, Helvetica, Verdana, Arial, Lucida, sans-serif;
+  --ifm-font-weight-base   : normal;
+  --ifm-letter-spacing-base: normal;
 
-  /* Background and text colors */
+  /* Link styling */
+  --ifm-link-color             : inherit;
+  --ifm-link-hover-color       : inherit;
+  --ifm-navbar-link-hover-color: inherit;
 
-  --psdi-dark-text-color-body    : #000000;
-  --psdi-dark-text-color-heading : #041E42;
+  /* Text colors for various parts of the page, with faded versions of each: f1: 25% faded, f2: 50% faded,
+     f3: 75% faded */
+
+  --psdi-dark-text-color-body   : #000000;
+  --psdi-dark-text-color-body-f1: #000000c0;
+  --psdi-dark-text-color-body-f2: #00000080;
+  --psdi-dark-text-color-body-f3: #00000040;
+
+  --psdi-dark-text-color-heading   : #041E42;
+  --psdi-dark-text-color-heading-f1: #041E42c0;
+  --psdi-dark-text-color-heading-f2: #041E4280;
+  --psdi-dark-text-color-heading-f3: #041E4240;
+
   --psdi-light-text-color-body   : #ffffff;
-  --psdi-light-text-color-heading: #ffffff;
+  --psdi-light-text-color-body-f1: #ffffffc0;
+  --psdi-light-text-color-body-f2: #ffffff80;
+  --psdi-light-text-color-body-f3: #ffffff40;
 
-  /* Default color (light mode) */
-  --psdi-text-color-default-body   : var(--psdi-dark-text-color-body);
-  --psdi-text-color-default-heading: var(--psdi-dark-text-color-heading);
-  --psdi-bg-color-default          : #ffffff;
+  --psdi-light-text-color-heading   : #ffffff;
+  --psdi-light-text-color-heading-f1: #ffffff;
+  --psdi-light-text-color-heading-f2: #ffffff;
+  --psdi-light-text-color-heading-f3: #ffffff;
 
-  /* Default color (dark mode) */
+  --psdi-text-color-default-body      : var(--psdi-dark-text-color-body);
+  --psdi-text-color-default-heading   : var(--psdi-dark-text-color-heading);
   --psdi-dm-text-color-default-body   : var(--psdi-light-text-color-body);
   --psdi-dm-text-color-default-heading: var(--psdi-light-text-color-heading);
-  --psdi-dm-bg-color-default          : #000000;
 
-  /* Primary color (light mode) - used for Hero panel and footer */
-  --psdi-bg-color-primary         : #041e42;
-  --psdi-bg-color-primary-dark    : #041b3b;
-  --psdi-bg-color-primary-darker  : #031938;
-  --psdi-bg-color-primary-darkest : #03152e;
-  --psdi-bg-color-primary-light   : #052756;
-  --psdi-bg-color-primary-lighter : #06326a;
-  --psdi-bg-color-primary-lightest: #07477f;
+  /* Default background color for light and dark modes */
+  --psdi-bg-color-default   : #ffffff;
+  --psdi-dm-bg-color-default: #0a0a19;
 
-  /* Primary color (dark mode) */
-  --psdi-dm-bg-color-primary         : #96caf4;
-  --psdi-dm-bg-color-primary-dark    : #72b8f0;
-  --psdi-dm-bg-color-primary-darker  : #61afee;
-  --psdi-dm-bg-color-primary-darkest : #2b94e9;
-  --psdi-dm-bg-color-primary-light   : #badcf8;
-  --psdi-dm-bg-color-primary-lighter : #cbe5fa;
-  --psdi-dm-bg-color-primary-lightest: #ffffff;
+  /* Background color for input elements for light and dark mode */
+  --psdi-bg-color-input             : #ffffff;
+  --psdi-bg-color-input-secondary   : #e0e0e0;
+  --psdi-bg-color-input-secondary-f1: #e0e0e0c0;
+  --psdi-bg-color-input-secondary-f2: #e0e0e080;
+  --psdi-bg-color-input-secondary-f3: #e0e0e040;
+  --psdi-bg-color-input-contrast    : #767676;
+  --psdi-bg-color-input-contrast-f1 : #767676c0;
+  --psdi-bg-color-input-contrast-f2 : #76767680;
+  --psdi-bg-color-input-contrast-f3 : #76767640;
 
-  /* Secondary color (light mode) */
-  --psdi-text-color-secondary-body   : var(--psdi-dark-text-color-body);
-  --psdi-text-color-secondary-heading: var(--psdi-dark-text-color-heading);
-  --psdi-bg-color-secondary          : #e5e1e6;
-  --psdi-bg-color-secondary-dark     : #cfc8d1;
-  --psdi-bg-color-secondary-darker   : #c5bcc7;
-  --psdi-bg-color-secondary-darkest  : #a497a8;
-  --psdi-bg-color-secondary-light    : #f0edf0;
-  --psdi-bg-color-secondary-lighter  : #fbfafb;
-  --psdi-bg-color-secondary-lightest : #ffffff;
+  --psdi-dm-bg-color-input                  : #050505;
+  --psdi-dm-bg-color-input-secondary-lighter: #4d4d4d;
+  --psdi-dm-bg-color-input-secondary-light  : #404040;
+  --psdi-dm-bg-color-input-secondary        : #323232;
+  --psdi-dm-bg-color-input-secondary-f1     : #323232c0;
+  --psdi-dm-bg-color-input-secondary-f2     : #32323280;
+  --psdi-dm-bg-color-input-secondary-f3     : #32323240;
+  --psdi-dm-bg-color-input-contrast         : #a0a0a0;
+  --psdi-dm-bg-color-input-contrast-f1      : #a0a0a0c0;
+  --psdi-dm-bg-color-input-contrast-f2      : #a0a0a080;
+  --psdi-dm-bg-color-input-contrast-f3      : #a0a0a040;
 
-  /* Secondary color (dark mode) */
-  --psdi-dm-text-color-secondary-body   : var(--psdi-dark-text-color-body);
-  --psdi-dm-text-color-secondary-heading: var(--psdi-dark-text-color-heading);
-  --psdi-dm-bg-color-secondary          : #bbbbbb;
-  --psdi-dm-bg-color-secondary-dark     : #a8a8a8;
-  --psdi-dm-bg-color-secondary-darker   : #9f9f9f;
-  --psdi-dm-bg-color-secondary-darkest  : #838383;
-  --psdi-dm-bg-color-secondary-light    : #cecece;
-  --psdi-dm-bg-color-secondary-lighter  : #d7d7d7;
-  --psdi-dm-bg-color-secondary-lightest : #f3f3f3;
+  /* Primary color - used for Hero panel and footer */
+  --psdi-color-primary           : #041e42;
+  --psdi-color-primary-dark      : #041b3b;
+  --psdi-color-primary-darker    : #031938;
+  --psdi-color-primary-darkest   : #03152e;
+  --psdi-color-primary-light     : #042452;
+  --psdi-color-primary-lighter   : #04316b;
+  --psdi-color-primary-lightest  : #00437d;
+  --psdi-color-primary-lightestp1: #005198;
+  --psdi-color-primary-lightestp2: #005cad;
+
+  --psdi-dm-color-primary           : var(--psdi-color-primary);
+  --psdi-dm-color-primary-dark      : var(--psdi-color-primary-dark);
+  --psdi-dm-color-primary-darker    : var(--psdi-color-primary-darker);
+  --psdi-dm-color-primary-darkest   : var(--psdi-color-primary-darkest);
+  --psdi-dm-color-primary-light     : var(--psdi-color-primary-light);
+  --psdi-dm-color-primary-lighter   : var(--psdi-color-primary-lighter);
+  --psdi-dm-color-primary-lightest  : var(--psdi-color-primary-lightest);
+  --psdi-dm-color-primary-lightestp1: var(--psdi-color-primary-lightestp1);
+  --psdi-dm-color-primary-lightestp2: var(--psdi-color-primary-lightestp2);
+
+  /* Secondary color - used for background of secondary sections */
+  --psdi-bg-color-secondary         : #e5e1e6;
+  --psdi-bg-color-secondary-dark    : #cfc8d1;
+  --psdi-bg-color-secondary-darker  : #c5bcc7;
+  --psdi-bg-color-secondary-darkest : #a497a8;
+  --psdi-bg-color-secondary-light   : #f0edf0;
+  --psdi-bg-color-secondary-lighter : #fbfafb;
+  --psdi-bg-color-secondary-lightest: #ffffff;
+
+  --psdi-dm-bg-color-secondary         : #181823;
+  --psdi-dm-bg-color-secondary-dark    : #12121e;
+  --psdi-dm-bg-color-secondary-darker  : #0c0c19;
+  --psdi-dm-bg-color-secondary-darkest : #060613;
+  --psdi-dm-bg-color-secondary-light   : #1e1e29;
+  --psdi-dm-bg-color-secondary-lighter : #24242f;
+  --psdi-dm-bg-color-secondary-lightest: #2a2a35;
 
   /* Success color */
   --ifm-color-success         : #5aa2ae;
@@ -110,84 +162,172 @@
   --ifm-color-danger-lighter : #b03b75;
   --ifm-color-danger-lightest: #c24785;
 
-  /* Footer */
-  --ifm-footer-background-color: var(--ifm-color-primary);
-  --ifn-footer-title-color     : var(--ifm-font-color-base-inverse);
-  --ifm-footer-color           : var(--ifm-font-color-base-inverse);
-  --ifm-footer-link-color      : var(--ifm-font-color-base-inverse);
-  --ifm-footer-link-hover-color: var(--ifm-font-color-base-inverse);
-
-  /* Button color */
-  --ifm-button-background-color     : var(--psdi-bg-color-secondary);
-  --ifm-button-background-color-dark: var(--psdi-bg-color-secondary-dark);
-  --ifm-button-color                : var(--psdi-dark-text-color-heading);
-
-  /* Border colors */
-  --psdi-border-color-light: #f5f6f7;
-  --psdi-border-color-dark : #111111;
-
-  /* Link styling */
-  --ifm-link-color             : inherit;
-  --ifm-link-hover-color       : inherit;
-  --ifm-navbar-link-hover-color: inherit;
-
   /* Set specific colors to used based on light/dark-mode */
   /* Define light mode here first, as default */
-  --ifm-background-color: var(--psdi-bg-color-default);
+  --ifm-background-color           : var(--psdi-bg-color-default);
+  --ifm-input-bg-color             : var(--psdi-bg-color-input);
+  --ifm-input-disabled-bg-color    : var(--psdi-bg-color-input-secondary);
+  --ifm-input-border-color         : var(--psdi-bg-color-input-contrast);
+  --ifm-input-disabled-border-color: var(--psdi-bg-color-input-contrast-f3);
 
-  --ifm-color-primary         : var(--psdi-bg-color-primary);
-  --ifm-color-primary-dark    : var(--psdi-bg-color-primary-dark);
-  --ifm-color-primary-darker  : var(--psdi-bg-color-primary-darker);
-  --ifm-color-primary-darkest : var(--psdi-bg-color-primary-darkest);
-  --ifm-color-primary-light   : var(--psdi-bg-color-primary-light);
-  --ifm-color-primary-lighter : var(--psdi-bg-color-primary-lighter);
-  --ifm-color-primary-lightest: var(--psdi-bg-color-primary-lightest);
+  --ifm-color-primary           : var(--psdi-color-primary);
+  --ifm-color-primary-dark      : var(--psdi-color-primary-dark);
+  --ifm-color-primary-darker    : var(--psdi-color-primary-darker);
+  --ifm-color-primary-darkest   : var(--psdi-color-primary-darkest);
+  --ifm-color-primary-light     : var(--psdi-color-primary-light);
+  --ifm-color-primary-lighter   : var(--psdi-color-primary-lighter);
+  --ifm-color-primary-lightest  : var(--psdi-color-primary-lightest);
+  --ifm-color-primary-lightestp1: var(--psdi-color-primary-lightestp1);
+  --ifm-color-primary-lightestp2: var(--psdi-color-primary-lightestp2);
+
+  --ifm-bg-color-button       : var(--ifm-color-primary);
+  --ifm-bg-color-button-hover : var(--ifm-color-primary-lighter);
+  --ifm-bg-color-button-active: var(--ifm-color-primary-lightest);
+
+  --ifm-color-button-disabled       : var(--psdi-dark-text-color-body-f2);
+  --ifm-bg-color-button-disabled    : var(--psdi-bg-color-input-contrast-f3);
+  --ifm-border-color-button-disabled: var(--psdi-bg-color-input-contrast-f3);
+
+  --ifm-color-button-cancel          : var(--psdi-text-color-default-body);
+  --ifm-bg-color-button-cancel       : var(--psdi-bg-color-input-secondary-f1);
+  --ifm-bg-color-button-cancel-hover : var(--psdi-bg-color-input-secondary);
+  --ifm-bg-color-button-cancel-active: var(--psdi-bg-color-input-secondary-f3);
+  --ifm-border-color-button-cancel   : var(--psdi-bg-color-input-secondary-f2);
 
   --ifm-color-secondary           : var(--psdi-bg-color-secondary);
   --ifm-color-secondary-dark      : var(--psdi-bg-color-secondary-dark);
   --ifm-background-color-secondary: var(--psdi-bg-color-secondary);
 
-  --ifm-font-color-base        : var(--psdi-dark-text-color-body);
-  --ifm-hero-text-color        : var(--psdi-light-text-color-body);
-  --ifm-heading-color          : var(--psdi-dark-text-color-heading);
-  --psdi-heading-color-inverse : var(--psdi-light-text-color-heading);
-  --ifm-font-color-secondary   : var(--psdi-text-color-secondary-body);
-  --ifm-heading-color-secondary: var(--psdi-dark-text-color-heading);
-  --psdi-font-color-faint      : gray;
+  --ifm-font-color-base   : var(--psdi-dark-text-color-body);
+  --ifm-font-color-base-f1: var(--psdi-dark-text-color-body-f1);
+  --ifm-font-color-base-f2: var(--psdi-dark-text-color-body-f2);
+  --ifm-font-color-base-f3: var(--psdi-dark-text-color-body-f3);
 
-  --psdi-border-color: var(--psdi-border-color-light);
+  --ifm-hero-text-color   : var(--psdi-light-text-color-body);
+  --ifm-hero-text-color-f1: var(--psdi-light-text-color-body-f1);
+  --ifm-hero-text-color-f2: var(--psdi-light-text-color-body-f2);
+  --ifm-hero-text-color-f3: var(--psdi-light-text-color-body-f3);
+
+  --ifm-font-color-primary   : var(--psdi-light-text-color-body);
+  --ifm-font-color-primary-f1: var(--psdi-light-text-color-body-f1);
+  --ifm-font-color-primary-f2: var(--psdi-light-text-color-body-f2);
+  --ifm-font-color-primary-f3: var(--psdi-light-text-color-body-f3);
+
+  --ifm-heading-color   : var(--psdi-dark-text-color-heading);
+  --ifm-heading-color-f1: var(--psdi-dark-text-color-heading-f1);
+  --ifm-heading-color-f2: var(--psdi-dark-text-color-heading-f2);
+  --ifm-heading-color-f3: var(--psdi-dark-text-color-heading-f3);
+
+  --ifm-hero-heading-color   : var(--psdi-light-text-color-heading);
+  --ifm-hero-heading-color-f1: var(--psdi-light-text-color-heading-f1);
+  --ifm-hero-heading-color-f2: var(--psdi-light-text-color-heading-f2);
+  --ifm-hero-heading-color-f3: var(--psdi-light-text-color-heading-f3);
+
+  --ifm-font-color-secondary   : var(--psdi-dark-text-color-body);
+  --ifm-font-color-secondary-f1: var(--psdi-dark-text-color-body-f1);
+  --ifm-font-color-secondary-f2: var(--psdi-dark-text-color-body-f2);
+  --ifm-font-color-secondary-f3: var(--psdi-dark-text-color-body-f3);
+
+  --ifm-heading-color-secondary   : var(--psdi-dark-text-color-heading);
+  --ifm-heading-color-secondary-f1: var(--psdi-dark-text-color-heading-f1);
+  --ifm-heading-color-secondary-f2: var(--psdi-dark-text-color-heading-f2);
+  --ifm-heading-color-secondary-f3: var(--psdi-dark-text-color-heading-f3);
+
+  --ifm-menu-color-active         : var(--psdi-color-primary);
+  --ifm-breadcrumb-color-active   : var(--psdi-color-primary);
+  --ifm-pagination-nav-color-hover: var(--psdi-color-primary);
 
   --lm-display: inherit;
   --dm-display: none;
 
+  /* And finally we define some variables which are based off the above variables set based on the theme */
+
+  /* Footer */
+  --ifm-footer-background-color: var(--ifm-color-primary);
+  --ifm-footer-title-color     : var(--ifm-hero-text-color);
+  --ifm-footer-color           : var(--ifm-hero-text-color);
+  --ifm-footer-link-color      : var(--ifm-hero-text-color);
+  --ifm-footer-link-hover-color: var(--ifm-hero-text-color);
+
 }
 
-[data-theme='dark'] {
+[data-theme='dark'],
+[data-theme='dark'] .hero--primary,
+[data-theme='dark'] .hero {
 
-  /* Set dark mode colors here */
-  --ifm-background-color: var(--psdi-dm-bg-color-default);
+  /* This section sets the mode-dependent variables to the values that they should take in dark mode */
+  --ifm-background-color           : var(--psdi-dm-bg-color-default);
+  --ifm-input-bg-color             : var(--psdi-dm-bg-color-input);
+  --ifm-input-disabled-bg-color    : var(--psdi-dm-bg-color-input-secondary);
+  --ifm-input-border-color         : var(--psdi-dm-bg-color-input-contrast);
+  --ifm-input-disabled-border-color: var(--psdi-dm-bg-color-input-contrast-f3);
 
-  --ifm-color-primary         : var(--psdi-dm-bg-color-primary);
-  --ifm-color-primary-dark    : var(--psdi-dm-bg-color-primary-dark);
-  --ifm-color-primary-darker  : var(--psdi-dm-bg-color-primary-darker);
-  --ifm-color-primary-darkest : var(--psdi-dm-bg-color-primary-darkest);
-  --ifm-color-primary-light   : var(--psdi-dm-bg-color-primary-light);
-  --ifm-color-primary-lighter : var(--psdi-dm-bg-color-primary-lighter);
-  --ifm-color-primary-lightest: var(--psdi-dm-bg-color-primary-lightest);
+  --ifm-color-primary           : var(--psdi-dm-color-primary);
+  --ifm-color-primary-dark      : var(--psdi-dm-color-primary-dark);
+  --ifm-color-primary-darker    : var(--psdi-dm-color-primary-darker);
+  --ifm-color-primary-darkest   : var(--psdi-dm-color-primary-darkest);
+  --ifm-color-primary-light     : var(--psdi-dm-color-primary-light);
+  --ifm-color-primary-lighter   : var(--psdi-dm-color-primary-lighter);
+  --ifm-color-primary-lightest  : var(--psdi-dm-color-primary-lightest);
+  --ifm-color-primary-lightestp1: var(--psdi-dm-color-primary-lightestp1);
+  --ifm-color-primary-lightestp2: var(--psdi-dm-color-primary-lightestp2);
+
+  --ifm-bg-color-button       : var(--ifm-color-primary-lighter);
+  --ifm-bg-color-button-hover : var(--ifm-color-primary-lightestp1);
+  --ifm-bg-color-button-active: var(--ifm-color-primary-lightestp2);
+
+  --ifm-color-button-disabled       : var(--psdi-light-text-color-body-f2);
+  --ifm-bg-color-button-disabled    : var(--psdi-dm-bg-color-input-contrast-f3);
+  --ifm-border-color-button-disabled: var(--psdi-dm-bg-color-input-contrast-f3);
+
+  --ifm-color-button-cancel          : var(--psdi-dm-text-color-default-body);
+  --ifm-bg-color-button-cancel       : var(--psdi-dm-bg-color-input-secondary);
+  --ifm-bg-color-button-cancel-hover : var(--psdi-dm-bg-color-input-secondary-light);
+  --ifm-bg-color-button-cancel-active: var(--psdi-dm-bg-color-input-secondary-lighter);
+  --ifm-border-color-button-cancel   : var(--psdi-dm-bg-color-input-secondary-f1);
 
   --ifm-color-secondary           : var(--psdi-dm-bg-color-secondary);
   --ifm-color-secondary-dark      : var(--psdi-dm-bg-color-secondary-dark);
   --ifm-background-color-secondary: var(--psdi-dm-bg-color-secondary);
 
-  --ifm-font-color-base        : var(--psdi-light-text-color-body);
-  --ifm-hero-text-color        : var(--psdi-dark-text-color-body);
-  --ifm-heading-color          : var(--psdi-light-text-color-heading);
-  --psdi-heading-color-inverse : var(--psdi-dark-text-color-heading);
-  --ifm-font-color-secondary   : var(--psdi-dm-text-color-secondary-body);
-  --ifm-heading-color-secondary: var(--psdi-dark-text-color-heading);
-  --psdi-font-color-faint      : gray;
+  --ifm-font-color-base   : var(--psdi-light-text-color-body);
+  --ifm-font-color-base-f1: var(--psdi-light-text-color-body-f1);
+  --ifm-font-color-base-f2: var(--psdi-light-text-color-body-f2);
+  --ifm-font-color-base-f3: var(--psdi-light-text-color-body-f3);
 
-  --psdi-border-color: var(--psdi-border-color-dark);
+  --ifm-hero-text-color   : var(--psdi-light-text-color-body);
+  --ifm-hero-text-color-f1: var(--psdi-light-text-color-body-f1);
+  --ifm-hero-text-color-f2: var(--psdi-light-text-color-body-f2);
+  --ifm-hero-text-color-f3: var(--psdi-light-text-color-body-f3);
+
+  --ifm-font-color-primary   : var(--psdi-dark-text-color-body);
+  --ifm-font-color-primary-f1: var(--psdi-dark-text-color-body-f1);
+  --ifm-font-color-primary-f2: var(--psdi-dark-text-color-body-f2);
+  --ifm-font-color-primary-f3: var(--psdi-dark-text-color-body-f3);
+
+  --ifm-heading-color   : var(--psdi-light-text-color-heading);
+  --ifm-heading-color-f1: var(--psdi-light-text-color-heading-f1);
+  --ifm-heading-color-f2: var(--psdi-light-text-color-heading-f2);
+  --ifm-heading-color-f3: var(--psdi-light-text-color-heading-f3);
+
+  --ifm-hero-heading-color   : var(--psdi-light-text-color-heading);
+  --ifm-hero-heading-color-f1: var(--psdi-light-text-color-heading-f1);
+  --ifm-hero-heading-color-f2: var(--psdi-light-text-color-heading-f2);
+  --ifm-hero-heading-color-f3: var(--psdi-light-text-color-heading-f3);
+
+  --ifm-font-color-secondary   : var(--psdi-light-text-color-body);
+  --ifm-font-color-secondary-f1: var(--psdi-light-text-color-body-f1);
+  --ifm-font-color-secondary-f2: var(--psdi-light-text-color-body-f2);
+  --ifm-font-color-secondary-f3: var(--psdi-light-text-color-body-f3);
+
+  --ifm-heading-color-secondary   : var(--psdi-light-text-color-heading);
+  --ifm-heading-color-secondary-f1: var(--psdi-light-text-color-heading-f1);
+  --ifm-heading-color-secondary-f2: var(--psdi-light-text-color-heading-f2);
+  --ifm-heading-color-secondary-f3: var(--psdi-light-text-color-heading-f3);
+
+  --ifm-menu-color-active         : var(--ifm-color-info);
+  --ifm-breadcrumb-color-active   : var(--ifm-color-info);
+  --ifm-pagination-nav-color-hover: var(--ifm-color-info);
 
   --lm-display: none;
   --dm-display: inherit;
@@ -211,7 +351,7 @@ body {
   font-weight     : var(--ifm-font-weight-base);
   background-color: var(--ifm-background-color);
   color           : var(--ifm-font-color-base);
-  letter-spacing  : var(--psdi-letter-spacing-base);
+  letter-spacing  : var(--ifm-letter-spacing-base);
   line-height     : var(--ifm-line-height-base);
   display         : flex;
   flex-direction  : column;
@@ -231,51 +371,87 @@ body {
   z-index   : 99999;
 }
 
-select,
-option,
-input {
+input[type="radio"]:hover {
+  cursor: pointer;
+}
+
+:is(select, option, input) {
   font-family     : var(--ifm-font-family-base);
   font-size       : var(--ifm-font-size-base);
   font-weight     : var(--ifm-font-weight-base);
-  background-color: var(--ifm-background-color);
+  background-color: var(--ifm-input-bg-color);
+  border          : 2px inset var(--ifm-input-border-color);
   color           : var(--ifm-font-color-base);
-  letter-spacing  : var(--psdi-letter-spacing-base);
+  letter-spacing  : var(--ifm-letter-spacing-base);
   line-height     : var(--ifm-line-height-base);
 }
 
-option:checked {
-  background-color: var(--ifm-color-primary);
-  color           : var(--ifm-hero-text-color);
+:is(select, option, input):disabled {
+  background-color: var(--ifm-input-disabled-bg-color);
+  border-color    : var(--ifm-input-disabled-border-color);
 }
 
 input::placeholder {
-  color     : var(--psdi-font-color-faint);
+  color     : var(--ifm-font-color-base-f2);
   font-style: italic;
 }
 
-button,
-input.button {
+:is(button, input.button, input[type="button"]):not(.clean-btn),
+input[type="file"]::file-selector-button {
   font-family     : var(--ifm-font-family-base);
   font-size       : var(--ifm-font-size-base);
-  font-weight     : var(--ifm-font-weight-base);
   color           : var(--ifm-hero-text-color);
-  background-color: var(--ifm-color-primary);
-  letter-spacing  : var(--psdi-letter-spacing-base);
+  background-color: var(--ifm-bg-color-button);
+  letter-spacing  : var(--ifm-letter-spacing-base);
   line-height     : var(--ifm-line-height-base);
   border-radius   : 0.25rem;
   margin          : 0.25rem;
 }
 
-button:hover,
-input.button:hover,
-button:focus,
-input.button:focus {
-  background-color: var(--ifm-color-primary-lighter);
+:is(button, input.button, input[type="button"]):not(.clean-btn):hover,
+input[type="file"]::file-selector-button:hover,
+:is(button, input.button, input[type="button"]):not(.clean-btn):focus,
+input[type="file"]::file-selector-button:focus {
+  background-color: var(--ifm-bg-color-button-hover);
+  cursor          : pointer;
 }
 
-button:hover,
-input.button:hover {
-  cursor: pointer;
+:is(button, input.button, input[type="button"]):not(.clean-btn):active,
+input[type="file"]::file-selector-button:active {
+  background-color: var(--ifm-bg-color-button-active);
+}
+
+:is(button, input.button, input[type="button"]):not(.clean-btn):disabled,
+input[type="file"]:disabled::file-selector-button {
+  background-color: var(--ifm-bg-color-button-disabled);
+  border-color    : var(--ifm-border-color-button-disabled);
+  color           : var(--ifm-color-button-disabled);
+}
+
+:is(button, input.button, input[type="button"]):not(.clean-btn):disabled:hover,
+input[type="file"]:disabled::file-selector-button:hover {
+  background-color: var(--ifm-bg-color-button-disabled);
+  cursor          : default;
+}
+
+:is(button, input.button, input[type="button"]).cancel:not(:disabled) {
+  color           : var(--ifm-color-button-cancel);
+  background-color: var(--ifm-bg-color-button-cancel);
+  border-color    : var(--ifm-border-color-button-cancel);
+}
+
+:is(button, input.button, input[type="button"]).cancel:not(:disabled):hover,
+:is(button, input.button, input[type="button"]).cancel:not(:disabled):focus {
+  background-color: var(--ifm-bg-color-button-cancel-hover);
+}
+
+:is(button, input.button, input[type="button"]).cancel:not(:disabled):active {
+  background-color: var(--ifm-bg-color-button-cancel-active);
+}
+
+option:checked {
+  background-color: var(--ifm-color-primary);
+  color           : var(--ifm-hero-text-color);
 }
 
 *:has(> .max-width-box) {
@@ -318,7 +494,6 @@ body>* {
   flex-direction  : column;
   align-items     : center;
   padding         : 0;
-  border-bottom   : 1px solid var(--psdi-border-color);
   height          : auto !important;
 }
 
@@ -357,35 +532,31 @@ body>* {
 }
 
 /* Applies only to buttons with this class not in the PSDI header, to not break docusaurus sites */
-.clean-btn {
+button.clean-btn {
   margin: 0;
 }
 
-#psdi-header .clean-btn {
-  background     : none;
-  border         : none;
-  color          : inherit;
-  cursor         : pointer;
-  font-family    : inherit;
-  padding        : 0;
-  align-items    : center;
-  border-radius  : 50%;
-  display        : flex;
-  justify-content: center;
-  height         : 2rem;
-  width          : 2rem;
+#psdi-header button.clean-btn {
+  background-color: inherit;
+  border          : none;
+  color           : inherit;
+  cursor          : pointer;
+  font-family     : inherit;
+  padding         : 0;
+  align-items     : center;
+  border-radius   : 50%;
+  display         : flex;
+  justify-content : center;
+  height          : 2rem;
+  width           : 2rem;
 }
 
-[data-theme='dark'] #psdi-header .clean-btn {
-  background-color: black;
+#psdi-header button.clean-btn:hover {
+  background-color: var(--ifm-background-color-secondary);
 }
 
-#psdi-header .clean-btn:hover {
-  background: var(--ifm-background-color-secondary);
-}
-
-#psdi-header .clean-btn:active {
-  background: inherit;
+#psdi-header button.clean-btn:active {
+  background-color: inherit;
 }
 
 h1,
@@ -445,11 +616,15 @@ p {
 
 .hero,
 .footer {
-  color: var(--ifm-hero-text-color);
+  color           : var(--ifm-hero-text-color);
+  background-color: var(--ifm-color-primary);
 }
 
-.hero {
-  background-color: var(--ifm-color-primary);
+[data-theme='dark'] :is(.header, .hero, .footer, .content, .secondary):has(.header, +.hero, +.footer, +.content,
+  +.secondary) {
+  border-width       : 1px;
+  border-color       : var(--ifm-hero-text-color-f1);
+  border-bottom-style: solid;
 }
 
 .hero .max-width-box {
@@ -471,31 +646,15 @@ p {
   background-color: var(--ifm-background-color-secondary);
 }
 
-.hero h1,
-.hero h2,
-.hero h3,
-.hero h4,
-.hero h5,
-.hero h6,
-.footer h1,
-.footer h2,
-.footer h3,
-.footer h4,
-.footer h5,
-.footer h6 {
-  color: var(--psdi-heading-color-inverse);
+:is(.hero, .footer) :is(h1, h2, h3, h4, h5, h6) {
+  color: var(--ifm-hero-heading-color);
 }
 
 .secondary {
   color: var(--ifm-font-color-secondary);
 }
 
-.secondary h1,
-.secondary h2,
-.secondary h3,
-.secondary h4,
-.secondary h5,
-.secondary h6 {
+:is(.secondary) :is(h1, h2, h3, h4, h5, h6) {
   color: var(--ifm-heading-color-secondary);
 }
 
@@ -510,34 +669,24 @@ a {
 .content_knG7 a:hover,
 a:hover {
   text-decoration: none;
+  cursor         : pointer;
+}
+
+a.no-pointer {
+  cursor: default;
 }
 
 /* For links which contain longer text content, don't underline any text in paragraphs,
    but do underline (and remove on hover) in the headings */
-a:has(>h1),
-a:has(>h2),
-a:has(>h3),
-a:has(>h4),
-a:has(>h5),
-a:has(>h6) {
+a:has(>h1, >h2, >h3, >h4, >h5, >h6) {
   text-decoration: none;
 }
 
-a h1,
-a h2,
-a h3,
-a h4,
-a h5,
-a h6 {
+a :is(h1, h2, h3, h4, h5, h6) {
   text-decoration: underline;
 }
 
-a:hover h1,
-a:hover h2,
-a:hover h3,
-a:hover h4,
-a:hover h5,
-a:hover h6 {
+a:hover :is(h1, h2, h3, h4, h5, h6) {
   text-decoration: none;
 }
 
@@ -582,9 +731,7 @@ a svg {
 }
 
 .footer {
-  background-color: var(--ifm-color-primary);
-  color           : var(--ifm-hero-text-color);
-  padding         : 0.5rem 2rem 0.5rem 2rem;
+  padding: 0.5rem 2rem 0.5rem 2rem;
 }
 
 .footer .max-width-box {
@@ -637,7 +784,7 @@ a svg {
 }
 
 .footer__title {
-  color          : var(--psdi-heading-color-inverse);
+  color          : var(--ifm-hero-heading-color);
   font-weight    : bold;
   display        : flex;
   flex-direction : column;
@@ -723,4 +870,21 @@ a svg {
 
 .footer__copyright__text {
   padding: 0;
+}
+
+/* Docusaurus-specific fixes */
+
+.button.button--secondary {
+  color: var(--ifm-font-color-secondary);
+}
+
+.table-of-contents__link--active,
+.table-of-contents__link--active code,
+.table-of-contents__link:hover,
+.table-of-contents__link:hover code {
+  color: var(--ifm-menu-color-active) !important;
+}
+
+.cardContainer_fWXF:hover {
+  border-color: var(--ifm-menu-color-active) !important;
 }

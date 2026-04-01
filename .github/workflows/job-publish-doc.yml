@@ -41,7 +41,7 @@ jobs:
       - name: Build doc
         run: pdoc --html psdi_glorius_plot
       - name: Setup Pages
-        uses: actions/configure-pages@v5
+        uses: actions/configure-pages@v6
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v4
         with:
@@ -49,4 +49,4 @@ jobs:
           path: "./html/psdi_glorius_plot"
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5

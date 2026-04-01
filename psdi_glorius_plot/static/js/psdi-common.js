@@ -53,12 +53,23 @@ export function setFooterSource(s) {
 const LIGHT_MODE = "light";
 const DARK_MODE = "dark";
 
-// Load color mode from session storage and apply it
-let mode = sessionStorage.getItem("mode");
-if (!mode) {
-  mode = LIGHT_MODE;
+// Check if the page supports dark mode by detecting if the page has a toggle button on it
+const l_toggle_buttons = document.querySelectorAll("button.color-mode-toggle, button.toggleButton_gllP");
+if (l_toggle_buttons.length > 0) {
+  // Load color mode from session storage and apply it if it's already been set, or else get the user's system preference
+  let mode = sessionStorage.getItem("mode");
+  if (!mode) {
+    const userPrefersDarkMode = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)');
+    if (userPrefersDarkMode && userPrefersDarkMode.matches)
+      mode = DARK_MODE;
+    else
+      mode = LIGHT_MODE;
+  }
+  document.documentElement.setAttribute("data-theme", mode);
+} else {
+  // The page doesn't support dark mode, so set it to light mode
+  document.documentElement.setAttribute("data-theme", LIGHT_MODE);
 }
-document.documentElement.setAttribute("data-theme", mode);
 
 function toggleMode() {
   let currentMode = document.documentElement.getAttribute("data-theme");

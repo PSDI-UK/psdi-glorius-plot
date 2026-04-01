@@ -45,6 +45,12 @@ class SiteEnv:
                                                       default=False)
         """True if the app is running in debug mode, False if not"""
 
+        self.test_mode: bool = self._determine_value(ev=const.TEST_EV,
+                                                     arg=None,
+                                                     value_type=bool,
+                                                     default=False)
+        """True if the app is running in test mode, False if not"""
+
         tag, sha, commit_date = self._determine_tag_sha_date()
 
         self.tag: str = tag
