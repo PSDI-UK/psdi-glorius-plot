@@ -54,7 +54,7 @@ jobs:
         if: ${{ ! inputs.simple }}
         run: |
           if ${{ inputs.prod }}; then
-            export ORIGIN=https://psdi-glorius-plot.psdi.ac.uk/
+            export ORIGIN=https://organic-toolkit.psdi.ac.uk/glorius-plot
           fi
           export GH_TOKEN=${{ github.token }}
           pytest tests/gui
@@ -62,7 +62,7 @@ jobs:
         if: ${{ inputs.simple }}
         run: |
           if ${{ inputs.prod }}; then
-            export ORIGIN=https://psdi-glorius-plot.psdi.ac.uk/
+            export ORIGIN=https://organic-toolkit.psdi.ac.uk/glorius-plot
           fi
           export GH_TOKEN=${{ github.token }}
           pytest 'tests/gui/gui_test.py::test_initial_frontpage'
