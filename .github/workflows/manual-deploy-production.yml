@@ -100,8 +100,6 @@ jobs:
 
   # Deploy container with tag to production environment
   deploy-stfc-production-k8s:
-    # When ready to enable this step, remove the following line
-    if: false
     name: Deploy to production
     needs: get-latest-release-tag
     uses: PSDI-UK/psdi-glorius-plot-deployment/.github/workflows/job-external-deployment.yaml@bf95f7bc0840247a40dbd8aef2aaa7ee2baad1fe
