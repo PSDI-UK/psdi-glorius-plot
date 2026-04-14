@@ -4,23 +4,21 @@ import { formatORCIDUrl } from "../utility.js";
 
 let pdfFontsLoaded = false;
 
-function initPdfFonts() {
+function initPdfFonts(siteUrl) {
   if (pdfFontsLoaded)
     return
+  pdfFontsLoaded = true;
 
   var fonts = {
     Arial: {
-      // The `fontsUrl` variable is set in the index.html template, which uses the Flask renderer to get the location
-      // that the "static/fonts" directory is deployed to
-      normal: fontsUrl + "/Arial.ttf",
-      bold: fontsUrl + "/Arial-B.ttf",
-      italics: fontsUrl + "/Arial-I.ttf",
-      bolditalics: fontsUrl + "/Arial-BI.ttf"
+      normal: siteUrl + "static/fonts/Arial.ttf",
+      bold: siteUrl + "static/fonts/Arial-B.ttf",
+      italics: siteUrl + "static/fonts/Arial-I.ttf",
+      bolditalics: siteUrl + "static/fonts/Arial-BI.ttf"
     }
   };
 
   pdfMake.addFonts(fonts);
-  pdfFontsLoaded = true;
 }
 
 /**
@@ -36,7 +34,25 @@ export async function makeESI(rocrateInfo) {
     var reactionSchemeImgPromise = loadDataURL(rocrateInfo.reactionSchemeImg);
   }
 
-  initPdfFonts();
+  // Load fonts for the PDF renderer. We need to provide the absolute web address to them, so we figure that out
+  // relative to the page URL
+  let url = window.location.href, hash = window.location.hash, search = window.location.search;
+
+  if (hash && url.endsWith(hash))
+    url = url.slice(0, -hash.length);
+
+  if (search && url.endsWith(search))
+    url = url.slice(0, -search.length);
+
+  // If the last segment of the URL contains a ., that implies it isn't a folder, so strip it from the URL
+  let lastUrlSegment = url.split("/").at(-1)
+  if (lastUrlSegment.includes(".")) {
+    // We use a regex here to ensure we replace at the end of the URL and not anywhere else the string appears. This
+    // shouldn't be an issue, but playing it safe here
+    url = url.replace(new RegExp(lastUrlSegment.replaceAll(".", "\.") + "$"), "");
+  }
+
+  initPdfFonts(url);
 
   const docStyles = {
     header: {
