@@ -4,21 +4,23 @@ import { formatORCIDUrl } from "../utility.js";
 
 let pdfFontsLoaded = false;
 
-function initPdfFonts(siteUrl) {
+function initPdfFonts() {
   if (pdfFontsLoaded)
     return
-  pdfFontsLoaded = true;
 
   var fonts = {
     Arial: {
-      normal: siteUrl + "static/fonts/Arial.ttf",
-      bold: siteUrl + "static/fonts/Arial-B.ttf",
-      italics: siteUrl + "static/fonts/Arial-I.ttf",
-      bolditalics: siteUrl + "static/fonts/Arial-BI.ttf"
+      // The `fontsUrl` variable is set in the index.html template, which uses the Flask renderer to get the location
+      // that the "static/fonts" directory is deployed to
+      normal: fontsUrl + "/Arial.ttf",
+      bold: fontsUrl + "/Arial-B.ttf",
+      italics: fontsUrl + "/Arial-I.ttf",
+      bolditalics: fontsUrl + "/Arial-BI.ttf"
     }
   };
 
   pdfMake.addFonts(fonts);
+  pdfFontsLoaded = true;
 }
 
 /**
@@ -34,12 +36,7 @@ export async function makeESI(rocrateInfo) {
     var reactionSchemeImgPromise = loadDataURL(rocrateInfo.reactionSchemeImg);
   }
 
-  // Load fonts for the PDF renderer. We need to provide the absolute web address to them, so we figure that out
-  // relative to the page URL
-  let url = window.location.href, hash = window.location.hash;
-  if (hash && url.endsWith(hash))
-    url = url.slice(0, -hash.length);
-  initPdfFonts(url);
+  initPdfFonts();
 
   const docStyles = {
     header: {
