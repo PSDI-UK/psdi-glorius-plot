@@ -1,11 +1,5 @@
 # Changelog for PSDI Glorius Plot Generator
 
-## v0.3.4
-
-## Bugfixes
-
-- Fixed issue where RO-crate data packages couldn't be exported if the user accessed the site through the /index.html alias
-
 ## v0.3.0
 
 ### New and Changed Functionality

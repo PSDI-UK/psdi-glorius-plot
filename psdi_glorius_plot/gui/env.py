@@ -223,14 +223,7 @@ def update_env(args: Namespace | None = None):
 
 def custom_url_for(*args, **kwargs):
     """Custom implementation of Flask's url_for which prepends the URL with a relative path"""
-
     url = url_for(*args, **kwargs)
-
-    # First, check if an external URL is requested, in which case we skip the addition of the relative URL path
-    if kwargs.get("_external"):
-        return url
-
-    # Make sure the relative path is properly included
     if url.startswith("/"):
         url = url[1:]
     url = os.path.join(get_env().rel_url_path, url)
