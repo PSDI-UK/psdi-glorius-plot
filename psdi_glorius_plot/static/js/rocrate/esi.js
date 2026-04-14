@@ -36,9 +36,22 @@ export async function makeESI(rocrateInfo) {
 
   // Load fonts for the PDF renderer. We need to provide the absolute web address to them, so we figure that out
   // relative to the page URL
-  let url = window.location.href, hash = window.location.hash;
+  let url = window.location.href, hash = window.location.hash, search = window.location.search;
+
   if (hash && url.endsWith(hash))
     url = url.slice(0, -hash.length);
+
+  if (search && url.endsWith(search))
+    url = url.slice(0, -search.length);
+
+  // If the last segment of the URL contains a ., that implies it isn't a folder, so strip it from the URL
+  let lastUrlSegment = url.split("/").at(-1)
+  if (lastUrlSegment.includes(".")) {
+    // We use a regex here to ensure we replace at the end of the URL and not anywhere else the string appears. This
+    // shouldn't be an issue, but playing it safe here
+    url = url.replace(new RegExp(lastUrlSegment.replaceAll(".", "\.") + "$"), "");
+  }
+
   initPdfFonts(url);
 
   const docStyles = {
