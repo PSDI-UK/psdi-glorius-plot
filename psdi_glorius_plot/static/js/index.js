@@ -162,6 +162,7 @@ let autoUpdating = false, gloriusPlot = null;
 let lastAspectRatio, lastLabelFontSizeWidthRatio, lastLabelFontSizeHeightRatio,
   lastAxisFontSizeWidthRatio, lastAxisFontSizeHeightRatio;
 let initWidth, initHeight, initLabelFontSize, initAxisFontSize;
+let lastMinOutput = null, lastMaxOutput = null;
 
 // Globals relating to data package export
 let roCrateFormUpdating = false;
@@ -726,6 +727,37 @@ function getDevPlotMode() {
   return rVal;
 }
 
+function updateMinMaxOutputStatus() {
+  const devPlotMode = getDevPlotMode();
+  const minOutputInput = $("#min-output-input"), maxOutputInput = $("#max-output-input");
+
+  if (devPlotMode == "mean") {
+    // When changing to mean mode, we disable the min/max inputs, store the previous values, and set the values to 0/100
+
+    minOutputInput.attr("disabled", "disabled");
+    lastMinOutput = minOutputInput.val();
+    minOutputInput.val(0);
+
+    maxOutputInput.attr("disabled", "disabled");
+    lastMaxOutput = maxOutputInput.val();
+    maxOutputInput.val(100);
+  } else {
+    // When changing from mean mode, we enable the min/max inputs, and if there are previous values stored, restore
+    // them, then delete the stored values
+
+    minOutputInput.removeAttr("disabled");
+    if (lastMinOutput !== null) {
+      minOutputInput.val(lastMinOutput);
+      lastMinOutput = null;
+    }
+    maxOutputInput.removeAttr("disabled");
+    if (lastMaxOutput !== null) {
+      maxOutputInput.val(lastMaxOutput);
+      lastMaxOutput = null;
+    }
+  }
+}
+
 function setDevPlotMode(val) {
   const lPlotSelectRadio = $("input.plot-select");
   lPlotSelectRadio.each(function () {
@@ -735,6 +767,7 @@ function setDevPlotMode(val) {
     else
       oThis.prop("checked", false);
   });
+  updateMinMaxOutputStatus();
 }
 
 function getWidth() {
@@ -931,11 +964,13 @@ function navigateToRowButtons(e) {
     targetButton = addRowButton;
   }
 
-  targetButton[0].focus();
+  // Check the button actually exists - if in the heading row, it won't
+  if (targetButton[0])
+    targetButton[0].focus();
 
   // If we moved away from a Quill editor, disable its toolbar and symbol palette
   const quillEl = currentCell.find(".condition-input");
-  if (quillEl) {
+  if (quillEl[0]) {
     const selector = "#" + quillEl.attr("id");
     disableQuillToolbar(selector);
   }
@@ -1096,15 +1131,6 @@ function getPlotData() {
   return data;
 }
 
-function checkPlotDataFile() {
-  let lFiles = this.files;
-  if (lFiles.length > 0) {
-    $("#load-data").removeAttr("disabled");
-  } else {
-    $("#load-data").attr("disabled", true);
-  }
-}
-
 async function loadPlotData() {
 
   // Check if the form is currently dirty, and check with the user before filling if so
@@ -1114,12 +1140,18 @@ async function loadPlotData() {
     }
   }
 
-  loadObject($("#load-data-file")[0].files[0], (data) => {
+  const fileInput = $("#load-data-file")[0];
+  const file = fileInput.files[0];
+
+  loadObject(file, (data) => {
     // Temporarily disable auto-updating the plot if it's enabled
     const lastAutoUpdating = autoUpdating;
     if (autoUpdating)
       disableAutoUpdates();
     autoUpdating = false;
+
+    // Clear the input in case the user wants to load the same file again
+    fileInput.value = null;
 
     setTitle(data["title"]);
     setOutcomeValue(data["outcome-value"]);
@@ -2260,6 +2292,9 @@ function postContribRowUpdate() {
         useDefaultCitation();
     });
   }
+
+  // Update the selection box to match the current number of rows
+  $("select#num-contrib").val(lAddContribButtons.length);
 }
 
 /**
@@ -2626,6 +2661,11 @@ async function exportROCrate() {
   if (renderFailed)
     return;
 
+  // Detemine the timestamp in the user's timezone. We subtract the timezone offset to determine this (given in minutes,
+  // so we convert to ms)
+  const utcTime = new Date();
+  const localTime = new Date(utcTime - utcTime.getTimezoneOffset() * 60 * 1000);
+
   // Set up a rocrateInfo object containing all info that will be needed to construct the various files in the rocrate
 
   // plotData will be modified when the Sensitivity Table is created to remove redundant information in it, so we create
@@ -2636,7 +2676,7 @@ async function exportROCrate() {
     title: makeTextVersions(getQuillEditorHTML("#rocrate-title-input")),
     desc: makeTextVersions(getQuillEditorHTML("#rocrate-desc-input")),
     about: makeTextVersions(getQuillEditorHTML("#rocrate-about")),
-    timestamp: (new Date()).toISOString(),
+    timestamp: localTime.toISOString(),
     version: version,
     reactionSchemeFile: reactionSchemePresent() && getReactionScheme(),
     reactionSchemeImg: reactionSchemeImgPresent() && getReactionSchemeImg(),
@@ -2960,6 +3000,8 @@ function updatePlotSelect() {
     $(".baseline-rel-deviation-cell, .rel-deviation-value-cell").addClass("col-selected");
     $(".plot-select-rel-cell").addClass("col-selected-bottom");
   }
+
+  updateMinMaxOutputStatus();
 }
 
 function toggleAutoUpdates(e) {

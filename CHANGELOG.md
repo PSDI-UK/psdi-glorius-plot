@@ -1,5 +1,22 @@
 # Changelog for PSDI Glorius Plot Generator
 
+## v0.3.4
+
+## Bugfixes
+
+- Fixed issue where RO-crate data packages couldn't be exported if the user accessed the site through the /index.html alias
+- Fixed issue where inserted symbols in formatted text editors wouldn't retain current formatting
+- Fixed a couple runtime errors to instead exit silently
+- Fixed formatting of symbol insertion buttons to appear as intended
+- When mean/sample plotting mode is selected, the min/max output inputs will be disabled, since having them present but non-functional in this mode was confusing
+- Fixed some formatting in generated README.md file in exported RO-Crate
+- Changed all times in generated RO-Crate to be in user's local time
+- When buttons are clicked to add or remove a contributor in the author list, the selection box will appropriately update
+
+**Stylistic Changes**
+
+- Adjusted labels for font size inputs on the plots and added clarifying tooltips
+
 ## v0.3.0
 
 ### New and Changed Functionality

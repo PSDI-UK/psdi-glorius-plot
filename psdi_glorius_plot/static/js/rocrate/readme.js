@@ -60,7 +60,7 @@ export function makeReadme(rocrateInfo) {
 ## File Structure
 
 - [**ESI.pdf**](./ESI.pdf): A PDF electronic supplementary information file containing the results table for the sensitivity of the reaction and the Glorius plot.
-- **[ro-crate-metadata.json](./ro-crate-metadata.json)**: A machine-readable file describing the dataset contained within this Research Object Crate (RO-Crate).
+- [**ro-crate-metadata.json**](./ro-crate-metadata.json): A machine-readable file describing the dataset contained within this Research Object Crate (RO-Crate).
 
 - **data folder**:${reactionSchemeLine}${baselineLine}${condDescLine}
   - **plot folder**:
