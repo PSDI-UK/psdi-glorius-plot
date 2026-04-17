@@ -214,16 +214,6 @@ function insertSymbol(e) {
   const selector = "#" + symbolButton.parents(":has(>.ql-container)").find(".ql-container").attr("id");
   const quill = getQuillEditor(selector);
 
-  // Find where in the editor we want to insert it. If a selection, delete the contents first. If no selection or
-  // cursor in the input, insert the symbol at the end
-  let index = quill.getLength() - 1;
-  const range = quill.getSelection();
-  if (range) {
-    index = range.index;
-    if (range.length > 0)
-      quill.deleteText(index, range.length, "user");
-  }
-
   // Determine the current formatting, which should be applied to this symbol, by checking which formatting buttons are
   // active
   const symbolFormats = {};
@@ -239,6 +229,16 @@ function insertSymbol(e) {
         symbolFormats.underline = true;
     }
   });
+
+  // Find where in the editor we want to insert it. If a selection, delete the contents first. If no selection or
+  // cursor in the input, insert the symbol at the end
+  let index = quill.getLength() - 1;
+  const range = quill.getSelection();
+  if (range) {
+    index = range.index;
+    if (range.length > 0)
+      quill.deleteText(index, range.length, "user");
+  }
 
   quill.insertText(index, symbol, symbolFormats, "user");
 
