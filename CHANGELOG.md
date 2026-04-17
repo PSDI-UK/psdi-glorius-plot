@@ -1,5 +1,11 @@
 # Changelog for PSDI Glorius Plot Generator
 
+## v0.3.5
+
+## Bugfixes
+
+- Fixed a bug where sub/superscript in the middle of a formatted text editor wouldn't apply to inserted symbols
+
 ## v0.3.4
 
 ## Bugfixes
