@@ -223,7 +223,24 @@ function insertSymbol(e) {
     if (range.length > 0)
       quill.deleteText(index, range.length, "user");
   }
-  quill.insertText(index, symbol, "user");
+
+  // Determine the current formatting, which should be applied to this symbol, by checking which formatting buttons are
+  // active
+  const symbolFormats = {};
+  const lFormatButtons = $(selector).parents(":has(>.ql-container)").find(".ql-formats>button");
+  lFormatButtons.each(function () {
+    const formatButton = $(this);
+    if (formatButton.hasClass("ql-active")) {
+      if (formatButton.hasClass("ql-bold"))
+        symbolFormats.bold = true;
+      else if (formatButton.hasClass("ql-italic"))
+        symbolFormats.italic = true;
+      else if (formatButton.hasClass("ql-underline"))
+        symbolFormats.underline = true;
+    }
+  });
+
+  quill.insertText(index, symbol, symbolFormats, "user");
 
   // Set the selection after the inserted symbol
   quill.setSelection(index + 1);
