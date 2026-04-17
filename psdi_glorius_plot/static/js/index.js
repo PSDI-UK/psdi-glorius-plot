@@ -2629,6 +2629,11 @@ async function exportROCrate() {
   if (renderFailed)
     return;
 
+  // Detemine the timestamp in the user's timezone. We subtract the timezone offset to determine this (given in minutes,
+  // so we convert to ms)
+  const utcTime = new Date();
+  const localTime = new Date(utcTime - utcTime.getTimezoneOffset() * 60 * 1000);
+
   // Set up a rocrateInfo object containing all info that will be needed to construct the various files in the rocrate
 
   // plotData will be modified when the Sensitivity Table is created to remove redundant information in it, so we create
@@ -2639,7 +2644,7 @@ async function exportROCrate() {
     title: makeTextVersions(getQuillEditorHTML("#rocrate-title-input")),
     desc: makeTextVersions(getQuillEditorHTML("#rocrate-desc-input")),
     about: makeTextVersions(getQuillEditorHTML("#rocrate-about")),
-    timestamp: (new Date()).toISOString(),
+    timestamp: localTime.toISOString(),
     version: version,
     reactionSchemeFile: reactionSchemePresent() && getReactionScheme(),
     reactionSchemeImg: reactionSchemeImgPresent() && getReactionSchemeImg(),
