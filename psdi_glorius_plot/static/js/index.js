@@ -2260,6 +2260,9 @@ function postContribRowUpdate() {
         useDefaultCitation();
     });
   }
+
+  // Update the selection box to match the current number of rows
+  $("select#num-contrib").val(lAddContribButtons.length);
 }
 
 /**
