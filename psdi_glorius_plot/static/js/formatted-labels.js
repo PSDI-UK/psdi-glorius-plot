@@ -227,6 +227,8 @@ function insertSymbol(e) {
         symbolFormats.italic = true;
       else if (formatButton.hasClass("ql-underline"))
         symbolFormats.underline = true;
+      else if (formatButton.hasClass("ql-script"))
+        symbolFormats.script = formatButton.val();
     }
   });
 
