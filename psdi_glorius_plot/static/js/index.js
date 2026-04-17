@@ -964,11 +964,13 @@ function navigateToRowButtons(e) {
     targetButton = addRowButton;
   }
 
-  targetButton[0].focus();
+  // Check the button actually exists - if in the heading row, it won't
+  if (targetButton[0])
+    targetButton[0].focus();
 
   // If we moved away from a Quill editor, disable its toolbar and symbol palette
   const quillEl = currentCell.find(".condition-input");
-  if (quillEl) {
+  if (quillEl[0]) {
     const selector = "#" + quillEl.attr("id");
     disableQuillToolbar(selector);
   }
