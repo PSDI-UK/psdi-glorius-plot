@@ -30,3 +30,6 @@ scripts/purge-common-style.sh
 # Downloaded assets
 psdi-assets.tar.gz
 psdi-common-style-*.*.*
+
+# Misc junk files
+wget-log
