@@ -16,15 +16,13 @@ This project uses a version of [GitLab Flow](https://about.gitlab.com/topics/ver
 The following tasks should be completed before merging a release candidate branch to `release`:
 
 - Determine the target version based on the changes made:
-
   - If any breaking changes have been made (after version 1.0.0), the version will advance to the next major version - `X.Y.Z` to `(X+1).0.0`
   - Otherwise, if any features are added, or any breaking changes are made before version 1.0.0, the version will advance to the next minor version - `X.Y.Z` to `X.(Y+1).0`.
   - Otherwise, the version will advance to the next bugfix version - `X.Y.Z` to `X.Y.(Z+1)`.
 
 - Create a release candidate branch with the name `rc-<target-version>` (e.g. `rc-1.2.3`), branched off of `main`. This should trigger an automated workflow to create a Pull Request from this branch to `release`. You may wish to edit the PR's name and/or description.
 
-- Tagging of the release is handled by an automated workflow which determines the new version based on the previous version and the commit history, looking for any commits which indicate a feature addition or breaking change using [Angular convention](https://github.com/conventional-changelog/conventional-changelog/tree/master/packages/conventional-changelog-angular#commit-message-format). Since we don't practice this regularly, you'll need to make a commit with this style to indicate any feature additions or breaking changes (this can be done when updating the version in the next step):
-
+- Tagging of the release is handled by an automated workflow which determines the new version based on the previous version and the commit history, looking for any commits which indicate a feature addition or breaking change using [Angular convention](https://github.com/conventional-changelog/conventional-changelog/tree/master/packages/conventional-changelog-angular#commit-message-format). Since we don't practice this regularly, you'll need to make a commit with this style to indicate any feature additions or breaking changes (this can be done when updating the Changelog or version in the following steps):
   - If there are any breaking changes **after version 1.0.0 is first published**, start the commit's first line with "feat(release): ", followed by a brief description of the release in a single line, then a blank line, then start the third line with "BREAKING CHANGE: ", followed by a description of the breaking change(s). Use manual newlines if necessary to keep lines in this description to a maximum of 50 characters. E.g.:
 
     ```
@@ -47,17 +45,15 @@ The following tasks should be completed before merging a release candidate branc
   - Otherwise, no special formatting is needed for a commit - the workflow will default to assuming a bugfix version incrementation when it doesn't see one of the two patterns above.
 
 - Check that the project version is updated to the desired new version in all places it appears:
-
   - `CHANGELOG.md` (The top section should reflect the new version)
 
-- Update the release date at the top of `README.md`
+- Update the release date at the top of `README.md` if present there
 
 - Ensure that all automated tests and checks pass - these should be run automatically on the PR opened above
 
 - Manually test the web interface. At this stage, it should be deployed to dev at https://psdi-glorius-plot-dev.psdi.ac.uk/ (requires VPN to access), and it can be run locally as well
-
-  - If there have been any changes to the Python backend, run a test that a file can be converted successfully and produces a proper log
-  - If there have been any changes to the web frontend, check the appearance of the site to ensure that it looks as desired. Test the Accessibility page to ensure that changes there work properly, are saved when requested and apply to other pages
+  - If there have been any changes to the Python backend, run an appropriate manual test which engages it and check that it behaves as expected
+  - If there have been any changes to the web frontend, check the appearance of the site to ensure that it looks as desired. Run a manual test of any critical frontend functionality to ensure it behaves as expected
 
 - Check that `CHANGELOG.md` is up-to-date with all changes in this version (including any fixes found to be necessary in the testing above). Any subsections for categories with no changes in this version can be removed to keep the file concise
 
@@ -65,10 +61,10 @@ If any of these tasks fail and require changes, make the needed changes and then
 
 Then, follow the following steps to make the release:
 
-1. Merge the pull request to `release`. The release candidate branch can be safely deleted. This should trigger an automated pipeline to tag, publish, and deploy and the new code.
-2. After the above pipeline finishes, confirm that the changes are shown live on the staging site at https://psdi-glorius-plot-staging.psdi.ac.uk/ by checking the version shown at the bottom of the Documentation page. If necessary, double-check that nothing has broken due to the slight changes in appearance between the dev and staging sites
+1. Merge the pull request to `release`. This should trigger an automated pipeline to tag, publish, and deploy and the new code. The release candidate branch can be safely deleted
+2. After the above pipeline finishes, confirm that the changes are shown live on the staging site at https://organic-toolkit-staging.psdi.ac.uk/glorius-plot by checking the version shown at the bottom of the Documentation page. If necessary, double-check that nothing has broken due to the slight changes in appearance between the dev and staging sites (typically this will just affect the displayed version and deployment on the Documentation page)
 3. Manually trigger the `Manual Trigger - Deploy to production cluster` workflow on the `release` branch to deploy the site from the staging to release environment, which will make the changes visible to users
-4. After completion of the workflow, confirm that the changes are live on the production site at https://psdi-glorius-plot.psdi.ac.uk/ by checking the version shown at the bottom of the Documentation page
+4. After completion of the workflow, confirm that the changes are live on the production site at https://organic-toolkit.psdi.ac.uk/glorius-plot by checking the version shown at the bottom of the Documentation page
 5. Merge `release` into `main` via PR (obviously don't delete `release` - if it even gives you the option to, something has gone wrong in the project rulesets, so report this).
 
 ## Changelog
@@ -240,11 +236,11 @@ branch deploys to which environment. The table also shows, for each environment:
   upon a commit to the source branch which passes the unit-tests job; or results from a _manual_ invocation of a workflow by a
   developer.
 
-| Environment   | URL                                          | Accessibility                              | Source branch | Deployment trigger |
-| ------------- | -------------------------------------------- | ------------------------------------------ | ------------- | ------------------ |
-| `development` | https://psdi-glorius-plot-dev.psdi.ac.uk     | STFC and University of Southampton subnets | `main`        | Automatic          |
-| `staging`     | https://psdi-glorius-plot-staging.psdi.ac.uk | STFC and University of Southampton subnets | `release`     | Automatic          |
-| `production`  | https://psdi-glorius-plot.psdi.ac.uk         | public                                     | `release`     | Manual             |
+| Environment   | URL                                                     | Accessibility                              | Source branch | Deployment trigger |
+| ------------- | ------------------------------------------------------- | ------------------------------------------ | ------------- | ------------------ |
+| `development` | https://organic-toolkit-dev.psdi.ac.uk/glorius-plot     | STFC and University of Southampton subnets | `main`        | Automatic          |
+| `staging`     | https://organic-toolkit-staging.psdi.ac.uk/glorius-plot | STFC and University of Southampton subnets | `release`     | Automatic          |
+| `production`  | https://organic-toolkit.psdi.ac.uk/glorius-plot         | public                                     | `release`     | Manual             |
 
 Thus the `main` is automatically deployed to the `development` environment, and the `release` branch is automatically deployed to the `staging`
 environment. However deployment from the `release` branch to the `production` environment is a manual process. This is to allow developers to
