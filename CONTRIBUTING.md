@@ -52,7 +52,6 @@ The following tasks should be completed before merging a release candidate branc
 - Ensure that all automated tests and checks pass - these should be run automatically on the PR opened above
 
 - Manually test the web interface. At this stage, it should be deployed to dev at https://psdi-glorius-plot-dev.psdi.ac.uk/ (requires VPN to access), and it can be run locally as well
-  - If there have been any changes to the Python backend, run an appropriate manual test which engages it and check that it behaves as expected
   - If there have been any changes to the web frontend, check the appearance of the site to ensure that it looks as desired. Run a manual test of any critical frontend functionality to ensure it behaves as expected
 
 - Check that `CHANGELOG.md` is up-to-date with all changes in this version (including any fixes found to be necessary in the testing above). Any subsections for categories with no changes in this version can be removed to keep the file concise
@@ -170,56 +169,6 @@ This project uses various GitHub workflows to perform Continuous Integration tas
 - Automatic tagging, publishing, and deployment of the `main` and `release` branches to the development, staging and production environments
 
 See the comments within the files for further details. See also the [section on deployment](#deployment) for details specific to deployment tasks.
-
-## Publishing
-
-The Python library, CLI, and local GUI are published as a Python package via PyPI. This section describes how the package is set up and how it's published.
-
-### Package Setup
-
-The package's setup is defined in the `pyproject.toml` file. This defines the project's metadata as well as necessary information for its build system.
-
-The package uses [Hatch](https://hatch.pypa.io/latest/) for its build backend, as it is simpler to configure than the classic [Setuptools](https://setuptools.pypa.io/en/latest/userguide/) and provides some useful extensibility.
-
-The version of the package is set to be determined from the version control system, meaning on the release branch, the version will always match the latest tag. This alleviates us of having to manually maintain the version for the package to keep it correct, but does result in some quirks. It's a bit fussier to set up (though that's done now), and it makes the user take an extra step if they want to install from source but haven't cloned the repository - this is noted in the installation instructions in the README.
-
-### Initial Publication
-
-This section details the procedure for the initial publication of this package.
-
-First, it's necessary to install a couple required packages in order to build a Python package: `build` to build it and `twine` to upload it. These can be installed with pip via:
-
-```bash
-pip install --upgrade build twine
-```
-
-Alternatively, your system may require installing them via its package manager, e.g. via:
-
-```bash
-sudo apt install python3-build twine
-```
-
-First, test building the project to ensure that it's build correctly and includes the correct files. This can be done through:
-
-```bash
-python -m build
-```
-
-This will create a directory "dist" which contains two files: a tarball of the package source, and a compiled wheel. Inspect the tarball (e.g. with `tar tf dist/filename.tar.gz`) to confirm that it contains the desired files.
-
-To upload, follow [this tutorial](https://packaging.python.org/en/latest/tutorials/packaging-projects/#uploading-the-distribution-archives), which first walks through a test upload to TestPyPI, and then provides the changes necessary to upload to PyPI proper.
-
-### Publishing Updates
-
-The `ci-release.yml` workflow is planned to publish any new releases to PyPI after the initial publication. This can be set up by uncommenting the relevant lines in this file, possibly updating the `job-publish-pypi.yml` to enable this (testing will be necessary), and setting up Trusted Publishing for the project on PyPI (see [guide](https://docs.github.com/en/actions/security-for-github-actions/security-hardening-your-deployments/configuring-openid-connect-in-pypi))
-
-### Project Management
-
-This project is published on PyPI at https://pypi.org/project/psdi-glorius-plot/ and on TestPyPI at https://test.pypi.org/project/psdi-glorius-plot/. Maintainers can manage the project through the "Manage" link on that page or from their own projects page.
-
-The most important setting to be aware of here is Publishing -> Trusted Publisher Management. This is the system used to allow automatic publishing of releases from GitHub. It's set up so that the current project, organisation, environment, and workflow for publishing are approved. If any of these change, this will need to be updated by adding a new trusted publisher with the new settings (on both PyPI and TestPyPI) and removing the old one.
-
-The management page can also be used to add or remove collaborators through the Collaborators tab. Generally the project on these sites doesn't require much maintenance, but at least a few active collaborators should be on it at all times to avoid getting locked out if someone is suddenly unavailable.
 
 ## Deployment
 
