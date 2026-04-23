@@ -2,6 +2,10 @@
 
 ## v0.3.5
 
+### New and Changed Functionality
+
+- Temporarily removed header link to Organic Toolkit hub until that page goes live
+
 ## Bugfixes
 
 - Fixed a bug where sub/superscript in the middle of a formatted text editor wouldn't apply to inserted symbols
