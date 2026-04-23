@@ -19,6 +19,18 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orestbida/cookieconsent@3.1.0/dist/cookieconsent.css">
   <link rel="stylesheet" href="{{url_for('static', filename='css/psdi-common.css')}}">
+  {% if ga_tag %}
+  <!-- Google tag (gtag.js) -->
+  <script type="text/plain" data-category="analytics" async
+    src="https://www.googletagmanager.com/gtag/js?id={{ ga_tag }}"></script>
+  <script type="text/plain" data-category="analytics">
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', '{{ ga_tag }}');
+  </script>
+  {% endif %}
 
   <script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4="
     crossorigin="anonymous"></script>
