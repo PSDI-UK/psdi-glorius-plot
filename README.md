@@ -2,14 +2,6 @@
 
 [![License Badge](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
-<!-- The following line can be commented out to add a coverage badge here once a gist has been created for it. See the
-tutorial at https://nedbatchelder.com/blog/202209/making_a_coverage_badge.html, and also enable the code to generate
-the badge in the .github/job-test-main.yaml workflow-->
-
-<!-- ![Coverage Badge](https://img.shields.io/endpoint?url=[GIST_URL]/covbadge.json) -->
-
-Release date: 2025-08-18
-
 This project provides the code for a Flask-hosted web app to generate a Glorius-style radar plot of reaction sensitivity for the user. It publishes a service to https://organic-toolkit.psdi.ac.uk/glorius-plot
 
 For internal testing, the main branch of this project is published to https://organic-toolkit-dev.psdi.ac.uk/glorius-plot, with a staging deployment at https://organic-toolkit-staging.psdi.ac.uk/glorius-plot
@@ -135,7 +127,7 @@ In addition to the dependencies listed above, this project uses the assets made 
 
 ## Using the online app
 
-Enter https://psdi_glorius_plot.psdi.ac.uk/ in a browser. Guidance on usage is given on each page of the website.
+Enter https://organic-toolkit.psdi.ac.uk/glorius-plot in a browser. Guidance on usage is given on each page of the website, and further guidance can be found at https://guidance.psdi.ac.uk/docusaurus-pages/docs/guidance/psdi-resources/organic-toolkit/glorius.
 
 ## Testing
 
