@@ -56,14 +56,13 @@ psdi-glorius-plot-gui = "psdi_glorius_plot.main_gui:main"
 psdi-glorius-plot-render = "psdi_glorius_plot.render_static:main"
 
 [project.urls]
-Homepage = "https://psdi-glorius-plot.psdi.ac.uk/"
-Documentation = "https://psdi-uk.github.io/psdi-glorius-plot/"
+Homepage = "https://organic-toolkit.psdi.ac.uk/glorius-plot"
+Documentation = "https://guidance.psdi.ac.uk/docusaurus-pages/docs/guidance/psdi-resources/organic-toolkit/glorius"
 Issues = "https://github.com/PSDI-UK/psdi-glorius-plot/issues"
 Changelog = "https://github.com/PSDI-UK/psdi-glorius-plot/blob/main/CHANGELOG.md"
 
-# Repository currently isn't public - when it goes public, uncomment the below
-# Repository = "https://github.com/PSDI-UK/psdi-glorius-plot"
-# Download = "https://github.com/PSDI-UK/psdi-glorius-plot/releases/latest"
+Repository = "https://github.com/PSDI-UK/psdi-glorius-plot"
+Download = "https://github.com/PSDI-UK/psdi-glorius-plot/releases/latest"
 
 [tool.hatch.build]
 exclude = [

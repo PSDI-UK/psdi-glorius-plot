@@ -6,6 +6,10 @@
 
 - Fixed a bug where sub/superscript in the middle of a formatted text editor wouldn't apply to inserted symbols
 
+## Documentation Changes
+
+- Cleaned up misc. documentation and project metadata in preparation for public release
+
 ## v0.3.4
 
 ## Bugfixes
