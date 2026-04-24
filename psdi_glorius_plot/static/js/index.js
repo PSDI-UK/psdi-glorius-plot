@@ -1370,9 +1370,14 @@ function calcDeviation() {
  */
 async function generatePlot(context = null) {
 
-  if (window.CookieConsent.acceptedCategory('analytics') && !setupPhase && !reportedFirstInteraction) {
-    window.gtag("event", "interaction");
-    reportedFirstInteraction = true;
+  if (window.CookieConsent.acceptedCategory('analytics') && !reportedFirstInteraction) {
+    if (setupPhase) {
+      // The first time this runs will be when the page is being set up, so we skip the event for that instance
+      setupPhase = false;
+    } else {
+      window.gtag("event", "interaction");
+      reportedFirstInteraction = true;
+    }
   }
 
   // Increment the render batch, so text from previous renders won't load, and store the value of the previous batch
@@ -3139,6 +3144,5 @@ $(document).ready(function () {
     .finally(() => {
       Path2D = backupPath2D;
       enableAutoUpdates();
-      setupPhase = false;
     });
 });
