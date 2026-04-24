@@ -1870,7 +1870,7 @@ function generateIfUpdating() {
 async function exportSvg() {
 
   if (window.CookieConsent.acceptedCategory('analytics')) {
-    window.gtag("event", "download_plot", { format });
+    window.gtag("event", "download_plot", { format: "svg" });
   }
 
   $("#export-image-buttons .loading-spinner").removeClass("hidden");
@@ -2022,6 +2022,11 @@ function scrollToSection(selector) {
  * Display the RO-crate export sections, scroll to the top of them, and show/adjust buttons to return to them
  */
 function startROCrateExport(scroll = true) {
+
+  if (window.CookieConsent.acceptedCategory('analytics')) {
+    window.gtag("event", "config_rocrate");
+  }
+
   $(".hidden-after-rocrate").addClass("hidden");
   $(".hidden-until-rocrate").removeClass("hidden");
   $(".rocrate-export").removeClass("hidden");
@@ -2643,7 +2648,7 @@ function checkCondDescs() {
 
 function updateROCrateDownloadEnabled() {
   let allGood = true;
-  Object.values(exportChecks).forEach((check) => {
+  Object.entries(exportChecks).forEach((check) => {
     if (!check)
       allGood = false;
   });
@@ -2667,7 +2672,7 @@ function makeTextVersions(textHTML) {
 async function exportROCrate() {
 
   if (window.CookieConsent.acceptedCategory('analytics')) {
-    window.gtag("event", "download_rocrate", { format });
+    window.gtag("event", "download_rocrate");
   }
 
   // Show the spinner while working
@@ -2834,7 +2839,7 @@ function enableButtons() {
 
   $("#export-image-png").on("click", () => {
     if (window.CookieConsent.acceptedCategory('analytics')) {
-      window.gtag("event", "download_plot", { format });
+      window.gtag("event", "download_plot", { format: "png" });
     }
     exportImage(CHART_SELECTOR, "png", "#export-image-buttons .loading-spinner");
   });
