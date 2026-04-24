@@ -4,7 +4,10 @@
 
 ### Miscellaneous Changes
 
-- Enabled analytics of use (for those users who consent)
+- Enabled analytics of how the page is used (for those users who consent):
+  - How many visitors interact with the page in any way which promps a plot generation
+  - How many users download the plot
+  - How many users download an RO-crate data package
 
 ## v0.3.5
 
