@@ -156,6 +156,8 @@ const ROCRATE_PLOT_DIR = ROCRATE_DATA_DIR + "plot/"
 
 // Globals - general
 let tooltipList;
+let setupPhase = true;
+let reportedFirstInteraction = false;
 
 // Globals relating to plot generation
 let autoUpdating = false, gloriusPlot = null;
@@ -1368,6 +1370,11 @@ function calcDeviation() {
  */
 async function generatePlot(context = null) {
 
+  if (window.CookieConsent.acceptedCategory('analytics') && !setupPhase && !reportedFirstInteraction) {
+    window.gtag("event", "interaction");
+    reportedFirstInteraction = true;
+  }
+
   // Increment the render batch, so text from previous renders won't load, and store the value of the previous batch
   let renderBatch = incrementRenderBatch();
 
@@ -1856,6 +1863,11 @@ function generateIfUpdating() {
  * Generates the image as .svg for export
  */
 async function exportSvg() {
+
+  if (window.CookieConsent.acceptedCategory('analytics')) {
+    window.gtag("event", "download_plot", { format });
+  }
+
   $("#export-image-buttons .loading-spinner").removeClass("hidden");
 
   const ctx = C2S(getWidth(), getHeight());
@@ -2649,6 +2661,10 @@ function makeTextVersions(textHTML) {
  */
 async function exportROCrate() {
 
+  if (window.CookieConsent.acceptedCategory('analytics')) {
+    window.gtag("event", "download_rocrate", { format });
+  }
+
   // Show the spinner while working
   $(".rocrate-download-and-spinner .loading-spinner").removeClass("hidden");
 
@@ -2811,8 +2827,12 @@ function enableButtons() {
   // Call generatePlot with no arguments so we don't pass something that isn't a context as the first argument
   $("#generate-plot").on("click", () => generatePlot());
 
-  $("#export-image-png").on("click", () => exportImage(CHART_SELECTOR, "png",
-    "#export-image-buttons .loading-spinner"));
+  $("#export-image-png").on("click", () => {
+    if (window.CookieConsent.acceptedCategory('analytics')) {
+      window.gtag("event", "download_plot", { format });
+    }
+    exportImage(CHART_SELECTOR, "png", "#export-image-buttons .loading-spinner");
+  });
   $("#export-image-svg").on("click", exportSvg);
   $("#export-rocrate-start").on("click", startROCrateExport);
 
@@ -3119,5 +3139,6 @@ $(document).ready(function () {
     .finally(() => {
       Path2D = backupPath2D;
       enableAutoUpdates();
+      setupPhase = false;
     });
 });
