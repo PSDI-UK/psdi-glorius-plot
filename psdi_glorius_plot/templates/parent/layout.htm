@@ -19,7 +19,7 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orestbida/cookieconsent@3.1.0/dist/cookieconsent.css">
   <link rel="stylesheet" href="{{url_for('static', filename='css/psdi-common.css')}}">
-  {% if ga_tag %}
+  {% if ga_tag and service_mode %}
   <!-- Google tag (gtag.js) -->
   <script type="text/plain" data-category="analytics" async
     src="https://www.googletagmanager.com/gtag/js?id={{ ga_tag }}"></script>
