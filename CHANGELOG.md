@@ -1,5 +1,11 @@
 # Changelog for PSDI Glorius Plot Generator
 
+## v0.4.1
+
+### Bugfixes
+
+- When resizing the plot, the page arrangement won't update until size changes are complete, so that the input box won't move away from the mouse cursor between clicks
+
 ## v0.4.0
 
 ### Miscellaneous Changes

@@ -552,11 +552,16 @@ function removeSampleCol(e, updateAfter = true) {
   postTableUpdateCleanup("sample", updateAfter);
 }
 
-function updateCanvasShape() {
-  $(CHART_SELECTOR).css({
-    "width": getWidth().toString(),
-    "height": getHeight().toString()
-  })
+function updateCanvasShape(canvasOnly = false) {
+  let lSelectors = [CHART_SELECTOR];
+  if (!canvasOnly)
+    lSelectors.push(CHART_SELECTOR + "-container");
+  for (const selector of lSelectors) {
+    $(selector).css({
+      "width": getWidth().toString(),
+      "height": getHeight().toString()
+    })
+  }
 }
 
 /**
@@ -581,7 +586,7 @@ function updateWidth() {
   }
 
   if (autoUpdating)
-    updateCanvasShape();
+    updateCanvasShape(true);
 }
 
 /**
@@ -606,7 +611,17 @@ function updateHeight() {
   }
 
   if (autoUpdating)
-    updateCanvasShape();
+    updateCanvasShape(true);
+}
+
+/**
+ * Called when the plot width/height input loses focus, to adjust the page layout to properly position the plot
+ */
+function finalisePlotDimsUpdate() {
+  // Check if either the width or height input is still focuses, in case focus has moved from one to the other
+  if ($("#width-input:focus").length > 0 || $("#height-input:focus").length > 0)
+    return;
+  updateCanvasShape(false);
 }
 
 /**
@@ -3116,8 +3131,10 @@ $(document).ready(function () {
 
   L_DIMS.forEach(dim => initNumDimControls(dim));
   enableOnChangeTriggers(), enableToggles(), enableButtons(), enableNavigation();
+  $("#width-input, #height-input").on("focusout", () => {
+    setTimeout(finalisePlotDimsUpdate, 10);
+  });
 
-  // TODO: Wait for first enable of auto updates until ChartJS is loaded
   enableDeviationCalc(), enableCanvasUpdate();
 
   enableROCrateOnChangeTriggers();
