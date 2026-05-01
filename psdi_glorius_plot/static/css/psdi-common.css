@@ -423,8 +423,8 @@ input::placeholder {
   font-style: italic;
 }
 
-:is(button, input.button, input[type="button"]):not(.clean-btn),
-input[type="file"]::file-selector-button {
+:is(button, input.button, input[type="button"]):not(.clean-btn, .tribe-common *),
+input[type="file"]:not(.tribe-common *)::file-selector-button {
   font-family     : var(--ifm-font-family-base);
   font-size       : var(--ifm-font-size-base);
   color           : var(--ifm-hero-text-color);
@@ -435,28 +435,28 @@ input[type="file"]::file-selector-button {
   margin          : 0.25rem;
 }
 
-:is(button, input.button, input[type="button"]):not(.clean-btn):hover,
-input[type="file"]::file-selector-button:hover,
-:is(button, input.button, input[type="button"]):not(.clean-btn):focus,
-input[type="file"]::file-selector-button:focus {
+:is(button, input.button, input[type="button"]):not(.clean-btn, .tribe-common *):hover,
+input[type="file"]:not(.tribe-common *)::file-selector-button:hover,
+:is(button, input.button, input[type="button"]):not(.clean-btn, .tribe-common *):focus,
+input[type="file"]:not(.tribe-common *)::file-selector-button:focus {
   background-color: var(--ifm-bg-color-button-hover);
   cursor          : pointer;
 }
 
-:is(button, input.button, input[type="button"]):not(.clean-btn):active,
-input[type="file"]::file-selector-button:active {
+:is(button, input.button, input[type="button"]):not(.clean-btn, .tribe-common *):active,
+input[type="file"]:not(.tribe-common *)::file-selector-button:active {
   background-color: var(--ifm-bg-color-button-active);
 }
 
-:is(button, input.button, input[type="button"]):not(.clean-btn):disabled,
-input[type="file"]:disabled::file-selector-button {
+:is(button, input.button, input[type="button"]):not(.clean-btn, .tribe-common *):disabled,
+input[type="file"]:not(.tribe-common *):disabled::file-selector-button {
   background-color: var(--ifm-bg-color-button-disabled);
   border-color    : var(--ifm-border-color-button-disabled);
   color           : var(--ifm-color-button-disabled);
 }
 
-:is(button, input.button, input[type="button"]):not(.clean-btn):disabled:hover,
-input[type="file"]:disabled::file-selector-button:hover {
+:is(button, input.button, input[type="button"]):not(.clean-btn, .tribe-common *):disabled:hover,
+input[type="file"]:not(.tribe-common *):disabled::file-selector-button:hover {
   background-color: var(--ifm-bg-color-button-disabled);
   cursor          : default;
 }
