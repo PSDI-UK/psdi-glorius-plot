@@ -118,13 +118,14 @@
   --psdi-bg-color-secondary-lighter : #fbfafb;
   --psdi-bg-color-secondary-lightest: #ffffff;
 
-  --psdi-dm-bg-color-secondary         : #181823;
-  --psdi-dm-bg-color-secondary-dark    : #12121e;
-  --psdi-dm-bg-color-secondary-darker  : #0c0c19;
-  --psdi-dm-bg-color-secondary-darkest : #060613;
-  --psdi-dm-bg-color-secondary-light   : #1e1e29;
-  --psdi-dm-bg-color-secondary-lighter : #24242f;
-  --psdi-dm-bg-color-secondary-lightest: #2a2a35;
+  --psdi-dm-bg-color-secondary           : #181823;
+  --psdi-dm-bg-color-secondary-dark      : #12121e;
+  --psdi-dm-bg-color-secondary-darker    : #0c0c19;
+  --psdi-dm-bg-color-secondary-darkest   : #060613;
+  --psdi-dm-bg-color-secondary-light     : #282833;
+  --psdi-dm-bg-color-secondary-lighter   : #383843;
+  --psdi-dm-bg-color-secondary-lightest  : #484843;
+  --psdi-dm-bg-color-secondary-lightestp1: #585853;
 
   /* Success color */
   --ifm-color-success         : #5aa2ae;
@@ -298,21 +299,23 @@
   --ifm-bg-color-button-cancel-active: var(--psdi-dm-bg-color-input-secondary-lighter);
   --ifm-border-color-button-cancel   : var(--psdi-dm-bg-color-input-secondary-f1);
 
-  --ifm-color-secondary         : var(--psdi-dm-bg-color-secondary);
-  --ifm-color-secondary-light   : var(--psdi-dm-bg-color-secondary-light);
-  --ifm-color-secondary-lighter : var(--psdi-dm-bg-color-secondary-lighter);
-  --ifm-color-secondary-lightest: var(--psdi-dm-bg-color-secondary-lightest);
-  --ifm-color-secondary-dark    : var(--psdi-dm-bg-color-secondary-dark);
-  --ifm-color-secondary-darker  : var(--psdi-dm-bg-color-secondary-darker);
-  --ifm-color-secondary-darkest : var(--psdi-dm-bg-color-secondary-darkest);
+  --ifm-color-secondary           : var(--psdi-dm-bg-color-secondary);
+  --ifm-color-secondary-light     : var(--psdi-dm-bg-color-secondary-light);
+  --ifm-color-secondary-lighter   : var(--psdi-dm-bg-color-secondary-lighter);
+  --ifm-color-secondary-lightest  : var(--psdi-dm-bg-color-secondary-lightest);
+  --ifm-color-secondary-lightestp1: var(--psdi-dm-bg-color-secondary-lightestp1);
+  --ifm-color-secondary-dark      : var(--psdi-dm-bg-color-secondary-dark);
+  --ifm-color-secondary-darker    : var(--psdi-dm-bg-color-secondary-darker);
+  --ifm-color-secondary-darkest   : var(--psdi-dm-bg-color-secondary-darkest);
 
-  --ifm-background-color-secondary         : var(--psdi-dm-bg-color-secondary);
-  --ifm-background-color-secondary-light   : var(--psdi-dm-bg-color-secondary-light);
-  --ifm-background-color-secondary-lighter : var(--psdi-dm-bg-color-secondary-lighter);
-  --ifm-background-color-secondary-lightest: var(--psdi-dm-bg-color-secondary-lightest);
-  --ifm-background-color-secondary-dark    : var(--psdi-dm-bg-color-secondary-dark);
-  --ifm-background-color-secondary-darker  : var(--psdi-dm-bg-color-secondary-darker);
-  --ifm-background-color-secondary-darkest : var(--psdi-dm-bg-color-secondary-darkest);
+  --ifm-background-color-secondary           : var(--psdi-dm-bg-color-secondary);
+  --ifm-background-color-secondary-light     : var(--psdi-dm-bg-color-secondary-light);
+  --ifm-background-color-secondary-lighter   : var(--psdi-dm-bg-color-secondary-lighter);
+  --ifm-background-color-secondary-lightest  : var(--psdi-dm-bg-color-secondary-lightest);
+  --ifm-background-color-secondary-lightestp1: var(--psdi-dm-bg-color-secondary-lightestp1);
+  --ifm-background-color-secondary-dark      : var(--psdi-dm-bg-color-secondary-dark);
+  --ifm-background-color-secondary-darker    : var(--psdi-dm-bg-color-secondary-darker);
+  --ifm-background-color-secondary-darkest   : var(--psdi-dm-bg-color-secondary-darkest);
 
   --ifm-font-color-base   : var(--psdi-light-text-color-body);
   --ifm-font-color-base-f1: var(--psdi-light-text-color-body-f1);
@@ -420,8 +423,8 @@ input::placeholder {
   font-style: italic;
 }
 
-:is(button, input.button, input[type="button"]):not(.clean-btn),
-input[type="file"]::file-selector-button {
+:is(button, input.button, input[type="button"]):not(.clean-btn, .tribe-common *),
+input[type="file"]:not(.tribe-common *)::file-selector-button {
   font-family     : var(--ifm-font-family-base);
   font-size       : var(--ifm-font-size-base);
   color           : var(--ifm-hero-text-color);
@@ -432,28 +435,28 @@ input[type="file"]::file-selector-button {
   margin          : 0.25rem;
 }
 
-:is(button, input.button, input[type="button"]):not(.clean-btn):hover,
-input[type="file"]::file-selector-button:hover,
-:is(button, input.button, input[type="button"]):not(.clean-btn):focus,
-input[type="file"]::file-selector-button:focus {
+:is(button, input.button, input[type="button"]):not(.clean-btn, .tribe-common *):hover,
+input[type="file"]:not(.tribe-common *)::file-selector-button:hover,
+:is(button, input.button, input[type="button"]):not(.clean-btn, .tribe-common *):focus,
+input[type="file"]:not(.tribe-common *)::file-selector-button:focus {
   background-color: var(--ifm-bg-color-button-hover);
   cursor          : pointer;
 }
 
-:is(button, input.button, input[type="button"]):not(.clean-btn):active,
-input[type="file"]::file-selector-button:active {
+:is(button, input.button, input[type="button"]):not(.clean-btn, .tribe-common *):active,
+input[type="file"]:not(.tribe-common *)::file-selector-button:active {
   background-color: var(--ifm-bg-color-button-active);
 }
 
-:is(button, input.button, input[type="button"]):not(.clean-btn):disabled,
-input[type="file"]:disabled::file-selector-button {
+:is(button, input.button, input[type="button"]):not(.clean-btn, .tribe-common *):disabled,
+input[type="file"]:not(.tribe-common *):disabled::file-selector-button {
   background-color: var(--ifm-bg-color-button-disabled);
   border-color    : var(--ifm-border-color-button-disabled);
   color           : var(--ifm-color-button-disabled);
 }
 
-:is(button, input.button, input[type="button"]):not(.clean-btn):disabled:hover,
-input[type="file"]:disabled::file-selector-button:hover {
+:is(button, input.button, input[type="button"]):not(.clean-btn, .tribe-common *):disabled:hover,
+input[type="file"]:not(.tribe-common *):disabled::file-selector-button:hover {
   background-color: var(--ifm-bg-color-button-disabled);
   cursor          : default;
 }

@@ -156,6 +156,8 @@ const ROCRATE_PLOT_DIR = ROCRATE_DATA_DIR + "plot/"
 
 // Globals - general
 let tooltipList;
+let setupPhase = true;
+let reportedFirstInteraction = false;
 
 // Globals relating to plot generation
 let autoUpdating = false, gloriusPlot = null;
@@ -550,11 +552,16 @@ function removeSampleCol(e, updateAfter = true) {
   postTableUpdateCleanup("sample", updateAfter);
 }
 
-function updateCanvasShape() {
-  $(CHART_SELECTOR).css({
-    "width": getWidth().toString(),
-    "height": getHeight().toString()
-  })
+function updateCanvasShape(canvasOnly = false) {
+  let lSelectors = [CHART_SELECTOR];
+  if (!canvasOnly)
+    lSelectors.push(CHART_SELECTOR + "-container");
+  for (const selector of lSelectors) {
+    $(selector).css({
+      "width": getWidth().toString(),
+      "height": getHeight().toString()
+    })
+  }
 }
 
 /**
@@ -579,7 +586,7 @@ function updateWidth() {
   }
 
   if (autoUpdating)
-    updateCanvasShape();
+    updateCanvasShape(true);
 }
 
 /**
@@ -604,7 +611,17 @@ function updateHeight() {
   }
 
   if (autoUpdating)
-    updateCanvasShape();
+    updateCanvasShape(true);
+}
+
+/**
+ * Called when the plot width/height input loses focus, to adjust the page layout to properly position the plot
+ */
+function finalisePlotDimsUpdate() {
+  // Check if either the width or height input is still focuses, in case focus has moved from one to the other
+  if ($("#width-input:focus").length > 0 || $("#height-input:focus").length > 0)
+    return;
+  updateCanvasShape(false);
 }
 
 /**
@@ -1368,6 +1385,16 @@ function calcDeviation() {
  */
 async function generatePlot(context = null) {
 
+  if (window.CookieConsent.acceptedCategory('analytics') && !reportedFirstInteraction) {
+    if (setupPhase) {
+      // The first time this runs will be when the page is being set up, so we skip the event for that instance
+      setupPhase = false;
+    } else {
+      window.gtag("event", "interaction");
+      reportedFirstInteraction = true;
+    }
+  }
+
   // Increment the render batch, so text from previous renders won't load, and store the value of the previous batch
   let renderBatch = incrementRenderBatch();
 
@@ -1856,6 +1883,11 @@ function generateIfUpdating() {
  * Generates the image as .svg for export
  */
 async function exportSvg() {
+
+  if (window.CookieConsent.acceptedCategory('analytics')) {
+    window.gtag("event", "download_plot", { format: "svg" });
+  }
+
   $("#export-image-buttons .loading-spinner").removeClass("hidden");
 
   const ctx = C2S(getWidth(), getHeight());
@@ -2005,6 +2037,11 @@ function scrollToSection(selector) {
  * Display the RO-crate export sections, scroll to the top of them, and show/adjust buttons to return to them
  */
 function startROCrateExport(scroll = true) {
+
+  if (window.CookieConsent.acceptedCategory('analytics')) {
+    window.gtag("event", "config_rocrate");
+  }
+
   $(".hidden-after-rocrate").addClass("hidden");
   $(".hidden-until-rocrate").removeClass("hidden");
   $(".rocrate-export").removeClass("hidden");
@@ -2626,7 +2663,7 @@ function checkCondDescs() {
 
 function updateROCrateDownloadEnabled() {
   let allGood = true;
-  Object.values(exportChecks).forEach((check) => {
+  Object.entries(exportChecks).forEach((check) => {
     if (!check)
       allGood = false;
   });
@@ -2648,6 +2685,10 @@ function makeTextVersions(textHTML) {
  * Create an RO-crate with all provided data and provide it to the user for download
  */
 async function exportROCrate() {
+
+  if (window.CookieConsent.acceptedCategory('analytics')) {
+    window.gtag("event", "download_rocrate");
+  }
 
   // Show the spinner while working
   $(".rocrate-download-and-spinner .loading-spinner").removeClass("hidden");
@@ -2811,8 +2852,12 @@ function enableButtons() {
   // Call generatePlot with no arguments so we don't pass something that isn't a context as the first argument
   $("#generate-plot").on("click", () => generatePlot());
 
-  $("#export-image-png").on("click", () => exportImage(CHART_SELECTOR, "png",
-    "#export-image-buttons .loading-spinner"));
+  $("#export-image-png").on("click", () => {
+    if (window.CookieConsent.acceptedCategory('analytics')) {
+      window.gtag("event", "download_plot", { format: "png" });
+    }
+    exportImage(CHART_SELECTOR, "png", "#export-image-buttons .loading-spinner");
+  });
   $("#export-image-svg").on("click", exportSvg);
   $("#export-rocrate-start").on("click", startROCrateExport);
 
@@ -3086,8 +3131,10 @@ $(document).ready(function () {
 
   L_DIMS.forEach(dim => initNumDimControls(dim));
   enableOnChangeTriggers(), enableToggles(), enableButtons(), enableNavigation();
+  $("#width-input, #height-input").on("focusout", () => {
+    setTimeout(finalisePlotDimsUpdate, 10);
+  });
 
-  // TODO: Wait for first enable of auto updates until ChartJS is loaded
   enableDeviationCalc(), enableCanvasUpdate();
 
   enableROCrateOnChangeTriggers();

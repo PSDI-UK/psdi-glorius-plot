@@ -19,6 +19,38 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orestbida/cookieconsent@3.1.0/dist/cookieconsent.css">
   <link rel="stylesheet" href="{{url_for('static', filename='css/psdi-common.css')}}">
+  {% if ga_tag %}
+  {% if service_mode %}
+  <!-- Google tag (gtag.js) -->
+  <script type="text/plain" data-category="analytics" async
+    src="https://www.googletagmanager.com/gtag/js?id={{ ga_tag }}"></script>
+  <script type="text/plain" data-category="analytics">
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', '{{ ga_tag }}');
+  </script>
+  {% else %}
+  <script type="text/plain" data-category="analytics">
+    // Define gtag as a logging function instead
+    function gtag(type, eventClass, data=null){
+      if (type==="event"){
+        let logStr = "Analytics event of class '" + eventClass + "' triggered";
+        if (!data) {
+          logStr += ".";
+        } else {
+          logStr += " with data:";
+          Object.entries(data).forEach(([key, val]) => {
+            logStr += "\n  " + key + ": " + val;
+          });
+        }
+        console.log(logStr);
+      }
+    }
+  </script>
+  {% endif %}
+  {% endif %}
 
   <script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4="
     crossorigin="anonymous"></script>
@@ -58,14 +90,11 @@
   <div id="cover"></div>
 
   {% block announcement %}
-  <div class="announcementBar_mb4j mathjax_ignore" role="banner">
-    <div class="max-width-box announcementBarContent_xLdY"><strong>Alert:</strong> This page is currently under
-      construction.
-      <br>
-      It is not yet fully-featured, and features may change or be removed at any time as we
-      continue development.
+  <!-- Announcement bar: Uncomment and fill in when needed to announce things such as downtime -->
+  <!-- <div class="announcementBar_mb4j mathjax_ignore" role="banner">
+    <div class="max-width-box announcementBarContent_xLdY">
     </div>
-  </div>
+  </div> -->
   {% endblock %}
 
   {% block header %}

@@ -1,10 +1,33 @@
 # Changelog for PSDI Glorius Plot Generator
 
+## v0.4.1
+
+### Bugfixes
+
+- When resizing the plot, the page arrangement won't update until size changes are complete, so that the input box won't move away from the mouse cursor between clicks
+
+## v0.4.0
+
+### Miscellaneous Changes
+
+- Enabled analytics of how the page is used (for those users who consent):
+  - How many visitors interact with the page in any way which promps a plot generation
+  - How many users download the plot
+  - How many users download an RO-crate data package
+
 ## v0.3.5
+
+### New and Changed Functionality
+
+- Temporarily removed header link to Organic Toolkit hub until that page goes live
 
 ## Bugfixes
 
 - Fixed a bug where sub/superscript in the middle of a formatted text editor wouldn't apply to inserted symbols
+
+## Documentation Changes
+
+- Cleaned up misc. documentation and project metadata in preparation for public release
 
 ## v0.3.4
 

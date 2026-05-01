@@ -1,5 +1,7 @@
 {% extends "parent/layout.htm" %}
 
+{% set ga_tag = 'G-8NZ9X10QTM' %}
+
 {% block head %}
 <!-- Set JS variables based on Python variables passed to the template renderer -->
 <script>
@@ -744,7 +746,9 @@
           <label for="auto-update-toggle">Auto-update</label>
         </span>
       </div>
-      <canvas id="glorius-plot" class="white-bg center-section"></canvas>
+      <div id="glorius-plot-container" class="center-section">
+        <canvas id="glorius-plot" class="white-bg"></canvas>
+      </div>
     </div>
   </div>
 </div>

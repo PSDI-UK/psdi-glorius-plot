@@ -102,9 +102,19 @@ textarea {
   margin-bottom: 0;
 }
 
+#glorius-plot-container {
+  position: relative;
+  height  : 600px;
+  width   : 600px;
+}
+
 #glorius-plot {
-  width : 700px;
-  border: 1px solid black;
+  position: absolute;
+  left    : 0;
+  bottom  : 0;
+  height  : 600px;
+  width   : 600px;
+  border  : 1px solid black;
 }
 
 #plot-display {
