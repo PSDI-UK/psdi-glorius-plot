@@ -10,14 +10,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>{% block page_title %}PSDI Glorius Plot Generator - Physical Sciences Data Infrastructure{% endblock %}</title>
   <link rel="icon" type="image/x-icon" href="{{url_for('static', filename='img/psdi-icon-dark.svg')}}">
-  <link rel="stylesheet" href="{{url_for('static', filename='css/FiraSans.css')}}">
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400">
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans+Condensed:700">
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:400">
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lexend:400">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css" />
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orestbida/cookieconsent@3.1.0/dist/cookieconsent.css">
+  <link rel="stylesheet" href="{{url_for('static', filename='css/fonts.css')}}">
+  <link rel="stylesheet" href="{{url_for('static', filename='css/bootstrap.min.css')}}">
+  <link rel="stylesheet" href="{{url_for('static', filename='css/quill.snow.css')}}">
+  <link rel="stylesheet" href="{{url_for('static', filename='css/cookieconsent.css')}}">
   <link rel="stylesheet" href="{{url_for('static', filename='css/psdi-common.css')}}">
   {% if ga_tag %}
   {% if service_mode %}
