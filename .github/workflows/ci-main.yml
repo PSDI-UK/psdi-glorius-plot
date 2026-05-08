@@ -26,9 +26,6 @@ jobs:
     uses: ./.github/workflows/job-test-main.yml
     secrets: inherit # pass all secrets for the environment
 
-  deploy-pages:
-    uses: ./.github/workflows/job-publish-pages.yml
-
   container-push:
     uses: ./.github/workflows/job-container-push.yml
     needs: [test-all]
