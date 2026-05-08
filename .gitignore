@@ -6,12 +6,6 @@
 *.pyc
 *.pyo
 
-# Compiled documentation
-html/*
-
-# Rendered static content
-public/*
-
 # Build files
 build/*
 dist/*

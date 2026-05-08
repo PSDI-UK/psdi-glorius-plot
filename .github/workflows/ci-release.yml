@@ -40,12 +40,6 @@ jobs:
     with:
       container_tag: ${{ needs.tag.outputs.container_tag }}
 
-  publish-doc:
-    # When ready to enable this step, remove the following line
-    if: false
-    needs: [tag]
-    uses: ./.github/workflows/job-publish-doc.yml
-
   # Deploy to Kubernetes Job
   # Requires an environment, which must reflect the target environment as defined in the
   # GitHub repository: https://github.com/PSDI-UK/psdi_glorius_plot/settings/environments
