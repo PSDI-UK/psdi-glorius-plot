@@ -12,12 +12,12 @@ on:
 
 jobs:
   test-python:
-    uses: PSDI-UK/psdi-github-workflows-public/.github/workflows/test-python.yml@13d6eb8fb4d93382eb1743ed51baf939f160c474
+    uses: PSDI-UK/psdi-github-workflows-public/.github/workflows/test-python.yml@77e3876faa907c4993562a01583b5831f3041d41
     with:
       source_dir: psdi_glorius_plot
   test-gui:
     name: Run full tests of the gui locally
-    uses: PSDI-UK/psdi-github-workflows-public/.github/workflows/test-gui.yml@13d6eb8fb4d93382eb1743ed51baf939f160c474
+    uses: PSDI-UK/psdi-github-workflows-public/.github/workflows/test-gui.yml@77e3876faa907c4993562a01583b5831f3041d41
     secrets:
       token: ${{ secrets.GITHUB_TOKEN }}
 
@@ -32,16 +32,16 @@ jobs:
   # scan.
   #
   #anchore-scan:
-  #  uses: PSDI-UK/psdi-glorius-plot-deployment/.github/workflows/anchore-scan.yml@13d6eb8fb4d93382eb1743ed51baf939f160c474
+  #  uses: PSDI-UK/psdi-glorius-plot-deployment/.github/workflows/anchore-scan.yml@77e3876faa907c4993562a01583b5831f3041d41
   #  needs: [test-package, test-gui]
 
   tag:
-    uses: PSDI-UK/psdi-github-workflows-public/.github/workflows/tag.yml@13d6eb8fb4d93382eb1743ed51baf939f160c474
+    uses: PSDI-UK/psdi-github-workflows-public/.github/workflows/tag.yml@77e3876faa907c4993562a01583b5831f3041d41
     secrets:
       token: ${{ secrets.GITHUB_TOKEN }}
 
   container-push:
-    uses: PSDI-UK/psdi-github-workflows-public/.github/workflows/container-push.yml@13d6eb8fb4d93382eb1743ed51baf939f160c474
+    uses: PSDI-UK/psdi-github-workflows-public/.github/workflows/container-push.yml@77e3876faa907c4993562a01583b5831f3041d41
     needs: [tag]
     with:
       container_tag: ${{ needs.tag.outputs.container_tag }}
@@ -58,11 +58,10 @@ jobs:
     needs: [tag, container-push]
     # Proceed if test-all was successful or skipped
     if: always() && (needs.container-push.result == 'success')
-    uses: PSDI-UK/psdi-github-workflows-public/.github/workflows/deploy.yml@13d6eb8fb4d93382eb1743ed51baf939f160c474
+    uses: PSDI-UK/psdi-github-workflows-public/.github/workflows/deploy.yml@77e3876faa907c4993562a01583b5831f3041d41
     with:
       container_tag: ${{ needs.tag.outputs.container_tag }}
       deployment_repo: psdi-glorius-plot-deployment
-      deployment_ref: 27273170ca3366db878ee100ad7bd4af25ae0d65
       environment: staging
       prod: false
     secrets:
