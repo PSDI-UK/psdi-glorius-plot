@@ -1,5 +1,11 @@
 # Changelog for PSDI Glorius Plot Generator
 
+## v0.4.3
+
+### Miscellaneous changes
+
+- Reusable GitHub workflows now moved to be sourced from the common repo https://github.com/PSDI-UK/psdi-github-workflows-public
+
 ## v0.4.2
 
 ### Miscellaneous changes
