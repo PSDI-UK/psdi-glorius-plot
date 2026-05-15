@@ -27,7 +27,7 @@ jobs:
   # scan.
   #
   #anchore-scan:
-  #  uses: PSDI-UK/psdi-glorius-plot-deployment/.github/workflows/anchore-scan.yml@db2f59b8cbfc650627f6bc3318bae9252035a7d6
+  #  uses: PSDI-UK/psdi-glorius-plot-deployment/.github/workflows/anchore-scan.yml@68b78848fe753c4faa3eb4c9e30034d3ff4eaae4
   #  needs: [test-package, test-gui]
 
   tag:
