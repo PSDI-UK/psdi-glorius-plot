@@ -61,7 +61,10 @@ jobs:
   test-prod:
     name: Test deployment was successful
     needs: deploy-stfc-production-k8s
-    uses: ./.github/workflows/job-test-gui.yml
+    uses: PSDI-UK/psdi-github-workflows-public/.github/workflows/test-gui.yml@68b78848fe753c4faa3eb4c9e30034d3ff4eaae4
     with:
       simple: true
       prod: true
+      origin: https://organic-toolkit.psdi.ac.uk/glorius-plot
+    secrets:
+      token: ${{ secrets.GITHUB_TOKEN }}

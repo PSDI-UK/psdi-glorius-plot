@@ -14,7 +14,10 @@ jobs:
   test-python:
     uses: ./.github/workflows/job-test-python.yml
   test-gui:
-    uses: ./.github/workflows/job-test-gui.yml
+    name: Run full tests of the gui locally
+    uses: PSDI-UK/psdi-github-workflows-public/.github/workflows/test-gui.yml@68b78848fe753c4faa3eb4c9e30034d3ff4eaae4
+    secrets:
+      token: ${{ secrets.GITHUB_TOKEN }}
 
   # The commented out code below runs a code vulnerability scan on the
   # containerised app. This will not work on the free GitHub plan, since
@@ -31,8 +34,9 @@ jobs:
   #  needs: [test-package, test-gui]
 
   tag:
-    uses: ./.github/workflows/job-tag.yml
-    needs: [test-python, test-gui]
+    uses: PSDI-UK/psdi-github-workflows-public/.github/workflows/tag.yml@68b78848fe753c4faa3eb4c9e30034d3ff4eaae4
+    secrets:
+      token: ${{ secrets.GITHUB_TOKEN }}
 
   container-push:
     uses: PSDI-UK/psdi-github-workflows-public/.github/workflows/container-push.yml@68b78848fe753c4faa3eb4c9e30034d3ff4eaae4
