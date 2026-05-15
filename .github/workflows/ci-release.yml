@@ -12,7 +12,9 @@ on:
 
 jobs:
   test-python:
-    uses: ./.github/workflows/job-test-python.yml
+    uses: PSDI-UK/psdi-github-workflows-public/.github/workflows/test-python.yml@bf05a4bd1ea45d81bae78abe18a9a32ea87eee24
+    with:
+      source_dir: psdi_glorius_plot
   test-gui:
     name: Run full tests of the gui locally
     uses: PSDI-UK/psdi-github-workflows-public/.github/workflows/test-gui.yml@bf05a4bd1ea45d81bae78abe18a9a32ea87eee24

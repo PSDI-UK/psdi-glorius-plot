@@ -19,7 +19,10 @@ on:
 jobs:
   test-python:
     if: github.event.pull_request.draft == false
-    uses: ./.github/workflows/job-test-python.yml
+    uses: PSDI-UK/psdi-github-workflows-public/.github/workflows/test-python.yml@bf05a4bd1ea45d81bae78abe18a9a32ea87eee24
+    with:
+      source_dir: psdi_glorius_plot
+
   test-gui:
     if: github.event.pull_request.draft == false
     name: Run full tests of the gui locally
