@@ -22,17 +22,25 @@ on:
 jobs:
   test-all:
     if: ${{ github.event_name == 'push' || ! github.event.inputs.skip-tests }}
-
-    uses: ./.github/workflows/job-test-main.yml
-    secrets: inherit # pass all secrets for the environment
+    uses: PSDI-UK/psdi-github-workflows-public/.github/workflows/test-all.yml@13d6eb8fb4d93382eb1743ed51baf939f160c474
+    with:
+      source_dir: psdi_glorius_plot
+      make_coverage_badge: false
+    secrets:
+      token: ${{ secrets.GITHUB_TOKEN }}
 
   container-push:
-    uses: ./.github/workflows/job-container-push.yml
+    uses: PSDI-UK/psdi-github-workflows-public/.github/workflows/container-push.yml@13d6eb8fb4d93382eb1743ed51baf939f160c474
     needs: [test-all]
     # Proceed if test-all was successful or skipped
     if: always() &&  (needs.test-all.result == 'skipped' || needs.test-all.result == 'success')
     with:
       container_tag: ${{ github.sha }}
+      service_name: psdi_glorius_plot
+      rel_url_path: /glorius-plot
+    secrets:
+      token: ${{ secrets.GITHUB_TOKEN }}
+
   # Deploy to Kubernetes Job
   # Requires an environment, which must reflect the target environment as defined in the
   # GitHub repository: https://github.com/PSDI-UK/psdi-glorius-plot/settings/environments
@@ -42,11 +50,14 @@ jobs:
     needs: [container-push]
     # Proceed if test-all was successful or skipped
     if: always() && (needs.container-push.result == 'success')
-    uses: PSDI-UK/psdi-glorius-plot-deployment/.github/workflows/job-external-deployment.yaml@bf95f7bc0840247a40dbd8aef2aaa7ee2baad1fe
+    uses: PSDI-UK/psdi-github-workflows-public/.github/workflows/deploy.yml@13d6eb8fb4d93382eb1743ed51baf939f160c474
     with:
-      # container_tag
       container_tag: ${{ github.sha }}
+      deployment_repo: psdi-glorius-plot-deployment
+      deployment_ref: 27273170ca3366db878ee100ad7bd4af25ae0d65
       environment: development
+      prod: false
     secrets:
+      token: ${{ secrets.GITHUB_TOKEN }}
       deployment_app_id: ${{ secrets.DEPLOYMENT_APP_ID }}
       deployment_app_private_key: ${{ secrets.DEPLOYMENT_APP_PRIVATE_KEY }}
