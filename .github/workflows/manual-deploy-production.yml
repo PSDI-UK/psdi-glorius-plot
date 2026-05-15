@@ -61,7 +61,7 @@ jobs:
   test-prod:
     name: Test deployment was successful
     needs: deploy-stfc-production-k8s
-    uses: PSDI-UK/psdi-github-workflows-public/.github/workflows/test-gui.yml@bf05a4bd1ea45d81bae78abe18a9a32ea87eee24
+    uses: PSDI-UK/psdi-github-workflows-public/.github/workflows/test-gui.yml@13d6eb8fb4d93382eb1743ed51baf939f160c474
     with:
       simple: true
       prod: true
