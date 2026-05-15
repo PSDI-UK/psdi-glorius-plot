@@ -22,9 +22,12 @@ on:
 jobs:
   test-all:
     if: ${{ github.event_name == 'push' || ! github.event.inputs.skip-tests }}
-
-    uses: ./.github/workflows/job-test-main.yml
-    secrets: inherit # pass all secrets for the environment
+    uses: PSDI-UK/psdi-github-workflows-public/.github/workflows/test-all.yml@bf05a4bd1ea45d81bae78abe18a9a32ea87eee24
+    with:
+      source_dir: psdi_glorius_plot
+      make_coverage_badge: false
+    secrets:
+      token: ${{ secrets.GITHUB_TOKEN }}
 
   container-push:
     uses: PSDI-UK/psdi-github-workflows-public/.github/workflows/container-push.yml@bf05a4bd1ea45d81bae78abe18a9a32ea87eee24
