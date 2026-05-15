@@ -27,7 +27,7 @@ jobs:
     secrets: inherit # pass all secrets for the environment
 
   container-push:
-    uses: PSDI-UK/psdi-github-workflows-public/.github/workflows/container-push.yml@68b78848fe753c4faa3eb4c9e30034d3ff4eaae4
+    uses: PSDI-UK/psdi-github-workflows-public/.github/workflows/container-push.yml@bf05a4bd1ea45d81bae78abe18a9a32ea87eee24
     needs: [test-all]
     # Proceed if test-all was successful or skipped
     if: always() &&  (needs.test-all.result == 'skipped' || needs.test-all.result == 'success')

@@ -23,7 +23,7 @@ jobs:
   test-gui:
     if: github.event.pull_request.draft == false
     name: Run full tests of the gui locally
-    uses: PSDI-UK/psdi-github-workflows-public/.github/workflows/test-gui.yml@68b78848fe753c4faa3eb4c9e30034d3ff4eaae4
+    uses: PSDI-UK/psdi-github-workflows-public/.github/workflows/test-gui.yml@bf05a4bd1ea45d81bae78abe18a9a32ea87eee24
     with:
       simple: true
     secrets:

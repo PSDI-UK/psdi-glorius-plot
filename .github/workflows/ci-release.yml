@@ -15,7 +15,7 @@ jobs:
     uses: ./.github/workflows/job-test-python.yml
   test-gui:
     name: Run full tests of the gui locally
-    uses: PSDI-UK/psdi-github-workflows-public/.github/workflows/test-gui.yml@68b78848fe753c4faa3eb4c9e30034d3ff4eaae4
+    uses: PSDI-UK/psdi-github-workflows-public/.github/workflows/test-gui.yml@bf05a4bd1ea45d81bae78abe18a9a32ea87eee24
     secrets:
       token: ${{ secrets.GITHUB_TOKEN }}
 
@@ -30,16 +30,16 @@ jobs:
   # scan.
   #
   #anchore-scan:
-  #  uses: PSDI-UK/psdi-glorius-plot-deployment/.github/workflows/anchore-scan.yml@68b78848fe753c4faa3eb4c9e30034d3ff4eaae4
+  #  uses: PSDI-UK/psdi-glorius-plot-deployment/.github/workflows/anchore-scan.yml@bf05a4bd1ea45d81bae78abe18a9a32ea87eee24
   #  needs: [test-package, test-gui]
 
   tag:
-    uses: PSDI-UK/psdi-github-workflows-public/.github/workflows/tag.yml@68b78848fe753c4faa3eb4c9e30034d3ff4eaae4
+    uses: PSDI-UK/psdi-github-workflows-public/.github/workflows/tag.yml@bf05a4bd1ea45d81bae78abe18a9a32ea87eee24
     secrets:
       token: ${{ secrets.GITHUB_TOKEN }}
 
   container-push:
-    uses: PSDI-UK/psdi-github-workflows-public/.github/workflows/container-push.yml@68b78848fe753c4faa3eb4c9e30034d3ff4eaae4
+    uses: PSDI-UK/psdi-github-workflows-public/.github/workflows/container-push.yml@bf05a4bd1ea45d81bae78abe18a9a32ea87eee24
     needs: [tag]
     with:
       container_tag: ${{ needs.tag.outputs.container_tag }}
