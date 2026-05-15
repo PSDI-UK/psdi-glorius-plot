@@ -12,59 +12,17 @@ run-name: Manual Trigger - Deploy to production cluster
 on:
   workflow_dispatch:
 
-jobs:
-  check-branch:
-    # Check that this job is being run on the release branch
-    name: Check this is release branch
-    runs-on: ubuntu-latest
-    steps:
-      - name: Check branch (success)
-        if: github.ref == 'refs/heads/release'
-        run: echo "Success - this is being run on the 'release' branch"
-      - name: Check branch (failure)
-        if: github.ref != 'refs/heads/release'
-        run: |
-          echo "ERROR: This workflow can only be run on the 'release' branch"
-          false # Command that always fails, to signal the job to fail
-
-  get-latest-release-tag:
-    # run on our self hosted github runners enabling access to STFC infrastructure
-    name: Get latest release tag
-    runs-on: ubuntu-latest
-    needs: check-branch
-    outputs:
-      tag: ${{ steps.get-tag.outputs.TARGET_TAG }}
-    steps:
-      - uses: actions/checkout@v6
-        with:
-          fetch-depth: 0
-      - name: Get latest tag in the relase branch
-        id: get-tag
-        run: |
-          TARGET_TAG=$(git tag --sort -version:refname | head -n 1)
-          echo "TARGET_TAG=$TARGET_TAG" >> "$GITHUB_OUTPUT"
-          echo "Highest version tag found to be = $TARGET_TAG"
-
-  # Deploy container with tag to production environment
+jobs: # Deploy container with tag to production environment
   deploy-stfc-production-k8s:
     name: Deploy to production
-    needs: get-latest-release-tag
-    uses: PSDI-UK/psdi-glorius-plot-deployment/.github/workflows/job-external-deployment.yaml@bf95f7bc0840247a40dbd8aef2aaa7ee2baad1fe
+    uses: PSDI-UK/psdi-github-workflows-public/.github/workflows/deploy.yml@13d6eb8fb4d93382eb1743ed51baf939f160c474
     with:
-      container_tag: ${{ needs.get-latest-release-tag.outputs.tag }}
+      deployment_repo: psdi-glorius-plot-deployment
+      deployment_ref: 27273170ca3366db878ee100ad7bd4af25ae0d65
       environment: production
-    secrets:
-      deployment_app_id: ${{ secrets.DEPLOYMENT_APP_ID }}
-      deployment_app_private_key: ${{ secrets.DEPLOYMENT_APP_PRIVATE_KEY }}
-
-  # Run a simple test on prod to ensure nothing is broken
-  test-prod:
-    name: Test deployment was successful
-    needs: deploy-stfc-production-k8s
-    uses: PSDI-UK/psdi-github-workflows-public/.github/workflows/test-gui.yml@13d6eb8fb4d93382eb1743ed51baf939f160c474
-    with:
-      simple: true
       prod: true
       origin: https://organic-toolkit.psdi.ac.uk/glorius-plot
     secrets:
       token: ${{ secrets.GITHUB_TOKEN }}
+      deployment_app_id: ${{ secrets.DEPLOYMENT_APP_ID }}
+      deployment_app_private_key: ${{ secrets.DEPLOYMENT_APP_PRIVATE_KEY }}
