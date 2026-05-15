@@ -53,8 +53,8 @@ jobs:
     uses: PSDI-UK/psdi-github-workflows-public/.github/workflows/deploy.yml@13d6eb8fb4d93382eb1743ed51baf939f160c474
     with:
       container_tag: ${{ github.sha }}
-      deployment_repo: DEPLOYMENT_REPO_NAME
-      deployment_ref: DEPLOYMENT_REPO_REF
+      deployment_repo: psdi-glorius-plot-deployment
+      deployment_ref: 27273170ca3366db878ee100ad7bd4af25ae0d65
       environment: development
       prod: false
     secrets:
