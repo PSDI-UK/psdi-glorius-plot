@@ -35,10 +35,14 @@ jobs:
     needs: [test-python, test-gui]
 
   container-push:
-    uses: ./.github/workflows/job-container-push.yml
+    uses: PSDI-UK/psdi-github-workflows-public/.github/workflows/container-push.yml@68b78848fe753c4faa3eb4c9e30034d3ff4eaae4
     needs: [tag]
     with:
       container_tag: ${{ needs.tag.outputs.container_tag }}
+      service_name: psdi_glorius_plot
+      rel_url_path: /glorius-plot
+    secrets:
+      token: ${{ secrets.GITHUB_TOKEN }}
 
   # Deploy to Kubernetes Job
   # Requires an environment, which must reflect the target environment as defined in the
