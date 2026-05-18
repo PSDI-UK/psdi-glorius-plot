@@ -19,14 +19,14 @@ on:
 jobs:
   test-python:
     if: github.event.pull_request.draft == false
-    uses: PSDI-UK/psdi-github-workflows-public/.github/workflows/test-python.yml@67d7b3aa8bf3028d0af7423924b7f4686f0a3295
+    uses: PSDI-UK/psdi-github-workflows-public/.github/workflows/test-python.yml@b4c884a5fbaa96777c26f1ac6d4eac67531e2fc7
     with:
       source_dir: psdi_glorius_plot
 
   test-gui:
     if: github.event.pull_request.draft == false
     name: Run full tests of the gui locally
-    uses: PSDI-UK/psdi-github-workflows-public/.github/workflows/test-gui.yml@67d7b3aa8bf3028d0af7423924b7f4686f0a3295
+    uses: PSDI-UK/psdi-github-workflows-public/.github/workflows/test-gui.yml@b4c884a5fbaa96777c26f1ac6d4eac67531e2fc7
     with:
       simple: true
     secrets:
