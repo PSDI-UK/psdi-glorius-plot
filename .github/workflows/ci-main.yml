@@ -22,7 +22,7 @@ on:
 jobs:
   test-all:
     if: ${{ github.event_name == 'push' || ! github.event.inputs.skip-tests }}
-    uses: PSDI-UK/psdi-github-workflows-public/.github/workflows/test-all.yml@77e3876faa907c4993562a01583b5831f3041d41
+    uses: PSDI-UK/psdi-github-workflows-public/.github/workflows/test-all.yml@ff09dcb2eec53c954f1eca17ad3cb00545ce8dc0
     with:
       source_dir: psdi_glorius_plot
       make_coverage_badge: false
@@ -30,7 +30,7 @@ jobs:
       token: ${{ secrets.GITHUB_TOKEN }}
 
   container-push:
-    uses: PSDI-UK/psdi-github-workflows-public/.github/workflows/container-push.yml@77e3876faa907c4993562a01583b5831f3041d41
+    uses: PSDI-UK/psdi-github-workflows-public/.github/workflows/container-push.yml@ff09dcb2eec53c954f1eca17ad3cb00545ce8dc0
     needs: [test-all]
     # Proceed if test-all was successful or skipped
     if: always() &&  (needs.test-all.result == 'skipped' || needs.test-all.result == 'success')
@@ -50,7 +50,7 @@ jobs:
     needs: [container-push]
     # Proceed if test-all was successful or skipped
     if: always() && (needs.container-push.result == 'success')
-    uses: PSDI-UK/psdi-github-workflows-public/.github/workflows/deploy.yml@77e3876faa907c4993562a01583b5831f3041d41
+    uses: PSDI-UK/psdi-github-workflows-public/.github/workflows/deploy.yml@ff09dcb2eec53c954f1eca17ad3cb00545ce8dc0
     with:
       container_tag: ${{ github.sha }}
       deployment_repo: psdi-glorius-plot-deployment
