@@ -12,9 +12,14 @@ on:
 
 jobs:
   test-python:
-    uses: ./.github/workflows/job-test-python.yml
+    uses: PSDI-UK/psdi-github-workflows-public/.github/workflows/test-python.yml@ff09dcb2eec53c954f1eca17ad3cb00545ce8dc0
+    with:
+      source_dir: psdi_glorius_plot
   test-gui:
-    uses: ./.github/workflows/job-test-gui.yml
+    name: Run full tests of the gui locally
+    uses: PSDI-UK/psdi-github-workflows-public/.github/workflows/test-gui.yml@ff09dcb2eec53c954f1eca17ad3cb00545ce8dc0
+    secrets:
+      token: ${{ secrets.GITHUB_TOKEN }}
 
   # The commented out code below runs a code vulnerability scan on the
   # containerised app. This will not work on the free GitHub plan, since
@@ -27,24 +32,23 @@ jobs:
   # scan.
   #
   #anchore-scan:
-  #  uses: ./.github/workflows/anchore-scan.yml
+  #  uses: PSDI-UK/psdi-glorius-plot-deployment/.github/workflows/anchore-scan.yml@ff09dcb2eec53c954f1eca17ad3cb00545ce8dc0
   #  needs: [test-package, test-gui]
 
   tag:
-    uses: ./.github/workflows/job-tag.yml
-    needs: [test-python, test-gui]
+    uses: PSDI-UK/psdi-github-workflows-public/.github/workflows/tag.yml@ff09dcb2eec53c954f1eca17ad3cb00545ce8dc0
+    secrets:
+      token: ${{ secrets.GITHUB_TOKEN }}
 
   container-push:
-    uses: ./.github/workflows/job-container-push.yml
+    uses: PSDI-UK/psdi-github-workflows-public/.github/workflows/container-push.yml@ff09dcb2eec53c954f1eca17ad3cb00545ce8dc0
     needs: [tag]
     with:
       container_tag: ${{ needs.tag.outputs.container_tag }}
-
-  publish-doc:
-    # When ready to enable this step, remove the following line
-    if: false
-    needs: [tag]
-    uses: ./.github/workflows/job-publish-doc.yml
+      service_name: psdi_glorius_plot
+      rel_url_path: /glorius-plot
+    secrets:
+      token: ${{ secrets.GITHUB_TOKEN }}
 
   # Deploy to Kubernetes Job
   # Requires an environment, which must reflect the target environment as defined in the
@@ -52,10 +56,15 @@ jobs:
   # The downstream deploy job leverages on Environment specific secrets, which also must be defined
   deploy-stfc-staging-k8s:
     needs: [tag, container-push]
-    uses: PSDI-UK/psdi-glorius-plot-deployment/.github/workflows/job-external-deployment.yaml@bf95f7bc0840247a40dbd8aef2aaa7ee2baad1fe
+    # Proceed if test-all was successful or skipped
+    if: always() && (needs.container-push.result == 'success')
+    uses: PSDI-UK/psdi-github-workflows-public/.github/workflows/deploy.yml@ff09dcb2eec53c954f1eca17ad3cb00545ce8dc0
     with:
       container_tag: ${{ needs.tag.outputs.container_tag }}
+      deployment_repo: psdi-glorius-plot-deployment
       environment: staging
+      prod: false
     secrets:
+      token: ${{ secrets.GITHUB_TOKEN }}
       deployment_app_id: ${{ secrets.DEPLOYMENT_APP_ID }}
       deployment_app_private_key: ${{ secrets.DEPLOYMENT_APP_PRIVATE_KEY }}

@@ -12,26 +12,35 @@ on:
         type: boolean
   push:
     branches: ["main"]
+    paths:
+      - "**/ci-main.yml"
+      - "psdi_glorius_plot/**"
+      - "tests/**"
+      - "Dockerfile"
+      - "pyproject.toml"
 
 jobs:
   test-all:
     if: ${{ github.event_name == 'push' || ! github.event.inputs.skip-tests }}
-
-    uses: ./.github/workflows/job-test-main.yml
-    secrets: inherit # pass all secrets for the environment
-
-  deploy-pages:
-    uses: ./.github/workflows/job-publish-pages.yml
-    needs: [test-all]
-    if: always() &&  (needs.test-all.result == 'skipped' || needs.test-all.result == 'success')
+    uses: PSDI-UK/psdi-github-workflows-public/.github/workflows/test-all.yml@ff09dcb2eec53c954f1eca17ad3cb00545ce8dc0
+    with:
+      source_dir: psdi_glorius_plot
+      make_coverage_badge: false
+    secrets:
+      token: ${{ secrets.GITHUB_TOKEN }}
 
   container-push:
-    uses: ./.github/workflows/job-container-push.yml
+    uses: PSDI-UK/psdi-github-workflows-public/.github/workflows/container-push.yml@ff09dcb2eec53c954f1eca17ad3cb00545ce8dc0
     needs: [test-all]
     # Proceed if test-all was successful or skipped
     if: always() &&  (needs.test-all.result == 'skipped' || needs.test-all.result == 'success')
     with:
       container_tag: ${{ github.sha }}
+      service_name: psdi_glorius_plot
+      rel_url_path: /glorius-plot
+    secrets:
+      token: ${{ secrets.GITHUB_TOKEN }}
+
   # Deploy to Kubernetes Job
   # Requires an environment, which must reflect the target environment as defined in the
   # GitHub repository: https://github.com/PSDI-UK/psdi-glorius-plot/settings/environments
@@ -41,11 +50,13 @@ jobs:
     needs: [container-push]
     # Proceed if test-all was successful or skipped
     if: always() && (needs.container-push.result == 'success')
-    uses: PSDI-UK/psdi-glorius-plot-deployment/.github/workflows/job-external-deployment.yaml@bf95f7bc0840247a40dbd8aef2aaa7ee2baad1fe
+    uses: PSDI-UK/psdi-github-workflows-public/.github/workflows/deploy.yml@ff09dcb2eec53c954f1eca17ad3cb00545ce8dc0
     with:
-      # container_tag
       container_tag: ${{ github.sha }}
+      deployment_repo: psdi-glorius-plot-deployment
       environment: development
+      prod: false
     secrets:
+      token: ${{ secrets.GITHUB_TOKEN }}
       deployment_app_id: ${{ secrets.DEPLOYMENT_APP_ID }}
       deployment_app_private_key: ${{ secrets.DEPLOYMENT_APP_PRIVATE_KEY }}
