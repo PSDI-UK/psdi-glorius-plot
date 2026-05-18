@@ -11,7 +11,7 @@ jobs:
   open-pull-request:
     # Open a PR to main if the branch isn't main itself
     if: ${{ github.head_ref || github.ref_name != 'release' }}
-    uses: PSDI-UK/psdi-github-workflows-public/.github/workflows/open-pull-request.yml@30e89ff83aa466fe35cad7b78444fbcedf345df9
+    uses: PSDI-UK/psdi-github-workflows-public/.github/workflows/open-pull-request.yml@b4c884a5fbaa96777c26f1ac6d4eac67531e2fc7
     with:
       target: release
       # Pass an empty string for args, which disables the default -d flag which creates the PR as a draft

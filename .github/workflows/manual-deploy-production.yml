@@ -15,7 +15,7 @@ on:
 jobs: # Deploy container with tag to production environment
   deploy-stfc-production-k8s:
     name: Deploy to production
-    uses: PSDI-UK/psdi-github-workflows-public/.github/workflows/deploy.yml@30e89ff83aa466fe35cad7b78444fbcedf345df9
+    uses: PSDI-UK/psdi-github-workflows-public/.github/workflows/deploy.yml@b4c884a5fbaa96777c26f1ac6d4eac67531e2fc7
     with:
       deployment_repo: psdi-glorius-plot-deployment
       environment: production
