@@ -21,7 +21,7 @@ on:
 
 jobs:
   test-all:
-    if: github.event_name == 'push' || ! github.event.inputs.skip-tests
+    if: github.event_name == 'push' || github.event.inputs.skip-tests == 'false'
     uses: PSDI-UK/psdi-github-workflows-public/.github/workflows/test-all.yml@30e89ff83aa466fe35cad7b78444fbcedf345df9
     with:
       source_dir: psdi_glorius_plot
