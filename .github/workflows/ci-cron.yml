@@ -12,39 +12,4 @@ on:
 
 jobs:
   update-assets:
-    name: Update common assets
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v6
-
-      - name: Fetch assets
-        run: |
-          ./scripts/fetch-common-style.sh
-
-      - name: Check for changes in staged files
-        id: check-changes
-        run: |
-          # Get the list of modified, added, or deleted files
-          CHANGED_FILES=$(git status --porcelain)
-
-          # Check if there are any changes
-          if [ -z "$CHANGED_FILES" ]; then
-            echo "No assets have been updated"
-            echo "has_changes=0" >> $GITHUB_OUTPUT
-          else
-            echo "Assets have been updated"
-            echo "has_changes=1" >> $GITHUB_OUTPUT
-          fi
-
-      - name: Create Pull Request (if changes detected)
-        if: steps.check-changes.outputs.has_changes == '1'
-        uses: peter-evans/create-pull-request@v8
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          branch: auto-update-assets
-          commit-message: "Automated update of PSDI common assets"
-          title: "Automated update of PSDI common assets"
-          body: "This PR contains automated updates to the PSDI common assets."
-          labels: automated
-          base: main
+    uses: PSDI-UK/psdi-github-workflows-public/.github/workflows/update-common-assets.yml@cb813e85a0616d23527594901b6b856130e5894a
