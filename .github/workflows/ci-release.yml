@@ -36,6 +36,7 @@ jobs:
   #  needs: [test-package, test-gui]
 
   tag:
+    needs: [test-python, test-gui]
     uses: PSDI-UK/psdi-github-workflows-public/.github/workflows/tag.yml@67d7b3aa8bf3028d0af7423924b7f4686f0a3295
     secrets:
       token: ${{ secrets.GITHUB_TOKEN }}
