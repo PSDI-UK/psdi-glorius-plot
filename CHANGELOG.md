@@ -1,5 +1,11 @@
 # Changelog for PSDI Glorius Plot Generator
 
+## v0.4.7
+
+### Miscellaneous changes
+
+- Added announcement bar that displays only on (likely) mobile devices warning that the site has not been fully tested on mobile
+
 ## v0.4.6
 
 ### Miscellaneous changes
