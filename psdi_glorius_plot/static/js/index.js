@@ -1979,16 +1979,16 @@ function fillExample() {
   $(".output-label-select").val("Isolated Yield (%)").trigger("change");
 
   // Fill the condition labels
-  updateQuillContents("#cl-0", "High <em>c</em>")
-  updateQuillContents("#cl-1", "Low <em>c</em>")
-  updateQuillContents("#cl-2", "H<sub>2</sub>O")
-  updateQuillContents("#cl-3", "Low O<sub>2</sub>")
-  updateQuillContents("#cl-4", "High O<sub>2</sub>")
-  updateQuillContents("#cl-5", "Low <em>T</em>")
-  updateQuillContents("#cl-6", "High <em>T</em>")
-  updateQuillContents("#cl-7", "Low <em>I</em>")
-  updateQuillContents("#cl-8", "High <em>I</em>")
-  updateQuillContents("#cl-9", "Big scale")
+  updateQuillContents("#cl-0", "High <em>c</em>");
+  updateQuillContents("#cl-1", "Low <em>c</em>");
+  updateQuillContents("#cl-2", "H<sub>2</sub>O");
+  updateQuillContents("#cl-3", "Low O<sub>2</sub>");
+  updateQuillContents("#cl-4", "High O<sub>2</sub>");
+  updateQuillContents("#cl-5", "Low <em>T</em>");
+  updateQuillContents("#cl-6", "High <em>T</em>");
+  updateQuillContents("#cl-7", "Low <em>I</em>");
+  updateQuillContents("#cl-8", "High <em>I</em>");
+  updateQuillContents("#cl-9", "Big scale");
 
   // Fill the baseline value
   $(".baseline-value").eq(0).val("58");
@@ -2012,6 +2012,21 @@ function fillExample() {
 
   if (lastAutoUpdating)
     enableAutoUpdates();
+
+  // Update contents contained in the ROCrate output form, starting with those based on the contents already present
+  updateROCrateForm(true);
+
+  // Fill the descriptions of the various conditions
+  updateQuillContents("#rcdi-0", "- 0.6 mL");
+  updateQuillContents("#rcdi-1", "+ 1.5 mL");
+  updateQuillContents("#rcdi-2", "+ 10 µl H<sub>2</sub>O");
+  updateQuillContents("#rcdi-3", "degassed");
+  updateQuillContents("#rcdi-4", "+ 10 ml air");
+  updateQuillContents("#rcdi-5", "0 °C");
+  updateQuillContents("#rcdi-6", "55 °C");
+  updateQuillContents("#rcdi-7", "20 cm distance to the LED");
+  updateQuillContents("#rcdi-8", "2 cm distance to the LED");
+  updateQuillContents("#rcdi-9", "standard scale × 30");
 
   // Set the current state of the form as "clean"
   cleanDirtyForms();
