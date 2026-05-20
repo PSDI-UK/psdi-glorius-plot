@@ -6,6 +6,7 @@
 <!-- Set JS variables based on Python variables passed to the template renderer -->
 <script>
   const version = "{{tag[1:]}}";
+  const CHARTJS_URL = "{{url_for('static', filename='js/packages/chart.umd.js')}}";
   let debug;
 </script>
 {% if debug_mode %}

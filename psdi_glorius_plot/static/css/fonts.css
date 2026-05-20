@@ -1,0 +1,35 @@
+@font-face {
+  font-family: 'Fira Sans';
+  font-style : normal;
+  font-weight: 400;
+  src        : url(../fonts/FiraSans.ttf) format('truetype');
+}
+
+@font-face {
+  font-family: 'Lato';
+  font-style : normal;
+  font-weight: 400;
+  src        : url(../fonts/Lato.ttf) format('truetype');
+}
+
+@font-face {
+  font-family: 'Lexend';
+  font-style : normal;
+  font-weight: 400;
+  src        : url(../fonts/Lexend.ttf) format('truetype');
+}
+
+@font-face {
+  font-family : 'Open Sans';
+  font-style  : normal;
+  font-weight : 400;
+  font-stretch: normal;
+  src         : url(../fonts/OpenSans.ttf) format('truetype');
+}
+
+@font-face {
+  font-family: 'Open Sans Condensed';
+  font-style : normal;
+  font-weight: 700;
+  src        : url(../fonts/OpenSansCondensed.ttf) format('truetype');
+}

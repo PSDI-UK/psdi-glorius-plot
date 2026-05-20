@@ -3162,7 +3162,7 @@ $(document).ready(function () {
   // WARNING: Anything which relies on Path2D should wait for this to finish before running
   const backupPath2D = Path2D;
   Path2D = null;
-  loadScript("https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js")
+  loadScript(CHARTJS_URL)
     .finally(() => {
       Path2D = backupPath2D;
       enableAutoUpdates();
