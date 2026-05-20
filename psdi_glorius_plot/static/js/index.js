@@ -2028,6 +2028,15 @@ function fillExample() {
   updateQuillContents("#rcdi-8", "2 cm distance to the LED");
   updateQuillContents("#rcdi-9", "standard scale × 30");
 
+  // Fill in the contributor information
+  $("select#num-contrib").val(6).change();
+  $("#rni-0").val("Fuhao Zhang"), $("#roi-0").val("0000-0003-0649-2707");
+  $("#rni-1").val("Subhabrata Dutta"), $("#roi-1").val("0000-0002-6041-557X");
+  $("#rni-2").val("Alessia Petti"), $("#roi-2").val("0000-0002-9732-6079");
+  $("#rni-3").val("Debanjan Rana"), $("#roi-3").val("https://onlinelibrary.wiley.com/authored-by/Rana/Debanjan");
+  $("#rni-4").val("Constantin G. Daniliuc"), $("#roi-4").val("0000-0002-6709-3673");
+  $("#rni-5").val("Frank Glorius"), $("#roi-5").val("0000-0002-0648-956X");
+
   // Set the current state of the form as "clean"
   cleanDirtyForms();
 
