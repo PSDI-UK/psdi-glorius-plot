@@ -2652,7 +2652,7 @@ function getReactionSchemeImg() {
  * @returns {String}
  */
 function getBaselineDesc() {
-  return getQuillEditorHTML("#rocrate-baseline-desc", false);
+  return getQuillEditorHTML("#rocrate-baseline-desc", false, true);
 }
 
 /**

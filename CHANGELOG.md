@@ -6,6 +6,10 @@
 
 - The "Fill with example data" button will now also fill in the RO-Crate export section with example data corresponding to the same dataset
 
+### Bugfixes
+
+- Fixed a bug where the `standard_conditions.html` file in an exported RO-Crate data package would use non-breaking spaces instead of normal spaces
+
 ### Miscellaneous changes
 
 - Added announcement bar that displays only on (likely) mobile devices warning that the site has not been fully tested on mobile

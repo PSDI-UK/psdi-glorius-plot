@@ -144,16 +144,18 @@ export function setQuillEditor(selector, editor) {
  * @param {Boolean} clean If true (default), will strip any HTML tags that aren't used for making formatted labels
  * @returns {String}
  */
-export function getQuillEditorHTML(selector, clean = true) {
+export function getQuillEditorHTML(selector, clean = true, allowBreaking = false) {
   const editor = getQuillEditor(selector);
   if (!editor)
     return "";
 
-  const editorHTML = editor.getSemanticHTML();
+  let editorHTML = editor.getSemanticHTML();
   if (clean)
-    return cleanTags(editorHTML);
-  else
-    return editorHTML
+    editorHTML = cleanTags(editorHTML);
+  if (allowBreaking)
+    editorHTML = editorHTML.replaceAll("&nbsp;", " ");
+
+  return editorHTML;
 
 }
 
