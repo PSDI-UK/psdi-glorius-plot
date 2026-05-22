@@ -78,7 +78,7 @@ export function surnameToCapitalized(s) {
  * @returns {String}
  */
 export function formatORCIDUrl(s) {
-  const orcIdMatch = s.match(/^(\d\d\d\d)-?(\d\d\d\d)-?(\d\d\d\d)-?(\d\d\d\d)$/);
+  const orcIdMatch = s.match(/^(\d\d\d\d)-?(\d\d\d\d)-?(\d\d\d\d)-?(\d\d\d[\dX])$/);
   if (orcIdMatch)
     s = `${ORCID_URL_BASE}${orcIdMatch[1]}-${orcIdMatch[2]}-${orcIdMatch[3]}-${orcIdMatch[4]}`;
   return s;
