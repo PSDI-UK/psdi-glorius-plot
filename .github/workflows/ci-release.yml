@@ -15,6 +15,7 @@ jobs:
     uses: PSDI-UK/psdi-github-workflows-public/.github/workflows/test-python.yml@b4c884a5fbaa96777c26f1ac6d4eac67531e2fc7
     with:
       source_dir: psdi_glorius_plot
+
   test-gui:
     name: Run full tests of the gui locally
     uses: PSDI-UK/psdi-github-workflows-public/.github/workflows/test-gui.yml@b4c884a5fbaa96777c26f1ac6d4eac67531e2fc7
@@ -57,8 +58,6 @@ jobs:
   # The downstream deploy job leverages on Environment specific secrets, which also must be defined
   deploy-stfc-staging-k8s:
     needs: [tag, container-push]
-    # Proceed if test-all was successful or skipped
-    if: always() && (needs.container-push.result == 'success')
     uses: PSDI-UK/psdi-github-workflows-public/.github/workflows/deploy.yml@b4c884a5fbaa96777c26f1ac6d4eac67531e2fc7
     with:
       container_tag: ${{ needs.tag.outputs.container_tag }}

@@ -25,7 +25,6 @@ jobs:
     uses: PSDI-UK/psdi-github-workflows-public/.github/workflows/test-all.yml@b4c884a5fbaa96777c26f1ac6d4eac67531e2fc7
     with:
       source_dir: psdi_glorius_plot
-      make_coverage_badge: false
     secrets:
       token: ${{ secrets.GITHUB_TOKEN }}
 

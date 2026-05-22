@@ -98,6 +98,18 @@ textarea {
   align-items   : center;
 }
 
+/* For elements that should only be displayed on mobile devices */
+.mobile-only {
+  display: none;
+}
+
+@media (pointer:none),
+(pointer:coarse) {
+  .mobile-only {
+    display: block;
+  }
+}
+
 #data-input {
   margin-bottom: 0;
 }

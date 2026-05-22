@@ -8,7 +8,7 @@
 # where '*' signify non-negative integers.
 
 name: Manual Trigger - Deploy to production cluster
-run-name: Manual Trigger - Deploy to production cluster
+run-name: Deploy to production cluster
 on:
   workflow_dispatch:
 
