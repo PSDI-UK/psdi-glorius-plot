@@ -2,6 +2,10 @@
 
 ## v0.4.7
 
+### New and Changed Functionality
+
+- The "Fill with example data" button will now also fill in the RO-Crate export section with example data corresponding to the same dataset
+
 ### Miscellaneous changes
 
 - Added announcement bar that displays only on (likely) mobile devices warning that the site has not been fully tested on mobile
