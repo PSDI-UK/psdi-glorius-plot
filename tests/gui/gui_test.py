@@ -4,6 +4,7 @@
 
 import math
 import os
+import re
 import time
 from collections.abc import Callable
 from multiprocessing import Process
@@ -50,11 +51,35 @@ TIMESTEP = 0.1
 PLOT_GENERATION_TIME = 0.3
 SLOW_PLOT_GENERATION_TIME = 2.0
 
-DOWNLOAD_LOCATION = "/tmp"
-EX_PLOT_PNG_FILENAME = "glorius_plot.png"
-EX_PLOT_SVG_FILENAME = "glorius_plot.svg"
 
-SAVE_FILENAME = "glorius_plot_data.json"
+def _local_and_qual(local: str, path: str):
+    """Return the local and qualified path to a file"""
+    return local, os.path.join(path, local)
+
+
+# Constants related to downloaded files and RO-Crate structure
+DOWNLOAD_LOCATION = "/tmp"
+PLOT_PNG_FILE, PLOT_PNG_QUAL_FILE = _local_and_qual("glorius_plot.png", DOWNLOAD_LOCATION)
+PLOT_SVG_FILE, PLOT_SVG_QUAL_FILE = _local_and_qual("glorius_plot.svg", DOWNLOAD_LOCATION)
+
+SAVE_FILE = "glorius_plot_data.json"
+
+RC_FILE_PATTERN = re.compile(r"/\d*4-\d\d-\d\d-\d*6-glorius-plot-ro-crate\.zip/")
+
+RC_ROOT_DIR = "glorius-plot"
+RC_ESI_FILE, RC_ESI_QUAL_FILE = _local_and_qual("ESI.pdf", RC_ROOT_DIR)
+RC_README_FILE, RC_README_QUAL_FILE = _local_and_qual("README.md", RC_ROOT_DIR)
+RC_METADATA_FILE, RC_ESI_QUAL_FILE = _local_and_qual("ro-crate-metadata.json", RC_ROOT_DIR)
+RC_DATA_DIR, RC_DATA_QUAL_DIR = _local_and_qual("data", RC_ROOT_DIR)
+
+RC_SCHEME_FILE, RC_SCHEME_QUAL_FILE = _local_and_qual("reaction_scheme.cdxml", RC_DATA_QUAL_DIR)
+RC_STANDARD_COND_FILE, RC_STANDARD_COND_QUAL_FILE = _local_and_qual("standard_conditions.html", RC_DATA_QUAL_DIR)
+RC_TEST_COND_FILE, RC_TEST_COND_QUAL_FILE = _local_and_qual("test_conditions.csv", RC_DATA_QUAL_DIR)
+RC_PLOT_DIR, RC_PLOT_QUAL_DIR = _local_and_qual("plot", RC_DATA_QUAL_DIR)
+
+RC_PLOT_FILE, RC_PLOT_QUAL_FILE = _local_and_qual("glorius_plot.png", RC_PLOT_QUAL_DIR)
+RC_TABLE_FILE, RC_TABLE_QUAL_FILE = _local_and_qual("sensitivity_table.csv", RC_PLOT_QUAL_DIR)
+RC_PREF_FILE, RC_PREF_QUAL_FILE = _local_and_qual("user_preferences.json", RC_PLOT_QUAL_DIR)
 
 origin = os.environ.get("ORIGIN", DEFAULT_ORIGIN)
 
@@ -817,11 +842,8 @@ def _wait_for_download(filename, timeout=TIMEOUT_SHORT):
 def test_download_plot(driver: WebDriver):
     """Test that we can download an image of the plot using the provided button"""
 
-    qualified_download_png_filename = os.path.join(DOWNLOAD_LOCATION, EX_PLOT_PNG_FILENAME)
-    qualified_download_svg_filename = os.path.join(DOWNLOAD_LOCATION, EX_PLOT_SVG_FILENAME)
-
     # If the downloaded files already exists, remove them
-    for filename in [qualified_download_png_filename, qualified_download_svg_filename]:
+    for filename in [PLOT_PNG_QUAL_FILE, PLOT_SVG_QUAL_FILE]:
         try:
             os.remove(filename)
         except FileNotFoundError:
@@ -836,22 +858,22 @@ def test_download_plot(driver: WebDriver):
 
     png_download_button = wait_for_element(driver, "//button[@id='export-image-png']")
     png_download_button.click()
-    _wait_for_download(qualified_download_png_filename)
+    _wait_for_download(PLOT_PNG_QUAL_FILE)
 
     # Note the filesize of the downloaded plot, check it's non-zero, then delete it
-    empty_png_plot_filesize = os.path.getsize(qualified_download_png_filename)
+    empty_png_plot_filesize = os.path.getsize(PLOT_PNG_QUAL_FILE)
     assert empty_png_plot_filesize > 0
-    os.remove(qualified_download_png_filename)
+    os.remove(PLOT_PNG_QUAL_FILE)
 
     # Now do the same with the svg version of the plot
 
     svg_download_button = wait_for_element(driver, "//button[@id='export-image-svg']")
     svg_download_button.click()
-    _wait_for_download(qualified_download_svg_filename, TIMEOUT_LONG)
+    _wait_for_download(PLOT_SVG_QUAL_FILE, TIMEOUT_LONG)
 
-    empty_svg_plot_filesize = os.path.getsize(qualified_download_svg_filename)
+    empty_svg_plot_filesize = os.path.getsize(PLOT_SVG_QUAL_FILE)
     assert empty_svg_plot_filesize > 0
-    os.remove(qualified_download_svg_filename)
+    os.remove(PLOT_SVG_QUAL_FILE)
 
     # Add a title to the plot now, so we can test if they seem to appear on the downloaded plot
 
@@ -861,11 +883,11 @@ def test_download_plot(driver: WebDriver):
 
     # Download it again
     scroll_element_into_view(driver, svg_download_button).click()
-    _wait_for_download(qualified_download_svg_filename, TIMEOUT_LONG)
+    _wait_for_download(PLOT_SVG_QUAL_FILE, TIMEOUT_LONG)
 
     # Note the filesize of the new downloaded plot, then delete it as well
-    title_plot_filesize = os.path.getsize(qualified_download_svg_filename)
-    os.remove(qualified_download_svg_filename)
+    title_plot_filesize = os.path.getsize(PLOT_SVG_QUAL_FILE)
+    os.remove(PLOT_SVG_QUAL_FILE)
 
     # Check that the file size of the plot with the title is larger than for the empty plot
     assert title_plot_filesize > empty_svg_plot_filesize
@@ -880,11 +902,11 @@ def test_download_plot(driver: WebDriver):
 
     # Download it again
     scroll_element_into_view(driver, svg_download_button).click()
-    _wait_for_download(qualified_download_svg_filename, TIMEOUT_LONG)
+    _wait_for_download(PLOT_SVG_QUAL_FILE, TIMEOUT_LONG)
 
     # Note the filesize of the new downloaded plot, then delete it as well
-    label_plot_filesize = os.path.getsize(qualified_download_svg_filename)
-    os.remove(qualified_download_svg_filename)
+    label_plot_filesize = os.path.getsize(PLOT_SVG_QUAL_FILE)
+    os.remove(PLOT_SVG_QUAL_FILE)
 
     # Check that the file size of the plot with the labels is now even larger than just the title
     assert label_plot_filesize > title_plot_filesize
@@ -894,11 +916,11 @@ def test_download_plot(driver: WebDriver):
     assert wait_for_condition(lambda: _get_num_condition_rows(driver) == 10)
 
     scroll_element_into_view(driver, svg_download_button).click()
-    _wait_for_download(qualified_download_svg_filename, TIMEOUT_LONG)
+    _wait_for_download(PLOT_SVG_QUAL_FILE, TIMEOUT_LONG)
 
     # Note the filesize of the new downloaded plot, then delete it as well
-    example_plot_filesize = os.path.getsize(qualified_download_svg_filename)
-    os.remove(qualified_download_svg_filename)
+    example_plot_filesize = os.path.getsize(PLOT_SVG_QUAL_FILE)
+    os.remove(PLOT_SVG_QUAL_FILE)
 
     # Check that the file size of the example plot is even larger than the labeled plot, since it's even more
     # complicated
@@ -958,7 +980,7 @@ def test_dirty_forms(driver: WebDriver):
 def test_save_load_data(driver: WebDriver):
     """Test that we can save and load data entered in the plot"""
 
-    qualified_save_filename = os.path.join(DOWNLOAD_LOCATION, SAVE_FILENAME)
+    qualified_save_filename = os.path.join(DOWNLOAD_LOCATION, SAVE_FILE)
 
     # If the save file already exists, remove it
     try:
