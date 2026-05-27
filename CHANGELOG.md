@@ -1,5 +1,11 @@
 # Changelog for PSDI Glorius Plot Generator
 
+## v0.4.8
+
+### Miscellaneous changes
+
+- Add link back to the Organic Toolkit Hub page
+
 ## v0.4.7
 
 ### New and Changed Functionality
