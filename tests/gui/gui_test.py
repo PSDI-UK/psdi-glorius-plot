@@ -1096,3 +1096,33 @@ def test_save_load_data(driver: WebDriver):
     assert _get_plot_height(driver) == TEST_HEIGHT
     assert _get_label_fontsize(driver) == TEST_LABEL_FONTSIZE
     assert _get_axis_fontsize(driver) == TEST_AXIS_FONTSIZE
+
+
+def _start_rocrate_export(driver: WebDriver, allow_already_started=True):
+    """Click the button to start exporting a RO-Crate data package"""
+    start_export_button = wait_for_element(driver, "export-rocrate-start", by=By.ID)
+    start_export_button.click()
+
+
+def test_rocrate_form(driver: WebDriver):
+    """Test that the RO-Crate export form is initially hidden but becomes visible when the button is clicked to start
+    exporting it
+    """
+
+    # Load the home page and wait for the page cover to be removed
+    driver.get(f"{origin}/")
+    wait_for_cover_hidden(driver)
+
+    # Check that the RO-Crate export section is initially hidden
+    rocrate_input_form = driver.find_element(By.ID, "rocrate-input")
+    with pytest.raises(MoveTargetOutOfBoundsException):
+        scroll_element_into_view(driver, rocrate_input_form)
+
+    # Click the button to open the form and confirm that it's now visible
+    _start_rocrate_export(driver)
+    rocrate_input_form.click()
+
+    # Also check that the button to make it visible itself no longer is visible
+    with pytest.raises(MoveTargetOutOfBoundsException):
+        export_start_button = driver.find_element(By.ID, "export-rocrate-start")
+        scroll_element_into_view(driver, export_start_button)
