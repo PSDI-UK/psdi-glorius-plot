@@ -288,7 +288,7 @@ def test_outcome_select(driver: WebDriver):
 
 
 def _get_num_condition_rows(driver: WebDriver):
-    l_e = driver.find_elements(By.XPATH, "//tr[contains(@class,'condition-row')]")
+    l_e = driver.find_elements(By.XPATH, "//tr[contains(@class,'rocrate-contrib-row)]")
     return len(l_e)
 
 
@@ -1410,3 +1410,39 @@ def test_about_buttons(driver: WebDriver):
     # Click the "Revert" button again, and check that the default values return
     revert_button.click()
     _check_info(default_title, default_desc, default_about)
+
+
+def _get_num_contrib_rows(driver: WebDriver):
+    l_e = driver.find_elements(By.XPATH, "//div[contains(@class,'rocrate-contrib-row')]")
+    return len(l_e)
+
+
+def _set_num_contrib_rows(driver: WebDriver, n: int):
+    row_select_element = wait_for_element(driver, "//select[@id='num-contrib']")
+    row_select = Select(row_select_element)
+    wait_for_success(lambda: row_select.select_by_value(str(n)))
+
+
+def test_num_contrib_control(driver: WebDriver):
+    """Test that the number of contributors can be controlled by the selector and buttons"""
+
+    _init_rocrate_export(driver, fill_example=True)
+
+    # Check that we initially have 6 rows, as expected
+    assert _get_num_contrib_rows(driver) == 6
+
+    # Check that we can change the number of contrib rows with the select input
+    _set_num_contrib_rows(driver, 8)
+    assert _get_num_contrib_rows(driver) == 8
+    _set_num_contrib_rows(driver, 4)
+    assert _get_num_contrib_rows(driver) == 4
+
+    # Check that we can add and remove rows with the buttons
+    add_contrib_button_0 = wait_for_element(driver, "//button[@id='add-rcb-0']")
+    add_contrib_button_0.click()
+    add_contrib_button_0.click()
+    add_contrib_button_0.click()
+    assert _get_num_contrib_rows(driver) == 7
+    wait_for_element(driver, "//button[@id='remove-rcb-2']").click()
+    wait_for_element(driver, "//button[@id='remove-rcb-3']").click()
+    assert _get_num_contrib_rows(driver) == 5
