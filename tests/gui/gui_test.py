@@ -152,10 +152,17 @@ def wait_for_cover_hidden(root: WebDriver):
     WebDriverWait(root, TIMEOUT_LONG).until(EC.invisibility_of_element((By.XPATH, "//div[@id='cover']")))
 
 
-def scroll_element_into_view(driver: WebDriver, e: WebElement):
+def scroll_element_into_view(driver: WebDriver, e: WebElement) -> WebElement:
     driver.execute_script("arguments[0].scrollIntoView({behavior: 'instant', block: 'center'});", e)
     wait_for_success(lambda: ActionChains(driver).move_to_element(e).perform())
     return e
+
+
+def send_keys(driver: WebDriver, keys: str, shift=False):
+    if not shift:
+        ActionChains(driver).send_keys(keys).perform()
+    else:
+        ActionChains(driver).key_down(Keys.SHIFT).send_keys(keys).key_up(Keys.SHIFT).perform()
 
 
 def wait_for_element(driver: WebDriver | WebElement,
@@ -391,10 +398,7 @@ def test_table_navigation(driver: WebDriver):
     wait_for_cover_hidden(driver)
 
     def _send_keys(keys: str, shift: bool = False):
-        if not shift:
-            ActionChains(driver).send_keys(keys).perform()
-        else:
-            ActionChains(driver).key_down(Keys.SHIFT).send_keys(keys).key_up(Keys.SHIFT).perform()
+        send_keys(driver, keys, shift)
 
     def _is_focused(e: WebElement) -> bool:
         return e == driver.switch_to.active_element
@@ -1247,12 +1251,37 @@ def test_cond_desc_rows(driver: WebDriver):
 def test_cond_desc_labels(driver: WebDriver):
     """Test that the condition description row labels all match the inputted condition values"""
 
+    def _get_l_conds(driver: WebDriver):
+        return driver.find_elements(
+            By.XPATH, "//tr[contains(@class,'condition-row')]//div[contains(@class,'ql-editor')]//p")
+
+    def _get_l_cond_descs(driver: WebDriver):
+        return driver.find_elements(
+            By.XPATH, "//tr[contains(@class,'rocrate-cond-row')]//div[contains(@class,'rocrate-cond-desc-label')]")
+
+    def _check_labels_match(driver):
+        l_conds = _get_l_conds(driver)
+        l_cond_descs = _get_l_cond_descs(driver)
+
+        for cond, cond_desc in zip(l_conds, l_cond_descs):
+            assert cond.get_attribute('innerHTML').replace("<br>", "")+":" == cond_desc.get_attribute('innerHTML')
+
+    # Start by checking that the labels are right with the example data
+
     _init_rocrate_export(driver, fill_example=True)
+    _check_labels_match(driver)
 
-    l_conds = driver.find_elements(
-        By.XPATH, "//tr[contains(@class,'condition-row')]//div[contains(@class,'ql-editor')]//p")
-    l_cond_descs = driver.find_elements(
-        By.XPATH, "//tr[contains(@class,'rocrate-cond-row')]//div[contains(@class,'rocrate-cond-desc-label')]")
+    # Make a few changes to the number of conditions and the labels, and check that they still match up in the end
 
-    for cond, cond_desc in zip(l_conds, l_cond_descs):
-        assert cond.get_attribute('innerHTML')+":" == cond_desc.get_attribute('innerHTML')
+    # Add a condition row after index 1, and remove the condition row at index 3
+    wait_for_element(driver, "//button[@id='add-cb-1']").click()
+    wait_for_element(driver, "//button[@id='remove-cb-3']").click()
+
+    # Check things match after these changes
+    _check_labels_match(driver)
+
+    # Edit the name of the newly-added condition, and check that the label is updated to match
+    new_cond = _get_l_conds(driver)[2]
+    scroll_element_into_view(driver, new_cond).click()
+    send_keys(driver, "New description")
+    _check_labels_match(driver)
