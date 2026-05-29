@@ -150,7 +150,7 @@ const D_LICENSE_INFO = {
 // Structure of the output RO-crate file
 
 const ROCRATE_FILENAME_BASE = "glorius-plot-ro-crate.zip";
-const ROCRATE_ROOT_DIR = "glorius-plot/"
+const ROCRATE_ROOT_DIR = ""
 const ROCRATE_DATA_DIR = ROCRATE_ROOT_DIR + "data/"
 const ROCRATE_PLOT_DIR = ROCRATE_DATA_DIR + "plot/"
 

@@ -6,6 +6,7 @@ import math
 import os
 import re
 import shutil
+import sys
 import time
 from collections.abc import Callable
 from multiprocessing import Process
@@ -17,6 +18,8 @@ from psdi_glorius_plot import constants as const
 
 # Skip all tests in this module if required packages for GUI testing aren't installed
 try:
+    from rocrate_validator import models as rocv_models
+    from rocrate_validator import services as rocv_services
     from selenium import webdriver
     from selenium.common.exceptions import NoAlertPresentException
     from selenium.webdriver import FirefoxOptions, Keys
@@ -67,7 +70,7 @@ SAVE_FILE = "glorius_plot_data.json"
 
 RC_FILE_PATTERN = re.compile(r"\d{4}-\d\d-\d\d-\d{6}-glorius-plot-ro-crate\.zip")
 
-RC_ROOT_DIR, RC_ROOT_QUAL_DIR = _local_and_qual("glorius-plot/", DOWNLOAD_LOCATION)
+RC_EXTRACT_DIR, RC_ROOT_QUAL_DIR = _local_and_qual("glorius-plot/", DOWNLOAD_LOCATION)
 RC_ESI_FILE, RC_ESI_QUAL_FILE = _local_and_qual("ESI.pdf", RC_ROOT_QUAL_DIR)
 RC_README_FILE, RC_README_QUAL_FILE = _local_and_qual("README.md", RC_ROOT_QUAL_DIR)
 RC_METADATA_FILE, RC_METADATA_QUAL_FILE = _local_and_qual("ro-crate-metadata.json", RC_ROOT_QUAL_DIR)
@@ -126,7 +129,7 @@ def driver():
 
     # The below is the likely installed path of the driver, which can be uncommented when testing locally to speed
     # things up and avoid bugs caused by being API rate limited
-    # driver_path = os.environ.get("HOME") + "/.wdm/drivers/geckodriver/linux64/v0.36.0/geckodriver"
+    driver_path = os.environ.get("HOME") + "/.wdm/drivers/geckodriver/linux64/v0.36.0/geckodriver"
 
     if not driver_path:
         driver_path = GeckoDriverManager().install()
@@ -1191,6 +1194,36 @@ def _init_rocrate_export(driver: WebDriver, fill_example=False):
     _start_rocrate_export(driver)
 
 
+def _validate_rocrate_file(rocrate_qual_file: str) -> bool:
+    """Run a validity test on an RO-Crate data package file
+
+    Parameters
+    ----------
+    rocrate_qual_file : str
+        The qualified path to the RO-Crate file to be validated
+
+    Returns
+    -------
+    bool
+        Whether or not the validation is successful
+    """
+
+    validation_result = rocv_services.validate(rocv_services.ValidationSettings(
+        rocrate_uri=rocrate_qual_file,
+        rocrate_relative_root_path=RC_EXTRACT_DIR,
+        requirement_severity=rocv_models.Severity.REQUIRED))
+
+    if not validation_result.has_issues():
+        return True
+    else:
+        # If validation was unsuccessful, print out all the issues found to stderr
+        print("RO-Crate is invalid!", file=sys.stderr)
+        for issue in validation_result.get_issues():
+            print(f"Detected issue of severity {issue.severity.name} with check \"{issue.check.identifier}\": " +
+                  issue.message, file=sys.stderr)
+        return False
+
+
 def test_rocrate_download(driver: WebDriver):
     """Test that a RO-Crate data package can be downloaded"""
 
@@ -1201,10 +1234,12 @@ def test_rocrate_download(driver: WebDriver):
     rocrate_qual_file = _wait_for_download(RC_FILE_PATTERN)
 
     # Try extracting the file to check that expected files exist/don't exist in it
-    shutil.unpack_archive(rocrate_qual_file, extract_dir=DOWNLOAD_LOCATION)
+    shutil.unpack_archive(rocrate_qual_file, extract_dir=os.path.join(DOWNLOAD_LOCATION, RC_EXTRACT_DIR))
 
     # This is a minimal RO-Crate, so only mandatory files should be present
     for file in L_RC_MANDATORY_FILES:
         assert os.path.exists(file), f"Expected file/dir {file} not found in ROCrate data package"
     for file in L_RC_OPTIONAL_FILES:
         assert not os.path.exists(file), f"Unexpected file/dir {file} found in ROCrate data package"
+
+    assert _validate_rocrate_file(rocrate_qual_file), f"RO-Crate file {rocrate_qual_file} failed validation"
