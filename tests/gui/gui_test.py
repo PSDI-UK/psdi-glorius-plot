@@ -298,7 +298,7 @@ def test_outcome_select(driver: WebDriver):
 
 
 def _get_num_condition_rows(driver: WebDriver):
-    l_e = driver.find_elements(By.XPATH, "//tr[contains(@class,'rocrate-contrib-row)]")
+    l_e = driver.find_elements(By.XPATH, "//tr[contains(@class,'condition-row')]")
     return len(l_e)
 
 
