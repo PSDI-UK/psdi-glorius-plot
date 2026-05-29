@@ -2476,7 +2476,10 @@ function useDefaultCitation(e) {
         const lCapsSurnameSegments = [];
         const lCapsForenameSegments = [];
         lNameSegments.forEach((s) => {
-          if (s.length > 1 && s === s.toUpperCase()) {
+          // Check for any initials in the segment and remove them from consideration (e.g. we don't want the "B.A." in
+          // "B.A. Barracus" to be mistaken for a surname because it's technically all-caps)
+          const nonInitialSegment = s.replaceAll(/\w\./g, "");
+          if (nonInitialSegments.length > 1 && s === s.toUpperCase()) {
             lCapsSurnameSegments.push(s);
           } else {
             lCapsForenameSegments.push(s);
