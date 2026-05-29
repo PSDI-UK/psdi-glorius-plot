@@ -1491,3 +1491,39 @@ def test_bib_info_buttons(driver: WebDriver):
     # Click the "Revert" button again, and check that the default values return
     revert_button.click()
     assert bib_el.get_property("innerHTML") == default_bib
+
+
+def test_orcid_lookup(driver: WebDriver):
+    """Test that we can use the ORCID Lookup button to search the ORCID site for a contributor"""
+
+    _init_rocrate_export(driver, fill_example=True)
+    original_window_handle = driver.current_window_handle
+
+    # Find the entry in the contributors row for Frank Glorius, and click the ORCID Lookup button
+    l_contrib_rows = driver.find_elements(By.XPATH, "//div[contains(@class,'rocrate-contrib-row')]")
+    for contrib_row in l_contrib_rows:
+        contrib_name_el = contrib_row.find_element(By.XPATH, ".//input[contains(@class,'rocrate-name-input')]")
+        if not contrib_name_el.get_property("value") == "Frank Glorius":
+            continue
+        lookup_button = contrib_row.find_element(By.XPATH, ".//button[contains(@class,'rocrate-orcid-lookup')]")
+        scroll_element_into_view(driver, lookup_button)
+        lookup_button.click()
+        break
+
+    # Wait for the new tab to load, then switch to it
+    WebDriverWait(driver, TIMEOUT_SHORT).until(EC.number_of_windows_to_be(2))
+    new_window_handle = (set(driver.window_handles) - {original_window_handle}).pop()
+    driver.switch_to.window(new_window_handle)
+    assert driver.current_window_handle == new_window_handle
+
+    # Wait for the search to finish
+    wait_for_condition((lambda: len(driver.find_elements(
+        By.XPATH, ".//td[contains(@class,'orcid-id-column')]//a")) > 0))
+
+    l_orcid_cells = driver.find_elements(By.XPATH, ".//td[contains(@class,'orcid-id-column')]//a")
+    EX_ORCID = "0000-0002-0648-956X"
+    for orcid_cell in l_orcid_cells:
+        if orcid_cell.get_property("innerHTML").strip() == EX_ORCID:
+            break
+    else:
+        pytest.fail(f"Expected ORCID ({EX_ORCID}) for Frank Glorius not found in lookup")
