@@ -2,6 +2,10 @@
 
 ## v0.4.9
 
+### New and Changed Functionality
+
+- The structure of outputted RO-Crate data packages has been changed to not include an additional root folder, to match the more common convention
+
 ### Testing changes
 
 - Added automated tests of RO-Crate export section
