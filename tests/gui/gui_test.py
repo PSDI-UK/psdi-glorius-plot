@@ -9,7 +9,6 @@ import shutil
 import time
 from collections.abc import Callable
 from multiprocessing import Process
-from zipfile import ZipFile
 
 import pytest
 
@@ -71,7 +70,7 @@ RC_FILE_PATTERN = re.compile(r"\d{4}-\d\d-\d\d-\d{6}-glorius-plot-ro-crate\.zip"
 RC_ROOT_DIR, RC_ROOT_QUAL_DIR = _local_and_qual("glorius-plot/", DOWNLOAD_LOCATION)
 RC_ESI_FILE, RC_ESI_QUAL_FILE = _local_and_qual("ESI.pdf", RC_ROOT_QUAL_DIR)
 RC_README_FILE, RC_README_QUAL_FILE = _local_and_qual("README.md", RC_ROOT_QUAL_DIR)
-RC_METADATA_FILE, RC_ESI_QUAL_FILE = _local_and_qual("ro-crate-metadata.json", RC_ROOT_QUAL_DIR)
+RC_METADATA_FILE, RC_METADATA_QUAL_FILE = _local_and_qual("ro-crate-metadata.json", RC_ROOT_QUAL_DIR)
 RC_DATA_DIR, RC_DATA_QUAL_DIR = _local_and_qual("data/", RC_ROOT_QUAL_DIR)
 
 RC_SCHEME_FILE, RC_SCHEME_QUAL_FILE = _local_and_qual("reaction_scheme.cdxml", RC_DATA_QUAL_DIR)
@@ -82,6 +81,10 @@ RC_PLOT_DIR, RC_PLOT_QUAL_DIR = _local_and_qual("plot/", RC_DATA_QUAL_DIR)
 RC_PLOT_FILE, RC_PLOT_QUAL_FILE = _local_and_qual("glorius_plot.png", RC_PLOT_QUAL_DIR)
 RC_TABLE_FILE, RC_TABLE_QUAL_FILE = _local_and_qual("sensitivity_table.csv", RC_PLOT_QUAL_DIR)
 RC_PREF_FILE, RC_PREF_QUAL_FILE = _local_and_qual("user_preferences.json", RC_PLOT_QUAL_DIR)
+
+L_RC_MANDATORY_FILES = [RC_ESI_QUAL_FILE, RC_README_QUAL_FILE, RC_METADATA_QUAL_FILE, RC_DATA_QUAL_DIR,
+                        RC_PLOT_QUAL_DIR, RC_PLOT_QUAL_FILE, RC_TABLE_QUAL_FILE, RC_PREF_QUAL_FILE]
+L_RC_OPTIONAL_FILES = [RC_SCHEME_QUAL_FILE, RC_STANDARD_COND_QUAL_FILE, RC_TEST_COND_QUAL_FILE]
 
 origin = os.environ.get("ORIGIN", DEFAULT_ORIGIN)
 
@@ -1195,12 +1198,12 @@ def test_rocrate_download(driver: WebDriver):
 
     wait_for_element(driver, "//button[@id='rocrate-download']").click()
 
-    rocrate_filename = _wait_for_download(RC_FILE_PATTERN)
+    rocrate_qual_file = _wait_for_download(RC_FILE_PATTERN)
 
-    # Try extracting the file to do a basic test of its validity
-    with ZipFile(rocrate_filename, 'r') as fz:
-        l_files = [x.filename.replace("glorius-plot/", "") for x in fz.infolist()]
-        assert RC_ESI_FILE in l_files
-        assert RC_README_FILE in l_files
-        assert RC_METADATA_FILE in l_files
-        assert RC_DATA_DIR in l_files
+    # Try extracting the file to check that expected files exist/don't exist in it
+    shutil.unpack_archive(rocrate_qual_file, extract_dir=DOWNLOAD_LOCATION)
+
+    for file in L_RC_MANDATORY_FILES:
+        assert os.path.exists(file), f"Expected file/dir {file} not found in ROCrate data package"
+    for file in L_RC_OPTIONAL_FILES:
+        assert not os.path.exists(file), f"Unexpected file/dir {file} found in ROCrate data package"
