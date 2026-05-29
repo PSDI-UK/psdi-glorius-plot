@@ -2,6 +2,10 @@
 
 ## v0.4.9
 
+### Bugfixes
+
+- Improved logic of detecting surnames in contributor names so that initials are less likely to be mistaken for surnames when generating a default citation
+
 ### Testing changes
 
 - Added automated tests of RO-Crate export section

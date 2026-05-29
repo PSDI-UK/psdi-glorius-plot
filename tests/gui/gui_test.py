@@ -288,7 +288,7 @@ def test_outcome_select(driver: WebDriver):
 
 
 def _get_num_condition_rows(driver: WebDriver):
-    l_e = driver.find_elements(By.XPATH, "//tr[contains(@class,'condition-row')]")
+    l_e = driver.find_elements(By.XPATH, "//tr[contains(@class,'rocrate-contrib-row)]")
     return len(l_e)
 
 
@@ -1358,3 +1358,172 @@ def test_file_structure(driver: WebDriver):
     scroll_element_into_view(driver, reaction_scheme_li)
     scroll_element_into_view(driver, standard_cond_li)
     scroll_element_into_view(driver, test_cond_li)
+
+
+def test_about_buttons(driver: WebDriver):
+    """Test that the Default and Revert buttons in the "About this Dataset" section work as expected"""
+
+    _init_rocrate_export(driver, fill_example=True)
+
+    title_el = wait_for_element(driver,
+                                "//div[@id='rocrate-title-input']//div[contains(@class,'ql-editor')]//p")
+    desc_el = wait_for_element(driver,
+                               "//div[@id='rocrate-desc-input']//div[contains(@class,'ql-editor')]//p")
+    about_el = wait_for_element(driver,
+                                "//div[@id='rocrate-about']//div[contains(@class,'ql-editor')]//p")
+
+    # Save the current values, which are what the defaults should be when we click the button to use the defaults
+    default_title = title_el.get_property("innerHTML")
+    default_desc = desc_el.get_property("innerHTML")
+    default_about = about_el.get_property("innerHTML")
+
+    # Replace the input in each
+    new_title = "Test title"
+    title_el.click()
+    send_keys(driver, Keys.BACKSPACE*100 + Keys.DELETE*100 + new_title)
+
+    new_desc = "Test description"
+    desc_el.click()
+    send_keys(driver, Keys.BACKSPACE*100 + Keys.DELETE*100 + new_desc)
+
+    new_about = "Test about"
+    about_el.click()
+    send_keys(driver, Keys.BACKSPACE*300 + Keys.DELETE*300 + new_about)
+
+    def _check_info(ex_title, ex_desc, ex_about):
+        assert title_el.get_property("innerHTML") == ex_title
+        assert desc_el.get_property("innerHTML") == ex_desc
+        assert about_el.get_property("innerHTML") == ex_about
+
+    # Sanity check that the values we entered are now there
+    _check_info(new_title, new_desc, new_about)
+
+    # Click the "Use Defaults" button and check that the default values appear
+    wait_for_element(driver, "//button[@id='rocrate-default-title-desc']").click()
+    _check_info(default_title, default_desc, default_about)
+
+    # Click the "Revert" button and check that the previous values appear
+    revert_button = wait_for_element(driver, "//button[@id='rocrate-revert-title-desc']")
+    revert_button.click()
+    _check_info(new_title, new_desc, new_about)
+
+    # Click the "Revert" button again, and check that the default values return
+    revert_button.click()
+    _check_info(default_title, default_desc, default_about)
+
+
+def _get_num_contrib_rows(driver: WebDriver):
+    l_e = driver.find_elements(By.XPATH, "//div[contains(@class,'rocrate-contrib-row')]")
+    return len(l_e)
+
+
+def _set_num_contrib_rows(driver: WebDriver, n: int):
+    row_select_element = wait_for_element(driver, "//select[@id='num-contrib']")
+    row_select = Select(row_select_element)
+    wait_for_success(lambda: row_select.select_by_value(str(n)))
+
+
+def test_num_contrib_control(driver: WebDriver):
+    """Test that the number of contributors can be controlled by the selector and buttons"""
+
+    _init_rocrate_export(driver, fill_example=True)
+
+    # Check that we initially have 6 rows, as expected
+    assert _get_num_contrib_rows(driver) == 6
+
+    # Check that we can change the number of contrib rows with the select input
+    _set_num_contrib_rows(driver, 8)
+    assert _get_num_contrib_rows(driver) == 8
+    _set_num_contrib_rows(driver, 4)
+    assert _get_num_contrib_rows(driver) == 4
+
+    # Check that we can add and remove rows with the buttons
+    add_contrib_button_0 = wait_for_element(driver, "//button[@id='add-rcb-0']")
+    add_contrib_button_0.click()
+    add_contrib_button_0.click()
+    add_contrib_button_0.click()
+    assert _get_num_contrib_rows(driver) == 7
+    wait_for_element(driver, "//button[@id='remove-rcb-2']").click()
+    wait_for_element(driver, "//button[@id='remove-rcb-3']").click()
+    assert _get_num_contrib_rows(driver) == 5
+
+
+def test_bib_info_buttons(driver: WebDriver):
+    """Test that the Default and Revert buttons in the "Bibliographic Info" section work as expected"""
+
+    _init_rocrate_export(driver, fill_example=True)
+
+    bib_el = wait_for_element(driver,
+                              "//div[@id='rocrate-citation']//div[contains(@class,'ql-editor')]//p")
+
+    # Save the current value - it's not the default in this case though
+    init_bib = bib_el.get_property("innerHTML")
+
+    # Replace the input
+    new_bib = "Test bib"
+    bib_el.click()
+    send_keys(driver, Keys.BACKSPACE*300 + Keys.DELETE*300 + new_bib)
+
+    # Sanity check that the value we entered is now there
+    assert bib_el.get_property("innerHTML") == new_bib
+
+    # Click the "Use Defaults" button and check that the default value appears and not the initial value
+    wait_for_element(driver, "//button[@id='rocrate-default-citation']").click()
+    default_bib = bib_el.get_property("innerHTML")
+    assert default_bib != init_bib
+
+    # To check that this does indeed appear to be the default value, we check that all the author names and plot title
+    # appear in it
+    l_contrib_rows = driver.find_elements(By.XPATH, "//div[contains(@class,'rocrate-contrib-row')]")
+    for contrib_row in l_contrib_rows:
+        contrib_name_el = contrib_row.find_element(By.XPATH, ".//input[contains(@class,'rocrate-name-input')]")
+        contrib_surname = contrib_name_el.get_property("value").split(" ")[-1]
+        assert contrib_surname in default_bib
+    title_el = wait_for_element(driver,
+                                "//div[@id='rocrate-title-input']//div[contains(@class,'ql-editor')]//p")
+    assert title_el.get_property("innerHTML") in default_bib
+
+    # Click the "Revert" button and check that the previous values appear
+    revert_button = wait_for_element(driver, "//button[@id='rocrate-revert-citation']")
+    revert_button.click()
+    assert bib_el.get_property("innerHTML") == new_bib
+
+    # Click the "Revert" button again, and check that the default values return
+    revert_button.click()
+    assert bib_el.get_property("innerHTML") == default_bib
+
+
+def test_orcid_lookup(driver: WebDriver):
+    """Test that we can use the ORCID Lookup button to search the ORCID site for a contributor"""
+
+    _init_rocrate_export(driver, fill_example=True)
+    original_window_handle = driver.current_window_handle
+
+    # Find the entry in the contributors row for Frank Glorius, and click the ORCID Lookup button
+    l_contrib_rows = driver.find_elements(By.XPATH, "//div[contains(@class,'rocrate-contrib-row')]")
+    for contrib_row in l_contrib_rows:
+        contrib_name_el = contrib_row.find_element(By.XPATH, ".//input[contains(@class,'rocrate-name-input')]")
+        if not contrib_name_el.get_property("value") == "Frank Glorius":
+            continue
+        lookup_button = contrib_row.find_element(By.XPATH, ".//button[contains(@class,'rocrate-orcid-lookup')]")
+        scroll_element_into_view(driver, lookup_button)
+        lookup_button.click()
+        break
+
+    # Wait for the new tab to load, then switch to it
+    WebDriverWait(driver, TIMEOUT_SHORT).until(EC.number_of_windows_to_be(2))
+    new_window_handle = (set(driver.window_handles) - {original_window_handle}).pop()
+    driver.switch_to.window(new_window_handle)
+    assert driver.current_window_handle == new_window_handle
+
+    # Wait for the search to finish
+    wait_for_condition((lambda: len(driver.find_elements(
+        By.XPATH, ".//td[contains(@class,'orcid-id-column')]//a")) > 0))
+
+    l_orcid_cells = driver.find_elements(By.XPATH, ".//td[contains(@class,'orcid-id-column')]//a")
+    EX_ORCID = "0000-0002-0648-956X"
+    for orcid_cell in l_orcid_cells:
+        if orcid_cell.get_property("innerHTML").strip() == EX_ORCID:
+            break
+    else:
+        pytest.fail(f"Expected ORCID ({EX_ORCID}) for Frank Glorius not found in lookup")
