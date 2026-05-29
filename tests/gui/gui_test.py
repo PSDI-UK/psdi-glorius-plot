@@ -893,6 +893,10 @@ def _wait_for_download(filename: str | re.Pattern[str], timeout=TIMEOUT_SHORT) -
     return found_filename
 
 
+def _fill_example_data(driver):
+    wait_for_element(driver, "//button[@id='fill-example']").click()
+
+
 def test_download_plot(driver: WebDriver):
     """Test that we can download an image of the plot using the provided button"""
 
@@ -962,7 +966,7 @@ def test_download_plot(driver: WebDriver):
     assert label_plot_filesize > title_plot_filesize
 
     # Now, fill the table with example data, wait for the plot to be re-generated, and download again
-    wait_for_element(driver, "//button[@id='fill-example']").click()
+    _fill_example_data(driver)
     assert wait_for_condition(lambda: _get_num_condition_rows(driver) == 10)
 
     scroll_element_into_view(driver, svg_download_button).click()
@@ -1001,8 +1005,7 @@ def test_dirty_forms(driver: WebDriver):
     alert.dismiss()
 
     # Test with the example data button
-    fill_example_button = wait_for_element(driver, "//button[@id='fill-example']")
-    fill_example_button.click()
+    _fill_example_data(driver)
     alert = Alert(driver)
     assert "Do you want to proceed?" in alert.text
     alert.dismiss()
@@ -1105,8 +1108,7 @@ def test_save_load_data(driver: WebDriver):
     _wait_for_download(qualified_save_filename)
 
     # Overwrite the data by filling with example data
-    fill_example_button = wait_for_element(driver, "//button[@id='fill-example']")
-    fill_example_button.click()
+    _fill_example_data(driver)
     alert = Alert(driver)
     assert "Do you want to proceed?" in alert.text
     alert.accept()
@@ -1190,7 +1192,7 @@ def _init_rocrate_export(driver: WebDriver, fill_example=False):
     _clear_downloaded_rocrate()
 
     if fill_example:
-        wait_for_element(driver, "//button[@id='fill-example']").click()
+        _fill_example_data(driver)
 
     _start_rocrate_export(driver)
 
@@ -1322,3 +1324,27 @@ def test_license_select(driver):
 
     wait_for_element(driver, "//input[@id='rocrate-license-other']").click()
     _check_license_info("", "", False)
+
+
+def test_file_structure(driver: WebDriver):
+    """Test that the File Structure section only shows elements that should be visible"""
+
+    # Start with a minimal fill, which shouldn't show the optional elements
+    _init_rocrate_export(driver)
+
+    reaction_scheme_li = driver.find_element(value="rocrate-reaction-scheme-li")
+    standard_cond_li = driver.find_element(value="rocrate-baseline-li")
+    test_cond_li = driver.find_element(value="rocrate-test-conditions-li")
+
+    with pytest.raises(MoveTargetOutOfBoundsException):
+        scroll_element_into_view(driver, reaction_scheme_li)
+    with pytest.raises(MoveTargetOutOfBoundsException):
+        scroll_element_into_view(driver, standard_cond_li)
+    with pytest.raises(MoveTargetOutOfBoundsException):
+        scroll_element_into_view(driver, test_cond_li)
+
+    # Now add data which should make them show up, and check that they are now visible
+    _fill_example_data(driver)
+    scroll_element_into_view(driver, reaction_scheme_li)
+    scroll_element_into_view(driver, standard_cond_li)
+    scroll_element_into_view(driver, test_cond_li)
