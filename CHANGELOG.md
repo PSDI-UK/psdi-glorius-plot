@@ -1,5 +1,11 @@
 # Changelog for PSDI Glorius Plot Generator
 
+## v0.4.9
+
+### Testing changes
+
+- Added automated tests of RO-Crate export section
+
 ## v0.4.8
 
 ### Miscellaneous changes

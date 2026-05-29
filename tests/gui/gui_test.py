@@ -5,6 +5,7 @@
 import math
 import os
 import re
+import shutil
 import time
 from collections.abc import Callable
 from multiprocessing import Process
@@ -64,22 +65,26 @@ PLOT_SVG_FILE, PLOT_SVG_QUAL_FILE = _local_and_qual("glorius_plot.svg", DOWNLOAD
 
 SAVE_FILE = "glorius_plot_data.json"
 
-RC_FILE_PATTERN = re.compile(r"/\d*4-\d\d-\d\d-\d*6-glorius-plot-ro-crate\.zip/")
+RC_FILE_PATTERN = re.compile(r"\d{4}-\d\d-\d\d-\d{6}-glorius-plot-ro-crate\.zip")
 
-RC_ROOT_DIR = "glorius-plot"
-RC_ESI_FILE, RC_ESI_QUAL_FILE = _local_and_qual("ESI.pdf", RC_ROOT_DIR)
-RC_README_FILE, RC_README_QUAL_FILE = _local_and_qual("README.md", RC_ROOT_DIR)
-RC_METADATA_FILE, RC_ESI_QUAL_FILE = _local_and_qual("ro-crate-metadata.json", RC_ROOT_DIR)
-RC_DATA_DIR, RC_DATA_QUAL_DIR = _local_and_qual("data", RC_ROOT_DIR)
+RC_ROOT_DIR, RC_ROOT_QUAL_DIR = _local_and_qual("glorius-plot/", DOWNLOAD_LOCATION)
+RC_ESI_FILE, RC_ESI_QUAL_FILE = _local_and_qual("ESI.pdf", RC_ROOT_QUAL_DIR)
+RC_README_FILE, RC_README_QUAL_FILE = _local_and_qual("README.md", RC_ROOT_QUAL_DIR)
+RC_METADATA_FILE, RC_METADATA_QUAL_FILE = _local_and_qual("ro-crate-metadata.json", RC_ROOT_QUAL_DIR)
+RC_DATA_DIR, RC_DATA_QUAL_DIR = _local_and_qual("data/", RC_ROOT_QUAL_DIR)
 
 RC_SCHEME_FILE, RC_SCHEME_QUAL_FILE = _local_and_qual("reaction_scheme.cdxml", RC_DATA_QUAL_DIR)
 RC_STANDARD_COND_FILE, RC_STANDARD_COND_QUAL_FILE = _local_and_qual("standard_conditions.html", RC_DATA_QUAL_DIR)
 RC_TEST_COND_FILE, RC_TEST_COND_QUAL_FILE = _local_and_qual("test_conditions.csv", RC_DATA_QUAL_DIR)
-RC_PLOT_DIR, RC_PLOT_QUAL_DIR = _local_and_qual("plot", RC_DATA_QUAL_DIR)
+RC_PLOT_DIR, RC_PLOT_QUAL_DIR = _local_and_qual("plot/", RC_DATA_QUAL_DIR)
 
 RC_PLOT_FILE, RC_PLOT_QUAL_FILE = _local_and_qual("glorius_plot.png", RC_PLOT_QUAL_DIR)
 RC_TABLE_FILE, RC_TABLE_QUAL_FILE = _local_and_qual("sensitivity_table.csv", RC_PLOT_QUAL_DIR)
 RC_PREF_FILE, RC_PREF_QUAL_FILE = _local_and_qual("user_preferences.json", RC_PLOT_QUAL_DIR)
+
+L_RC_MANDATORY_FILES = [RC_ESI_QUAL_FILE, RC_README_QUAL_FILE, RC_METADATA_QUAL_FILE, RC_DATA_QUAL_DIR,
+                        RC_PLOT_QUAL_DIR, RC_PLOT_QUAL_FILE, RC_TABLE_QUAL_FILE, RC_PREF_QUAL_FILE]
+L_RC_OPTIONAL_FILES = [RC_SCHEME_QUAL_FILE, RC_STANDARD_COND_QUAL_FILE, RC_TEST_COND_QUAL_FILE]
 
 origin = os.environ.get("ORIGIN", DEFAULT_ORIGIN)
 
@@ -819,35 +824,76 @@ def test_plot_sizing(driver: WebDriver):
     assert _get_axis_fontsize(driver) == init_axis_fontsize*scale
 
 
-def _wait_for_download(filename, timeout=TIMEOUT_SHORT):
+def _clear_download(*l_filenames: str | re.Pattern[str]):
+    """Clear files that might have been downloaded in a previous test run"""
+
+    l_download_files = os.listdir(DOWNLOAD_LOCATION)
+
+    # Determine which files to remove
+    l_filenames_to_remove: list[str] = []
+    for filename in l_filenames:
+        # Check if it's a string or Regex and handle appropriate
+        if isinstance(filename, str):
+            l_filenames_to_remove.append(os.path.join(DOWNLOAD_LOCATION, filename))
+            continue
+        # Implicit else it's a regex
+        for download_file in l_download_files:
+            if filename.match(download_file):
+                l_filenames_to_remove.append(os.path.join(DOWNLOAD_LOCATION, download_file))
+                continue
+
+    # And now remove all files in the list
+    for file_to_remove in l_filenames_to_remove:
+        try:
+            os.remove(file_to_remove)
+        except FileNotFoundError:
+            pass
+
+
+def _wait_for_download(filename: str | re.Pattern[str], timeout=TIMEOUT_SHORT) -> str:
     time_elapsed = 0
     file_exists = False
     last_filesize = 0
     new_filesize = 0
+
     # Continue waiting while any of the following conditions are true:
     # - The file doesn't exist
     # - The file exists, but its size is zero
     # - The file exists, but its size is different from the last time it was checked
+
+    found_filename: str = ""
+
     while not file_exists or new_filesize == 0 or new_filesize != last_filesize:
-        file_exists = os.path.isfile(filename)
+
+        # Check if the file exists, checking differently depending on if we're doing a regex match or not
+        file_exists = False
+        if isinstance(filename, str):
+            file_exists = os.path.isfile(filename)
+            found_filename = filename
+        else:
+            l_files = os.listdir(DOWNLOAD_LOCATION)
+            for file in l_files:
+                if filename.match(file):
+                    file_exists = True
+                    found_filename = os.path.join(DOWNLOAD_LOCATION, file)
+                    break
+
         last_filesize = new_filesize
         time.sleep(TIMESTEP)
         if file_exists:
-            new_filesize = os.path.getsize(filename)
+            new_filesize = os.path.getsize(found_filename)
         time_elapsed += TIMESTEP
         if time_elapsed > timeout:
             pytest.fail(f"Download of {filename} timed out")
+
+    return found_filename
 
 
 def test_download_plot(driver: WebDriver):
     """Test that we can download an image of the plot using the provided button"""
 
     # If the downloaded files already exists, remove them
-    for filename in [PLOT_PNG_QUAL_FILE, PLOT_SVG_QUAL_FILE]:
-        try:
-            os.remove(filename)
-        except FileNotFoundError:
-            pass
+    _clear_download(PLOT_PNG_QUAL_FILE, PLOT_SVG_QUAL_FILE)
 
     # Load the home page and wait for the page cover to be removed
     driver.get(f"{origin}/")
@@ -863,7 +909,7 @@ def test_download_plot(driver: WebDriver):
     # Note the filesize of the downloaded plot, check it's non-zero, then delete it
     empty_png_plot_filesize = os.path.getsize(PLOT_PNG_QUAL_FILE)
     assert empty_png_plot_filesize > 0
-    os.remove(PLOT_PNG_QUAL_FILE)
+    _clear_download(PLOT_PNG_QUAL_FILE)
 
     # Now do the same with the svg version of the plot
 
@@ -873,7 +919,7 @@ def test_download_plot(driver: WebDriver):
 
     empty_svg_plot_filesize = os.path.getsize(PLOT_SVG_QUAL_FILE)
     assert empty_svg_plot_filesize > 0
-    os.remove(PLOT_SVG_QUAL_FILE)
+    _clear_download(PLOT_SVG_QUAL_FILE)
 
     # Add a title to the plot now, so we can test if they seem to appear on the downloaded plot
 
@@ -887,7 +933,7 @@ def test_download_plot(driver: WebDriver):
 
     # Note the filesize of the new downloaded plot, then delete it as well
     title_plot_filesize = os.path.getsize(PLOT_SVG_QUAL_FILE)
-    os.remove(PLOT_SVG_QUAL_FILE)
+    _clear_download(PLOT_SVG_QUAL_FILE)
 
     # Check that the file size of the plot with the title is larger than for the empty plot
     assert title_plot_filesize > empty_svg_plot_filesize
@@ -906,7 +952,7 @@ def test_download_plot(driver: WebDriver):
 
     # Note the filesize of the new downloaded plot, then delete it as well
     label_plot_filesize = os.path.getsize(PLOT_SVG_QUAL_FILE)
-    os.remove(PLOT_SVG_QUAL_FILE)
+    _clear_download(PLOT_SVG_QUAL_FILE)
 
     # Check that the file size of the plot with the labels is now even larger than just the title
     assert label_plot_filesize > title_plot_filesize
@@ -920,7 +966,7 @@ def test_download_plot(driver: WebDriver):
 
     # Note the filesize of the new downloaded plot, then delete it as well
     example_plot_filesize = os.path.getsize(PLOT_SVG_QUAL_FILE)
-    os.remove(PLOT_SVG_QUAL_FILE)
+    _clear_download(PLOT_SVG_QUAL_FILE)
 
     # Check that the file size of the example plot is even larger than the labeled plot, since it's even more
     # complicated
@@ -983,10 +1029,7 @@ def test_save_load_data(driver: WebDriver):
     qualified_save_filename = os.path.join(DOWNLOAD_LOCATION, SAVE_FILE)
 
     # If the save file already exists, remove it
-    try:
-        os.remove(qualified_save_filename)
-    except FileNotFoundError:
-        pass
+    _clear_download(qualified_save_filename)
 
     # Load the home page and wait for the page cover to be removed
     driver.get(f"{origin}/")
@@ -1096,3 +1139,71 @@ def test_save_load_data(driver: WebDriver):
     assert _get_plot_height(driver) == TEST_HEIGHT
     assert _get_label_fontsize(driver) == TEST_LABEL_FONTSIZE
     assert _get_axis_fontsize(driver) == TEST_AXIS_FONTSIZE
+
+
+def _start_rocrate_export(driver: WebDriver, allow_already_started=True):
+    """Click the button to start exporting a RO-Crate data package"""
+    start_export_button = wait_for_element(driver, "export-rocrate-start", by=By.ID)
+    start_export_button.click()
+
+
+def test_rocrate_form(driver: WebDriver):
+    """Test that the RO-Crate export form is initially hidden but becomes visible when the button is clicked to start
+    exporting it
+    """
+
+    # Load the home page and wait for the page cover to be removed
+    driver.get(f"{origin}/")
+    wait_for_cover_hidden(driver)
+
+    # Check that the RO-Crate export section is initially hidden
+    rocrate_input_form = driver.find_element(By.ID, "rocrate-input")
+    with pytest.raises(MoveTargetOutOfBoundsException):
+        scroll_element_into_view(driver, rocrate_input_form)
+
+    # Click the button to open the form and confirm that it's now visible
+    _start_rocrate_export(driver)
+    rocrate_input_form.click()
+
+    # Also check that the button to make it visible itself no longer is visible
+    with pytest.raises(MoveTargetOutOfBoundsException):
+        export_start_button = driver.find_element(By.ID, "export-rocrate-start")
+        scroll_element_into_view(driver, export_start_button)
+
+
+def _clear_downloaded_rocrate():
+    _clear_download(RC_FILE_PATTERN)
+    shutil.rmtree(RC_ROOT_QUAL_DIR, ignore_errors=True)
+
+
+def _init_rocrate_export(driver: WebDriver, fill_example=False):
+    """Set up the page and the RO-Crate export section"""
+
+    # Load the home page and wait for the page cover to be removed
+    driver.get(f"{origin}/")
+    wait_for_cover_hidden(driver)
+
+    _clear_downloaded_rocrate()
+
+    if fill_example:
+        wait_for_element(driver, "//button[@id='fill-example']").click()
+
+    _start_rocrate_export(driver)
+
+
+def test_rocrate_download(driver: WebDriver):
+    """Test that a RO-Crate data package can be downloaded"""
+
+    _init_rocrate_export(driver)
+
+    wait_for_element(driver, "//button[@id='rocrate-download']").click()
+
+    rocrate_qual_file = _wait_for_download(RC_FILE_PATTERN)
+
+    # Try extracting the file to check that expected files exist/don't exist in it
+    shutil.unpack_archive(rocrate_qual_file, extract_dir=DOWNLOAD_LOCATION)
+
+    for file in L_RC_MANDATORY_FILES:
+        assert os.path.exists(file), f"Expected file/dir {file} not found in ROCrate data package"
+    for file in L_RC_OPTIONAL_FILES:
+        assert not os.path.exists(file), f"Unexpected file/dir {file} found in ROCrate data package"
