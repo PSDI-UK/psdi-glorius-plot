@@ -1203,6 +1203,7 @@ def test_rocrate_download(driver: WebDriver):
     # Try extracting the file to check that expected files exist/don't exist in it
     shutil.unpack_archive(rocrate_qual_file, extract_dir=DOWNLOAD_LOCATION)
 
+    # This is a minimal RO-Crate, so only mandatory files should be present
     for file in L_RC_MANDATORY_FILES:
         assert os.path.exists(file), f"Expected file/dir {file} not found in ROCrate data package"
     for file in L_RC_OPTIONAL_FILES:
