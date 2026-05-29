@@ -1358,3 +1358,55 @@ def test_file_structure(driver: WebDriver):
     scroll_element_into_view(driver, reaction_scheme_li)
     scroll_element_into_view(driver, standard_cond_li)
     scroll_element_into_view(driver, test_cond_li)
+
+
+def test_about_buttons(driver: WebDriver):
+    """Test that the Default and Revert buttons in the "About this Dataset" work as expected"""
+
+    _init_rocrate_export(driver, fill_example=True)
+
+    title_el = wait_for_element(driver,
+                                "//div[@id='rocrate-title-input']//div[contains(@class,'ql-editor')]//p")
+    desc_el = wait_for_element(driver,
+                               "//div[@id='rocrate-desc-input']//div[contains(@class,'ql-editor')]//p")
+    about_el = wait_for_element(driver,
+                                "//div[@id='rocrate-about']//div[contains(@class,'ql-editor')]//p")
+
+    # Save the current values, which are what the defaults should be when we click the button to use the defaults
+    default_title = title_el.get_property("innerHTML")
+    default_desc = desc_el.get_property("innerHTML")
+    default_about = about_el.get_property("innerHTML")
+
+    # Replace the input in each
+    new_title = "Test title"
+    title_el.click()
+    send_keys(driver, Keys.BACKSPACE*100 + Keys.DELETE*100 + new_title)
+
+    new_desc = "Test description"
+    desc_el.click()
+    send_keys(driver, Keys.BACKSPACE*100 + Keys.DELETE*100 + new_desc)
+
+    new_about = "Test about"
+    about_el.click()
+    send_keys(driver, Keys.BACKSPACE*300 + Keys.DELETE*300 + new_about)
+
+    def _check_info(ex_title, ex_desc, ex_about):
+        assert title_el.get_property("innerHTML") == ex_title
+        assert desc_el.get_property("innerHTML") == ex_desc
+        assert about_el.get_property("innerHTML") == ex_about
+
+    # Sanity check that the values we entered are now there
+    _check_info(new_title, new_desc, new_about)
+
+    # Click the "Use Defaults" button and check that the default values appear
+    wait_for_element(driver, "//button[@id='rocrate-default-title-desc']").click()
+    _check_info(default_title, default_desc, default_about)
+
+    # Click the "Revert" button and check that the previous values appear
+    revert_button = wait_for_element(driver, "//button[@id='rocrate-revert-title-desc']")
+    revert_button.click()
+    _check_info(new_title, new_desc, new_about)
+
+    # Click the "Revert" button again, and check that the default values return
+    revert_button.click()
+    _check_info(default_title, default_desc, default_about)
