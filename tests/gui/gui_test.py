@@ -89,6 +89,13 @@ L_RC_MANDATORY_FILES = [RC_ESI_QUAL_FILE, RC_README_QUAL_FILE, RC_METADATA_QUAL_
                         RC_PLOT_QUAL_DIR, RC_PLOT_QUAL_FILE, RC_TABLE_QUAL_FILE, RC_PREF_QUAL_FILE]
 L_RC_OPTIONAL_FILES = [RC_SCHEME_QUAL_FILE, RC_STANDARD_COND_QUAL_FILE, RC_TEST_COND_QUAL_FILE]
 
+# Paths to test data files
+
+PROJECT_PATH = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), "../.."))
+
+EXAMPLE_CDXML = os.path.join(PROJECT_PATH, "test_data/example_standard_reaction.cdxml")
+EXAMPLE_PNG = os.path.join(PROJECT_PATH, "test_data/example_standard_reaction.png")
+
 origin = os.environ.get("ORIGIN", DEFAULT_ORIGIN)
 
 # Run tests in production mode and test mode
@@ -129,7 +136,7 @@ def driver():
 
     # The below is the likely installed path of the driver, which can be uncommented when testing locally to speed
     # things up and avoid bugs caused by being API rate limited
-    driver_path = os.environ.get("HOME") + "/.wdm/drivers/geckodriver/linux64/v0.36.0/geckodriver"
+    # driver_path = os.environ.get("HOME") + "/.wdm/drivers/geckodriver/linux64/v0.36.0/geckodriver"
 
     if not driver_path:
         driver_path = GeckoDriverManager().install()
@@ -1224,8 +1231,8 @@ def _validate_rocrate_file(rocrate_qual_file: str) -> bool:
         return False
 
 
-def test_rocrate_download(driver: WebDriver):
-    """Test that a RO-Crate data package can be downloaded"""
+def test_rocrate_download_valid(driver: WebDriver):
+    """Test that a RO-Crate data package can be downloaded and is valid"""
 
     _init_rocrate_export(driver)
 
@@ -1241,5 +1248,30 @@ def test_rocrate_download(driver: WebDriver):
         assert os.path.exists(file), f"Expected file/dir {file} not found in ROCrate data package"
     for file in L_RC_OPTIONAL_FILES:
         assert not os.path.exists(file), f"Unexpected file/dir {file} found in ROCrate data package"
+
+    assert _validate_rocrate_file(rocrate_qual_file), f"RO-Crate file {rocrate_qual_file} failed validation"
+
+    # Now try with a fully-featured RO-Crate
+
+    # Fill with example data, which will fill most of the RO-Crate export section
+    wait_for_element(driver, "//button[@id='fill-example']").click()
+
+    # The only bit missing is that we need to manually provide the reaction image files
+    wait_for_element(driver, "//input[@id='rocrate-cdxml']").send_keys(EXAMPLE_CDXML)
+    wait_for_element(driver, "//input[@id='rocrate-img']").send_keys(EXAMPLE_PNG)
+
+    wait_for_element(driver, "//button[@id='rocrate-download']").click()
+
+    # Clear the previous download and download again
+    _clear_downloaded_rocrate()
+    wait_for_element(driver, "//button[@id='rocrate-download']").click()
+    rocrate_qual_file = _wait_for_download(RC_FILE_PATTERN)
+
+    # Try extracting the file to check that expected files exist/don't exist in it
+    shutil.unpack_archive(rocrate_qual_file, extract_dir=os.path.join(DOWNLOAD_LOCATION, RC_EXTRACT_DIR))
+
+    # This is a maximal RO-Crate, so all files should be present
+    for file in L_RC_MANDATORY_FILES + L_RC_OPTIONAL_FILES:
+        assert os.path.exists(file), f"Expected file/dir {file} not found in ROCrate data package"
 
     assert _validate_rocrate_file(rocrate_qual_file), f"RO-Crate file {rocrate_qual_file} failed validation"
