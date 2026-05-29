@@ -1361,7 +1361,7 @@ def test_file_structure(driver: WebDriver):
 
 
 def test_about_buttons(driver: WebDriver):
-    """Test that the Default and Revert buttons in the "About this Dataset" work as expected"""
+    """Test that the Default and Revert buttons in the "About this Dataset" section work as expected"""
 
     _init_rocrate_export(driver, fill_example=True)
 
@@ -1446,3 +1446,48 @@ def test_num_contrib_control(driver: WebDriver):
     wait_for_element(driver, "//button[@id='remove-rcb-2']").click()
     wait_for_element(driver, "//button[@id='remove-rcb-3']").click()
     assert _get_num_contrib_rows(driver) == 5
+
+
+def test_bib_info_buttons(driver: WebDriver):
+    """Test that the Default and Revert buttons in the "Bibliographic Info" section work as expected"""
+
+    _init_rocrate_export(driver, fill_example=True)
+
+    bib_el = wait_for_element(driver,
+                              "//div[@id='rocrate-citation']//div[contains(@class,'ql-editor')]//p")
+
+    # Save the current value - it's not the default in this case though
+    init_bib = bib_el.get_property("innerHTML")
+
+    # Replace the input
+    new_bib = "Test bib"
+    bib_el.click()
+    send_keys(driver, Keys.BACKSPACE*300 + Keys.DELETE*300 + new_bib)
+
+    # Sanity check that the value we entered is now there
+    assert bib_el.get_property("innerHTML") == new_bib
+
+    # Click the "Use Defaults" button and check that the default value appears and not the initial value
+    wait_for_element(driver, "//button[@id='rocrate-default-citation']").click()
+    default_bib = bib_el.get_property("innerHTML")
+    assert default_bib != init_bib
+
+    # To check that this does indeed appear to be the default value, we check that all the author names and plot title
+    # appear in it
+    l_contrib_rows = driver.find_elements(By.XPATH, "//div[contains(@class,'rocrate-contrib-row')]")
+    for contrib_row in l_contrib_rows:
+        contrib_name_el = contrib_row.find_element(By.XPATH, ".//input[contains(@class,'rocrate-name-input')]")
+        contrib_surname = contrib_name_el.get_property("value").split(" ")[-1]
+        assert contrib_surname in default_bib
+    title_el = wait_for_element(driver,
+                                "//div[@id='rocrate-title-input']//div[contains(@class,'ql-editor')]//p")
+    assert title_el.get_property("innerHTML") in default_bib
+
+    # Click the "Revert" button and check that the previous values appear
+    revert_button = wait_for_element(driver, "//button[@id='rocrate-revert-citation']")
+    revert_button.click()
+    assert bib_el.get_property("innerHTML") == new_bib
+
+    # Click the "Revert" button again, and check that the default values return
+    revert_button.click()
+    assert bib_el.get_property("innerHTML") == default_bib
