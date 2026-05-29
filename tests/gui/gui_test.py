@@ -1207,3 +1207,38 @@ def test_rocrate_download(driver: WebDriver):
         assert os.path.exists(file), f"Expected file/dir {file} not found in ROCrate data package"
     for file in L_RC_OPTIONAL_FILES:
         assert not os.path.exists(file), f"Unexpected file/dir {file} found in ROCrate data package"
+
+
+def _get_num_cond_desc_rows(driver: WebDriver):
+    l_e = driver.find_elements(By.XPATH, "//tr[contains(@class,'rocrate-cond-row')]")
+    return len(l_e)
+
+
+def test_cond_desc_rows(driver):
+    """Test that the number of condition description rows always matches the number of condition rows"""
+
+    _init_rocrate_export(driver)
+
+    # Check the number of rows is equal when initialised, and after a couple changes
+    assert _get_num_condition_rows(driver) == _get_num_cond_desc_rows(driver)
+
+    _set_num_condition_rows(driver, 7)
+    assert _get_num_condition_rows(driver) == _get_num_cond_desc_rows(driver)
+
+    _set_num_condition_rows(driver, 4)
+    assert _get_num_condition_rows(driver) == _get_num_cond_desc_rows(driver)
+
+    # Also check that if we change the rows before loading the RO-Crate export section, the number of description rows
+    # is initialised correctly
+
+    driver.get(f"{origin}/")
+    wait_for_cover_hidden(driver)
+    _set_num_condition_rows(driver, 8)
+    _start_rocrate_export(driver)
+    assert _get_num_condition_rows(driver) == _get_num_cond_desc_rows(driver)
+
+    driver.get(f"{origin}/")
+    wait_for_cover_hidden(driver)
+    _set_num_condition_rows(driver, 3)
+    _start_rocrate_export(driver)
+    assert _get_num_condition_rows(driver) == _get_num_cond_desc_rows(driver)
