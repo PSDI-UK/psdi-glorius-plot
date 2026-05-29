@@ -1214,7 +1214,7 @@ def _get_num_cond_desc_rows(driver: WebDriver):
     return len(l_e)
 
 
-def test_cond_desc_rows(driver):
+def test_cond_desc_rows(driver: WebDriver):
     """Test that the number of condition description rows always matches the number of condition rows"""
 
     _init_rocrate_export(driver)
@@ -1242,3 +1242,17 @@ def test_cond_desc_rows(driver):
     _set_num_condition_rows(driver, 3)
     _start_rocrate_export(driver)
     assert _get_num_condition_rows(driver) == _get_num_cond_desc_rows(driver)
+
+
+def test_cond_desc_labels(driver: WebDriver):
+    """Test that the condition description row labels all match the inputted condition values"""
+
+    _init_rocrate_export(driver, fill_example=True)
+
+    l_conds = driver.find_elements(
+        By.XPATH, "//tr[contains(@class,'condition-row')]//div[contains(@class,'ql-editor')]//p")
+    l_cond_descs = driver.find_elements(
+        By.XPATH, "//tr[contains(@class,'rocrate-cond-row')]//div[contains(@class,'rocrate-cond-desc-label')]")
+
+    for cond, cond_desc in zip(l_conds, l_cond_descs):
+        assert cond.get_attribute('innerHTML')+":" == cond_desc.get_attribute('innerHTML')
