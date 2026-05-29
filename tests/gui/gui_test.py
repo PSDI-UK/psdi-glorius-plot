@@ -88,6 +88,13 @@ L_RC_OPTIONAL_FILES = [RC_SCHEME_QUAL_FILE, RC_STANDARD_COND_QUAL_FILE, RC_TEST_
 
 origin = os.environ.get("ORIGIN", DEFAULT_ORIGIN)
 
+# Paths to test data files
+
+PROJECT_PATH = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), "../.."))
+
+EXAMPLE_CDXML = os.path.join(PROJECT_PATH, "test_data/example_standard_reaction.cdxml")
+EXAMPLE_PNG = os.path.join(PROJECT_PATH, "test_data/example_standard_reaction.png")
+
 # Run tests in production mode and test mode
 os.environ[const.PRODUCTION_EV] = "true"
 os.environ[const.TEST_EV] = "true"
@@ -1025,7 +1032,7 @@ def test_dirty_forms(driver: WebDriver):
 
     scroll_element_into_view(driver, download_button).click()
 
-    scroll_element_into_view(driver, fill_example_button).click()
+    _fill_example_data(driver)
     with pytest.raises(NoAlertPresentException):
         Alert(driver).text
 
@@ -1191,10 +1198,12 @@ def _init_rocrate_export(driver: WebDriver, fill_example=False):
 
     _clear_downloaded_rocrate()
 
+    _start_rocrate_export(driver)
+
     if fill_example:
         _fill_example_data(driver)
-
-    _start_rocrate_export(driver)
+        wait_for_element(driver, "//input[@id='rocrate-cdxml']").send_keys(EXAMPLE_CDXML)
+        wait_for_element(driver, "//input[@id='rocrate-img']").send_keys(EXAMPLE_PNG)
 
 
 def test_rocrate_download(driver: WebDriver):
@@ -1345,6 +1354,7 @@ def test_file_structure(driver: WebDriver):
 
     # Now add data which should make them show up, and check that they are now visible
     _fill_example_data(driver)
+    wait_for_element(driver, "//input[@id='rocrate-cdxml']").send_keys(EXAMPLE_CDXML)
     scroll_element_into_view(driver, reaction_scheme_li)
     scroll_element_into_view(driver, standard_cond_li)
     scroll_element_into_view(driver, test_cond_li)
