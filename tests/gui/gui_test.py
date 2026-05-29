@@ -88,6 +88,13 @@ L_RC_OPTIONAL_FILES = [RC_SCHEME_QUAL_FILE, RC_STANDARD_COND_QUAL_FILE, RC_TEST_
 
 origin = os.environ.get("ORIGIN", DEFAULT_ORIGIN)
 
+# Paths to test data files
+
+PROJECT_PATH = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), "../.."))
+
+EXAMPLE_CDXML = os.path.join(PROJECT_PATH, "test_data/example_standard_reaction.cdxml")
+EXAMPLE_PNG = os.path.join(PROJECT_PATH, "test_data/example_standard_reaction.png")
+
 # Run tests in production mode and test mode
 os.environ[const.PRODUCTION_EV] = "true"
 os.environ[const.TEST_EV] = "true"
@@ -152,10 +159,17 @@ def wait_for_cover_hidden(root: WebDriver):
     WebDriverWait(root, TIMEOUT_LONG).until(EC.invisibility_of_element((By.XPATH, "//div[@id='cover']")))
 
 
-def scroll_element_into_view(driver: WebDriver, e: WebElement):
+def scroll_element_into_view(driver: WebDriver, e: WebElement) -> WebElement:
     driver.execute_script("arguments[0].scrollIntoView({behavior: 'instant', block: 'center'});", e)
     wait_for_success(lambda: ActionChains(driver).move_to_element(e).perform())
     return e
+
+
+def send_keys(driver: WebDriver, keys: str, shift=False):
+    if not shift:
+        ActionChains(driver).send_keys(keys).perform()
+    else:
+        ActionChains(driver).key_down(Keys.SHIFT).send_keys(keys).key_up(Keys.SHIFT).perform()
 
 
 def wait_for_element(driver: WebDriver | WebElement,
@@ -391,10 +405,7 @@ def test_table_navigation(driver: WebDriver):
     wait_for_cover_hidden(driver)
 
     def _send_keys(keys: str, shift: bool = False):
-        if not shift:
-            ActionChains(driver).send_keys(keys).perform()
-        else:
-            ActionChains(driver).key_down(Keys.SHIFT).send_keys(keys).key_up(Keys.SHIFT).perform()
+        send_keys(driver, keys, shift)
 
     def _is_focused(e: WebElement) -> bool:
         return e == driver.switch_to.active_element
@@ -889,6 +900,10 @@ def _wait_for_download(filename: str | re.Pattern[str], timeout=TIMEOUT_SHORT) -
     return found_filename
 
 
+def _fill_example_data(driver):
+    wait_for_element(driver, "//button[@id='fill-example']").click()
+
+
 def test_download_plot(driver: WebDriver):
     """Test that we can download an image of the plot using the provided button"""
 
@@ -958,7 +973,7 @@ def test_download_plot(driver: WebDriver):
     assert label_plot_filesize > title_plot_filesize
 
     # Now, fill the table with example data, wait for the plot to be re-generated, and download again
-    wait_for_element(driver, "//button[@id='fill-example']").click()
+    _fill_example_data(driver)
     assert wait_for_condition(lambda: _get_num_condition_rows(driver) == 10)
 
     scroll_element_into_view(driver, svg_download_button).click()
@@ -997,8 +1012,7 @@ def test_dirty_forms(driver: WebDriver):
     alert.dismiss()
 
     # Test with the example data button
-    fill_example_button = wait_for_element(driver, "//button[@id='fill-example']")
-    fill_example_button.click()
+    _fill_example_data(driver)
     alert = Alert(driver)
     assert "Do you want to proceed?" in alert.text
     alert.dismiss()
@@ -1018,7 +1032,7 @@ def test_dirty_forms(driver: WebDriver):
 
     scroll_element_into_view(driver, download_button).click()
 
-    scroll_element_into_view(driver, fill_example_button).click()
+    _fill_example_data(driver)
     with pytest.raises(NoAlertPresentException):
         Alert(driver).text
 
@@ -1101,8 +1115,7 @@ def test_save_load_data(driver: WebDriver):
     _wait_for_download(qualified_save_filename)
 
     # Overwrite the data by filling with example data
-    fill_example_button = wait_for_element(driver, "//button[@id='fill-example']")
-    fill_example_button.click()
+    _fill_example_data(driver)
     alert = Alert(driver)
     assert "Do you want to proceed?" in alert.text
     alert.accept()
@@ -1185,10 +1198,12 @@ def _init_rocrate_export(driver: WebDriver, fill_example=False):
 
     _clear_downloaded_rocrate()
 
-    if fill_example:
-        wait_for_element(driver, "//button[@id='fill-example']").click()
-
     _start_rocrate_export(driver)
+
+    if fill_example:
+        _fill_example_data(driver)
+        wait_for_element(driver, "//input[@id='rocrate-cdxml']").send_keys(EXAMPLE_CDXML)
+        wait_for_element(driver, "//input[@id='rocrate-img']").send_keys(EXAMPLE_PNG)
 
 
 def test_rocrate_download(driver: WebDriver):
@@ -1207,3 +1222,139 @@ def test_rocrate_download(driver: WebDriver):
         assert os.path.exists(file), f"Expected file/dir {file} not found in ROCrate data package"
     for file in L_RC_OPTIONAL_FILES:
         assert not os.path.exists(file), f"Unexpected file/dir {file} found in ROCrate data package"
+
+
+def _get_num_cond_desc_rows(driver: WebDriver):
+    l_e = driver.find_elements(By.XPATH, "//tr[contains(@class,'rocrate-cond-row')]")
+    return len(l_e)
+
+
+def test_cond_desc_rows(driver: WebDriver):
+    """Test that the number of condition description rows always matches the number of condition rows"""
+
+    _init_rocrate_export(driver)
+
+    # Check the number of rows is equal when initialised, and after a couple changes
+    assert _get_num_condition_rows(driver) == _get_num_cond_desc_rows(driver)
+
+    _set_num_condition_rows(driver, 7)
+    assert _get_num_condition_rows(driver) == _get_num_cond_desc_rows(driver)
+
+    _set_num_condition_rows(driver, 4)
+    assert _get_num_condition_rows(driver) == _get_num_cond_desc_rows(driver)
+
+    # Also check that if we change the rows before loading the RO-Crate export section, the number of description rows
+    # is initialised correctly
+
+    driver.get(f"{origin}/")
+    wait_for_cover_hidden(driver)
+    _set_num_condition_rows(driver, 8)
+    _start_rocrate_export(driver)
+    assert _get_num_condition_rows(driver) == _get_num_cond_desc_rows(driver)
+
+    driver.get(f"{origin}/")
+    wait_for_cover_hidden(driver)
+    _set_num_condition_rows(driver, 3)
+    _start_rocrate_export(driver)
+    assert _get_num_condition_rows(driver) == _get_num_cond_desc_rows(driver)
+
+
+def test_cond_desc_labels(driver: WebDriver):
+    """Test that the condition description row labels all match the inputted condition values"""
+
+    def _get_l_conds(driver: WebDriver):
+        return driver.find_elements(
+            By.XPATH, "//tr[contains(@class,'condition-row')]//div[contains(@class,'ql-editor')]//p")
+
+    def _get_l_cond_descs(driver: WebDriver):
+        return driver.find_elements(
+            By.XPATH, "//tr[contains(@class,'rocrate-cond-row')]//div[contains(@class,'rocrate-cond-desc-label')]")
+
+    def _check_labels_match(driver):
+        l_conds = _get_l_conds(driver)
+        l_cond_descs = _get_l_cond_descs(driver)
+
+        for cond, cond_desc in zip(l_conds, l_cond_descs):
+            assert cond.get_attribute('innerHTML').replace("<br>", "")+":" == cond_desc.get_attribute('innerHTML')
+
+    # Start by checking that the labels are right with the example data
+
+    _init_rocrate_export(driver, fill_example=True)
+    _check_labels_match(driver)
+
+    # Make a few changes to the number of conditions and the labels, and check that they still match up in the end
+
+    # Add a condition row after index 1, and remove the condition row at index 3
+    wait_for_element(driver, "//button[@id='add-cb-1']").click()
+    wait_for_element(driver, "//button[@id='remove-cb-3']").click()
+
+    # Check things match after these changes
+    _check_labels_match(driver)
+
+    # Edit the name of the newly-added condition, and check that the label is updated to match
+    new_cond = _get_l_conds(driver)[2]
+    scroll_element_into_view(driver, new_cond).click()
+    send_keys(driver, "New description")
+    _check_labels_match(driver)
+
+
+def test_license_select(driver):
+    """Test that selecting a license will result in its details appearing in the input boxes for it"""
+
+    _init_rocrate_export(driver)
+
+    def _check_license_info(name, link, disabled=True):
+        name_input: WebElement = driver.find_element(value="rocrate-license-name")
+        link_input: WebElement = driver.find_element(value="rocrate-license-url")
+        assert name_input.get_attribute("value") == name
+        assert link_input.get_attribute("value") == link
+        if disabled:
+            assert name_input.get_attribute("disabled") == 'true'
+            assert link_input.get_attribute("disabled") == 'true'
+        else:
+            assert name_input.get_attribute("disabled") is None
+            assert link_input.get_attribute("disabled") is None
+
+    # Click on each license option in turn and check that the input text is correct
+    wait_for_element(driver, "//input[@id='rocrate-license-none']").click()
+    _check_license_info("", "")
+
+    wait_for_element(driver, "//input[@id='rocrate-license-cc0']").click()
+    _check_license_info("Creative Commons Zero v1.0 Universal",
+                        "https://spdx.org/licenses/CC0-1.0.html")
+
+    wait_for_element(driver, "//input[@id='rocrate-license-cc-by-4.0']").click()
+    _check_license_info("Creative Commons Attribution 4.0 International",
+                        "https://spdx.org/licenses/CC-BY-4.0.html")
+
+    wait_for_element(driver, "//input[@id='rocrate-license-cc-by-sa-4.0']").click()
+    _check_license_info("Creative Commons Attribution Share Alike 4.0 International",
+                        "https://spdx.org/licenses/CC-BY-SA-4.0.html")
+
+    wait_for_element(driver, "//input[@id='rocrate-license-other']").click()
+    _check_license_info("", "", False)
+
+
+def test_file_structure(driver: WebDriver):
+    """Test that the File Structure section only shows elements that should be visible"""
+
+    # Start with a minimal fill, which shouldn't show the optional elements
+    _init_rocrate_export(driver)
+
+    reaction_scheme_li = driver.find_element(value="rocrate-reaction-scheme-li")
+    standard_cond_li = driver.find_element(value="rocrate-baseline-li")
+    test_cond_li = driver.find_element(value="rocrate-test-conditions-li")
+
+    with pytest.raises(MoveTargetOutOfBoundsException):
+        scroll_element_into_view(driver, reaction_scheme_li)
+    with pytest.raises(MoveTargetOutOfBoundsException):
+        scroll_element_into_view(driver, standard_cond_li)
+    with pytest.raises(MoveTargetOutOfBoundsException):
+        scroll_element_into_view(driver, test_cond_li)
+
+    # Now add data which should make them show up, and check that they are now visible
+    _fill_example_data(driver)
+    wait_for_element(driver, "//input[@id='rocrate-cdxml']").send_keys(EXAMPLE_CDXML)
+    scroll_element_into_view(driver, reaction_scheme_li)
+    scroll_element_into_view(driver, standard_cond_li)
+    scroll_element_into_view(driver, test_cond_li)
