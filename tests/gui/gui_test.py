@@ -1285,3 +1285,40 @@ def test_cond_desc_labels(driver: WebDriver):
     scroll_element_into_view(driver, new_cond).click()
     send_keys(driver, "New description")
     _check_labels_match(driver)
+
+
+def test_license_select(driver):
+    """Test that selecting a license will result in its details appearing in the input boxes for it"""
+
+    _init_rocrate_export(driver)
+
+    def _check_license_info(name, link, disabled=True):
+        name_input: WebElement = driver.find_element(value="rocrate-license-name")
+        link_input: WebElement = driver.find_element(value="rocrate-license-url")
+        assert name_input.get_attribute("value") == name
+        assert link_input.get_attribute("value") == link
+        if disabled:
+            assert name_input.get_attribute("disabled") == 'true'
+            assert link_input.get_attribute("disabled") == 'true'
+        else:
+            assert name_input.get_attribute("disabled") is None
+            assert link_input.get_attribute("disabled") is None
+
+    # Click on each license option in turn and check that the input text is correct
+    wait_for_element(driver, "//input[@id='rocrate-license-none']").click()
+    _check_license_info("", "")
+
+    wait_for_element(driver, "//input[@id='rocrate-license-cc0']").click()
+    _check_license_info("Creative Commons Zero v1.0 Universal",
+                        "https://spdx.org/licenses/CC0-1.0.html")
+
+    wait_for_element(driver, "//input[@id='rocrate-license-cc-by-4.0']").click()
+    _check_license_info("Creative Commons Attribution 4.0 International",
+                        "https://spdx.org/licenses/CC-BY-4.0.html")
+
+    wait_for_element(driver, "//input[@id='rocrate-license-cc-by-sa-4.0']").click()
+    _check_license_info("Creative Commons Attribution Share Alike 4.0 International",
+                        "https://spdx.org/licenses/CC-BY-SA-4.0.html")
+
+    wait_for_element(driver, "//input[@id='rocrate-license-other']").click()
+    _check_license_info("", "", False)
