@@ -143,7 +143,7 @@ def driver():
 
     # The below is the likely installed path of the driver, which can be uncommented when testing locally to speed
     # things up and avoid bugs caused by being API rate limited
-    # driver_path = os.environ.get("HOME") + "/.wdm/drivers/geckodriver/linux64/v0.36.0/geckodriver"
+    driver_path = os.environ.get("HOME") + "/.wdm/drivers/geckodriver/linux64/v0.36.0/geckodriver"
 
     if not driver_path:
         driver_path = GeckoDriverManager().install()
@@ -882,15 +882,17 @@ def _wait_for_download(filename: str | re.Pattern[str], timeout=TIMEOUT_SHORT) -
     # - The file exists, but its size is zero
     # - The file exists, but its size is different from the last time it was checked
 
-    found_filename: str = ""
+    if isinstance(filename, str):
+        found_filename = filename
+    else:
+        found_filename: str = ""
 
     while not file_exists or new_filesize == 0 or new_filesize != last_filesize:
 
         # Check if the file exists, checking differently depending on if we're doing a regex match or not
         file_exists = False
-        if isinstance(filename, str):
-            file_exists = os.path.isfile(filename)
-            found_filename = filename
+        if found_filename:
+            file_exists = os.path.isfile(found_filename)
         else:
             l_files = os.listdir(DOWNLOAD_LOCATION)
             for file in l_files:
@@ -1253,7 +1255,7 @@ def test_rocrate_download_valid(driver: WebDriver):
 
     wait_for_element(driver, "//button[@id='rocrate-download']").click()
 
-    rocrate_qual_file = _wait_for_download(RC_FILE_PATTERN)
+    rocrate_qual_file = _wait_for_download(RC_FILE_PATTERN, TIMEOUT_LONG)
 
     # Try extracting the file to check that expected files exist/don't exist in it
     shutil.unpack_archive(rocrate_qual_file, extract_dir=os.path.join(DOWNLOAD_LOCATION, RC_EXTRACT_DIR))
@@ -1275,12 +1277,10 @@ def test_rocrate_download_valid(driver: WebDriver):
     wait_for_element(driver, "//input[@id='rocrate-cdxml']").send_keys(EXAMPLE_CDXML)
     wait_for_element(driver, "//input[@id='rocrate-img']").send_keys(EXAMPLE_PNG)
 
-    wait_for_element(driver, "//button[@id='rocrate-download']").click()
-
     # Clear the previous download and download again
     _clear_downloaded_rocrate()
     wait_for_element(driver, "//button[@id='rocrate-download']").click()
-    rocrate_qual_file = _wait_for_download(RC_FILE_PATTERN)
+    rocrate_qual_file = _wait_for_download(RC_FILE_PATTERN, TIMEOUT_LONG)
 
     # Try extracting the file to check that expected files exist/don't exist in it
     shutil.unpack_archive(rocrate_qual_file, extract_dir=os.path.join(DOWNLOAD_LOCATION, RC_EXTRACT_DIR))
