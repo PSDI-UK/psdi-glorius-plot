@@ -143,7 +143,7 @@ def driver():
 
     # The below is the likely installed path of the driver, which can be uncommented when testing locally to speed
     # things up and avoid bugs caused by being API rate limited
-    driver_path = os.environ.get("HOME") + "/.wdm/drivers/geckodriver/linux64/v0.36.0/geckodriver"
+    # driver_path = os.environ.get("HOME") + "/.wdm/drivers/geckodriver/linux64/v0.36.0/geckodriver"
 
     if not driver_path:
         driver_path = GeckoDriverManager().install()
@@ -244,12 +244,15 @@ def wait_for_success(action: Callable, timeout=TIMEOUT_SHORT):
                 raise
 
 
-def test_initial_frontpage(driver: WebDriver):
-    """A basic unit test that checks that the front page is displayed with the expected content"""
-
-    # Load the home page and wait for the page cover to be removed
+def _init_page(driver):
+    """Initialise the home page for tests and wait for the page cover to be removed"""
     driver.get(f"{origin}/")
     wait_for_cover_hidden(driver)
+
+
+def test_initial_frontpage(driver: WebDriver):
+    """A basic unit test that checks that the front page is displayed with the expected content"""
+    _init_page(driver)
 
     # Check that the front page contains expected elements
 
@@ -257,14 +260,73 @@ def test_initial_frontpage(driver: WebDriver):
     assert (wait_for_element(driver, "//header//h5")).text == "Glorius Plot Generator"
 
 
+def test_navigate_home(driver: WebDriver):
+    """Test that the user can navigate from the page to the PSDI home page using the logo in the header"""
+    _init_page(driver)
+    wait_for_element(driver, "//a[contains(@class,'navbar__logo')]").click()
+    assert (wait_for_element(driver, "//h1")).text == "Physical Sciences Data Infrastructure"
+
+
+def test_navigate_header(driver: WebDriver):
+    """Test that the user can use the header to navigate between pages of the site"""
+    _init_page(driver)
+
+    def _find_header_link(text: str):
+        # Get a list of links in the header, and find the one whose text matches the desired value
+        l_header_links = driver.find_elements(By.CSS_SELECTOR, ".navbar__link")
+        return [x for x in l_header_links if x.text == text][0]
+
+    def _click_header_link(text: str, url_segment: str):
+        _find_header_link(text).click()
+        WebDriverWait(driver, 10).until(EC.url_contains(url_segment))
+
+    # Test that we can navigate to the Documentation page through the header link
+    _click_header_link("Documentation", "documentation.html")
+    assert (wait_for_element(driver, "//h1")).text == "Documentation"
+
+    # Test that we can navigate back to the home page through the header link
+    _click_header_link("Home", "index.html")
+    assert (wait_for_element(driver, "//h1")).text == "PSDI Glorius Plot Generator"
+
+    # Now try instead clicking the title link on the Documentation page
+    _click_header_link("Documentation", "documentation.html")
+    driver.find_element(By.CSS_SELECTOR, ".navbar__title").click()
+    WebDriverWait(driver, 10).until(EC.url_contains("index.html"))
+    assert (wait_for_element(driver, "//h1")).text == "PSDI Glorius Plot Generator"
+
+    # Test using the header link to go to the Organic Toolkit Home page
+    _click_header_link("Organic Toolkit Home", "organic-toolkit.psdi.ac.uk")
+    assert (wait_for_element(driver, "//h1")).text == "PSDI Organic Toolkit"
+
+    # Test using the header link to get to the Provide Feedback form
+    _init_page(driver)
+    _click_header_link("Provide Feedback", "forms.office.com/pages/responsepage.aspx")
+    assert (wait_for_element(driver, "//div[@id='FormTitleId_titleAriaId']/div/span/b/span")
+            ).text == "PSDI Glorius Plot Generator: Feedback Form"
+
+
+def test_light_dark_mode(driver: WebDriver):
+    """Test that the light/dark mode toggle in the header behaves as expected"""
+    _init_page(driver)
+
+    # Check that we initially find the sun icon to toggle to dark mode, then click it to toggle
+    wait_for_element(driver, "//button[contains(@class,'color-mode-toggle')]" +
+                     "//img[contains(@class,'lm-only')]", wait_for_clickable=True).click()
+
+    # Now check for the moon icon to toggle to light mode, and try clicking it as well
+    wait_for_element(driver, "//button[contains(@class,'color-mode-toggle')]" +
+                     "//img[contains(@class,'dm-only')]", wait_for_clickable=True).click()
+
+    # And finally check that the sun icon has returned
+    wait_for_element(driver, "//button[contains(@class,'color-mode-toggle')]" +
+                     "//img[contains(@class,'lm-only')]", wait_for_clickable=True)
+
+
 def test_outcome_select(driver: WebDriver):
     """Test that the outcome can be changed to produce desired effects - showing/hiding custom input, updating text
     of coloumn in table, etc.
     """
-
-    # Load the home page and wait for the page cover to be removed
-    driver.get(f"{origin}/")
-    wait_for_cover_hidden(driver)
+    _init_page(driver)
 
     # Get the select box used for the outcome
     outcome_select_element = wait_for_element(driver, "//*[@id='os-0']")
@@ -310,10 +372,7 @@ def _set_num_condition_rows(driver: WebDriver, n: int):
 
 def test_num_conditions_control(driver: WebDriver):
     """Test that adding/removing/setting condition rows works as expected"""
-
-    # Load the home page and wait for the page cover to be removed
-    driver.get(f"{origin}/")
-    wait_for_cover_hidden(driver)
+    _init_page(driver)
 
     # Check that we start with 5 rows
     assert _get_num_condition_rows(driver) == 5
@@ -354,10 +413,7 @@ def _set_num_sample_columns(driver: WebDriver, n: int):
 
 def test_num_samples_control(driver: WebDriver):
     """Test that adding/removing/setting sample columns works as expected"""
-
-    # Load the home page and wait for the page cover to be removed
-    driver.get(f"{origin}/")
-    wait_for_cover_hidden(driver)
+    _init_page(driver)
 
     # Check that we start with 1 column
     assert _get_num_sample_columns(driver) == 1
@@ -409,10 +465,7 @@ def test_num_samples_control(driver: WebDriver):
 
 def test_table_navigation(driver: WebDriver):
     """Test that the table can be navigated as expected with tab and enter"""
-
-    # Load the home page and wait for the page cover to be removed
-    driver.get(f"{origin}/")
-    wait_for_cover_hidden(driver)
+    _init_page(driver)
 
     def _send_keys(keys: str, shift: bool = False):
         send_keys(driver, keys, shift)
@@ -577,10 +630,7 @@ def _check_value_outline_presence(driver: WebDriver, present=True):
 
 def test_value_to_plot_option(driver: WebDriver):
     """Test that the radio input to select which value to plot works as expected"""
-
-    # Load the home page and wait for the page cover to be removed
-    driver.get(f"{origin}/")
-    wait_for_cover_hidden(driver)
+    _init_page(driver)
 
     mean_radio = wait_for_element(driver, "//input[@id='plot-mean']")
     abs_radio = wait_for_element(driver, "//input[@id='plot-abs']")
@@ -647,10 +697,7 @@ def test_value_to_plot_option(driver: WebDriver):
 
 def test_calcs(driver: WebDriver):
     """Test that values in the plot are calculated properly"""
-
-    # Load the home page and wait for the page cover to be removed
-    driver.get(f"{origin}/")
-    wait_for_cover_hidden(driver)
+    _init_page(driver)
 
     # Size the table so we have 10 rows and columns
     _set_num_condition_rows(driver, 10)
@@ -750,10 +797,7 @@ def _set_axis_fontsize(driver: WebDriver, x: float):
 
 def test_fan_plot_controls(driver: WebDriver):
     """Test that toggling fan plot mode makes the radar-plot-specific controls disappear"""
-
-    # Load the home page and wait for the page cover to be removed
-    driver.get(f"{origin}/")
-    wait_for_cover_hidden(driver)
+    _init_page(driver)
 
     # Toggle fan plot mode, checking that nothing goes wrong when we do so
     fan_select_element = wait_for_element(driver, "//select[@id='fan-select']")
@@ -765,10 +809,7 @@ def test_fan_plot_controls(driver: WebDriver):
 
 def test_plot_sizing(driver: WebDriver):
     """Test that we can resize the plot properly"""
-
-    # Load the home page and wait for the page cover to be removed
-    driver.get(f"{origin}/")
-    wait_for_cover_hidden(driver)
+    _init_page(driver)
 
     init_plot_width = 600
     init_plot_height = 600
@@ -921,10 +962,7 @@ def test_download_plot(driver: WebDriver):
 
     # If the downloaded files already exists, remove them
     _clear_download(PLOT_PNG_QUAL_FILE, PLOT_SVG_QUAL_FILE)
-
-    # Load the home page and wait for the page cover to be removed
-    driver.get(f"{origin}/")
-    wait_for_cover_hidden(driver)
+    _init_page(driver)
 
     # Wait a moment after the page loads so the plot can be generated
     time.sleep(PLOT_GENERATION_TIME)
@@ -1002,10 +1040,7 @@ def test_download_plot(driver: WebDriver):
 
 def test_dirty_forms(driver: WebDriver):
     """Run tests that an alert pops up to warn the user before leaving when they've entered data in the form"""
-
-    # Load the home page and wait for the page cover to be removed
-    driver.get(f"{origin}/")
-    wait_for_cover_hidden(driver)
+    _init_page(driver)
 
     # Input some data into the form
     first_baseline_input = wait_for_element(driver, "//input[contains(@class,'baseline-value')]")
@@ -1056,10 +1091,7 @@ def test_save_load_data(driver: WebDriver):
 
     # If the save file already exists, remove it
     _clear_download(qualified_save_filename)
-
-    # Load the home page and wait for the page cover to be removed
-    driver.get(f"{origin}/")
-    wait_for_cover_hidden(driver)
+    _init_page(driver)
 
     # We want to change pretty much every aspect of the plot away from details, then test
     # that all those changes persist when saved and later reloaded
@@ -1176,10 +1208,7 @@ def test_rocrate_form(driver: WebDriver):
     """Test that the RO-Crate export form is initially hidden but becomes visible when the button is clicked to start
     exporting it
     """
-
-    # Load the home page and wait for the page cover to be removed
-    driver.get(f"{origin}/")
-    wait_for_cover_hidden(driver)
+    _init_page(driver)
 
     # Check that the RO-Crate export section is initially hidden
     rocrate_input_form = driver.find_element(By.ID, "rocrate-input")
@@ -1203,10 +1232,7 @@ def _clear_downloaded_rocrate():
 
 def _init_rocrate_export(driver: WebDriver, fill_example=False):
     """Set up the page and the RO-Crate export section"""
-
-    # Load the home page and wait for the page cover to be removed
-    driver.get(f"{origin}/")
-    wait_for_cover_hidden(driver)
+    _init_page(driver)
 
     _clear_downloaded_rocrate()
 
