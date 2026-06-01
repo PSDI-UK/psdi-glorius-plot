@@ -1407,6 +1407,29 @@ class TestRoCrateContents:
         for key, val in prefs_file.items():
             assert val == save_file[key]
 
+    def test_plot(self, driver: WebDriver):
+        """Test that the plot contained in the RO-Crate matches that shown on the page"""
+
+        # Compare the plot to one downloaded to see if they're the same
+        rocrate_plot = open(RC_PLOT_QUAL_FILE, "rb").read()
+
+        _clear_download(PLOT_PNG_QUAL_FILE)
+        wait_for_element(driver, "//button[@id='export-image-png']").click()
+        _wait_for_download(PLOT_PNG_QUAL_FILE)
+
+        downloaded_plot = open(RC_PLOT_QUAL_FILE, "rb").read()
+
+        assert rocrate_plot == downloaded_plot
+
+    def test_reaction_scheme(self, driver: WebDriver):
+        """Test that the reaction scheme cdxml file contained in the RO-Crate matches that uploaded by the user"""
+
+        # Compare the file to the one in the example data to see if they're the same
+        rocrate_scheme = open(RC_SCHEME_QUAL_FILE, "rb").read()
+        example_scheme = open(EXAMPLE_CDXML, "rb").read()
+
+        assert rocrate_scheme == example_scheme
+
 
 def _get_num_cond_desc_rows(driver: WebDriver):
     l_e = driver.find_elements(By.XPATH, "//tr[contains(@class,'rocrate-cond-row')]")
