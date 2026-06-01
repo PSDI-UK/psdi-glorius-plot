@@ -14,6 +14,7 @@ from collections.abc import Callable
 from multiprocessing import Process
 
 import pytest
+from pypdf import PdfReader
 
 import psdi_glorius_plot
 from psdi_glorius_plot import constants as const
@@ -1421,7 +1422,7 @@ class TestRoCrateContents:
 
         assert rocrate_plot == downloaded_plot
 
-    def test_reaction_scheme(self, driver: WebDriver):
+    def test_reaction_scheme(self):
         """Test that the reaction scheme cdxml file contained in the RO-Crate matches that uploaded by the user"""
 
         # Compare the file to the one in the example data to see if they're the same
@@ -1429,6 +1430,36 @@ class TestRoCrateContents:
         example_scheme = open(EXAMPLE_CDXML, "rb").read()
 
         assert rocrate_scheme == example_scheme
+
+    @staticmethod
+    def _extract_image_from_pdf(pdf_filename, image_index, image_filename):
+        """Extract an image from a PDF, saving it in a file"""
+        pdf_reader = PdfReader(pdf_filename)
+        target_image_index = 0
+        for page in pdf_reader.pages:
+            for image_file_object in page.images:
+                if image_index < target_image_index:
+                    image_index += 1
+                    continue
+                image_file_object.image.save(image_filename)
+                break
+            else:
+                continue
+            # If the nested for loop is broken out of, this branch will be reached, and we break out of the parent for
+            # loop too
+            break
+
+    def test_reaction_image(self):
+        """Test that the reaction image contained within the ESI.pdf file in the RO-Crate matches that uploaded by the
+        user"""
+
+        extracted_image_filename = os.path.join(DOWNLOAD_LOCATION, "extracted_scheme.png")
+        _clear_download(extracted_image_filename)
+        self._extract_image_from_pdf(RC_ESI_QUAL_FILE, 0, extracted_image_filename)
+
+        # The file gets slightly changed when embedded in the PDF, so we can test for an exact match. Instead we check
+        # that the file size is close
+        assert math.isclose(os.path.getsize(extracted_image_filename), os.path.getsize(EXAMPLE_PNG), rel_tol=0.05)
 
 
 def _get_num_cond_desc_rows(driver: WebDriver):
