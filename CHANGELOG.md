@@ -2,6 +2,10 @@
 
 ## v0.4.9
 
+### New and Changed Functionality
+
+- The structure of outputted RO-Crate data packages has been changed to not include an additional root folder, to match the more common convention
+
 ### Bugfixes
 
 - Improved logic of detecting surnames in contributor names so that initials are less likely to be mistaken for surnames when generating a default citation
