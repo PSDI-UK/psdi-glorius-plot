@@ -143,7 +143,7 @@ def driver():
 
     # The below is the likely installed path of the driver, which can be uncommented when testing locally to speed
     # things up and avoid bugs caused by being API rate limited
-    # driver_path = os.environ.get("HOME") + "/.wdm/drivers/geckodriver/linux64/v0.36.0/geckodriver"
+    driver_path = os.environ.get("HOME") + "/.wdm/drivers/geckodriver/linux64/v0.36.0/geckodriver"
 
     if not driver_path:
         driver_path = GeckoDriverManager().install()
@@ -1349,6 +1349,16 @@ def test_rocrate_download_valid(driver: WebDriver):
         assert os.path.exists(file), f"Expected file/dir {file} not found in ROCrate data package"
 
     assert _validate_rocrate_file(rocrate_qual_file), f"RO-Crate file {rocrate_qual_file} failed validation"
+
+
+def test_rocrate_contents(driver: WebDriver):
+    """Test that the contents of the generated RO-Crate data package match what the user input"""
+
+    # Fill the form with default info, and we'll check that this is all represented in the generated file
+    _init_rocrate_export(driver, fill_example=True)
+    wait_for_element(driver, "//button[@id='rocrate-download']").click()
+    rocrate_qual_file = _wait_for_download(RC_FILE_PATTERN, TIMEOUT_LONG)
+    shutil.unpack_archive(rocrate_qual_file, extract_dir=os.path.join(DOWNLOAD_LOCATION, RC_EXTRACT_DIR))
 
 
 def _get_num_cond_desc_rows(driver: WebDriver):
