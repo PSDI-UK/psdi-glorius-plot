@@ -267,6 +267,31 @@ def test_navigate_home(driver: WebDriver):
     assert (wait_for_element(driver, "//h1")).text == "Physical Sciences Data Infrastructure"
 
 
+def test_navigate_header(driver: WebDriver):
+    """Test that the user can use the header to navigate between pages of the site"""
+    _init_page(driver)
+
+    def _find_header_link(text: str):
+        # Get a list of links in the header, and construct a dict keyed on their text
+        l_header_links = driver.find_elements(By.CSS_SELECTOR, ".navbar__link")
+        d_header_links = {x.text: x for x in l_header_links}
+
+        # Try clicking on the Documentation link, and check that this takes us to the Documentation page
+        return d_header_links[text]
+
+    def _click_header_link(text: str, rel_url: str):
+        _find_header_link(text).click()
+        WebDriverWait(driver, 10).until(EC.url_contains(rel_url))
+
+    # Test that we can navigate to the Documentation page through the header link
+    _click_header_link("Documentation", "documentation.html")
+    assert (wait_for_element(driver, "//h1")).text == "Documentation"
+
+    # Test that we can navigate back to the home page through the header link
+    _click_header_link("Home", "index.html")
+    assert (wait_for_element(driver, "//h1")).text == "PSDI Glorius Plot Generator"
+
+
 def test_outcome_select(driver: WebDriver):
     """Test that the outcome can be changed to produce desired effects - showing/hiding custom input, updating text
     of coloumn in table, etc.
