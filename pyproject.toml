@@ -52,6 +52,7 @@ gui-test = [
   "selenium",
   "webdriver_manager",
   "roc-validator",
+  "pypdf[image]",
 ]
 deploy = ["gunicorn"]
 doc = ["pdoc3", "gunicorn", "pytest", "selenium"]
