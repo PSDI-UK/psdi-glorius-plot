@@ -2,6 +2,7 @@
 
 # Selenium test script for PSDI Glorius Plot Generator Service.
 
+import csv
 import math
 import os
 import re
@@ -1351,14 +1352,45 @@ def test_rocrate_download_valid(driver: WebDriver):
     assert _validate_rocrate_file(rocrate_qual_file), f"RO-Crate file {rocrate_qual_file} failed validation"
 
 
-def test_rocrate_contents(driver: WebDriver):
-    """Test that the contents of the generated RO-Crate data package match what the user input"""
+class TestRoCrateContents:
 
-    # Fill the form with default info, and we'll check that this is all represented in the generated file
-    _init_rocrate_export(driver, fill_example=True)
-    wait_for_element(driver, "//button[@id='rocrate-download']").click()
-    rocrate_qual_file = _wait_for_download(RC_FILE_PATTERN, TIMEOUT_LONG)
-    shutil.unpack_archive(rocrate_qual_file, extract_dir=os.path.join(DOWNLOAD_LOCATION, RC_EXTRACT_DIR))
+    @pytest.fixture(scope="class", autouse=True)
+    def init_rocrate(self, driver: WebDriver):
+        """Prepare and extract the RO-Crate we want to check using default data"""
+        _init_rocrate_export(driver, fill_example=True)
+        wait_for_element(driver, "//button[@id='rocrate-download']").click()
+        rocrate_qual_file = _wait_for_download(RC_FILE_PATTERN, TIMEOUT_LONG)
+        shutil.unpack_archive(rocrate_qual_file, extract_dir=os.path.join(DOWNLOAD_LOCATION, RC_EXTRACT_DIR))
+
+    def test_sens_table(self, driver: WebDriver):
+        """Test that the contents of the generated RO-Crate data package match what the user input"""
+        # Load the sensitivity table extracted from the RO-Crate and check it's as expected
+        with open(RC_TABLE_QUAL_FILE) as fi:
+            csv_reader = csv.reader(fi)
+            l_condition_names = driver.find_elements(By.CSS_SELECTOR, ".condition-input p")
+            l_yields = driver.find_elements(By.CSS_SELECTOR, "input.sample-value")
+            l_deviations = driver.find_elements(By.CSS_SELECTOR, "input.rel-deviation-value")
+            for i, row in enumerate(csv_reader):
+                if i == 0:
+                    # In the first row, check the header is as expected
+                    assert row[0] == "Test parameter"
+                    assert row[1] == "Isolated Yield (%)"
+                    assert row[2] == "Deviation (%)"
+                    continue
+
+                elif i == 1:
+                    # In the second row, check that we have the Standard Conditions info
+                    assert row[0] == "Standard Conditions"
+                    baseline_cell = driver.find_element(By.CSS_SELECTOR, "input.baseline-value")
+                    assert row[1] == str(baseline_cell.get_property("value"))
+                    assert row[2] == ""
+                    continue
+
+                # In subsequent rows, check the contents match what's entered in the table for each condition
+                assert row[0] == l_condition_names[i-2].get_attribute("innerHTML")
+                assert row[1] == str(l_yields[i-2].get_property("value"))
+                assert row[2] == str(l_deviations[i-2].get_property("value"))
+                continue
 
 
 def _get_num_cond_desc_rows(driver: WebDriver):
