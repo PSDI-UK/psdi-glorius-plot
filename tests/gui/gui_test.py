@@ -277,7 +277,9 @@ def test_navigate_header(driver: WebDriver):
         return [x for x in l_header_links if x.text == text][0]
 
     def _click_header_link(text: str, url_segment: str):
-        _find_header_link(text).click()
+        el = _find_header_link(text)
+        scroll_element_into_view(driver, el)
+        el.click()
         WebDriverWait(driver, 10).until(EC.url_contains(url_segment))
 
     # Test that we can navigate to the Documentation page through the header link
@@ -320,6 +322,31 @@ def test_light_dark_mode(driver: WebDriver):
     # And finally check that the sun icon has returned
     wait_for_element(driver, "//button[contains(@class,'color-mode-toggle')]" +
                      "//img[contains(@class,'lm-only')]", wait_for_clickable=True)
+
+
+def test_navigate_policies(driver: WebDriver):
+    """Test that the user can navigate to the PSDI policies via footer links"""
+
+    def _find_footer_link(text: str):
+        # Get a list of links in the header, and find the one whose text matches the desired value
+        l_footer_links = driver.find_elements(By.CSS_SELECTOR, "ul.footer__items a")
+        return [x for x in l_footer_links if x.text == text][0]
+
+    def _click_footer_link(text: str, url_segment: str):
+        el = _find_footer_link(text)
+        scroll_element_into_view(driver, el)
+        el.click()
+        WebDriverWait(driver, 10).until(EC.url_contains(url_segment))
+
+    # Test that we can navigate to the Privacy policy via the footer link
+    _init_page(driver)
+    _click_footer_link("Privacy", "www.psdi.ac.uk/privacy/")
+    assert (wait_for_element(driver, "//h1")).text == "Privacy policy"
+
+    # Test that we can navigate to the Terms and Conditions via the footer link
+    _init_page(driver)
+    _click_footer_link("Terms and Conditions", "www.psdi.ac.uk/terms-and-conditions/")
+    assert (wait_for_element(driver, "//h1")).text == "Terms & Conditions"
 
 
 def test_outcome_select(driver: WebDriver):
