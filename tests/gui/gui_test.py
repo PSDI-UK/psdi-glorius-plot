@@ -3,6 +3,7 @@
 # Selenium test script for PSDI Glorius Plot Generator Service.
 
 import csv
+import json
 import math
 import os
 import re
@@ -67,7 +68,7 @@ DOWNLOAD_LOCATION = "/tmp"
 PLOT_PNG_FILE, PLOT_PNG_QUAL_FILE = _local_and_qual("glorius_plot.png", DOWNLOAD_LOCATION)
 PLOT_SVG_FILE, PLOT_SVG_QUAL_FILE = _local_and_qual("glorius_plot.svg", DOWNLOAD_LOCATION)
 
-SAVE_FILE = "glorius_plot_data.json"
+SAVE_FILE, SAVE_QUAL_FILE = _local_and_qual("glorius_plot_data.json", DOWNLOAD_LOCATION)
 
 RC_FILE_PATTERN = re.compile(r"\d{4}-\d\d-\d\d-\d{6}-glorius-plot-ro-crate\.zip")
 
@@ -1121,10 +1122,8 @@ def test_dirty_forms(driver: WebDriver):
 def test_save_load_data(driver: WebDriver):
     """Test that we can save and load data entered in the plot"""
 
-    qualified_save_filename = os.path.join(DOWNLOAD_LOCATION, SAVE_FILE)
-
     # If the save file already exists, remove it
-    _clear_download(qualified_save_filename)
+    _clear_download(SAVE_QUAL_FILE)
     _init_page(driver)
 
     # We want to change pretty much every aspect of the plot away from details, then test
@@ -1190,7 +1189,7 @@ def test_save_load_data(driver: WebDriver):
     # Now save the plot
     save_button = wait_for_element(driver, "//button[@id='save-data']")
     save_button.click()
-    _wait_for_download(qualified_save_filename)
+    _wait_for_download(SAVE_QUAL_FILE)
 
     # Overwrite the data by filling with example data
     _fill_example_data(driver)
@@ -1202,7 +1201,7 @@ def test_save_load_data(driver: WebDriver):
     time.sleep(PLOT_GENERATION_TIME)
 
     # Now load the saved data
-    wait_for_element(driver, "//input[@id='load-data-file']").send_keys(qualified_save_filename)
+    wait_for_element(driver, "//input[@id='load-data-file']").send_keys(SAVE_QUAL_FILE)
     time.sleep(PLOT_GENERATION_TIME)
 
     # Check that all data we entered before has now been reloaded
@@ -1363,8 +1362,8 @@ class TestRoCrateContents:
         shutil.unpack_archive(rocrate_qual_file, extract_dir=os.path.join(DOWNLOAD_LOCATION, RC_EXTRACT_DIR))
 
     def test_sens_table(self, driver: WebDriver):
-        """Test that the contents of the generated RO-Crate data package match what the user input"""
-        # Load the sensitivity table extracted from the RO-Crate and check it's as expected
+        """Test that the sensitivity table in the RO-Crate data package is correct"""
+
         with open(RC_TABLE_QUAL_FILE) as fi:
             csv_reader = csv.reader(fi)
             l_condition_names = driver.find_elements(By.CSS_SELECTOR, ".condition-input p")
@@ -1391,6 +1390,22 @@ class TestRoCrateContents:
                 assert row[1] == str(l_yields[i-2].get_property("value"))
                 assert row[2] == str(l_deviations[i-2].get_property("value"))
                 continue
+
+    def test_user_prefs(self, driver: WebDriver):
+        """Test that the user preferences file in the RO-Crate data package is correct"""
+
+        # The easiest way to check this is correct is to compare to a save file
+        _clear_download(SAVE_QUAL_FILE)
+        wait_for_element(driver, "//button[@id='save-data']").click()
+        _wait_for_download(SAVE_QUAL_FILE)
+
+        save_file = json.load(open(SAVE_QUAL_FILE))
+        prefs_file = json.load(open(RC_PREF_QUAL_FILE))
+
+        # Check that all the items in the preferences file match those in the save file
+        # The save file will also contain the sensitivity table, but we don't need to worry about that
+        for key, val in prefs_file.items():
+            assert val == save_file[key]
 
 
 def _get_num_cond_desc_rows(driver: WebDriver):
