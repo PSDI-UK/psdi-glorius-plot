@@ -261,7 +261,10 @@ def test_initial_frontpage(driver: WebDriver):
 
 
 def test_navigate_home(driver: WebDriver):
-    """Test that the user can navigate from the page to the PSDI home page"""
+    """Test that the user can navigate from the page to the PSDI home page using the logo in the header"""
+    _init_page(driver)
+    wait_for_element(driver, "//a[contains(@class,'navbar__logo')]").click()
+    assert (wait_for_element(driver, "//h1")).text == "Physical Sciences Data Infrastructure"
 
 
 def test_outcome_select(driver: WebDriver):
