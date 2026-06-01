@@ -272,12 +272,9 @@ def test_navigate_header(driver: WebDriver):
     _init_page(driver)
 
     def _find_header_link(text: str):
-        # Get a list of links in the header, and construct a dict keyed on their text
+        # Get a list of links in the header, and find the one whose text matches the desired value
         l_header_links = driver.find_elements(By.CSS_SELECTOR, ".navbar__link")
-        d_header_links = {x.text: x for x in l_header_links}
-
-        # Try clicking on the Documentation link, and check that this takes us to the Documentation page
-        return d_header_links[text]
+        return [x.text for x in l_header_links if x.text == text][0]
 
     def _click_header_link(text: str, rel_url: str):
         _find_header_link(text).click()
