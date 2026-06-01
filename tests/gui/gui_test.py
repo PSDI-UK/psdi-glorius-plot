@@ -305,6 +305,23 @@ def test_navigate_header(driver: WebDriver):
             ).text == "PSDI Glorius Plot Generator: Feedback Form"
 
 
+def test_light_dark_mode(driver: WebDriver):
+    """Test that the light/dark mode toggle in the header behaves as expected"""
+    _init_page(driver)
+
+    # Check that we initially find the sun icon to toggle to dark mode, then click it to toggle
+    wait_for_element(driver, "//button[contains(@class,'color-mode-toggle')]" +
+                     "//img[contains(@class,'lm-only')]", wait_for_clickable=True).click()
+
+    # Now check for the moon icon to toggle to light mode, and try clicking it as well
+    wait_for_element(driver, "//button[contains(@class,'color-mode-toggle')]" +
+                     "//img[contains(@class,'dm-only')]", wait_for_clickable=True).click()
+
+    # And finally check that the sun icon has returned
+    wait_for_element(driver, "//button[contains(@class,'color-mode-toggle')]" +
+                     "//img[contains(@class,'lm-only')]", wait_for_clickable=True)
+
+
 def test_outcome_select(driver: WebDriver):
     """Test that the outcome can be changed to produce desired effects - showing/hiding custom input, updating text
     of coloumn in table, etc.
