@@ -252,7 +252,6 @@ def _init_page(driver):
 
 def test_initial_frontpage(driver: WebDriver):
     """A basic unit test that checks that the front page is displayed with the expected content"""
-
     _init_page(driver)
 
     # Check that the front page contains expected elements
@@ -269,7 +268,6 @@ def test_outcome_select(driver: WebDriver):
     """Test that the outcome can be changed to produce desired effects - showing/hiding custom input, updating text
     of coloumn in table, etc.
     """
-
     _init_page(driver)
 
     # Get the select box used for the outcome
@@ -316,7 +314,6 @@ def _set_num_condition_rows(driver: WebDriver, n: int):
 
 def test_num_conditions_control(driver: WebDriver):
     """Test that adding/removing/setting condition rows works as expected"""
-
     _init_page(driver)
 
     # Check that we start with 5 rows
@@ -358,7 +355,6 @@ def _set_num_sample_columns(driver: WebDriver, n: int):
 
 def test_num_samples_control(driver: WebDriver):
     """Test that adding/removing/setting sample columns works as expected"""
-
     _init_page(driver)
 
     # Check that we start with 1 column
@@ -411,7 +407,6 @@ def test_num_samples_control(driver: WebDriver):
 
 def test_table_navigation(driver: WebDriver):
     """Test that the table can be navigated as expected with tab and enter"""
-
     _init_page(driver)
 
     def _send_keys(keys: str, shift: bool = False):
@@ -577,7 +572,6 @@ def _check_value_outline_presence(driver: WebDriver, present=True):
 
 def test_value_to_plot_option(driver: WebDriver):
     """Test that the radio input to select which value to plot works as expected"""
-
     _init_page(driver)
 
     mean_radio = wait_for_element(driver, "//input[@id='plot-mean']")
@@ -645,7 +639,6 @@ def test_value_to_plot_option(driver: WebDriver):
 
 def test_calcs(driver: WebDriver):
     """Test that values in the plot are calculated properly"""
-
     _init_page(driver)
 
     # Size the table so we have 10 rows and columns
@@ -746,7 +739,6 @@ def _set_axis_fontsize(driver: WebDriver, x: float):
 
 def test_fan_plot_controls(driver: WebDriver):
     """Test that toggling fan plot mode makes the radar-plot-specific controls disappear"""
-
     _init_page(driver)
 
     # Toggle fan plot mode, checking that nothing goes wrong when we do so
@@ -759,7 +751,6 @@ def test_fan_plot_controls(driver: WebDriver):
 
 def test_plot_sizing(driver: WebDriver):
     """Test that we can resize the plot properly"""
-
     _init_page(driver)
 
     init_plot_width = 600
@@ -913,7 +904,6 @@ def test_download_plot(driver: WebDriver):
 
     # If the downloaded files already exists, remove them
     _clear_download(PLOT_PNG_QUAL_FILE, PLOT_SVG_QUAL_FILE)
-
     _init_page(driver)
 
     # Wait a moment after the page loads so the plot can be generated
@@ -992,7 +982,6 @@ def test_download_plot(driver: WebDriver):
 
 def test_dirty_forms(driver: WebDriver):
     """Run tests that an alert pops up to warn the user before leaving when they've entered data in the form"""
-
     _init_page(driver)
 
     # Input some data into the form
@@ -1044,7 +1033,6 @@ def test_save_load_data(driver: WebDriver):
 
     # If the save file already exists, remove it
     _clear_download(qualified_save_filename)
-
     _init_page(driver)
 
     # We want to change pretty much every aspect of the plot away from details, then test
@@ -1162,7 +1150,6 @@ def test_rocrate_form(driver: WebDriver):
     """Test that the RO-Crate export form is initially hidden but becomes visible when the button is clicked to start
     exporting it
     """
-
     _init_page(driver)
 
     # Check that the RO-Crate export section is initially hidden
@@ -1187,7 +1174,6 @@ def _clear_downloaded_rocrate():
 
 def _init_rocrate_export(driver: WebDriver, fill_example=False):
     """Set up the page and the RO-Crate export section"""
-
     _init_page(driver)
 
     _clear_downloaded_rocrate()
