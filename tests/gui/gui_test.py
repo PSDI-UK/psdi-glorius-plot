@@ -276,9 +276,9 @@ def test_navigate_header(driver: WebDriver):
         l_header_links = driver.find_elements(By.CSS_SELECTOR, ".navbar__link")
         return [x for x in l_header_links if x.text == text][0]
 
-    def _click_header_link(text: str, rel_url: str):
+    def _click_header_link(text: str, url_segment: str):
         _find_header_link(text).click()
-        WebDriverWait(driver, 10).until(EC.url_contains(rel_url))
+        WebDriverWait(driver, 10).until(EC.url_contains(url_segment))
 
     # Test that we can navigate to the Documentation page through the header link
     _click_header_link("Documentation", "documentation.html")
@@ -293,6 +293,16 @@ def test_navigate_header(driver: WebDriver):
     driver.find_element(By.CSS_SELECTOR, ".navbar__title").click()
     WebDriverWait(driver, 10).until(EC.url_contains("index.html"))
     assert (wait_for_element(driver, "//h1")).text == "PSDI Glorius Plot Generator"
+
+    # Test using the header link to go to the Organic Toolkit Home page
+    _click_header_link("Organic Toolkit Home", "organic-toolkit.psdi.ac.uk")
+    assert (wait_for_element(driver, "//h1")).text == "PSDI Organic Toolkit"
+
+    # Test using the header link to get to the Provide Feedback form
+    _init_page(driver)
+    _click_header_link("Provide Feedback", "forms.office.com/pages/responsepage.aspx")
+    assert (wait_for_element(driver, "//div[@id='FormTitleId_titleAriaId']/div/span/b/span")
+            ).text == "PSDI Glorius Plot Generator: Feedback Form"
 
 
 def test_outcome_select(driver: WebDriver):
