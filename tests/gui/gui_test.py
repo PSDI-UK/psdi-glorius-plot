@@ -288,6 +288,12 @@ def test_navigate_header(driver: WebDriver):
     _click_header_link("Home", "index.html")
     assert (wait_for_element(driver, "//h1")).text == "PSDI Glorius Plot Generator"
 
+    # Now try instead clicking the title link on the Documentation page
+    _click_header_link("Documentation", "documentation.html")
+    driver.find_element(By.CSS_SELECTOR, ".navbar__title").click()
+    WebDriverWait(driver, 10).until(EC.url_contains("index.html"))
+    assert (wait_for_element(driver, "//h1")).text == "PSDI Glorius Plot Generator"
+
 
 def test_outcome_select(driver: WebDriver):
     """Test that the outcome can be changed to produce desired effects - showing/hiding custom input, updating text
