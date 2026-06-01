@@ -274,7 +274,7 @@ def test_navigate_header(driver: WebDriver):
     def _find_header_link(text: str):
         # Get a list of links in the header, and find the one whose text matches the desired value
         l_header_links = driver.find_elements(By.CSS_SELECTOR, ".navbar__link")
-        return [x.text for x in l_header_links if x.text == text][0]
+        return [x for x in l_header_links if x.text == text][0]
 
     def _click_header_link(text: str, rel_url: str):
         _find_header_link(text).click()
