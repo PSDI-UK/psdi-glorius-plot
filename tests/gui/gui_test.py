@@ -64,6 +64,14 @@ def _local_and_qual(local: str, path: str):
     return local, os.path.join(path, local)
 
 
+# Reused regexes
+HTML_TAG_PATTERN = re.compile(r"<[^>]+>(.*?)<\/[^>]+>")
+EM_TAG_PATTERN = re.compile(r"<\/?em>")
+STRONG_TAG_PATTERN = re.compile(r"<\/?strong>")
+U_TAG_PATTERN = re.compile(r"<\/?u>")
+SUB_TAG_PATTERN = re.compile(r"<\/?sub>")
+SUP_TAG_PATTERN = re.compile(r"<\/?sup>")
+
 # Constants related to downloaded files and RO-Crate structure
 DOWNLOAD_LOCATION = "/tmp"
 PLOT_PNG_FILE, PLOT_PNG_QUAL_FILE = _local_and_qual("glorius_plot.png", DOWNLOAD_LOCATION)
@@ -1411,11 +1419,26 @@ class RoCrateContentsTester:
     @staticmethod
     def _strip_tags(x: str):
         """Strip all HTML tags from a string"""
-        tag_match = re.compile(r"<[^>]+>(.*?)<\/[^>]+>")
         last_x = ""
         while last_x != x:
             last_x = x
-            x = re.sub(tag_match, r"\1", x)
+            x = re.sub(HTML_TAG_PATTERN, r"\1", x)
+        return x
+
+    @staticmethod
+    def _html_to_md(x: str):
+        """Convert an HTML string to Markdown"""
+
+        # First, sanitise any characters in the string which would be misinterpreted as MD syntax
+        x = re.sub(re.compile(r"([*~^])"), r"\1", x)
+
+        # Then convert HTML markup to Markdown where the latter exists, or else remove it
+        x = re.sub(EM_TAG_PATTERN, "*", x)
+        x = re.sub(STRONG_TAG_PATTERN, "**", x)
+        x = re.sub(U_TAG_PATTERN, "", x)
+        x = re.sub(SUB_TAG_PATTERN, "~", x)
+        x = re.sub(SUP_TAG_PATTERN, "^", x)
+
         return x
 
 
