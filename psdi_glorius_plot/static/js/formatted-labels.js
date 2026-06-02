@@ -480,12 +480,10 @@ export function HTMLToTex(s) {
  */
 export function HTMLToMd(s) {
 
-  // The first few lines here sanitise input so it won't be mistaken as Md syntax. Note that backticks (`) are
+  // The first line here sanitises input so it won't be mistaken as Md syntax. Note that backticks (`) are
   // deliberately NOT sanitised - these are used so rarely that if they are present, it's probably because the user does
   // intend for them to be used as Markdown syntax
-  s = s.replaceAll("*", "\\*")
-    .replaceAll("~", "\\~")
-    .replaceAll("^", "\\^")
+  s = s.replaceAll(/([*~^])/g, "\\$1")
     // The remaining lines convert HTML tags to equivalent Markdown where the latter exists, removing it when not
     .replaceAll(/<\/?em>/g, "*")
     .replaceAll(/<\/?strong>/g, "**")
