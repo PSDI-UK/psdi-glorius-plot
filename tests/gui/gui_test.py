@@ -1461,6 +1461,19 @@ class TestRoCrateContents:
         # that the file size is close
         assert math.isclose(os.path.getsize(extracted_image_filename), os.path.getsize(EXAMPLE_PNG), rel_tol=0.05)
 
+    def test_glorius_plot_image(self):
+        """Test that the Glorius plot image contained within the ESI.pdf file in the RO-Crate matches that generated"""
+
+        extracted_image_filename = os.path.join(DOWNLOAD_LOCATION, "extracted_plot.png")
+        _clear_download(extracted_image_filename)
+        self._extract_image_from_pdf(RC_ESI_QUAL_FILE, 0, extracted_image_filename)
+
+        # Since the file contained in the RO-Crate is checked to be correct in an above test, we compare with it here
+        # The file gets slightly changed when embedded in the PDF, so we can test for an exact match. Instead we check
+        # that the file size is close
+        assert math.isclose(os.path.getsize(extracted_image_filename),
+                            os.path.getsize(RC_PLOT_QUAL_FILE), rel_tol=0.05)
+
 
 def _get_num_cond_desc_rows(driver: WebDriver):
     l_e = driver.find_elements(By.XPATH, "//tr[contains(@class,'rocrate-cond-row')]")
