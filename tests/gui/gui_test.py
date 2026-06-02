@@ -1624,7 +1624,7 @@ class TestRoCrateMaximal(RoCrateContentsTester):
     def test_description(self, driver: WebDriver):
         """Test that the provided description is present in the data package where expected"""
 
-        # Get the title in HTML markup from the user input
+        # Get the description in HTML markup from the user input
         html_desc = driver.find_element(
             By.CSS_SELECTOR, "#rocrate-desc-input>.ql-editor>p").get_property("innerHTML")
 
@@ -1634,6 +1634,16 @@ class TestRoCrateMaximal(RoCrateContentsTester):
         # Check for it in the ro-crate-metadata.json file
         metadata_file = json.load(open(RC_METADATA_QUAL_FILE))
         assert metadata_file["@graph"][0]["description"] == self._strip_tags(html_desc)
+
+    def test_about(self, driver: WebDriver):
+        """Test that the provided "About" text is present in the data package where expected"""
+
+        # Get the about text in HTML markup from the user input
+        html_about = driver.find_element(
+            By.CSS_SELECTOR, "#rocrate-about>.ql-editor>p").get_property("innerHTML")
+
+        # Check for it in the README.md file
+        assert "\n\n**About**: " + self._html_to_md(html_about, True) in open(RC_README_QUAL_FILE).read()
 
 
 class TestRoCrateMinimal(RoCrateContentsTester):
