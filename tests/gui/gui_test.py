@@ -1382,19 +1382,41 @@ class RoCrateContentsTester:
         return None
 
     @staticmethod
-    def _find_text_in_pdf(pdf_filename: str, match: str | re.Pattern[str]):
+    def _find_text_in_pdf(pdf_filename: str, match: str | re.Pattern[str], append_next_page=False) -> str | None:
         """Find where a text string or regex occurs in a PDF and returns the text of the page where it's found"""
+
         pdf_reader = PdfReader(pdf_filename)
-        for page in pdf_reader.pages:
+        i_match = None
+        text_match = None
+        for i, page in enumerate(pdf_reader.pages):
             text = page.extract_text()
             if isinstance(match, str):
                 if match in text:
-                    return text
+                    i_match = i
+                    text_match = text
+                    break
             elif match.match(text):
-                return text
+                text_match = text
+                break
 
-        # If we get here, the text wasn't found so return None to indicate this
-        return None
+        if i_match is None:
+            return None
+        elif not append_next_page:
+            return text_match
+
+        if i_match < len(pdf_reader.pages)-1:
+            return text_match + pdf_reader.pages[i+1].extract_text()
+        return text_match
+
+    @staticmethod
+    def _strip_tags(x: str):
+        """Strip all HTML tags from a string"""
+        tag_match = re.compile(r"<[^>]+>(.*?)<\/[^>]+>")
+        last_x = ""
+        while last_x != x:
+            last_x = x
+            x = re.sub(tag_match, r"\1", x)
+        return x
 
 
 class TestRoCrateMaximal(RoCrateContentsTester):
@@ -1516,6 +1538,40 @@ class TestRoCrateMaximal(RoCrateContentsTester):
         sample_text = standard_conditions_input.split("<")[0][0:20]
         assert self._find_text_in_pdf(RC_ESI_QUAL_FILE, sample_text)
 
+    def test_test_conditions(self, driver: WebDriver):
+        """Test that the test conditions and their descriptions provided by the user are found in the applicable file
+        and in the ESI.pdf file"""
+
+        l_condition_names = driver.find_elements(By.CSS_SELECTOR, ".condition-input>.ql-editor>p")
+        l_condition_descs = driver.find_elements(By.CSS_SELECTOR,
+                                                 ".rocrate-cond-desc-input>.ql-editor>p")
+
+        # Check the Test Conditions csv file first
+        with open(RC_TEST_COND_QUAL_FILE) as fi:
+            csv_reader = csv.reader(fi)
+            for i, row in enumerate(csv_reader):
+                if i == 0:
+                    # In the first row, check the header is as expected
+                    assert row[0] == "Test parameter"
+                    assert row[1] == "Experimental conditions"
+                    continue
+
+                # In subsequent rows, check the contents match what's entered in the table for each condition
+                assert row[0] == l_condition_names[i-1].get_attribute("innerHTML")
+                assert row[1] == l_condition_descs[i-1].get_attribute("innerHTML")
+                continue
+
+        # Now check for it in the ESI.pdf file as well
+
+        # Look for the heading of this section, and extract the text of the page it's on and the following page as well,
+        # which should contain the full table
+        pdf_text = self._find_text_in_pdf(RC_ESI_QUAL_FILE, "Preparation of sensitivity assessment of reaction",
+                                          append_next_page=True)
+        assert pdf_text
+        for name, desc in zip(l_condition_names, l_condition_descs):
+            assert self._strip_tags(name.get_attribute("innerHTML")) in pdf_text
+            assert self._strip_tags(desc.get_attribute("innerHTML")) in pdf_text
+
 
 class TestRoCrateMinimal(RoCrateContentsTester):
     """This class tests that an RO-Crate without all data filled in will be missing elements that are only present when
@@ -1551,6 +1607,16 @@ class TestRoCrateMinimal(RoCrateContentsTester):
         # text to match here, so we just look for the heading (the text "Standard Conditions" may appear elsewhere in
         # the PDF, but only in this section heading should it have a newline on either side)
         assert not self._find_text_in_pdf(RC_ESI_QUAL_FILE, "\nStandard conditions\n")
+
+    def test_test_conditions_absent(self):
+        """Test that if no test condition descriptions are provided by the user, no file is made for them and no section
+        is present in the ESI.pdf file"""
+
+        # Check the Test Conditions csv file first
+        assert not os.path.isfile(RC_TEST_COND_QUAL_FILE)
+
+        # Check that the section isn't present in the ESI.pdf file
+        assert not self._find_text_in_pdf(RC_ESI_QUAL_FILE, "Preparation of sensitivity assessment of reaction")
 
 
 def _get_num_cond_desc_rows(driver: WebDriver):
