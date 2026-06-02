@@ -1352,15 +1352,40 @@ def test_rocrate_download_valid(driver: WebDriver):
     assert _validate_rocrate_file(rocrate_qual_file), f"RO-Crate file {rocrate_qual_file} failed validation"
 
 
-class TestRoCrateContents:
+class RoCrateContentsTester:
+
+    fill_example: bool
 
     @pytest.fixture(scope="class", autouse=True)
     def init_rocrate(self, driver: WebDriver):
         """Prepare and extract the RO-Crate we want to check using default data"""
-        _init_rocrate_export(driver, fill_example=True)
+        _init_rocrate_export(driver, fill_example=self.fill_example)
         wait_for_element(driver, "//button[@id='rocrate-download']").click()
         rocrate_qual_file = _wait_for_download(RC_FILE_PATTERN, TIMEOUT_LONG)
         shutil.unpack_archive(rocrate_qual_file, extract_dir=os.path.join(DOWNLOAD_LOCATION, RC_EXTRACT_DIR))
+
+    @staticmethod
+    def _extract_image_from_pdf(pdf_filename, target_image_index, image_filename):
+        """Extract an image from a PDF, saving it in a file"""
+        _clear_download(image_filename)
+        pdf_reader = PdfReader(pdf_filename)
+        image_index = 0
+        for page in pdf_reader.pages:
+            for image_file_object in page.images:
+                if image_index < target_image_index:
+                    image_index += 1
+                    continue
+                image_file_object.image.save(image_filename)
+                return image_file_object.data
+
+        # If we get here, no image at this index was found, so return None to indicate this
+        return None
+
+
+class TestRoCrateMaximal(RoCrateContentsTester):
+    """This class tests that an RO-Crate with all data filled in contains all the expected values"""
+
+    fill_example = True
 
     def test_sens_table(self, driver: WebDriver):
         """Test that the sensitivity table in the RO-Crate data package is correct"""
@@ -1431,30 +1456,11 @@ class TestRoCrateContents:
 
         assert rocrate_scheme == example_scheme
 
-    @staticmethod
-    def _extract_image_from_pdf(pdf_filename, image_index, image_filename):
-        """Extract an image from a PDF, saving it in a file"""
-        pdf_reader = PdfReader(pdf_filename)
-        target_image_index = 0
-        for page in pdf_reader.pages:
-            for image_file_object in page.images:
-                if image_index < target_image_index:
-                    image_index += 1
-                    continue
-                image_file_object.image.save(image_filename)
-                break
-            else:
-                continue
-            # If the nested for loop is broken out of, this branch will be reached, and we break out of the parent for
-            # loop too
-            break
-
     def test_reaction_image(self):
         """Test that the reaction image contained within the ESI.pdf file in the RO-Crate matches that uploaded by the
         user"""
 
         extracted_image_filename = os.path.join(DOWNLOAD_LOCATION, "extracted_scheme.png")
-        _clear_download(extracted_image_filename)
         self._extract_image_from_pdf(RC_ESI_QUAL_FILE, 0, extracted_image_filename)
 
         # The file gets slightly changed when embedded in the PDF, so we can test for an exact match. Instead we check
@@ -1465,7 +1471,6 @@ class TestRoCrateContents:
         """Test that the Glorius plot image contained within the ESI.pdf file in the RO-Crate matches that generated"""
 
         extracted_image_filename = os.path.join(DOWNLOAD_LOCATION, "extracted_plot.png")
-        _clear_download(extracted_image_filename)
         self._extract_image_from_pdf(RC_ESI_QUAL_FILE, 0, extracted_image_filename)
 
         # Since the file contained in the RO-Crate is checked to be correct in an above test, we compare with it here
@@ -1473,6 +1478,32 @@ class TestRoCrateContents:
         # that the file size is close
         assert math.isclose(os.path.getsize(extracted_image_filename),
                             os.path.getsize(RC_PLOT_QUAL_FILE), rel_tol=0.05)
+
+
+class TestRoCrateMinimal(RoCrateContentsTester):
+    """This class tests that an RO-Crate without all data filled in will be missing elements that are only present when
+    provided"""
+
+    fill_example = False
+
+    def test_reaction_scheme_absent(self):
+        """Test that no reaction scheme file was found in the RO-Crate"""
+
+        assert not os.path.isfile(RC_SCHEME_QUAL_FILE)
+
+    def test_reaction_image_absent(self):
+        """Test that no reaction scheme image was found in the RO-Crate"""
+
+        # To ensure the reaction image isn't in the EDI.pdf file, we loop through it to extract all images and check
+        # that none of them match the reaction image
+
+        extracted_image_filename = os.path.join(DOWNLOAD_LOCATION, "extracted_scheme.png")
+
+        i = 0
+        while self._extract_image_from_pdf(RC_ESI_QUAL_FILE, i, extracted_image_filename):
+            assert not math.isclose(os.path.getsize(extracted_image_filename),
+                                    os.path.getsize(EXAMPLE_PNG), rel_tol=0.05)
+            i += 1
 
 
 def _get_num_cond_desc_rows(driver: WebDriver):
