@@ -1381,6 +1381,21 @@ class RoCrateContentsTester:
         # If we get here, no image at this index was found, so return None to indicate this
         return None
 
+    @staticmethod
+    def _find_text_in_pdf(pdf_filename: str, match: str | re.Pattern[str]):
+        """Find where a text string or regex occurs in a PDF and returns the text of the page where it's found"""
+        pdf_reader = PdfReader(pdf_filename)
+        for page in pdf_reader.pages:
+            text = page.extract_text()
+            if isinstance(match, str):
+                if match in text:
+                    return text
+            elif match.match(text):
+                return text
+
+        # If we get here, the text wasn't found so return None to indicate this
+        return None
+
 
 class TestRoCrateMaximal(RoCrateContentsTester):
     """This class tests that an RO-Crate with all data filled in contains all the expected values"""
@@ -1479,6 +1494,28 @@ class TestRoCrateMaximal(RoCrateContentsTester):
         assert math.isclose(os.path.getsize(extracted_image_filename),
                             os.path.getsize(RC_PLOT_QUAL_FILE), rel_tol=0.05)
 
+    def test_standard_conditions(self, driver: WebDriver):
+        """Test that the provided standard conditions are provided in the RO-Crate in their own file and in the ESI.pdf
+        file"""
+
+        # Get the conditions text from the input on the page
+        standard_conditions_input = driver.find_element(
+            By.CSS_SELECTOR, "#rocrate-baseline-desc>div.ql-editor>p").get_property("innerHTML")
+
+        # Read in the standard conditions file from the RO-Crate, and check that the input text is found in it
+        standard_conditions_output_html = open(RC_STANDARD_COND_QUAL_FILE).read()
+        assert standard_conditions_input in standard_conditions_output_html
+
+        # Now check through the ESI.pdf file to find the standard conditions text. Start by looking for the heading
+        # (the text "Standard Conditions" may appear elsewhere in the PDF, but only in this section heading should it
+        # have a newline on either side)
+        assert self._find_text_in_pdf(RC_ESI_QUAL_FILE, "\nStandard conditions\n")
+
+        # Check that the text describing the standard conditions is found as well. This won't appear exactly due to
+        # formatting differences, so we just look for the first few characters (before any formatting)
+        sample_text = standard_conditions_input.split("<")[0][0:20]
+        assert self._find_text_in_pdf(RC_ESI_QUAL_FILE, sample_text)
+
 
 class TestRoCrateMinimal(RoCrateContentsTester):
     """This class tests that an RO-Crate without all data filled in will be missing elements that are only present when
@@ -1504,6 +1541,16 @@ class TestRoCrateMinimal(RoCrateContentsTester):
             assert not math.isclose(os.path.getsize(extracted_image_filename),
                                     os.path.getsize(EXAMPLE_PNG), rel_tol=0.05)
             i += 1
+
+    def test_standard_conditions_absent(self):
+        """Test that the standard conditions file is not present in the output RO-Crate or ESI.pdf file"""
+
+        assert not os.path.isfile(RC_STANDARD_COND_QUAL_FILE)
+
+        # Now check through the ESI.pdf file to make sure we don'tfind the standard conditions text. There's no input
+        # text to match here, so we just look for the heading (the text "Standard Conditions" may appear elsewhere in
+        # the PDF, but only in this section heading should it have a newline on either side)
+        assert not self._find_text_in_pdf(RC_ESI_QUAL_FILE, "\nStandard conditions\n")
 
 
 def _get_num_cond_desc_rows(driver: WebDriver):
