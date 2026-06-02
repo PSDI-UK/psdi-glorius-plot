@@ -1645,6 +1645,20 @@ class TestRoCrateMaximal(RoCrateContentsTester):
         # Check for it in the README.md file
         assert "\n\n**About**: " + self._html_to_md(html_about, True) in open(RC_README_QUAL_FILE).read()
 
+    def test_license(self, driver: WebDriver):
+        """Test that the provided license name and link are present in the data package where expected"""
+
+        # Get the license name and description in HTML markup from the user input
+        license_name: str = driver.find_element(By.CSS_SELECTOR, "#rocrate-license-name").get_property("value")
+        license_url: str = driver.find_element(By.CSS_SELECTOR, "#rocrate-license-url").get_property("value")
+
+        # Check for it in the README.md file
+        assert ("**License:** [" + license_name + "](" + license_url + ")") in open(RC_README_QUAL_FILE).read()
+
+        # Check for it in the ro-crate-metadata.json file
+        metadata_file = json.load(open(RC_METADATA_QUAL_FILE))
+        assert metadata_file["@graph"][0]["license"]["@id"] == license_url
+
 
 class TestRoCrateMinimal(RoCrateContentsTester):
     """This class tests that an RO-Crate without all data filled in will be missing elements that are only present when
