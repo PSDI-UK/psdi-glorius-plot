@@ -1621,6 +1621,20 @@ class TestRoCrateMaximal(RoCrateContentsTester):
         metadata_file = json.load(open(RC_METADATA_QUAL_FILE))
         assert metadata_file["@graph"][0]["name"] == self._strip_tags(html_title)
 
+    def test_description(self, driver: WebDriver):
+        """Test that the provided description is present in the data package where expected"""
+
+        # Get the title in HTML markup from the user input
+        html_desc = driver.find_element(
+            By.CSS_SELECTOR, "#rocrate-desc-input>.ql-editor>p").get_property("innerHTML")
+
+        # Check for it in the README.md file
+        assert "\n\n**Description**: " + self._html_to_md(html_desc, True) in open(RC_README_QUAL_FILE).read()
+
+        # Check for it in the ro-crate-metadata.json file
+        metadata_file = json.load(open(RC_METADATA_QUAL_FILE))
+        assert metadata_file["@graph"][0]["description"] == self._strip_tags(html_desc)
+
 
 class TestRoCrateMinimal(RoCrateContentsTester):
     """This class tests that an RO-Crate without all data filled in will be missing elements that are only present when
