@@ -1659,6 +1659,34 @@ class TestRoCrateMaximal(RoCrateContentsTester):
         metadata_file = json.load(open(RC_METADATA_QUAL_FILE))
         assert metadata_file["@graph"][0]["license"]["@id"] == license_url
 
+    def test_contribs(self, driver: WebDriver):
+        """Test that the provided author names and links are present in the RO-Crate where expected"""
+
+        # Get lists of the author name and links
+        l_contrib_names: list[str] = [x.get_property("value") for x in driver.find_elements(
+            By.CSS_SELECTOR, ".rocrate-name-input")]
+        l_contrib_orcids: list[str] = [x.get_property("value") for x in driver.find_elements(
+            By.CSS_SELECTOR, ".rocrate-orcid-input")]
+
+        # Load from the various sources where we'll be checking for author info
+        esi_text = self._find_text_in_pdf(RC_ESI_QUAL_FILE, "Bibliographic Information\n", True)
+        readme_text = open(RC_README_QUAL_FILE).read()
+        l_metadata_authors = [x["@id"] for x in json.load(open(RC_METADATA_QUAL_FILE))["@graph"][0]["author"]]
+
+        # Check that each author is present in each source
+        for name, orcid in zip(l_contrib_names, l_contrib_orcids):
+
+            # Get the link based on the ORCID
+            link: str
+            if not orcid.startswith("http"):
+                link = "https://orcid.org/" + orcid
+            else:
+                link = orcid
+
+            assert name in esi_text
+            assert ("**Name**: [" + name + "](" + link + ")") in readme_text
+            assert link in l_metadata_authors
+
 
 class TestRoCrateMinimal(RoCrateContentsTester):
     """This class tests that an RO-Crate without all data filled in will be missing elements that are only present when
