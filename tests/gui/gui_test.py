@@ -1687,6 +1687,18 @@ class TestRoCrateMaximal(RoCrateContentsTester):
             assert ("**Name**: [" + name + "](" + link + ")") in readme_text
             assert link in l_metadata_authors
 
+    def test_contact(self, driver: WebDriver):
+        """Test that the provided contact email is present in the data package where expected"""
+
+        # Get the email from the user input
+        email = driver.find_element(By.CSS_SELECTOR, "#rocrate-email-input").get_property("value")
+
+        # Check for the title in the ESI.pdf file
+        assert self._find_text_in_pdf(RC_ESI_QUAL_FILE, "Contact: " + email + ".\n")
+
+        # Check for it in the README.md file
+        assert "**Contact**: " + email in open(RC_README_QUAL_FILE).read()
+
 
 class TestRoCrateMinimal(RoCrateContentsTester):
     """This class tests that an RO-Crate without all data filled in will be missing elements that are only present when
