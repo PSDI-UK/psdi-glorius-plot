@@ -158,7 +158,7 @@ def driver():
 
     # The below is the likely installed path of the driver, which can be uncommented when testing locally to speed
     # things up and avoid bugs caused by being API rate limited
-    driver_path = os.environ.get("HOME") + "/.wdm/drivers/geckodriver/linux64/v0.36.0/geckodriver"
+    # driver_path = os.environ.get("HOME") + "/.wdm/drivers/geckodriver/linux64/v0.36.0/geckodriver"
 
     if not driver_path:
         driver_path = GeckoDriverManager().install()
