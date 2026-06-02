@@ -66,6 +66,10 @@ def _local_and_qual(local: str, path: str):
 
 # Reused regexes
 HTML_TAG_PATTERN = re.compile(r"<[^>]+>(.*?)<\/[^>]+>")
+ENCLOSING_TAG_PATTERN = re.compile(r"^<[^>]+>(.*?)<\/[^>]+>$")
+
+MD_SANITISE_PATTERN = re.compile(r"([*~^])")
+
 EM_TAG_PATTERN = re.compile(r"<\/?em>")
 STRONG_TAG_PATTERN = re.compile(r"<\/?strong>")
 U_TAG_PATTERN = re.compile(r"<\/?u>")
@@ -1426,18 +1430,23 @@ class RoCrateContentsTester:
         return x
 
     @staticmethod
-    def _html_to_md(x: str):
+    def _html_to_md(x: str, strip_enclosing_tags=True):
         """Convert an HTML string to Markdown"""
 
+        # If we're stripping enclosing tags (that is, tags that include the whole string), do that first
+        if strip_enclosing_tags:
+            while ENCLOSING_TAG_PATTERN.match(x):
+                x = ENCLOSING_TAG_PATTERN.sub(r"\1", x)
+
         # First, sanitise any characters in the string which would be misinterpreted as MD syntax
-        x = re.sub(re.compile(r"([*~^])"), r"\1", x)
+        x = MD_SANITISE_PATTERN.sub(r"\1", x)
 
         # Then convert HTML markup to Markdown where the latter exists, or else remove it
-        x = re.sub(EM_TAG_PATTERN, "*", x)
-        x = re.sub(STRONG_TAG_PATTERN, "**", x)
-        x = re.sub(U_TAG_PATTERN, "", x)
-        x = re.sub(SUB_TAG_PATTERN, "~", x)
-        x = re.sub(SUP_TAG_PATTERN, "^", x)
+        x = EM_TAG_PATTERN.sub("*", x)
+        x = STRONG_TAG_PATTERN.sub("**", x)
+        x = U_TAG_PATTERN.sub("", x)
+        x = SUB_TAG_PATTERN.sub("~", x)
+        x = SUP_TAG_PATTERN.sub("^", x)
 
         return x
 
@@ -1594,6 +1603,23 @@ class TestRoCrateMaximal(RoCrateContentsTester):
         for name, desc in zip(l_condition_names, l_condition_descs):
             assert self._strip_tags(name.get_attribute("innerHTML")) in pdf_text
             assert self._strip_tags(desc.get_attribute("innerHTML")) in pdf_text
+
+    def test_title(self, driver: WebDriver):
+        """Test that the provided title is present in the data package where expected"""
+
+        # Get the title in HTML markup from the user input
+        html_title = driver.find_element(
+            By.CSS_SELECTOR, "#rocrate-title-input>.ql-editor>p").get_property("innerHTML")
+
+        # Check for the title in the ESI.pdf file
+        assert self._find_text_in_pdf(RC_ESI_QUAL_FILE, self._strip_tags(html_title)+"\n")
+
+        # Check for it in the README.md file
+        assert "## About\n\n**Title**: " + self._html_to_md(html_title, True) in open(RC_README_QUAL_FILE).read()
+
+        # Check for it in the ro-crate-metadata.json file
+        metadata_file = json.load(open(RC_METADATA_QUAL_FILE))
+        assert metadata_file["@graph"][0]["name"] == self._strip_tags(html_title)
 
 
 class TestRoCrateMinimal(RoCrateContentsTester):
