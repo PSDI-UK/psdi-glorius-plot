@@ -2,20 +2,27 @@
 
 # Selenium test script for PSDI Glorius Plot Generator Service.
 
+import csv
+import json
 import math
 import os
 import re
+import shutil
+import sys
 import time
 from collections.abc import Callable
 from multiprocessing import Process
 
 import pytest
+from pypdf import PdfReader
 
 import psdi_glorius_plot
 from psdi_glorius_plot import constants as const
 
 # Skip all tests in this module if required packages for GUI testing aren't installed
 try:
+    from rocrate_validator import models as rocv_models
+    from rocrate_validator import services as rocv_services
     from selenium import webdriver
     from selenium.common.exceptions import NoAlertPresentException
     from selenium.webdriver import FirefoxOptions, Keys
@@ -57,31 +64,61 @@ def _local_and_qual(local: str, path: str):
     return local, os.path.join(path, local)
 
 
+# Reused regexes
+HTML_TAG_PATTERN = re.compile(r"<[^>]+>(.*?)<\/[^>]+>")
+ENCLOSING_TAG_PATTERN = re.compile(r"^<[^>]+>(.*?)<\/[^>]+>$")
+
+MD_SANITISE_PATTERN = re.compile(r"([*~^])")
+
+EM_TAG_PATTERN = re.compile(r"<\/?em>")
+STRONG_TAG_PATTERN = re.compile(r"<\/?strong>")
+U_TAG_PATTERN = re.compile(r"<\/?u>")
+SUB_TAG_PATTERN = re.compile(r"<\/?sub>")
+SUP_TAG_PATTERN = re.compile(r"<\/?sup>")
+
 # Constants related to downloaded files and RO-Crate structure
 DOWNLOAD_LOCATION = "/tmp"
 PLOT_PNG_FILE, PLOT_PNG_QUAL_FILE = _local_and_qual("glorius_plot.png", DOWNLOAD_LOCATION)
 PLOT_SVG_FILE, PLOT_SVG_QUAL_FILE = _local_and_qual("glorius_plot.svg", DOWNLOAD_LOCATION)
 
-SAVE_FILE = "glorius_plot_data.json"
+SAVE_FILE, SAVE_QUAL_FILE = _local_and_qual("glorius_plot_data.json", DOWNLOAD_LOCATION)
 
-RC_FILE_PATTERN = re.compile(r"/\d*4-\d\d-\d\d-\d*6-glorius-plot-ro-crate\.zip/")
+RC_FILE_PATTERN = re.compile(r"\d{4}-\d\d-\d\d-\d{6}-glorius-plot-ro-crate\.zip")
 
-RC_ROOT_DIR = "glorius-plot"
-RC_ESI_FILE, RC_ESI_QUAL_FILE = _local_and_qual("ESI.pdf", RC_ROOT_DIR)
-RC_README_FILE, RC_README_QUAL_FILE = _local_and_qual("README.md", RC_ROOT_DIR)
-RC_METADATA_FILE, RC_ESI_QUAL_FILE = _local_and_qual("ro-crate-metadata.json", RC_ROOT_DIR)
-RC_DATA_DIR, RC_DATA_QUAL_DIR = _local_and_qual("data", RC_ROOT_DIR)
+RC_EXTRACT_DIR, RC_ROOT_QUAL_DIR = _local_and_qual("glorius-plot/", DOWNLOAD_LOCATION)
+RC_ESI_FILE, RC_ESI_QUAL_FILE = _local_and_qual("ESI.pdf", RC_ROOT_QUAL_DIR)
+RC_README_FILE, RC_README_QUAL_FILE = _local_and_qual("README.md", RC_ROOT_QUAL_DIR)
+RC_METADATA_FILE, RC_METADATA_QUAL_FILE = _local_and_qual("ro-crate-metadata.json", RC_ROOT_QUAL_DIR)
+RC_DATA_DIR, RC_DATA_QUAL_DIR = _local_and_qual("data/", RC_ROOT_QUAL_DIR)
 
 RC_SCHEME_FILE, RC_SCHEME_QUAL_FILE = _local_and_qual("reaction_scheme.cdxml", RC_DATA_QUAL_DIR)
 RC_STANDARD_COND_FILE, RC_STANDARD_COND_QUAL_FILE = _local_and_qual("standard_conditions.html", RC_DATA_QUAL_DIR)
 RC_TEST_COND_FILE, RC_TEST_COND_QUAL_FILE = _local_and_qual("test_conditions.csv", RC_DATA_QUAL_DIR)
-RC_PLOT_DIR, RC_PLOT_QUAL_DIR = _local_and_qual("plot", RC_DATA_QUAL_DIR)
+RC_PLOT_DIR, RC_PLOT_QUAL_DIR = _local_and_qual("plot/", RC_DATA_QUAL_DIR)
 
 RC_PLOT_FILE, RC_PLOT_QUAL_FILE = _local_and_qual("glorius_plot.png", RC_PLOT_QUAL_DIR)
 RC_TABLE_FILE, RC_TABLE_QUAL_FILE = _local_and_qual("sensitivity_table.csv", RC_PLOT_QUAL_DIR)
 RC_PREF_FILE, RC_PREF_QUAL_FILE = _local_and_qual("user_preferences.json", RC_PLOT_QUAL_DIR)
 
+L_RC_MANDATORY_FILES = [RC_ESI_QUAL_FILE, RC_README_QUAL_FILE, RC_METADATA_QUAL_FILE, RC_DATA_QUAL_DIR,
+                        RC_PLOT_QUAL_DIR, RC_PLOT_QUAL_FILE, RC_TABLE_QUAL_FILE, RC_PREF_QUAL_FILE]
+L_RC_OPTIONAL_FILES = [RC_SCHEME_QUAL_FILE, RC_STANDARD_COND_QUAL_FILE, RC_TEST_COND_QUAL_FILE]
+
+# Paths to test data files
+
+PROJECT_PATH = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), "../.."))
+
+EXAMPLE_CDXML = os.path.join(PROJECT_PATH, "test_data/example_standard_reaction.cdxml")
+EXAMPLE_PNG = os.path.join(PROJECT_PATH, "test_data/example_standard_reaction.png")
+
 origin = os.environ.get("ORIGIN", DEFAULT_ORIGIN)
+
+# Paths to test data files
+
+PROJECT_PATH = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), "../.."))
+
+EXAMPLE_CDXML = os.path.join(PROJECT_PATH, "test_data/example_standard_reaction.cdxml")
+EXAMPLE_PNG = os.path.join(PROJECT_PATH, "test_data/example_standard_reaction.png")
 
 # Run tests in production mode and test mode
 os.environ[const.PRODUCTION_EV] = "true"
@@ -147,10 +184,17 @@ def wait_for_cover_hidden(root: WebDriver):
     WebDriverWait(root, TIMEOUT_LONG).until(EC.invisibility_of_element((By.XPATH, "//div[@id='cover']")))
 
 
-def scroll_element_into_view(driver: WebDriver, e: WebElement):
+def scroll_element_into_view(driver: WebDriver, e: WebElement) -> WebElement:
     driver.execute_script("arguments[0].scrollIntoView({behavior: 'instant', block: 'center'});", e)
     wait_for_success(lambda: ActionChains(driver).move_to_element(e).perform())
     return e
+
+
+def send_keys(driver: WebDriver, keys: str, shift=False):
+    if not shift:
+        ActionChains(driver).send_keys(keys).perform()
+    else:
+        ActionChains(driver).key_down(Keys.SHIFT).send_keys(keys).key_up(Keys.SHIFT).perform()
 
 
 def wait_for_element(driver: WebDriver | WebElement,
@@ -215,12 +259,15 @@ def wait_for_success(action: Callable, timeout=TIMEOUT_SHORT):
                 raise
 
 
-def test_initial_frontpage(driver: WebDriver):
-    """A basic unit test that checks that the front page is displayed with the expected content"""
-
-    # Load the home page and wait for the page cover to be removed
+def _init_page(driver):
+    """Initialise the home page for tests and wait for the page cover to be removed"""
     driver.get(f"{origin}/")
     wait_for_cover_hidden(driver)
+
+
+def test_initial_frontpage(driver: WebDriver):
+    """A basic unit test that checks that the front page is displayed with the expected content"""
+    _init_page(driver)
 
     # Check that the front page contains expected elements
 
@@ -228,14 +275,106 @@ def test_initial_frontpage(driver: WebDriver):
     assert (wait_for_element(driver, "//header//h5")).text == "Glorius Plot Generator"
 
 
+def test_navigate_home(driver: WebDriver):
+    """Test that the user can navigate from the page to the PSDI home page using the logo in the header"""
+    _init_page(driver)
+    wait_for_element(driver, "//a[contains(@class,'navbar__logo')]").click()
+    assert (wait_for_element(driver, "//h1")).text == "Physical Sciences Data Infrastructure"
+
+
+def test_navigate_header(driver: WebDriver):
+    """Test that the user can use the header to navigate between pages of the site"""
+    _init_page(driver)
+
+    def _find_header_link(text: str):
+        # Get a list of links in the header, and find the one whose text matches the desired value
+        l_header_links = driver.find_elements(By.CSS_SELECTOR, ".navbar__link")
+        return [x for x in l_header_links if x.text == text][0]
+
+    def _click_header_link(text: str, url_segment: str):
+        el = _find_header_link(text)
+        scroll_element_into_view(driver, el)
+        el.click()
+        WebDriverWait(driver, 10).until(EC.url_contains(url_segment))
+
+    # Test that we can navigate to the Documentation page through the header link
+    _click_header_link("Documentation", "documentation.html")
+    assert (wait_for_element(driver, "//h1")).text == "Documentation"
+
+    # Test that we can navigate back to the home page through the header link
+    _click_header_link("Home", "index.html")
+    assert (wait_for_element(driver, "//h1")).text == "PSDI Glorius Plot Generator"
+
+    # Now try instead clicking the title link on the Documentation page
+    _click_header_link("Documentation", "documentation.html")
+    driver.find_element(By.CSS_SELECTOR, ".navbar__title").click()
+    WebDriverWait(driver, 10).until(EC.url_contains("index.html"))
+    assert (wait_for_element(driver, "//h1")).text == "PSDI Glorius Plot Generator"
+
+    # Test using the header link to go to the Organic Toolkit Home page
+    _click_header_link("Organic Toolkit Home", "organic-toolkit.psdi.ac.uk")
+    assert (wait_for_element(driver, "//h1")).text == "PSDI Organic Toolkit"
+
+    # Test using the header link to get to the Provide Feedback form from both the home and Documentation pages
+    _init_page(driver)
+    _click_header_link("Provide Feedback", "forms.office.com/pages/responsepage.aspx")
+    assert (wait_for_element(driver, "//div[@id='FormTitleId_titleAriaId']/div/span/b/span")
+            ).text == "PSDI Glorius Plot Generator: Feedback Form"
+
+    _init_page(driver)
+    _click_header_link("Documentation", "documentation.html")
+    _click_header_link("Provide Feedback", "forms.office.com/pages/responsepage.aspx")
+    assert (wait_for_element(driver, "//div[@id='FormTitleId_titleAriaId']/div/span/b/span")
+            ).text == "PSDI Glorius Plot Generator: Feedback Form"
+
+
+def test_light_dark_mode(driver: WebDriver):
+    """Test that the light/dark mode toggle in the header behaves as expected"""
+    _init_page(driver)
+
+    # Check that we initially find the sun icon to toggle to dark mode, then click it to toggle
+    wait_for_element(driver, "//button[contains(@class,'color-mode-toggle')]" +
+                     "//img[contains(@class,'lm-only')]", wait_for_clickable=True).click()
+
+    # Now check for the moon icon to toggle to light mode, and try clicking it as well
+    wait_for_element(driver, "//button[contains(@class,'color-mode-toggle')]" +
+                     "//img[contains(@class,'dm-only')]", wait_for_clickable=True).click()
+
+    # And finally check that the sun icon has returned
+    wait_for_element(driver, "//button[contains(@class,'color-mode-toggle')]" +
+                     "//img[contains(@class,'lm-only')]", wait_for_clickable=True)
+
+
+def test_navigate_policies(driver: WebDriver):
+    """Test that the user can navigate to the PSDI policies via footer links"""
+
+    def _find_footer_link(text: str):
+        # Get a list of links in the header, and find the one whose text matches the desired value
+        l_footer_links = driver.find_elements(By.CSS_SELECTOR, "ul.footer__items a")
+        return [x for x in l_footer_links if x.text == text][0]
+
+    def _click_footer_link(text: str, url_segment: str):
+        el = _find_footer_link(text)
+        scroll_element_into_view(driver, el)
+        el.click()
+        WebDriverWait(driver, 10).until(EC.url_contains(url_segment))
+
+    # Test that we can navigate to the Privacy policy via the footer link
+    _init_page(driver)
+    _click_footer_link("Privacy", "www.psdi.ac.uk/privacy/")
+    assert (wait_for_element(driver, "//h1")).text == "Privacy policy"
+
+    # Test that we can navigate to the Terms and Conditions via the footer link
+    _init_page(driver)
+    _click_footer_link("Terms and Conditions", "www.psdi.ac.uk/terms-and-conditions/")
+    assert (wait_for_element(driver, "//h1")).text == "Terms & Conditions"
+
+
 def test_outcome_select(driver: WebDriver):
     """Test that the outcome can be changed to produce desired effects - showing/hiding custom input, updating text
     of coloumn in table, etc.
     """
-
-    # Load the home page and wait for the page cover to be removed
-    driver.get(f"{origin}/")
-    wait_for_cover_hidden(driver)
+    _init_page(driver)
 
     # Get the select box used for the outcome
     outcome_select_element = wait_for_element(driver, "//*[@id='os-0']")
@@ -281,10 +420,7 @@ def _set_num_condition_rows(driver: WebDriver, n: int):
 
 def test_num_conditions_control(driver: WebDriver):
     """Test that adding/removing/setting condition rows works as expected"""
-
-    # Load the home page and wait for the page cover to be removed
-    driver.get(f"{origin}/")
-    wait_for_cover_hidden(driver)
+    _init_page(driver)
 
     # Check that we start with 5 rows
     assert _get_num_condition_rows(driver) == 5
@@ -325,10 +461,7 @@ def _set_num_sample_columns(driver: WebDriver, n: int):
 
 def test_num_samples_control(driver: WebDriver):
     """Test that adding/removing/setting sample columns works as expected"""
-
-    # Load the home page and wait for the page cover to be removed
-    driver.get(f"{origin}/")
-    wait_for_cover_hidden(driver)
+    _init_page(driver)
 
     # Check that we start with 1 column
     assert _get_num_sample_columns(driver) == 1
@@ -380,16 +513,10 @@ def test_num_samples_control(driver: WebDriver):
 
 def test_table_navigation(driver: WebDriver):
     """Test that the table can be navigated as expected with tab and enter"""
-
-    # Load the home page and wait for the page cover to be removed
-    driver.get(f"{origin}/")
-    wait_for_cover_hidden(driver)
+    _init_page(driver)
 
     def _send_keys(keys: str, shift: bool = False):
-        if not shift:
-            ActionChains(driver).send_keys(keys).perform()
-        else:
-            ActionChains(driver).key_down(Keys.SHIFT).send_keys(keys).key_up(Keys.SHIFT).perform()
+        send_keys(driver, keys, shift)
 
     def _is_focused(e: WebElement) -> bool:
         return e == driver.switch_to.active_element
@@ -551,10 +678,7 @@ def _check_value_outline_presence(driver: WebDriver, present=True):
 
 def test_value_to_plot_option(driver: WebDriver):
     """Test that the radio input to select which value to plot works as expected"""
-
-    # Load the home page and wait for the page cover to be removed
-    driver.get(f"{origin}/")
-    wait_for_cover_hidden(driver)
+    _init_page(driver)
 
     mean_radio = wait_for_element(driver, "//input[@id='plot-mean']")
     abs_radio = wait_for_element(driver, "//input[@id='plot-abs']")
@@ -621,10 +745,7 @@ def test_value_to_plot_option(driver: WebDriver):
 
 def test_calcs(driver: WebDriver):
     """Test that values in the plot are calculated properly"""
-
-    # Load the home page and wait for the page cover to be removed
-    driver.get(f"{origin}/")
-    wait_for_cover_hidden(driver)
+    _init_page(driver)
 
     # Size the table so we have 10 rows and columns
     _set_num_condition_rows(driver, 10)
@@ -724,10 +845,7 @@ def _set_axis_fontsize(driver: WebDriver, x: float):
 
 def test_fan_plot_controls(driver: WebDriver):
     """Test that toggling fan plot mode makes the radar-plot-specific controls disappear"""
-
-    # Load the home page and wait for the page cover to be removed
-    driver.get(f"{origin}/")
-    wait_for_cover_hidden(driver)
+    _init_page(driver)
 
     # Toggle fan plot mode, checking that nothing goes wrong when we do so
     fan_select_element = wait_for_element(driver, "//select[@id='fan-select']")
@@ -739,10 +857,7 @@ def test_fan_plot_controls(driver: WebDriver):
 
 def test_plot_sizing(driver: WebDriver):
     """Test that we can resize the plot properly"""
-
-    # Load the home page and wait for the page cover to be removed
-    driver.get(f"{origin}/")
-    wait_for_cover_hidden(driver)
+    _init_page(driver)
 
     init_plot_width = 600
     init_plot_height = 600
@@ -819,39 +934,83 @@ def test_plot_sizing(driver: WebDriver):
     assert _get_axis_fontsize(driver) == init_axis_fontsize*scale
 
 
-def _wait_for_download(filename, timeout=TIMEOUT_SHORT):
+def _clear_download(*l_filenames: str | re.Pattern[str]):
+    """Clear files that might have been downloaded in a previous test run"""
+
+    l_download_files = os.listdir(DOWNLOAD_LOCATION)
+
+    # Determine which files to remove
+    l_filenames_to_remove: list[str] = []
+    for filename in l_filenames:
+        # Check if it's a string or Regex and handle appropriate
+        if isinstance(filename, str):
+            l_filenames_to_remove.append(os.path.join(DOWNLOAD_LOCATION, filename))
+            continue
+        # Implicit else it's a regex
+        for download_file in l_download_files:
+            if filename.match(download_file):
+                l_filenames_to_remove.append(os.path.join(DOWNLOAD_LOCATION, download_file))
+                continue
+
+    # And now remove all files in the list
+    for file_to_remove in l_filenames_to_remove:
+        try:
+            os.remove(file_to_remove)
+        except FileNotFoundError:
+            pass
+
+
+def _wait_for_download(filename: str | re.Pattern[str], timeout=TIMEOUT_SHORT) -> str:
     time_elapsed = 0
     file_exists = False
     last_filesize = 0
     new_filesize = 0
+
     # Continue waiting while any of the following conditions are true:
     # - The file doesn't exist
     # - The file exists, but its size is zero
     # - The file exists, but its size is different from the last time it was checked
+
+    if isinstance(filename, str):
+        found_filename = filename
+    else:
+        found_filename: str = ""
+
     while not file_exists or new_filesize == 0 or new_filesize != last_filesize:
-        file_exists = os.path.isfile(filename)
+
+        # Check if the file exists, checking differently depending on if we're doing a regex match or not
+        file_exists = False
+        if found_filename:
+            file_exists = os.path.isfile(found_filename)
+        else:
+            l_files = os.listdir(DOWNLOAD_LOCATION)
+            for file in l_files:
+                if filename.match(file):
+                    file_exists = True
+                    found_filename = os.path.join(DOWNLOAD_LOCATION, file)
+                    break
+
         last_filesize = new_filesize
         time.sleep(TIMESTEP)
         if file_exists:
-            new_filesize = os.path.getsize(filename)
+            new_filesize = os.path.getsize(found_filename)
         time_elapsed += TIMESTEP
         if time_elapsed > timeout:
             pytest.fail(f"Download of {filename} timed out")
+
+    return found_filename
+
+
+def _fill_example_data(driver):
+    wait_for_element(driver, "//button[@id='fill-example']").click()
 
 
 def test_download_plot(driver: WebDriver):
     """Test that we can download an image of the plot using the provided button"""
 
     # If the downloaded files already exists, remove them
-    for filename in [PLOT_PNG_QUAL_FILE, PLOT_SVG_QUAL_FILE]:
-        try:
-            os.remove(filename)
-        except FileNotFoundError:
-            pass
-
-    # Load the home page and wait for the page cover to be removed
-    driver.get(f"{origin}/")
-    wait_for_cover_hidden(driver)
+    _clear_download(PLOT_PNG_QUAL_FILE, PLOT_SVG_QUAL_FILE)
+    _init_page(driver)
 
     # Wait a moment after the page loads so the plot can be generated
     time.sleep(PLOT_GENERATION_TIME)
@@ -863,7 +1022,7 @@ def test_download_plot(driver: WebDriver):
     # Note the filesize of the downloaded plot, check it's non-zero, then delete it
     empty_png_plot_filesize = os.path.getsize(PLOT_PNG_QUAL_FILE)
     assert empty_png_plot_filesize > 0
-    os.remove(PLOT_PNG_QUAL_FILE)
+    _clear_download(PLOT_PNG_QUAL_FILE)
 
     # Now do the same with the svg version of the plot
 
@@ -873,7 +1032,7 @@ def test_download_plot(driver: WebDriver):
 
     empty_svg_plot_filesize = os.path.getsize(PLOT_SVG_QUAL_FILE)
     assert empty_svg_plot_filesize > 0
-    os.remove(PLOT_SVG_QUAL_FILE)
+    _clear_download(PLOT_SVG_QUAL_FILE)
 
     # Add a title to the plot now, so we can test if they seem to appear on the downloaded plot
 
@@ -887,7 +1046,7 @@ def test_download_plot(driver: WebDriver):
 
     # Note the filesize of the new downloaded plot, then delete it as well
     title_plot_filesize = os.path.getsize(PLOT_SVG_QUAL_FILE)
-    os.remove(PLOT_SVG_QUAL_FILE)
+    _clear_download(PLOT_SVG_QUAL_FILE)
 
     # Check that the file size of the plot with the title is larger than for the empty plot
     assert title_plot_filesize > empty_svg_plot_filesize
@@ -906,13 +1065,13 @@ def test_download_plot(driver: WebDriver):
 
     # Note the filesize of the new downloaded plot, then delete it as well
     label_plot_filesize = os.path.getsize(PLOT_SVG_QUAL_FILE)
-    os.remove(PLOT_SVG_QUAL_FILE)
+    _clear_download(PLOT_SVG_QUAL_FILE)
 
     # Check that the file size of the plot with the labels is now even larger than just the title
     assert label_plot_filesize > title_plot_filesize
 
     # Now, fill the table with example data, wait for the plot to be re-generated, and download again
-    wait_for_element(driver, "//button[@id='fill-example']").click()
+    _fill_example_data(driver)
     assert wait_for_condition(lambda: _get_num_condition_rows(driver) == 10)
 
     scroll_element_into_view(driver, svg_download_button).click()
@@ -920,7 +1079,7 @@ def test_download_plot(driver: WebDriver):
 
     # Note the filesize of the new downloaded plot, then delete it as well
     example_plot_filesize = os.path.getsize(PLOT_SVG_QUAL_FILE)
-    os.remove(PLOT_SVG_QUAL_FILE)
+    _clear_download(PLOT_SVG_QUAL_FILE)
 
     # Check that the file size of the example plot is even larger than the labeled plot, since it's even more
     # complicated
@@ -929,10 +1088,7 @@ def test_download_plot(driver: WebDriver):
 
 def test_dirty_forms(driver: WebDriver):
     """Run tests that an alert pops up to warn the user before leaving when they've entered data in the form"""
-
-    # Load the home page and wait for the page cover to be removed
-    driver.get(f"{origin}/")
-    wait_for_cover_hidden(driver)
+    _init_page(driver)
 
     # Input some data into the form
     first_baseline_input = wait_for_element(driver, "//input[contains(@class,'baseline-value')]")
@@ -951,8 +1107,7 @@ def test_dirty_forms(driver: WebDriver):
     alert.dismiss()
 
     # Test with the example data button
-    fill_example_button = wait_for_element(driver, "//button[@id='fill-example']")
-    fill_example_button.click()
+    _fill_example_data(driver)
     alert = Alert(driver)
     assert "Do you want to proceed?" in alert.text
     alert.dismiss()
@@ -972,7 +1127,7 @@ def test_dirty_forms(driver: WebDriver):
 
     scroll_element_into_view(driver, download_button).click()
 
-    scroll_element_into_view(driver, fill_example_button).click()
+    _fill_example_data(driver)
     with pytest.raises(NoAlertPresentException):
         Alert(driver).text
 
@@ -980,17 +1135,9 @@ def test_dirty_forms(driver: WebDriver):
 def test_save_load_data(driver: WebDriver):
     """Test that we can save and load data entered in the plot"""
 
-    qualified_save_filename = os.path.join(DOWNLOAD_LOCATION, SAVE_FILE)
-
     # If the save file already exists, remove it
-    try:
-        os.remove(qualified_save_filename)
-    except FileNotFoundError:
-        pass
-
-    # Load the home page and wait for the page cover to be removed
-    driver.get(f"{origin}/")
-    wait_for_cover_hidden(driver)
+    _clear_download(SAVE_QUAL_FILE)
+    _init_page(driver)
 
     # We want to change pretty much every aspect of the plot away from details, then test
     # that all those changes persist when saved and later reloaded
@@ -1055,11 +1202,10 @@ def test_save_load_data(driver: WebDriver):
     # Now save the plot
     save_button = wait_for_element(driver, "//button[@id='save-data']")
     save_button.click()
-    _wait_for_download(qualified_save_filename)
+    _wait_for_download(SAVE_QUAL_FILE)
 
     # Overwrite the data by filling with example data
-    fill_example_button = wait_for_element(driver, "//button[@id='fill-example']")
-    fill_example_button.click()
+    _fill_example_data(driver)
     alert = Alert(driver)
     assert "Do you want to proceed?" in alert.text
     alert.accept()
@@ -1068,7 +1214,7 @@ def test_save_load_data(driver: WebDriver):
     time.sleep(PLOT_GENERATION_TIME)
 
     # Now load the saved data
-    wait_for_element(driver, "//input[@id='load-data-file']").send_keys(qualified_save_filename)
+    wait_for_element(driver, "//input[@id='load-data-file']").send_keys(SAVE_QUAL_FILE)
     time.sleep(PLOT_GENERATION_TIME)
 
     # Check that all data we entered before has now been reloaded
@@ -1096,3 +1242,824 @@ def test_save_load_data(driver: WebDriver):
     assert _get_plot_height(driver) == TEST_HEIGHT
     assert _get_label_fontsize(driver) == TEST_LABEL_FONTSIZE
     assert _get_axis_fontsize(driver) == TEST_AXIS_FONTSIZE
+
+
+def _start_rocrate_export(driver: WebDriver, allow_already_started=True):
+    """Click the button to start exporting a RO-Crate data package"""
+    start_export_button = wait_for_element(driver, "export-rocrate-start", by=By.ID)
+    start_export_button.click()
+
+
+def test_rocrate_form(driver: WebDriver):
+    """Test that the RO-Crate export form is initially hidden but becomes visible when the button is clicked to start
+    exporting it
+    """
+    _init_page(driver)
+
+    # Check that the RO-Crate export section is initially hidden
+    rocrate_input_form = driver.find_element(By.ID, "rocrate-input")
+    with pytest.raises(MoveTargetOutOfBoundsException):
+        scroll_element_into_view(driver, rocrate_input_form)
+
+    # Click the button to open the form and confirm that it's now visible
+    _start_rocrate_export(driver)
+    rocrate_input_form.click()
+
+    # Also check that the button to make it visible itself no longer is visible
+    with pytest.raises(MoveTargetOutOfBoundsException):
+        export_start_button = driver.find_element(By.ID, "export-rocrate-start")
+        scroll_element_into_view(driver, export_start_button)
+
+
+def _clear_downloaded_rocrate():
+    _clear_download(RC_FILE_PATTERN)
+    shutil.rmtree(RC_ROOT_QUAL_DIR, ignore_errors=True)
+
+
+def _init_rocrate_export(driver: WebDriver, fill_example=False):
+    """Set up the page and the RO-Crate export section"""
+    _init_page(driver)
+
+    _clear_downloaded_rocrate()
+
+    _start_rocrate_export(driver)
+
+    if fill_example:
+        _fill_example_data(driver)
+        wait_for_element(driver, "//input[@id='rocrate-cdxml']").send_keys(EXAMPLE_CDXML)
+        wait_for_element(driver, "//input[@id='rocrate-img']").send_keys(EXAMPLE_PNG)
+
+
+def _validate_rocrate_file(rocrate_qual_file: str) -> bool:
+    """Run a validity test on an RO-Crate data package file
+
+    Parameters
+    ----------
+    rocrate_qual_file : str
+        The qualified path to the RO-Crate file to be validated
+
+    Returns
+    -------
+    bool
+        Whether or not the validation is successful
+    """
+
+    validation_result = rocv_services.validate(rocv_services.ValidationSettings(
+        rocrate_uri=rocrate_qual_file,
+        rocrate_relative_root_path=RC_EXTRACT_DIR,
+        requirement_severity=rocv_models.Severity.REQUIRED))
+
+    if not validation_result.has_issues():
+        return True
+    else:
+        # If validation was unsuccessful, print out all the issues found to stderr
+        print("RO-Crate is invalid!", file=sys.stderr)
+        for issue in validation_result.get_issues():
+            print(f"Detected issue of severity {issue.severity.name} with check \"{issue.check.identifier}\": " +
+                  issue.message, file=sys.stderr)
+        return False
+
+
+def test_rocrate_download_valid(driver: WebDriver):
+    """Test that a RO-Crate data package can be downloaded and is valid"""
+
+    _init_rocrate_export(driver)
+
+    wait_for_element(driver, "//button[@id='rocrate-download']").click()
+
+    rocrate_qual_file = _wait_for_download(RC_FILE_PATTERN, TIMEOUT_LONG)
+
+    # Try extracting the file to check that expected files exist/don't exist in it
+    shutil.unpack_archive(rocrate_qual_file, extract_dir=os.path.join(DOWNLOAD_LOCATION, RC_EXTRACT_DIR))
+
+    # This is a minimal RO-Crate, so only mandatory files should be present
+    for file in L_RC_MANDATORY_FILES:
+        assert os.path.exists(file), f"Expected file/dir {file} not found in ROCrate data package"
+    for file in L_RC_OPTIONAL_FILES:
+        assert not os.path.exists(file), f"Unexpected file/dir {file} found in ROCrate data package"
+
+    assert _validate_rocrate_file(rocrate_qual_file), f"RO-Crate file {rocrate_qual_file} failed validation"
+
+    # Now try with a fully-featured RO-Crate
+
+    # Fill with example data, which will fill most of the RO-Crate export section
+    wait_for_element(driver, "//button[@id='fill-example']").click()
+
+    # The only bit missing is that we need to manually provide the reaction image files
+    wait_for_element(driver, "//input[@id='rocrate-cdxml']").send_keys(EXAMPLE_CDXML)
+    wait_for_element(driver, "//input[@id='rocrate-img']").send_keys(EXAMPLE_PNG)
+
+    # Clear the previous download and download again
+    _clear_downloaded_rocrate()
+    wait_for_element(driver, "//button[@id='rocrate-download']").click()
+    rocrate_qual_file = _wait_for_download(RC_FILE_PATTERN, TIMEOUT_LONG)
+
+    # Try extracting the file to check that expected files exist/don't exist in it
+    shutil.unpack_archive(rocrate_qual_file, extract_dir=os.path.join(DOWNLOAD_LOCATION, RC_EXTRACT_DIR))
+
+    # This is a maximal RO-Crate, so all files should be present
+    for file in L_RC_MANDATORY_FILES + L_RC_OPTIONAL_FILES:
+        assert os.path.exists(file), f"Expected file/dir {file} not found in ROCrate data package"
+
+    assert _validate_rocrate_file(rocrate_qual_file), f"RO-Crate file {rocrate_qual_file} failed validation"
+
+
+class RoCrateContentsTester:
+
+    fill_example: bool
+
+    @pytest.fixture(scope="class", autouse=True)
+    def init_rocrate(self, driver: WebDriver):
+        """Prepare and extract the RO-Crate we want to check using default data"""
+        _init_rocrate_export(driver, fill_example=self.fill_example)
+        wait_for_element(driver, "//button[@id='rocrate-download']").click()
+        rocrate_qual_file = _wait_for_download(RC_FILE_PATTERN, TIMEOUT_LONG)
+        shutil.unpack_archive(rocrate_qual_file, extract_dir=os.path.join(DOWNLOAD_LOCATION, RC_EXTRACT_DIR))
+
+    @staticmethod
+    def _extract_image_from_pdf(pdf_filename, target_image_index, image_filename):
+        """Extract an image from a PDF, saving it in a file"""
+        _clear_download(image_filename)
+        pdf_reader = PdfReader(pdf_filename)
+        image_index = 0
+        for page in pdf_reader.pages:
+            for image_file_object in page.images:
+                if image_index < target_image_index:
+                    image_index += 1
+                    continue
+                image_file_object.image.save(image_filename)
+                return image_file_object.data
+
+        # If we get here, no image at this index was found, so return None to indicate this
+        return None
+
+    @staticmethod
+    def _find_text_in_pdf(pdf_filename: str, match: str | re.Pattern[str], append_next_page=False) -> str | None:
+        """Find where a text string or regex occurs in a PDF and returns the text of the page where it's found"""
+
+        pdf_reader = PdfReader(pdf_filename)
+        i_match = None
+        text_match = None
+        for i, page in enumerate(pdf_reader.pages):
+            text = page.extract_text()
+            if isinstance(match, str):
+                if match in text:
+                    i_match = i
+                    text_match = text
+                    break
+            elif match.match(text):
+                text_match = text
+                break
+
+        if i_match is None:
+            return None
+        elif not append_next_page:
+            return text_match
+
+        if i_match < len(pdf_reader.pages)-1:
+            return text_match + pdf_reader.pages[i+1].extract_text()
+        return text_match
+
+    @staticmethod
+    def _strip_tags(x: str):
+        """Strip all HTML tags from a string"""
+        last_x = ""
+        while last_x != x:
+            last_x = x
+            x = re.sub(HTML_TAG_PATTERN, r"\1", x)
+        return x
+
+    @staticmethod
+    def _html_to_md(x: str, strip_enclosing_tags=True):
+        """Convert an HTML string to Markdown"""
+
+        # If we're stripping enclosing tags (that is, tags that include the whole string), do that first
+        if strip_enclosing_tags:
+            while ENCLOSING_TAG_PATTERN.match(x):
+                x = ENCLOSING_TAG_PATTERN.sub(r"\1", x)
+
+        # First, sanitise any characters in the string which would be misinterpreted as MD syntax
+        x = MD_SANITISE_PATTERN.sub(r"\1", x)
+
+        # Then convert HTML markup to Markdown where the latter exists, or else remove it
+        x = EM_TAG_PATTERN.sub("*", x)
+        x = STRONG_TAG_PATTERN.sub("**", x)
+        x = U_TAG_PATTERN.sub("", x)
+        x = SUB_TAG_PATTERN.sub("~", x)
+        x = SUP_TAG_PATTERN.sub("^", x)
+
+        return x
+
+
+class TestRoCrateMaximal(RoCrateContentsTester):
+    """This class tests that an RO-Crate with all data filled in contains all the expected values"""
+
+    fill_example = True
+
+    def test_sens_table(self, driver: WebDriver):
+        """Test that the sensitivity table in the RO-Crate data package is correct"""
+
+        with open(RC_TABLE_QUAL_FILE) as fi:
+            csv_reader = csv.reader(fi)
+            l_condition_names = driver.find_elements(By.CSS_SELECTOR, ".condition-input p")
+            l_yields = driver.find_elements(By.CSS_SELECTOR, "input.sample-value")
+            l_deviations = driver.find_elements(By.CSS_SELECTOR, "input.rel-deviation-value")
+            for i, row in enumerate(csv_reader):
+                if i == 0:
+                    # In the first row, check the header is as expected
+                    assert row[0] == "Test parameter"
+                    assert row[1] == "Isolated Yield (%)"
+                    assert row[2] == "Deviation (%)"
+                    continue
+
+                elif i == 1:
+                    # In the second row, check that we have the Standard Conditions info
+                    assert row[0] == "Standard Conditions"
+                    baseline_cell = driver.find_element(By.CSS_SELECTOR, "input.baseline-value")
+                    assert row[1] == str(baseline_cell.get_property("value"))
+                    assert row[2] == ""
+                    continue
+
+                # In subsequent rows, check the contents match what's entered in the table for each condition
+                assert row[0] == l_condition_names[i-2].get_attribute("innerHTML")
+                assert row[1] == str(l_yields[i-2].get_property("value"))
+                assert row[2] == str(l_deviations[i-2].get_property("value"))
+                continue
+
+    def test_user_prefs(self, driver: WebDriver):
+        """Test that the user preferences file in the RO-Crate data package is correct"""
+
+        # The easiest way to check this is correct is to compare to a save file
+        _clear_download(SAVE_QUAL_FILE)
+        wait_for_element(driver, "//button[@id='save-data']").click()
+        _wait_for_download(SAVE_QUAL_FILE)
+
+        save_file = json.load(open(SAVE_QUAL_FILE))
+        prefs_file = json.load(open(RC_PREF_QUAL_FILE))
+
+        # Check that all the items in the preferences file match those in the save file
+        # The save file will also contain the sensitivity table, but we don't need to worry about that
+        for key, val in prefs_file.items():
+            assert val == save_file[key]
+
+    def test_plot(self, driver: WebDriver):
+        """Test that the plot contained in the RO-Crate matches that shown on the page"""
+
+        # Compare the plot to one downloaded to see if they're the same
+        rocrate_plot = open(RC_PLOT_QUAL_FILE, "rb").read()
+
+        _clear_download(PLOT_PNG_QUAL_FILE)
+        wait_for_element(driver, "//button[@id='export-image-png']").click()
+        _wait_for_download(PLOT_PNG_QUAL_FILE)
+
+        downloaded_plot = open(RC_PLOT_QUAL_FILE, "rb").read()
+
+        assert rocrate_plot == downloaded_plot
+
+    def test_reaction_scheme(self):
+        """Test that the reaction scheme cdxml file contained in the RO-Crate matches that uploaded by the user"""
+
+        # Compare the file to the one in the example data to see if they're the same
+        rocrate_scheme = open(RC_SCHEME_QUAL_FILE, "rb").read()
+        example_scheme = open(EXAMPLE_CDXML, "rb").read()
+
+        assert rocrate_scheme == example_scheme
+
+    def test_reaction_image(self):
+        """Test that the reaction image contained within the ESI.pdf file in the RO-Crate matches that uploaded by the
+        user"""
+
+        extracted_image_filename = os.path.join(DOWNLOAD_LOCATION, "extracted_scheme.png")
+        self._extract_image_from_pdf(RC_ESI_QUAL_FILE, 0, extracted_image_filename)
+
+        # The file gets slightly changed when embedded in the PDF, so we can test for an exact match. Instead we check
+        # that the file size is close
+        assert math.isclose(os.path.getsize(extracted_image_filename), os.path.getsize(EXAMPLE_PNG), rel_tol=0.05)
+
+    def test_glorius_plot_image(self):
+        """Test that the Glorius plot image contained within the ESI.pdf file in the RO-Crate matches that generated"""
+
+        extracted_image_filename = os.path.join(DOWNLOAD_LOCATION, "extracted_plot.png")
+        self._extract_image_from_pdf(RC_ESI_QUAL_FILE, 0, extracted_image_filename)
+
+        # Since the file contained in the RO-Crate is checked to be correct in an above test, we compare with it here
+        # The file gets slightly changed when embedded in the PDF, so we can test for an exact match. Instead we check
+        # that the file size is close
+        assert math.isclose(os.path.getsize(extracted_image_filename),
+                            os.path.getsize(RC_PLOT_QUAL_FILE), rel_tol=0.05)
+
+    def test_standard_conditions(self, driver: WebDriver):
+        """Test that the provided standard conditions are provided in the RO-Crate in their own file and in the ESI.pdf
+        file"""
+
+        # Get the conditions text from the input on the page
+        standard_conditions_input = driver.find_element(
+            By.CSS_SELECTOR, "#rocrate-baseline-desc>div.ql-editor>p").get_property("innerHTML")
+
+        # Read in the standard conditions file from the RO-Crate, and check that the input text is found in it
+        standard_conditions_output_html = open(RC_STANDARD_COND_QUAL_FILE).read()
+        assert standard_conditions_input in standard_conditions_output_html
+
+        # Now check through the ESI.pdf file to find the standard conditions text. Start by looking for the heading
+        # (the text "Standard Conditions" may appear elsewhere in the PDF, but only in this section heading should it
+        # have a newline on either side)
+        assert self._find_text_in_pdf(RC_ESI_QUAL_FILE, "\nStandard conditions\n")
+
+        # Check that the text describing the standard conditions is found as well. This won't appear exactly due to
+        # formatting differences, so we just look for the first few characters (before any formatting)
+        sample_text = standard_conditions_input.split("<")[0][0:20]
+        assert self._find_text_in_pdf(RC_ESI_QUAL_FILE, sample_text)
+
+    def test_test_conditions(self, driver: WebDriver):
+        """Test that the test conditions and their descriptions provided by the user are found in the applicable file
+        and in the ESI.pdf file"""
+
+        l_condition_names = driver.find_elements(By.CSS_SELECTOR, ".condition-input>.ql-editor>p")
+        l_condition_descs = driver.find_elements(By.CSS_SELECTOR,
+                                                 ".rocrate-cond-desc-input>.ql-editor>p")
+
+        # Check the Test Conditions csv file first
+        with open(RC_TEST_COND_QUAL_FILE) as fi:
+            csv_reader = csv.reader(fi)
+            for i, row in enumerate(csv_reader):
+                if i == 0:
+                    # In the first row, check the header is as expected
+                    assert row[0] == "Test parameter"
+                    assert row[1] == "Experimental conditions"
+                    continue
+
+                # In subsequent rows, check the contents match what's entered in the table for each condition
+                assert row[0] == l_condition_names[i-1].get_attribute("innerHTML")
+                assert row[1] == l_condition_descs[i-1].get_attribute("innerHTML")
+                continue
+
+        # Now check for it in the ESI.pdf file as well
+
+        # Look for the heading of this section, and extract the text of the page it's on and the following page as well,
+        # which should contain the full table
+        pdf_text = self._find_text_in_pdf(RC_ESI_QUAL_FILE, "Preparation of sensitivity assessment of reaction",
+                                          append_next_page=True)
+        assert pdf_text
+        for name, desc in zip(l_condition_names, l_condition_descs):
+            assert self._strip_tags(name.get_attribute("innerHTML")) in pdf_text
+            assert self._strip_tags(desc.get_attribute("innerHTML")) in pdf_text
+
+    def test_title(self, driver: WebDriver):
+        """Test that the provided title is present in the data package where expected"""
+
+        # Get the title in HTML markup from the user input
+        html_title = driver.find_element(
+            By.CSS_SELECTOR, "#rocrate-title-input>.ql-editor>p").get_property("innerHTML")
+
+        # Check for the title in the ESI.pdf file
+        assert self._find_text_in_pdf(RC_ESI_QUAL_FILE, self._strip_tags(html_title)+"\n")
+
+        # Check for it in the README.md file
+        assert "## About\n\n**Title**: " + self._html_to_md(html_title, True) in open(RC_README_QUAL_FILE).read()
+
+        # Check for it in the ro-crate-metadata.json file
+        metadata_file = json.load(open(RC_METADATA_QUAL_FILE))
+        assert metadata_file["@graph"][0]["name"] == self._strip_tags(html_title)
+
+    def test_description(self, driver: WebDriver):
+        """Test that the provided description is present in the data package where expected"""
+
+        # Get the description in HTML markup from the user input
+        html_desc = driver.find_element(
+            By.CSS_SELECTOR, "#rocrate-desc-input>.ql-editor>p").get_property("innerHTML")
+
+        # Check for it in the README.md file
+        assert "\n\n**Description**: " + self._html_to_md(html_desc, True) in open(RC_README_QUAL_FILE).read()
+
+        # Check for it in the ro-crate-metadata.json file
+        metadata_file = json.load(open(RC_METADATA_QUAL_FILE))
+        assert metadata_file["@graph"][0]["description"] == self._strip_tags(html_desc)
+
+    def test_about(self, driver: WebDriver):
+        """Test that the provided "About" text is present in the data package where expected"""
+
+        # Get the about text in HTML markup from the user input
+        html_about = driver.find_element(
+            By.CSS_SELECTOR, "#rocrate-about>.ql-editor>p").get_property("innerHTML")
+
+        # Check for it in the README.md file
+        assert "\n\n**About**: " + self._html_to_md(html_about, True) in open(RC_README_QUAL_FILE).read()
+
+    def test_license(self, driver: WebDriver):
+        """Test that the provided license name and link are present in the data package where expected"""
+
+        # Get the license name and description in HTML markup from the user input
+        license_name: str = driver.find_element(By.CSS_SELECTOR, "#rocrate-license-name").get_property("value")
+        license_url: str = driver.find_element(By.CSS_SELECTOR, "#rocrate-license-url").get_property("value")
+
+        # Check for it in the README.md file
+        assert ("**License:** [" + license_name + "](" + license_url + ")") in open(RC_README_QUAL_FILE).read()
+
+        # Check for it in the ro-crate-metadata.json file
+        metadata_file = json.load(open(RC_METADATA_QUAL_FILE))
+        assert metadata_file["@graph"][0]["license"]["@id"] == license_url
+
+    def test_contribs(self, driver: WebDriver):
+        """Test that the provided author names and links are present in the RO-Crate where expected"""
+
+        # Get lists of the author name and links
+        l_contrib_names: list[str] = [x.get_property("value") for x in driver.find_elements(
+            By.CSS_SELECTOR, ".rocrate-name-input")]
+        l_contrib_orcids: list[str] = [x.get_property("value") for x in driver.find_elements(
+            By.CSS_SELECTOR, ".rocrate-orcid-input")]
+
+        # Load from the various sources where we'll be checking for author info
+        esi_text = self._find_text_in_pdf(RC_ESI_QUAL_FILE, "Bibliographic Information\n", True)
+        readme_text = open(RC_README_QUAL_FILE).read()
+        l_metadata_authors = [x["@id"] for x in json.load(open(RC_METADATA_QUAL_FILE))["@graph"][0]["author"]]
+
+        # Check that each author is present in each source
+        for name, orcid in zip(l_contrib_names, l_contrib_orcids):
+
+            # Get the link based on the ORCID
+            link: str
+            if not orcid.startswith("http"):
+                link = "https://orcid.org/" + orcid
+            else:
+                link = orcid
+
+            assert name in esi_text
+            assert ("**Name**: [" + name + "](" + link + ")") in readme_text
+            assert link in l_metadata_authors
+
+    def test_contact(self, driver: WebDriver):
+        """Test that the provided contact email is present in the data package where expected"""
+
+        # Get the email from the user input
+        email = driver.find_element(By.CSS_SELECTOR, "#rocrate-email-input").get_property("value")
+
+        # Check for the title in the ESI.pdf file
+        assert self._find_text_in_pdf(RC_ESI_QUAL_FILE, "Contact: " + email + ".\n")
+
+        # Check for it in the README.md file
+        assert "**Contact**: " + email in open(RC_README_QUAL_FILE).read()
+
+    def test_citation(self, driver: WebDriver):
+        """Test that the provided citation text is present in the data package where expected"""
+
+        # Get the citation text from the user input
+        citation: str = driver.find_element(By.CSS_SELECTOR,
+                                            "#rocrate-citation>.ql-editor>p").get_property("innerHTML")
+
+        # Check for the citation in the ESI.pdf file. Since we don't know exactly where linebreaks will be in it,
+        # we just check for the first portion
+        assert self._find_text_in_pdf(RC_ESI_QUAL_FILE, self._strip_tags(citation)[0:20])
+
+        # Check for it in the README.md file
+        assert self._html_to_md(citation) + "\n\n## File Structure" in open(RC_README_QUAL_FILE).read()
+
+
+class TestRoCrateMinimal(RoCrateContentsTester):
+    """This class tests that an RO-Crate without all data filled in will be missing elements that are only present when
+    provided"""
+
+    fill_example = False
+
+    def test_reaction_scheme_absent(self):
+        """Test that no reaction scheme file was found in the RO-Crate"""
+
+        assert not os.path.isfile(RC_SCHEME_QUAL_FILE)
+
+    def test_reaction_image_absent(self):
+        """Test that no reaction scheme image was found in the RO-Crate"""
+
+        # To ensure the reaction image isn't in the EDI.pdf file, we loop through it to extract all images and check
+        # that none of them match the reaction image
+
+        extracted_image_filename = os.path.join(DOWNLOAD_LOCATION, "extracted_scheme.png")
+
+        i = 0
+        while self._extract_image_from_pdf(RC_ESI_QUAL_FILE, i, extracted_image_filename):
+            assert not math.isclose(os.path.getsize(extracted_image_filename),
+                                    os.path.getsize(EXAMPLE_PNG), rel_tol=0.05)
+            i += 1
+
+    def test_standard_conditions_absent(self):
+        """Test that the standard conditions file is not present in the output RO-Crate or ESI.pdf file"""
+
+        assert not os.path.isfile(RC_STANDARD_COND_QUAL_FILE)
+
+        # Now check through the ESI.pdf file to make sure we don'tfind the standard conditions text. There's no input
+        # text to match here, so we just look for the heading (the text "Standard Conditions" may appear elsewhere in
+        # the PDF, but only in this section heading should it have a newline on either side)
+        assert not self._find_text_in_pdf(RC_ESI_QUAL_FILE, "\nStandard conditions\n")
+
+    def test_test_conditions_absent(self):
+        """Test that if no test condition descriptions are provided by the user, no file is made for them and no section
+        is present in the ESI.pdf file"""
+
+        # Check the Test Conditions csv file first
+        assert not os.path.isfile(RC_TEST_COND_QUAL_FILE)
+
+        # Check that the section isn't present in the ESI.pdf file
+        assert not self._find_text_in_pdf(RC_ESI_QUAL_FILE, "Preparation of sensitivity assessment of reaction")
+
+
+def _get_num_cond_desc_rows(driver: WebDriver):
+    l_e = driver.find_elements(By.XPATH, "//tr[contains(@class,'rocrate-cond-row')]")
+    return len(l_e)
+
+
+def test_cond_desc_rows(driver: WebDriver):
+    """Test that the number of condition description rows always matches the number of condition rows"""
+
+    _init_rocrate_export(driver)
+
+    # Check the number of rows is equal when initialised, and after a couple changes
+    assert _get_num_condition_rows(driver) == _get_num_cond_desc_rows(driver)
+
+    _set_num_condition_rows(driver, 7)
+    assert _get_num_condition_rows(driver) == _get_num_cond_desc_rows(driver)
+
+    _set_num_condition_rows(driver, 4)
+    assert _get_num_condition_rows(driver) == _get_num_cond_desc_rows(driver)
+
+    # Also check that if we change the rows before loading the RO-Crate export section, the number of description rows
+    # is initialised correctly
+
+    driver.get(f"{origin}/")
+    wait_for_cover_hidden(driver)
+    _set_num_condition_rows(driver, 8)
+    _start_rocrate_export(driver)
+    assert _get_num_condition_rows(driver) == _get_num_cond_desc_rows(driver)
+
+    driver.get(f"{origin}/")
+    wait_for_cover_hidden(driver)
+    _set_num_condition_rows(driver, 3)
+    _start_rocrate_export(driver)
+    assert _get_num_condition_rows(driver) == _get_num_cond_desc_rows(driver)
+
+
+def test_cond_desc_labels(driver: WebDriver):
+    """Test that the condition description row labels all match the inputted condition values"""
+
+    def _get_l_conds(driver: WebDriver):
+        return driver.find_elements(
+            By.XPATH, "//tr[contains(@class,'condition-row')]//div[contains(@class,'ql-editor')]//p")
+
+    def _get_l_cond_descs(driver: WebDriver):
+        return driver.find_elements(
+            By.XPATH, "//tr[contains(@class,'rocrate-cond-row')]//div[contains(@class,'rocrate-cond-desc-label')]")
+
+    def _check_labels_match(driver):
+        l_conds = _get_l_conds(driver)
+        l_cond_descs = _get_l_cond_descs(driver)
+
+        for cond, cond_desc in zip(l_conds, l_cond_descs):
+            assert cond.get_attribute('innerHTML').replace("<br>", "")+":" == cond_desc.get_attribute('innerHTML')
+
+    # Start by checking that the labels are right with the example data
+
+    _init_rocrate_export(driver, fill_example=True)
+    _check_labels_match(driver)
+
+    # Make a few changes to the number of conditions and the labels, and check that they still match up in the end
+
+    # Add a condition row after index 1, and remove the condition row at index 3
+    wait_for_element(driver, "//button[@id='add-cb-1']").click()
+    wait_for_element(driver, "//button[@id='remove-cb-3']").click()
+
+    # Check things match after these changes
+    _check_labels_match(driver)
+
+    # Edit the name of the newly-added condition, and check that the label is updated to match
+    new_cond = _get_l_conds(driver)[2]
+    scroll_element_into_view(driver, new_cond).click()
+    send_keys(driver, "New description")
+    _check_labels_match(driver)
+
+
+def test_license_select(driver):
+    """Test that selecting a license will result in its details appearing in the input boxes for it"""
+
+    _init_rocrate_export(driver)
+
+    def _check_license_info(name, link, disabled=True):
+        name_input: WebElement = driver.find_element(value="rocrate-license-name")
+        link_input: WebElement = driver.find_element(value="rocrate-license-url")
+        assert name_input.get_attribute("value") == name
+        assert link_input.get_attribute("value") == link
+        if disabled:
+            assert name_input.get_attribute("disabled") == 'true'
+            assert link_input.get_attribute("disabled") == 'true'
+        else:
+            assert name_input.get_attribute("disabled") is None
+            assert link_input.get_attribute("disabled") is None
+
+    # Click on each license option in turn and check that the input text is correct
+    wait_for_element(driver, "//input[@id='rocrate-license-none']").click()
+    _check_license_info("", "")
+
+    wait_for_element(driver, "//input[@id='rocrate-license-cc0']").click()
+    _check_license_info("Creative Commons Zero v1.0 Universal",
+                        "https://spdx.org/licenses/CC0-1.0.html")
+
+    wait_for_element(driver, "//input[@id='rocrate-license-cc-by-4.0']").click()
+    _check_license_info("Creative Commons Attribution 4.0 International",
+                        "https://spdx.org/licenses/CC-BY-4.0.html")
+
+    wait_for_element(driver, "//input[@id='rocrate-license-cc-by-sa-4.0']").click()
+    _check_license_info("Creative Commons Attribution Share Alike 4.0 International",
+                        "https://spdx.org/licenses/CC-BY-SA-4.0.html")
+
+    wait_for_element(driver, "//input[@id='rocrate-license-other']").click()
+    _check_license_info("", "", False)
+
+
+def test_file_structure(driver: WebDriver):
+    """Test that the File Structure section only shows elements that should be visible"""
+
+    # Start with a minimal fill, which shouldn't show the optional elements
+    _init_rocrate_export(driver)
+
+    reaction_scheme_li = driver.find_element(value="rocrate-reaction-scheme-li")
+    standard_cond_li = driver.find_element(value="rocrate-baseline-li")
+    test_cond_li = driver.find_element(value="rocrate-test-conditions-li")
+
+    with pytest.raises(MoveTargetOutOfBoundsException):
+        scroll_element_into_view(driver, reaction_scheme_li)
+    with pytest.raises(MoveTargetOutOfBoundsException):
+        scroll_element_into_view(driver, standard_cond_li)
+    with pytest.raises(MoveTargetOutOfBoundsException):
+        scroll_element_into_view(driver, test_cond_li)
+
+    # Now add data which should make them show up, and check that they are now visible
+    _fill_example_data(driver)
+    wait_for_element(driver, "//input[@id='rocrate-cdxml']").send_keys(EXAMPLE_CDXML)
+    scroll_element_into_view(driver, reaction_scheme_li)
+    scroll_element_into_view(driver, standard_cond_li)
+    scroll_element_into_view(driver, test_cond_li)
+
+
+def test_about_buttons(driver: WebDriver):
+    """Test that the Default and Revert buttons in the "About this Dataset" section work as expected"""
+
+    _init_rocrate_export(driver, fill_example=True)
+
+    title_el = wait_for_element(driver,
+                                "//div[@id='rocrate-title-input']//div[contains(@class,'ql-editor')]//p")
+    desc_el = wait_for_element(driver,
+                               "//div[@id='rocrate-desc-input']//div[contains(@class,'ql-editor')]//p")
+    about_el = wait_for_element(driver,
+                                "//div[@id='rocrate-about']//div[contains(@class,'ql-editor')]//p")
+
+    # Save the current values, which are what the defaults should be when we click the button to use the defaults
+    default_title = title_el.get_property("innerHTML")
+    default_desc = desc_el.get_property("innerHTML")
+    default_about = about_el.get_property("innerHTML")
+
+    # Replace the input in each
+    new_title = "Test title"
+    title_el.click()
+    send_keys(driver, Keys.BACKSPACE*100 + Keys.DELETE*100 + new_title)
+
+    new_desc = "Test description"
+    desc_el.click()
+    send_keys(driver, Keys.BACKSPACE*100 + Keys.DELETE*100 + new_desc)
+
+    new_about = "Test about"
+    about_el.click()
+    send_keys(driver, Keys.BACKSPACE*300 + Keys.DELETE*300 + new_about)
+
+    def _check_info(ex_title, ex_desc, ex_about):
+        assert title_el.get_property("innerHTML") == ex_title
+        assert desc_el.get_property("innerHTML") == ex_desc
+        assert about_el.get_property("innerHTML") == ex_about
+
+    # Sanity check that the values we entered are now there
+    _check_info(new_title, new_desc, new_about)
+
+    # Click the "Use Defaults" button and check that the default values appear
+    wait_for_element(driver, "//button[@id='rocrate-default-title-desc']").click()
+    _check_info(default_title, default_desc, default_about)
+
+    # Click the "Revert" button and check that the previous values appear
+    revert_button = wait_for_element(driver, "//button[@id='rocrate-revert-title-desc']")
+    revert_button.click()
+    _check_info(new_title, new_desc, new_about)
+
+    # Click the "Revert" button again, and check that the default values return
+    revert_button.click()
+    _check_info(default_title, default_desc, default_about)
+
+
+def _get_num_contrib_rows(driver: WebDriver):
+    l_e = driver.find_elements(By.XPATH, "//div[contains(@class,'rocrate-contrib-row')]")
+    return len(l_e)
+
+
+def _set_num_contrib_rows(driver: WebDriver, n: int):
+    row_select_element = wait_for_element(driver, "//select[@id='num-contrib']")
+    row_select = Select(row_select_element)
+    wait_for_success(lambda: row_select.select_by_value(str(n)))
+
+
+def test_num_contrib_control(driver: WebDriver):
+    """Test that the number of contributors can be controlled by the selector and buttons"""
+
+    _init_rocrate_export(driver, fill_example=True)
+
+    # Check that we initially have 6 rows, as expected
+    assert _get_num_contrib_rows(driver) == 6
+
+    # Check that we can change the number of contrib rows with the select input
+    _set_num_contrib_rows(driver, 8)
+    assert _get_num_contrib_rows(driver) == 8
+    _set_num_contrib_rows(driver, 4)
+    assert _get_num_contrib_rows(driver) == 4
+
+    # Check that we can add and remove rows with the buttons
+    add_contrib_button_0 = wait_for_element(driver, "//button[@id='add-rcb-0']")
+    add_contrib_button_0.click()
+    add_contrib_button_0.click()
+    add_contrib_button_0.click()
+    assert _get_num_contrib_rows(driver) == 7
+    wait_for_element(driver, "//button[@id='remove-rcb-2']").click()
+    wait_for_element(driver, "//button[@id='remove-rcb-3']").click()
+    assert _get_num_contrib_rows(driver) == 5
+
+
+def test_bib_info_buttons(driver: WebDriver):
+    """Test that the Default and Revert buttons in the "Bibliographic Info" section work as expected"""
+
+    _init_rocrate_export(driver, fill_example=True)
+
+    bib_el = wait_for_element(driver,
+                              "//div[@id='rocrate-citation']//div[contains(@class,'ql-editor')]//p")
+
+    # Save the current value - it's not the default in this case though
+    init_bib = bib_el.get_property("innerHTML")
+
+    # Replace the input
+    new_bib = "Test bib"
+    bib_el.click()
+    send_keys(driver, Keys.BACKSPACE*300 + Keys.DELETE*300 + new_bib)
+
+    # Sanity check that the value we entered is now there
+    assert bib_el.get_property("innerHTML") == new_bib
+
+    # Click the "Use Defaults" button and check that the default value appears and not the initial value
+    wait_for_element(driver, "//button[@id='rocrate-default-citation']").click()
+    default_bib = bib_el.get_property("innerHTML")
+    assert default_bib != init_bib
+
+    # To check that this does indeed appear to be the default value, we check that all the author names and plot title
+    # appear in it
+    l_contrib_rows = driver.find_elements(By.XPATH, "//div[contains(@class,'rocrate-contrib-row')]")
+    for contrib_row in l_contrib_rows:
+        contrib_name_el = contrib_row.find_element(By.XPATH, ".//input[contains(@class,'rocrate-name-input')]")
+        contrib_surname = contrib_name_el.get_property("value").split(" ")[-1]
+        assert contrib_surname in default_bib
+    title_el = wait_for_element(driver,
+                                "//div[@id='rocrate-title-input']//div[contains(@class,'ql-editor')]//p")
+    assert title_el.get_property("innerHTML") in default_bib
+
+    # Click the "Revert" button and check that the previous values appear
+    revert_button = wait_for_element(driver, "//button[@id='rocrate-revert-citation']")
+    revert_button.click()
+    assert bib_el.get_property("innerHTML") == new_bib
+
+    # Click the "Revert" button again, and check that the default values return
+    revert_button.click()
+    assert bib_el.get_property("innerHTML") == default_bib
+
+
+def test_orcid_lookup(driver: WebDriver):
+    """Test that we can use the ORCID Lookup button to search the ORCID site for a contributor"""
+
+    _init_rocrate_export(driver, fill_example=True)
+    original_window_handle = driver.current_window_handle
+
+    # Find the entry in the contributors row for Frank Glorius, and click the ORCID Lookup button
+    l_contrib_rows = driver.find_elements(By.XPATH, "//div[contains(@class,'rocrate-contrib-row')]")
+    for contrib_row in l_contrib_rows:
+        contrib_name_el = contrib_row.find_element(By.XPATH, ".//input[contains(@class,'rocrate-name-input')]")
+        if not contrib_name_el.get_property("value") == "Frank Glorius":
+            continue
+        lookup_button = contrib_row.find_element(By.XPATH, ".//button[contains(@class,'rocrate-orcid-lookup')]")
+        scroll_element_into_view(driver, lookup_button)
+        lookup_button.click()
+        break
+
+    # Wait for the new tab to load, then switch to it
+    WebDriverWait(driver, TIMEOUT_SHORT).until(EC.number_of_windows_to_be(2))
+    new_window_handle = (set(driver.window_handles) - {original_window_handle}).pop()
+    driver.switch_to.window(new_window_handle)
+    assert driver.current_window_handle == new_window_handle
+
+    # Wait for the search to finish
+    wait_for_condition((lambda: len(driver.find_elements(
+        By.XPATH, ".//td[contains(@class,'orcid-id-column')]//a")) > 0))
+
+    l_orcid_cells = driver.find_elements(By.XPATH, ".//td[contains(@class,'orcid-id-column')]//a")
+    EX_ORCID = "0000-0002-0648-956X"
+    for orcid_cell in l_orcid_cells:
+        if orcid_cell.get_property("innerHTML").strip() == EX_ORCID:
+            break
+    else:
+        pytest.fail(f"Expected ORCID ({EX_ORCID}) for Frank Glorius not found in lookup")

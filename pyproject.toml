@@ -46,7 +46,14 @@ local_scheme = "no-local-version"
 
 [project.optional-dependencies]
 test = ["pytest", "coverage"]
-gui-test = ["pytest", "coverage", "selenium", "webdriver_manager"]
+gui-test = [
+  "pytest",
+  "coverage",
+  "selenium",
+  "webdriver_manager",
+  "roc-validator",
+  "pypdf[image]",
+]
 deploy = ["gunicorn"]
 doc = ["pdoc3", "gunicorn", "pytest", "selenium"]
 plots = ["matplotlib"]

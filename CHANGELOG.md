@@ -1,5 +1,19 @@
 # Changelog for PSDI Glorius Plot Generator
 
+## v0.5.0
+
+### New and Changed Functionality
+
+- The structure of outputted RO-Crate data packages has been changed to not include an additional root folder, to match the more common convention
+
+### Bugfixes
+
+- Improved logic of detecting surnames in contributor names so that initials are less likely to be mistaken for surnames when generating a default citation
+
+### Testing changes
+
+- Added automated tests of RO-Crate export section
+
 ## v0.4.8
 
 ### Miscellaneous changes

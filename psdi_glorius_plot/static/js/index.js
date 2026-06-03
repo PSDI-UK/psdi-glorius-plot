@@ -150,7 +150,7 @@ const D_LICENSE_INFO = {
 // Structure of the output RO-crate file
 
 const ROCRATE_FILENAME_BASE = "glorius-plot-ro-crate.zip";
-const ROCRATE_ROOT_DIR = "glorius-plot/"
+const ROCRATE_ROOT_DIR = ""
 const ROCRATE_DATA_DIR = ROCRATE_ROOT_DIR + "data/"
 const ROCRATE_PLOT_DIR = ROCRATE_DATA_DIR + "plot/"
 
@@ -2476,7 +2476,10 @@ function useDefaultCitation(e) {
         const lCapsSurnameSegments = [];
         const lCapsForenameSegments = [];
         lNameSegments.forEach((s) => {
-          if (s.length > 1 && s === s.toUpperCase()) {
+          // Check for any initials in the segment and remove them from consideration (e.g. we don't want the "B.A." in
+          // "B.A. Barracus" to be mistaken for a surname because it's technically all-caps)
+          const nonInitialSegment = s.replaceAll(/\w\./g, "");
+          if (nonInitialSegment.length > 1 && s === s.toUpperCase()) {
             lCapsSurnameSegments.push(s);
           } else {
             lCapsForenameSegments.push(s);
