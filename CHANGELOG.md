@@ -1,5 +1,11 @@
 # Changelog for PSDI Glorius Plot Generator
 
+## v0.5.1
+
+### Stylistic Change
+
+- Pulled updated common assets, adding link to sitemap to footer
+
 ## v0.5.0
 
 ### New and Changed Functionality
@@ -94,7 +100,7 @@
 - Changed all times in generated RO-Crate to be in user's local time
 - When buttons are clicked to add or remove a contributor in the author list, the selection box will appropriately update
 
-**Stylistic Changes**
+### Stylistic Change
 
 - Adjusted labels for font size inputs on the plots and added clarifying tooltips
 
