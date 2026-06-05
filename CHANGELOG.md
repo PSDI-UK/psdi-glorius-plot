@@ -4,7 +4,7 @@
 
 ### Stylistic Change
 
--Pulled updated common assets, adding link to sitemap to footer
+- Pulled updated common assets, adding link to sitemap to footer
 
 ## v0.5.0
 
