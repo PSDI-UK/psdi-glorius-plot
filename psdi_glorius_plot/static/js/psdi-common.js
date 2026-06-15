@@ -93,6 +93,14 @@ export function connectModeToggleButton() {
   });
 }
 
+export function disconnectModeToggleButton() {
+  // Disconnect the mode toggle function from the button
+  const lModeToggleButton = document.querySelectorAll(".color-mode-toggle");
+  lModeToggleButton.forEach(function (modeToggleButton) {
+    modeToggleButton.removeEventListener("click", toggleMode);
+  });
+}
+
 // Counter for elements that need to be loaded - each we request loading will increment this by 1
 let loadSteps = 0;
 
