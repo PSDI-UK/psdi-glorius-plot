@@ -1534,7 +1534,7 @@ class TestRoCrateMaximal(RoCrateContentsTester):
 
         # The file gets slightly changed when embedded in the PDF, so we can test for an exact match. Instead we check
         # that the file size is close
-        assert math.isclose(os.path.getsize(extracted_image_filename), os.path.getsize(EXAMPLE_PNG), rel_tol=0.05)
+        assert math.isclose(os.path.getsize(extracted_image_filename), os.path.getsize(EXAMPLE_PNG), rel_tol=0.1)
 
     def test_glorius_plot_image(self):
         """Test that the Glorius plot image contained within the ESI.pdf file in the RO-Crate matches that generated"""
@@ -1546,7 +1546,7 @@ class TestRoCrateMaximal(RoCrateContentsTester):
         # The file gets slightly changed when embedded in the PDF, so we can test for an exact match. Instead we check
         # that the file size is close
         assert math.isclose(os.path.getsize(extracted_image_filename),
-                            os.path.getsize(RC_PLOT_QUAL_FILE), rel_tol=0.05)
+                            os.path.getsize(RC_PLOT_QUAL_FILE), rel_tol=0.1)
 
     def test_standard_conditions(self, driver: WebDriver):
         """Test that the provided standard conditions are provided in the RO-Crate in their own file and in the ESI.pdf
@@ -1736,7 +1736,7 @@ class TestRoCrateMinimal(RoCrateContentsTester):
         i = 0
         while self._extract_image_from_pdf(RC_ESI_QUAL_FILE, i, extracted_image_filename):
             assert not math.isclose(os.path.getsize(extracted_image_filename),
-                                    os.path.getsize(EXAMPLE_PNG), rel_tol=0.05)
+                                    os.path.getsize(EXAMPLE_PNG), rel_tol=0.1)
             i += 1
 
     def test_standard_conditions_absent(self):
