@@ -317,13 +317,13 @@ def test_navigate_header(driver: WebDriver):
 
     # Test using the header link to get to the Provide Feedback form from both the home and Documentation pages
     _init_page(driver)
-    _click_header_link("Provide Feedback", "forms.office.com/pages/responsepage.aspx")
+    _click_header_link("Provide Feedback", "responsepage.aspx")
     assert (wait_for_element(driver, "//div[@id='FormTitleId_titleAriaId']/div/span/b/span")
             ).text == "PSDI Glorius Plot Generator: Feedback Form"
 
     _init_page(driver)
     _click_header_link("Documentation", "documentation.html")
-    _click_header_link("Provide Feedback", "forms.office.com/pages/responsepage.aspx")
+    _click_header_link("Provide Feedback", "responsepage.aspx")
     assert (wait_for_element(driver, "//div[@id='FormTitleId_titleAriaId']/div/span/b/span")
             ).text == "PSDI Glorius Plot Generator: Feedback Form"
 
