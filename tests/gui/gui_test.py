@@ -1369,9 +1369,10 @@ class RoCrateContentsTester:
     fill_example: bool
 
     @pytest.fixture(scope="class", autouse=True)
-    def init_rocrate(self, driver: WebDriver):
+    @classmethod
+    def init_rocrate(cls, driver: WebDriver):
         """Prepare and extract the RO-Crate we want to check using default data"""
-        _init_rocrate_export(driver, fill_example=self.fill_example)
+        _init_rocrate_export(driver, fill_example=cls.fill_example)
         wait_for_element(driver, "//button[@id='rocrate-download']").click()
         rocrate_qual_file = _wait_for_download(RC_FILE_PATTERN, TIMEOUT_LONG)
         shutil.unpack_archive(rocrate_qual_file, extract_dir=os.path.join(DOWNLOAD_LOCATION, RC_EXTRACT_DIR))
