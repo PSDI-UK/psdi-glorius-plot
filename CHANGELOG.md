@@ -1,8 +1,18 @@
 # Changelog for PSDI Glorius Plot Generator
 
+## v0.5.2
+
+### Miscellaneous changes
+
+- Updated common assets, switching to self-hosting fonts for GDPR compliance
+
+### Testing changes
+
+- Set ORCID test to be skipped, since it will spuriously fail if the ORCID site is down
+
 ## v0.5.1
 
-### Stylistic Change
+### Stylistic changes
 
 - Pulled updated common assets, adding link to sitemap to footer
 
