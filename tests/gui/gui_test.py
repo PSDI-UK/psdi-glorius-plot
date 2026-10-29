@@ -317,13 +317,13 @@ def test_navigate_header(driver: WebDriver):
 
     # Test using the header link to get to the Provide Feedback form from both the home and Documentation pages
     _init_page(driver)
-    _click_header_link("Provide Feedback", "forms.office.com/pages/responsepage.aspx")
+    _click_header_link("Provide Feedback", "responsepage.aspx")
     assert (wait_for_element(driver, "//div[@id='FormTitleId_titleAriaId']/div/span/b/span")
             ).text == "PSDI Glorius Plot Generator: Feedback Form"
 
     _init_page(driver)
     _click_header_link("Documentation", "documentation.html")
-    _click_header_link("Provide Feedback", "forms.office.com/pages/responsepage.aspx")
+    _click_header_link("Provide Feedback", "responsepage.aspx")
     assert (wait_for_element(driver, "//div[@id='FormTitleId_titleAriaId']/div/span/b/span")
             ).text == "PSDI Glorius Plot Generator: Feedback Form"
 
@@ -1369,9 +1369,10 @@ class RoCrateContentsTester:
     fill_example: bool
 
     @pytest.fixture(scope="class", autouse=True)
-    def init_rocrate(self, driver: WebDriver):
+    @classmethod
+    def init_rocrate(cls, driver: WebDriver):
         """Prepare and extract the RO-Crate we want to check using default data"""
-        _init_rocrate_export(driver, fill_example=self.fill_example)
+        _init_rocrate_export(driver, fill_example=cls.fill_example)
         wait_for_element(driver, "//button[@id='rocrate-download']").click()
         rocrate_qual_file = _wait_for_download(RC_FILE_PATTERN, TIMEOUT_LONG)
         shutil.unpack_archive(rocrate_qual_file, extract_dir=os.path.join(DOWNLOAD_LOCATION, RC_EXTRACT_DIR))
@@ -2029,6 +2030,9 @@ def test_bib_info_buttons(driver: WebDriver):
     assert bib_el.get_property("innerHTML") == default_bib
 
 
+@pytest.mark.skip(reason="This test succeeding is dependent on uptime of the ORCID website, so frequently gives false "
+                  "failures when that site goes down. It should be manually tested before any releases, but doesn't "
+                  "need to be regularly run.")
 def test_orcid_lookup(driver: WebDriver):
     """Test that we can use the ORCID Lookup button to search the ORCID site for a contributor"""
 

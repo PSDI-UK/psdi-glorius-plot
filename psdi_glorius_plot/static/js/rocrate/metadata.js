@@ -67,7 +67,7 @@ export function makeMetadata(rocrateInfo) {
 	}
 
 	let text = `{
-    "@context": "https://w3id.org/ro/crate/1.1/context",
+    "@context": "https://w3id.org/ro/crate/1.3/context",
     "@graph": [
 		{
 			"@id": "./",
