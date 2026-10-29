@@ -51,7 +51,7 @@ gui-test = [
   "coverage",
   "selenium",
   "webdriver_manager",
-  "roc-validator",
+  "roc-validator==0.12.0",
   "pypdf[image]",
 ]
 deploy = ["gunicorn"]
