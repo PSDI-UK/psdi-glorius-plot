@@ -2030,6 +2030,9 @@ def test_bib_info_buttons(driver: WebDriver):
     assert bib_el.get_property("innerHTML") == default_bib
 
 
+@pytest.mark.skip(reason="This test succeeding is dependent on uptime of the ORCID website, so frequently gives false "
+                  "failures when that site goes down. It should be manually tested before any releases, but doesn't "
+                  "need to be regularly run.")
 def test_orcid_lookup(driver: WebDriver):
     """Test that we can use the ORCID Lookup button to search the ORCID site for a contributor"""
 
