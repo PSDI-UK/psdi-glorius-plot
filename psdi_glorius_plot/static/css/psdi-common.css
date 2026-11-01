@@ -524,10 +524,27 @@ body>* {
   height          : auto !important;
 }
 
-.announcementBarContent_xLdY {
+.announcementBar_mb4j.info {
+  background-color: var(--ifm-color-info);
+}
+
+.announcementBar_mb4j:has(>.closeButton_CVFx) {
+  flex-direction : row;
+  justify-content: center;
+}
+
+.announcementBarPlaceholder_vyr4 {
+  display: none;
+}
+
+.announcementBar_mb4j .announcementBarContent_xLdY {
   font-size : 1rem;
   padding   : 5px 0;
   text-align: center;
+}
+
+.announcementBar_mb4j:has(>.closeButton_CVFx) .announcementBarContent_xLdY {
+  flex: none;
 }
 
 .header .max-width-box {
