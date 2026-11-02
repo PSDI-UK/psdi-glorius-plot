@@ -143,9 +143,27 @@
 }
 
 @font-face {
+    font-family      : "Lato Fallback";
+    src              : local("Arial");
+    size-adjust      : 94.49%;
+    ascent-override  : 104.46%;
+    descent-override : 22.54%;
+    line-gap-override: 0%;
+}
+
+@font-face {
     font-family : 'Oswald';
     src         : url('../fonts/Oswald-Regular.woff2') format('woff2');
     font-weight : normal;
     font-style  : normal;
     font-display: swap;
+}
+
+@font-face {
+    font-family      : "Oswald Fallback";
+    src              : local("Arial");
+    size-adjust      : 111.46%;
+    ascent-override  : 107.03%;
+    descent-override : 25.93%;
+    line-gap-override: 0%;
 }
