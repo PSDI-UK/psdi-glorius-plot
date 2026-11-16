@@ -4,12 +4,13 @@ name: CI - Periodic jobs
 run-name: CI - Periodic jobs
 
 on:
-  schedule:
-    # Run once a week
-    - cron: "00 0 1,8,15,22 * *"
-  # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
+  schedule:
+    # Run every Sunday-Monday midnight
+    - cron: "00 0 * * mon"
 
 jobs:
   update-assets:
-    uses: PSDI-UK/psdi-github-workflows-public/.github/workflows/update-common-assets.yml@cb813e85a0616d23527594901b6b856130e5894a
+    uses: PSDI-UK/psdi-github-workflows-public/.github/workflows/update-common-assets.yml@6077506c3723a31fad3b6ff02c84c16f2a8ffc6c
+    secrets:
+      token: ${{ secrets.GITHUB_TOKEN }}
