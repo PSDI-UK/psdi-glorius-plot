@@ -12,13 +12,13 @@ on:
 
 jobs:
   test-python:
-    uses: PSDI-UK/psdi-github-workflows-public/.github/workflows/test-python.yml@b4c884a5fbaa96777c26f1ac6d4eac67531e2fc7
+    uses: PSDI-UK/psdi-github-workflows-public/.github/workflows/test-python.yml@6077506c3723a31fad3b6ff02c84c16f2a8ffc6c
     with:
       source_dir: psdi_glorius_plot
 
   test-gui:
     name: Run full tests of the gui locally
-    uses: PSDI-UK/psdi-github-workflows-public/.github/workflows/test-gui.yml@b4c884a5fbaa96777c26f1ac6d4eac67531e2fc7
+    uses: PSDI-UK/psdi-github-workflows-public/.github/workflows/test-gui.yml@6077506c3723a31fad3b6ff02c84c16f2a8ffc6c
     secrets:
       token: ${{ secrets.GITHUB_TOKEN }}
 
@@ -33,17 +33,17 @@ jobs:
   # scan.
   #
   #anchore-scan:
-  #  uses: PSDI-UK/psdi-glorius-plot-deployment/.github/workflows/anchore-scan.yml@b4c884a5fbaa96777c26f1ac6d4eac67531e2fc7
+  #  uses: PSDI-UK/psdi-glorius-plot-deployment/.github/workflows/anchore-scan.yml@6077506c3723a31fad3b6ff02c84c16f2a8ffc6c
   #  needs: [test-package, test-gui]
 
   tag:
     needs: [test-python, test-gui]
-    uses: PSDI-UK/psdi-github-workflows-public/.github/workflows/tag.yml@b4c884a5fbaa96777c26f1ac6d4eac67531e2fc7
+    uses: PSDI-UK/psdi-github-workflows-public/.github/workflows/tag.yml@6077506c3723a31fad3b6ff02c84c16f2a8ffc6c
     secrets:
       token: ${{ secrets.GITHUB_TOKEN }}
 
   container-push:
-    uses: PSDI-UK/psdi-github-workflows-public/.github/workflows/container-push.yml@b4c884a5fbaa96777c26f1ac6d4eac67531e2fc7
+    uses: PSDI-UK/psdi-github-workflows-public/.github/workflows/container-push.yml@6077506c3723a31fad3b6ff02c84c16f2a8ffc6c
     needs: [tag]
     with:
       container_tag: ${{ needs.tag.outputs.container_tag }}
@@ -58,7 +58,7 @@ jobs:
   # The downstream deploy job leverages on Environment specific secrets, which also must be defined
   deploy-stfc-staging-k8s:
     needs: [tag, container-push]
-    uses: PSDI-UK/psdi-github-workflows-public/.github/workflows/deploy.yml@b4c884a5fbaa96777c26f1ac6d4eac67531e2fc7
+    uses: PSDI-UK/psdi-github-workflows-public/.github/workflows/deploy.yml@6077506c3723a31fad3b6ff02c84c16f2a8ffc6c
     with:
       container_tag: ${{ needs.tag.outputs.container_tag }}
       deployment_repo: psdi-glorius-plot-deployment
