@@ -24,3 +24,9 @@ scripts/purge-common-style.sh
 # Downloaded assets
 psdi-assets.tar.gz
 psdi-common-style-*.*.*
+
+# Node modules
+node_modules/
+
+# Build files for variability plot
+psdi_variability_plot/static/js/glorius.js
