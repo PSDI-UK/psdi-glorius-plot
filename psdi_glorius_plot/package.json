@@ -11,6 +11,7 @@
   "description": "",
   "dependencies": {
     "bootstrap": "^5.3.9",
+    "chartjs": "^0.3.24",
     "esbuild": "^0.25.11",
     "jquery": "^4.1.0",
     "jquery.dirtyforms": "^2.0.0",
