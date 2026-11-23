@@ -1,0 +1,17 @@
+{
+  "name": "psdi-glorius-plot",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "build": "esbuild src/index.mjs --bundle --outfile=static/js/glorius.js",
+    "buildWatch": "esbuild src/index.mjs --bundle --outfile=static/js/glorius.js --watch",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "license": "",
+  "description": "",
+  "dependencies": {},
+  "devDependencies": {
+    "esbuild": "^0.25.11",
+    "file-saver": "^2.0.5"
+  }
+}
