@@ -28,6 +28,26 @@ let numAwaitingRender = 0;
 
 const dQuillEditors = {};
 
+// Load MathJAX
+import { source as mathJaxSource } from '@mathjax/src/components/js/source.js';
+
+global.MathJax = {
+  loader: {
+    paths: { mathjax: '@mathjax/src/bundle' },
+    load: ['adaptors/liteDOM'],
+    require: (file => import(file)),
+    source: mathJaxSource
+  },
+  svg: {
+    blacker: 1,
+    fontCache: 'local', // Use a local fontCache to ensure generated SVGs will work as standalone
+  },
+  output: {
+    font: 'mathjax-fira'
+  }
+}
+loadMathJaxComponents();
+
 /**
  * Initialise a Quill editor
  * @param {String} selector 
@@ -275,31 +295,17 @@ export function enableQuillEvents(alwaysCallback, otherCallbacks) {
   });
 }
 
+
+export async function loadMathJaxComponents() {
+  return import(source['tex-chtml']);
+}
+
 /**
  * MathJax is loaded asynchronously, so early calls to generate the plot may not have it. This waits to ensure it's
  * available
  */
 export async function waitForMathJax() {
-  return new Promise(resolve => {
-
-    // Check if it's already available before doing anything else
-    if (MathJax.tex2svg)
-      resolve();
-
-    // Check on an interval until it's ready
-    let interval;
-    let elapsed = 0;
-
-    const checkForMathJax = function () {
-      elapsed += T_WAIT;
-      if (MathJax.tex2svg || elapsed >= MAX_ELAPSED) {
-        clearInterval(interval);
-        resolve();
-      }
-    };
-
-    interval = setInterval(checkForMathJax, T_WAIT);
-  });
+  return Promise.all([loadMathJaxComponents(), MathJax.startup.promise]);
 }
 
 /**
