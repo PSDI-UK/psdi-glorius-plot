@@ -1,3 +1,5 @@
+@import url('fira-sans.css');
+
 /* Control for elements that display only in either direct or calc mode */
 :root {
   --radar-mode-display: block;
