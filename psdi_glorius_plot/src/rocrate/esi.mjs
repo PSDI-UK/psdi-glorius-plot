@@ -1,0 +1,361 @@
+import { cleanTags } from "../formatted-labels.js";
+import { loadDataURL } from "../io.js";
+import { formatORCIDUrl } from "../utility.js";
+
+let pdfFontsLoaded = false;
+
+function initPdfFonts(siteUrl) {
+  if (pdfFontsLoaded)
+    return
+  pdfFontsLoaded = true;
+
+  var fonts = {
+    Arial: {
+      normal: siteUrl + "static/fonts/Arial.ttf",
+      bold: siteUrl + "static/fonts/Arial-B.ttf",
+      italics: siteUrl + "static/fonts/Arial-I.ttf",
+      bolditalics: siteUrl + "static/fonts/Arial-BI.ttf"
+    }
+  };
+
+  pdfMake.addFonts(fonts);
+}
+
+/**
+ * 
+ * @param {*} rocrateInfo 
+ * @returns 
+ */
+export async function makeESI(rocrateInfo) {
+
+  if (rocrateInfo.reactionSchemeImg) {
+    // The Image needs to be fully loaded before we create the PDF, so we start loading as early as possible, and wait
+    // on it as long as possible, then fill in the info in the document tree when it's ready
+    var reactionSchemeImgPromise = loadDataURL(rocrateInfo.reactionSchemeImg);
+  }
+
+  // Load fonts for the PDF renderer. We need to provide the absolute web address to them, so we figure that out
+  // relative to the page URL
+  let url = window.location.href, hash = window.location.hash, search = window.location.search;
+
+  if (hash && url.endsWith(hash))
+    url = url.slice(0, -hash.length);
+
+  if (search && url.endsWith(search))
+    url = url.slice(0, -search.length);
+
+  // If the last segment of the URL contains a ., that implies it isn't a folder, so strip it from the URL
+  let lastUrlSegment = url.split("/").at(-1)
+  if (lastUrlSegment.includes(".")) {
+    // We use a regex here to ensure we replace at the end of the URL and not anywhere else the string appears. This
+    // shouldn't be an issue, but playing it safe here
+    url = url.replace(new RegExp(lastUrlSegment.replaceAll(".", "\.") + "$"), "");
+  }
+
+  initPdfFonts(url);
+
+  const docStyles = {
+    header: {
+      fontSize: 18,
+      bold: true
+    },
+    subheader: {
+      fontSize: 14,
+      bold: true,
+      margin: [0, 20, 0, 8]
+    }
+  }
+  const defaultStyle = {
+    font: "Arial",
+    fontSize: 12
+  };
+  const leftLabelLayout = {
+    hLineWidth: function () { return 0; },
+    vLineWidth: function () { return 0; },
+    paddingLeft: function () { return 0; },
+    paddingRight: function (colIndex) { return colIndex === 0 ? 24 : 16; },
+    paddingTop: function () { return 2; },
+    paddingBottom: function (rowIndex) { return rowIndex === 0 ? 4 : 2; }
+  }
+
+  // Create the document contents, starting with the main header and the (always-present) Biblio Info section
+  const docContent = [
+    {
+      text: rocrateInfo.title.txt,
+      style: "header"
+    },
+    {
+      text: "Bibliographic Information",
+      style: "subheader"
+    },
+    {
+      text: rocrateInfo.bibInfo.esiInfo
+    }
+  ];
+
+  // Append other sections to the document content, if they're going to be present
+  if (rocrateInfo.baselineDesc) {
+    docContent.push(
+      {
+        text: "Standard conditions",
+        style: "subheader"
+      },
+      formatFromHTML(rocrateInfo.baselineDesc.html)
+    )
+  }
+
+  if (rocrateInfo.condDescTable) {
+
+    // Format table cells individually
+    const condDescTableFormatted = rocrateInfo.condDescTable.arr.map((row, i) => {
+      return row.map((cell) => {
+        let content = formatFromHTML(cell);
+        if (i == 0) {
+          content = {
+            text: content,
+            bold: true
+          }
+        }
+        return content;
+      });
+    });
+
+    docContent.push(
+      {
+        text: "Preparation of sensitivity assessment of reaction",
+        style: "subheader"
+      },
+      {
+        layout: leftLabelLayout,
+        table: {
+          headerRows: 1,
+          body: condDescTableFormatted
+        }
+      }
+    )
+  }
+
+  if (rocrateInfo.reactionSchemeImg) {
+
+    // Use a function-scope variable here so we can reference it later when we're ready to fill in with the loaded
+    // DataURL
+    var reactionSchemeImgInfo = {
+      image: null,
+      fit: [500, 700]
+    }
+
+    docContent.push(
+      {
+        layout: "noBorders",
+        table: {
+          headerRows: 2,
+          keepWithHeaderRows: true,
+          body: [
+            [{
+              text: "Reaction",
+              style: "subheader"
+            }],
+            [reactionSchemeImgInfo],
+          ]
+        }
+      }
+    )
+
+  }
+
+  var gloriusPlotImgInfo = {
+    image: null,
+    fit: [500, 700]
+  }
+
+
+
+  // Format table cells individually
+  const sensitivityTableFormatted = rocrateInfo.sensitivityTable.arr.map((row, i) => {
+    return row.map((cell) => {
+      let content;
+      if (typeof cell === "string" || cell instanceof String)
+        content = formatFromHTML(cell);
+      else
+        content = cell.toString();
+      if (i == 0) {
+        content = {
+          text: content,
+          bold: true
+        }
+      }
+      return content;
+    })
+  });
+
+  docContent.push(
+    {
+      text: "Results of sensitivity of reaction",
+      style: "subheader"
+    },
+    {
+      layout: leftLabelLayout,
+      table: {
+        headerRows: 1,
+        body: sensitivityTableFormatted
+      }
+    },
+    {
+      layout: "noBorders",
+      table: {
+        headerRows: 2,
+        keepWithHeaderRows: true,
+        body: [
+          [{
+            text: "Glorius plot",
+            style: "subheader"
+          }],
+          [gloriusPlotImgInfo],
+        ]
+      }
+    }
+
+  )
+
+  // Just before creating the PDF, we wait and load the DataURLs for the images
+
+  // The gloriusPlot is provided as a promise for a Blob, but the current version of pdfMake only accepts paths to
+  // images and dataURLs, so we convert the Blob to the latter using the FileReader API
+  gloriusPlotImgInfo.image = await rocrateInfo.gloriusPlotPromise.then((blob) => {
+    return new Promise((resolve, reject) => {
+      var fr = new FileReader();
+      fr.onload = (e) => { resolve(e.target.result); }
+      fr.onerror = (e) => { reject(e.target.result); }
+      fr.readAsDataURL(blob);
+    });
+  });
+
+  if (rocrateInfo.reactionSchemeImg) {
+    reactionSchemeImgInfo.image = await reactionSchemeImgPromise;
+  }
+
+  return pdfMake.createPdf({ content: docContent, styles: docStyles, defaultStyle: defaultStyle }).getBlob();
+}
+
+export function formatESIBibInfo(lNamesAndORCIDs, contactEmail, citation) {
+
+  const lFormattedNames = [];
+  lNamesAndORCIDs.forEach(([name, orcId]) => {
+    // If no name is present, skip this entry
+    if (!name)
+      return;
+    lFormattedNames.push({ text: name, link: formatORCIDUrl(orcId), decoration: 'underline' })
+  });
+
+  const lTextSegments = [];
+
+  // Format differently depending on if we have, none, one, two, or three or more authors
+  if (lFormattedNames.length == 1) {
+    lTextSegments.push("Author: ", lFormattedNames[0], ".");
+  } else if (lFormattedNames.length == 2) {
+    lTextSegments.push("Authors: ", lFormattedNames[0], " and ", lFormattedNames[1], ".");
+  } else if (lFormattedNames.length > 2) {
+    lTextSegments.push("Authors: ");
+    for (let i = 0; i < lFormattedNames.length; ++i) {
+      if (i < lFormattedNames.length - 1)
+        lTextSegments.push(lFormattedNames[i], ", ");
+      else
+        lTextSegments.push("and ", lFormattedNames[i], ".");
+    }
+  }
+
+  if (contactEmail) {
+    lTextSegments.push(" Contact: ", { text: contactEmail, link: `mailto:${contactEmail}`, decoration: 'underline' },
+      ".");
+  }
+
+  if (citation) {
+    if (lTextSegments.length > 0)
+      lTextSegments.push("\n\n");
+    lTextSegments.push(formatFromHTML(citation));
+  }
+
+  // If we have no content in the section, fill it with "N/A"
+  if (lTextSegments.length == 0)
+    return ["N/A"];
+
+  return lTextSegments;
+}
+
+/**
+ * Formats a string with HTML markup into an array of text segments formatted for pdfMake
+ * @param {String} text 
+ * @returns {Array<String>}
+ */
+function formatFromHTML(text) {
+  text = cleanTags(text);
+
+  // Regex which captures any of the formatting tags we're looking for, with a capturing group which notes which tag it
+  // is
+  const tagRegex = /<(\/?em|\/?strong|\/?u|\/?sub|\/?sup)>/gmu;
+
+  // Per how RegEx splits are handled, the resulting string here will be alternating segments and capturing groups,
+  // e.g. High <em>c</em> => ["High ", "em", "c", "/em", ""]
+  const lInTextSegments = text.split(tagRegex);
+  const numTags = (lInTextSegments.length - 1) / 2;
+
+  // Early return in case there's no formatting to be done
+  if (numTags == 0)
+    return text;
+
+  // Start building the output array - it will always start out unformatted
+  let lOutTextSegments = [{
+    text: lInTextSegments[0],
+    bold: false,
+    italics: false,
+    sub: false,
+    sup: false,
+    decoration: false
+  }];
+
+  for (let i = 0; i < numTags; ++i) {
+    // Use the previous segment as a base for any changes to style relative to it
+    const newSegment = { ...lOutTextSegments[i] };
+
+    // Set the text to that of the next segment
+    newSegment.text = lInTextSegments[2 * i + 2];
+
+    // Check what the tag is, and from that adjust the style as appropriate
+    switch (lInTextSegments[2 * i + 1]) {
+      case "em":
+        newSegment.italics = true;
+        break;
+      case "/em":
+        newSegment.italics = false;
+        break;
+      case "strong":
+        newSegment.bold = true;
+        break;
+      case "/strong":
+        newSegment.bold = false;
+        break;
+      case "u":
+        newSegment.decoration = "underline";
+        break;
+      case "/u":
+        newSegment.decoration = false;
+        break;
+      case "sub":
+        newSegment.sub = true;
+        break;
+      case "/sub":
+        newSegment.sub = false;
+        break;
+      case "sup":
+        newSegment.sup = true;
+        break;
+      case "/sup":
+        newSegment.sup = false;
+        break;
+      default:
+    }
+    lOutTextSegments.push(newSegment);
+  }
+
+  return { text: lOutTextSegments };
+}
