@@ -4,7 +4,7 @@
  * @author Bryan Gillis
  */
 
-import { LRUCache } from './packages/lru-cache.min.js'
+import { LRUCache } from 'lru-cache'
 
 const htmlToSvgCache = new LRUCache({ max: 20 });
 

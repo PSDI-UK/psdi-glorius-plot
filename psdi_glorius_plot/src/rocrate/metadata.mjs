@@ -1,4 +1,4 @@
-import { formatORCIDUrl } from "../utility.js";
+import { formatORCIDUrl } from "../utility.mjs";
 
 /**
  * Generates the text of a metadata file based on user input

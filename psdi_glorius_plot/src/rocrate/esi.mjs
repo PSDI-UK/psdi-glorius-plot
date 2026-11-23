@@ -1,6 +1,6 @@
-import { cleanTags } from "../formatted-labels.js";
-import { loadDataURL } from "../io.js";
-import { formatORCIDUrl } from "../utility.js";
+import { cleanTags } from "../formatted-labels.mjs";
+import { loadDataURL } from "../io.mjs";
+import { formatORCIDUrl } from "../utility.mjs";
 
 let pdfFontsLoaded = false;
 
