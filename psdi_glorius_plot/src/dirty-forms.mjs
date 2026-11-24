@@ -5,6 +5,13 @@
  * @author Bryan Gillis
  */
 
+import { $ } from "jquery";
+
+// Make the $ and jQuery variables set globally so they can be found by the Dirtyforms plugin so it can attach methods
+// to them
+window.$ = window.jQuery = $;
+import 'jquery.dirtyforms';
+
 /**
  * Initializes dirty forms checking for the current page
  * @param {string} selector CSS selector for the elements to apply this to, default "form"
