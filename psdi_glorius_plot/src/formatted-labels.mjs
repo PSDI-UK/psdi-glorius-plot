@@ -29,14 +29,11 @@ let numAwaitingRender = 0;
 const dQuillEditors = {};
 
 // Load MathJAX
-import { source as mathJaxSource } from '@mathjax/src/components/js/source.js';
-
-global.MathJax = {
+MathJax = {
   loader: {
     paths: { mathjax: '@mathjax/src/bundle' },
-    load: ['adaptors/liteDOM'],
-    require: (file => import(file)),
-    source: mathJaxSource
+    load: ['input/tex', 'output/svg', 'adaptors/liteDOM'],
+    require: (file => import(file))
   },
   svg: {
     blacker: 1,
@@ -46,6 +43,7 @@ global.MathJax = {
     font: 'mathjax-fira'
   }
 }
+import '@mathjax/src/bundle/startup.js';
 loadMathJaxComponents();
 
 /**
@@ -297,7 +295,7 @@ export function enableQuillEvents(alwaysCallback, otherCallbacks) {
 
 
 export async function loadMathJaxComponents() {
-  return import(source['tex-chtml']);
+  return import('@mathjax/src/bundle/startup.js');
 }
 
 /**

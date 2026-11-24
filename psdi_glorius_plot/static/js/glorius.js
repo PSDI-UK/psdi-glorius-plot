@@ -25,10 +25,449 @@
     mod
   ));
 
-  // node_modules/@mathjax/src/components/mjs/source.cjs
-  var require_source = __commonJS({
-    "node_modules/@mathjax/src/components/mjs/source.cjs"(exports2, module) {
-      module.exports.dirname = __dirname;
+  // node_modules/@mathjax/src/bundle/startup.js
+  var require_startup = __commonJS({
+    "node_modules/@mathjax/src/bundle/startup.js"(exports) {
+      (() => {
+        "use strict";
+        var e = { d: (t2, n2) => {
+          for (var o2 in n2) e.o(n2, o2) && !e.o(t2, o2) && Object.defineProperty(t2, o2, { enumerable: true, get: n2[o2] });
+        } };
+        e.g = (function() {
+          if ("object" == typeof globalThis) return globalThis;
+          try {
+            return this || new Function("return this")();
+          } catch (e2) {
+            if ("object" == typeof window) return window;
+          }
+        })(), e.o = (e2, t2) => Object.prototype.hasOwnProperty.call(e2, t2), e.r = (e2) => {
+          "undefined" != typeof Symbol && Symbol.toStringTag && Object.defineProperty(e2, Symbol.toStringTag, { value: "Module" }), Object.defineProperty(e2, "__esModule", { value: true });
+        };
+        var t = {};
+        e.r(t), e.d(t, { Package: () => f, PackageError: () => x2 });
+        var n = {};
+        e.r(n), e.d(n, { CONFIG: () => L2, Loader: () => O2, MathJax: () => M2, PathFilters: () => v });
+        var o = {};
+        e.r(o), e.d(o, { CONFIG: () => R2, MathJax: () => E, Startup: () => k2 });
+        const s = "4.1.3", a = {}, i = "undefined" != typeof window ? window : void 0 !== e.g ? e.g : "undefined" != typeof globalThis ? globalThis : a;
+        function r(e2) {
+          return "object" == typeof e2 && null !== e2;
+        }
+        function d3(e2, t2, n2 = false) {
+          var o2;
+          for (const s2 of Object.keys(t2)) "__esModule" !== s2 && e2[s2] !== t2[s2] && null !== t2[s2] && void 0 !== t2[s2] && (r(e2[s2]) && r(t2[s2]) ? d3(e2[s2], t2[s2], n2 || "_" === s2) : n2 && (null === (o2 = Object.getOwnPropertyDescriptor(e2, s2)) || void 0 === o2 ? void 0 : o2.get) || (e2[s2] = t2[s2]));
+          return e2;
+        }
+        function c(e2, t2, n2) {
+          e2[t2] || (e2[t2] = {}), e2 = e2[t2];
+          for (const t3 of Object.keys(n2)) r(e2[t3]) && r(n2[t3]) ? c(e2, t3, n2[t3]) : null == e2[t3] && null != n2[t3] && (e2[t3] = n2[t3]);
+          return e2;
+        }
+        function u(e2) {
+          return d3(l, e2);
+        }
+        void 0 !== i.MathJax && i.MathJax.constructor === {}.constructor || (i.MathJax = {}), i.MathJax.version || (i.MathJax = { version: s, _: {}, config: i.MathJax });
+        const l = i.MathJax;
+        !Object.hasOwn && l.config.startup.polyfillHasOwn && (Object.hasOwn = function(e2, t2) {
+          if (null == e2) throw new TypeError("Cannot convert undefined or null to object");
+          return Object.prototype.hasOwnProperty.call(Object(e2), t2);
+        });
+        const p = "undefined" != typeof window, h = "undefined" != typeof exports, m = { window: p ? window : null, document: p ? window.document : null, os: (() => {
+          if (p && window.navigator) {
+            const e2 = window.navigator.appVersion, t2 = [["Win", "Windows"], ["Mac", "MacOS"], ["X11", "Unix"], ["Linux", "Unix"]];
+            for (const [n2, o2] of t2) if (e2.includes(n2)) return o2;
+            if (window.navigator.userAgent.includes("Android")) return "Unix";
+          } else if ("undefined" != typeof process) return { linux: "Unix", android: "Unix", aix: "Unix", freebsd: "Unix", netbsd: "Unix", openbsd: "Unix", sunos: "Unix", darwin: "MacOS", win32: "Windows", cygwin: "Windows" }[process.platform] || process.platform;
+          return "unknown";
+        })(), path: (e2) => e2 };
+        "Windows" === m.os && (m.path = (e2) => e2.match(/^[/\\]?[a-zA-Z]:[/\\]/) ? (h ? "" : "file://") + e2.replace(/\\/g, "/").replace(/^\//, "") : e2.replace(/^\//, "file:///"));
+        class x2 extends Error {
+          constructor(e2, t2) {
+            super(e2), this.package = t2;
+          }
+        }
+        class f {
+          get canLoad() {
+            return 0 === this.dependencyCount && !this.noLoad && !this.isLoading && !this.hasFailed;
+          }
+          static loadPromise(e2) {
+            const t2 = L2[e2] || {}, n2 = t2.extraLoads ? O2.load(...t2.extraLoads) : Promise.resolve(), o2 = t2.checkReady || (() => Promise.resolve());
+            return n2.then(() => o2());
+          }
+          static resolvePath(e2, t2 = true) {
+            const n2 = { name: e2, original: e2, addExtension: t2 };
+            return O2.pathFilters.execute(n2), n2.name;
+          }
+          static loadAll() {
+            for (const e2 of this.packages.values()) e2.canLoad && e2.load();
+          }
+          constructor(e2, t2 = false) {
+            this.isLoaded = false, this.result = {}, this.isLoading = false, this.hasFailed = false, this.dependents = [], this.dependencies = [], this.dependencyCount = 0, this.provided = [], this.name = e2, this.noLoad = t2, f.packages.set(e2, this), this.promise = this.makePromise(this.makeDependencies());
+          }
+          makeDependencies() {
+            const e2 = [], t2 = f.packages, n2 = this.noLoad, o2 = this.name, s2 = [];
+            Object.hasOwn(L2.dependencies, o2) ? s2.push(...L2.dependencies[o2]) : "core" !== o2 && s2.push("core");
+            for (const o3 of s2) {
+              const s3 = t2.get(o3) || new f(o3, n2);
+              this.dependencies.includes(s3) || (s3.addDependent(this, n2), this.dependencies.push(s3), s3.isLoaded || (this.dependencyCount++, e2.push(s3.promise)));
+            }
+            return e2;
+          }
+          makePromise(e2) {
+            let t2 = new Promise((e3, t3) => {
+              this.resolve = e3, this.reject = t3;
+            });
+            const n2 = L2[this.name] || {};
+            return n2.ready && (t2 = t2.then((e3) => n2.ready(this.name))), e2.length && (e2.push(t2), t2 = Promise.all(e2).then((e3) => e3.join(", "))), n2.failed && t2.catch((e3) => n2.failed(new x2(e3, this.name))), t2;
+          }
+          load() {
+            if (!this.isLoaded && !this.isLoading && !this.noLoad) {
+              this.isLoading = true;
+              const e2 = f.resolvePath(this.name);
+              L2.require ? this.loadCustom(e2) : this.loadScript(e2);
+            }
+          }
+          loadCustom(e2) {
+            try {
+              const t2 = L2.require(e2);
+              t2 instanceof Promise ? t2.then((e3) => this.result = e3).then(() => this.checkLoad()).catch((t3) => this.failed(`Can't load "` + e2 + '"\n' + t3.message.trim())) : (this.result = t2, this.checkLoad());
+            } catch (e3) {
+              this.failed(e3.message);
+            }
+          }
+          loadScript(e2) {
+            const t2 = m.document.createElement("script");
+            t2.src = e2, t2.charset = "UTF-8", t2.onload = (e3) => this.checkLoad(), t2.onerror = (t3) => this.failed(`Can't load "` + e2 + '"'), m.document.head.appendChild(t2);
+          }
+          loaded() {
+            this.isLoaded = true, this.isLoading = false;
+            for (const e2 of this.dependents) e2.requirementSatisfied();
+            for (const e2 of this.provided) e2.loaded();
+            this.resolve(this.name);
+          }
+          failed(e2) {
+            this.hasFailed = true, this.isLoading = false, this.reject(new x2(e2, this.name));
+          }
+          checkLoad() {
+            f.loadPromise(this.name).then(() => this.loaded()).catch((e2) => this.failed(e2));
+          }
+          requirementSatisfied() {
+            this.dependencyCount && (this.dependencyCount--, this.canLoad && this.load());
+          }
+          provides(e2 = []) {
+            for (const t2 of e2) {
+              let e3 = f.packages.get(t2);
+              e3 || (L2.dependencies[t2] || (L2.dependencies[t2] = []), L2.dependencies[t2].push(t2), e3 = new f(t2, true), e3.isLoading = true), this.provided.push(e3);
+            }
+          }
+          addDependent(e2, t2) {
+            this.dependents.push(e2), t2 || this.checkNoLoad();
+          }
+          checkNoLoad() {
+            if (this.noLoad) {
+              this.noLoad = false;
+              for (const e2 of this.dependencies) e2.checkNoLoad();
+            }
+          }
+        }
+        f.packages = /* @__PURE__ */ new Map();
+        class g {
+          constructor() {
+            this.items = [], this.items = [];
+          }
+          [Symbol.iterator]() {
+            let e2 = 0;
+            const t2 = this.items;
+            return { next: () => ({ value: t2[e2++], done: e2 > t2.length }) };
+          }
+          add(e2, t2 = g.DEFAULTPRIORITY) {
+            let n2 = this.items.length;
+            do {
+              n2--;
+            } while (n2 >= 0 && t2 < this.items[n2].priority);
+            return this.items.splice(n2 + 1, 0, { item: e2, priority: t2 }), e2;
+          }
+          remove(e2) {
+            let t2 = this.items.length;
+            do {
+              t2--;
+            } while (t2 >= 0 && this.items[t2].item !== e2);
+            return t2 >= 0 && this.items.splice(t2, 1), this;
+          }
+        }
+        g.DEFAULTPRIORITY = 5;
+        const y = l.config || {};
+        var b = function(e2, t2, n2, o2) {
+          return new (n2 || (n2 = Promise))(function(s2, a2) {
+            function i2(e3) {
+              try {
+                d4(o2.next(e3));
+              } catch (e4) {
+                a2(e4);
+              }
+            }
+            function r2(e3) {
+              try {
+                d4(o2.throw(e3));
+              } catch (e4) {
+                a2(e4);
+              }
+            }
+            function d4(e3) {
+              var t3;
+              e3.done ? s2(e3.value) : (t3 = e3.value, t3 instanceof n2 ? t3 : new n2(function(e4) {
+                e4(t3);
+              })).then(i2, r2);
+            }
+            d4((o2 = o2.apply(e2, t2 || [])).next());
+          });
+        };
+        const v = { source: (e2) => (Object.hasOwn(L2.source, e2.name) && (e2.name = L2.source[e2.name]), true), normalize: (e2) => {
+          const t2 = e2.name;
+          return t2.match(/^(?:[a-z]+:\/)?\/|[a-z]:[/\\]|\[/i) || (e2.name = "[mathjax]/" + t2.replace(/^\.\//, "")), true;
+        }, prefix: (e2) => {
+          let t2;
+          for (; (t2 = e2.name.match(/^\[([^\]]*)\]/)) && Object.hasOwn(L2.paths, t2[1]); ) e2.name = L2.paths[t2[1]] + e2.name.substring(t2[0].length);
+          return true;
+        }, addExtension: (e2) => (e2.addExtension && !e2.name.match(/\.[^/]+$/) && (e2.name += ".js"), true) }, w = l.version, O2 = { versions: /* @__PURE__ */ new Map(), nestedLoads: [], ready(...e2) {
+          0 === e2.length && (e2 = Array.from(f.packages.keys()));
+          const t2 = [];
+          for (const n2 of e2) {
+            const e3 = f.packages.get(n2) || new f(n2, true);
+            t2.push(e3.promise);
+          }
+          return Promise.all(t2);
+        }, load(...e2) {
+          if (0 === e2.length) return Promise.resolve([]);
+          let t2 = [];
+          this.nestedLoads.unshift(t2);
+          const n2 = Promise.resolve().then(() => b(this, void 0, void 0, function* () {
+            const n3 = [];
+            for (const t3 of e2) {
+              let e3 = f.packages.get(t3);
+              e3 || (e3 = new f(t3), e3.provides(L2.provides[t3])), e3.checkNoLoad(), n3.push(e3.promise.then(() => (L2.versionWarnings && e3.isLoaded && !O2.versions.has(f.resolvePath(t3)) && console.warn(`No version information available for component ${t3}`), e3.result)));
+            }
+            f.loadAll();
+            const o2 = yield Promise.all(n3);
+            for (; t2.length; ) {
+              const e3 = Promise.all(t2);
+              t2 = this.nestedLoads[this.nestedLoads.indexOf(t2)] = [], yield e3;
+            }
+            return this.nestedLoads.splice(this.nestedLoads.indexOf(t2), 1), o2;
+          }));
+          return this.nestedLoads.slice(1).forEach((e3) => e3.push(n2)), n2;
+        }, preLoaded(...e2) {
+          for (const t2 of e2) {
+            let e3 = f.packages.get(t2);
+            e3 || (e3 = new f(t2, true), e3.provides(L2.provides[t2])), e3.loaded();
+          }
+        }, addPackageData(e2, t2) {
+          let n2 = L2[e2];
+          n2 || (n2 = L2[e2] = {});
+          for (const [e3, o2] of Object.entries(t2)) if (Array.isArray(o2)) {
+            n2[e3] || (n2[e3] = []);
+            const t3 = /* @__PURE__ */ new Set([...n2[e3], ...o2]);
+            n2[e3] = [...t3];
+          } else n2[e3] = o2;
+        }, defaultReady() {
+          void 0 !== M2.startup && M2.config.startup.ready();
+        }, getRoot() {
+          if (m.document) {
+            const e2 = m.document.currentScript || m.document.getElementById("MathJax-script");
+            if (e2 && e2 instanceof HTMLScriptElement) return e2.src.replace(/\/[^/]*$/, "");
+          }
+          return y?.loader?.paths?.mathjax || y?.__dirname || "/";
+        }, checkVersion(e2, t2, n2) {
+          return this.saveVersion(e2), !(!L2.versionWarnings || t2 === w) && (console.warn(`Component ${e2} uses ${t2} of MathJax; version in use is ${w}`), true);
+        }, saveVersion(e2) {
+          O2.versions.set(f.resolvePath(e2), w);
+        }, pathFilters: new class extends g {
+          constructor(e2 = null) {
+            super(), e2 && this.addList(e2);
+          }
+          addList(e2) {
+            for (const t2 of e2) Array.isArray(t2) ? this.add(t2[0], t2[1]) : this.add(t2);
+          }
+          execute(...e2) {
+            for (const t2 of this) {
+              if (false === t2.item(...e2)) return false;
+            }
+            return true;
+          }
+          asyncExecute(...e2) {
+            let t2 = -1;
+            const n2 = this.items;
+            return new Promise((o2, s2) => {
+              !(function a2() {
+                for (; ++t2 < n2.length; ) {
+                  const i2 = n2[t2].item(...e2);
+                  if (i2 instanceof Promise) return void i2.then(a2).catch((e3) => s2(e3));
+                  if (false === i2) return void o2(false);
+                }
+                o2(true);
+              })();
+            });
+          }
+        }() };
+        O2.pathFilters.add(v.source, 0), O2.pathFilters.add(v.normalize, 10), O2.pathFilters.add(v.prefix, 20), O2.pathFilters.add(v.addExtension, 30);
+        const M2 = l;
+        if (void 0 === M2.loader) {
+          c(M2.config, "loader", { paths: { mathjax: O2.getRoot(), fonts: m.window ? "https://cdn.jsdelivr.net/npm/@mathjax" : "@mathjax" }, source: {}, dependencies: {}, provides: {}, load: [], ready: O2.defaultReady.bind(O2), failed: (e2) => console.log(`MathJax(${e2.package || "?"}): ${e2.message}`), require: null, pathFilters: [], versionWarnings: true }), u({ loader: O2 });
+          for (const e2 of M2.config.loader.pathFilters) Array.isArray(e2) ? O2.pathFilters.add(e2[0], e2[1]) : O2.pathFilters.add(e2);
+        }
+        const L2 = M2.config.loader;
+        const P2 = { invalidOption: "warn", optionError: (e2, t2) => {
+          if ("fatal" === P2.invalidOption) throw new Error(e2);
+          console.warn("MathJax: " + e2);
+        } };
+        var j2 = function(e2, t2, n2, o2) {
+          return new (n2 || (n2 = Promise))(function(s2, a2) {
+            function i2(e3) {
+              try {
+                d4(o2.next(e3));
+              } catch (e4) {
+                a2(e4);
+              }
+            }
+            function r2(e3) {
+              try {
+                d4(o2.throw(e3));
+              } catch (e4) {
+                a2(e4);
+              }
+            }
+            function d4(e3) {
+              var t3;
+              e3.done ? s2(e3.value) : (t3 = e3.value, t3 instanceof n2 ? t3 : new n2(function(e4) {
+                e4(t3);
+              })).then(i2, r2);
+            }
+            d4((o2 = o2.apply(e2, t2 || [])).next());
+          });
+        };
+        class k2 {
+          static toMML(e2) {
+            return k2.visitor.visitTree(e2, this.document);
+          }
+          static registerConstructor(e2, t2) {
+            k2.constructors[e2] = t2;
+          }
+          static useHandler(e2, t2 = false) {
+            R2.handler && !t2 || (R2.handler = e2);
+          }
+          static useAdaptor(e2, t2 = false) {
+            R2.adaptor && !t2 || (R2.adaptor = e2);
+          }
+          static useInput(e2, t2 = false) {
+            F && !t2 || R2.input.push(e2);
+          }
+          static useOutput(e2, t2 = false) {
+            R2.output && !t2 || (R2.output = e2);
+          }
+          static extendHandler(e2, t2 = 10) {
+            k2.extensions.add(e2, t2);
+          }
+          static defaultReady() {
+            k2.getComponents(), k2.makeMethods(), k2.pagePromise.then(() => R2.pageReady()).then(() => k2.promiseResolve()).catch((e2) => k2.promiseReject(e2));
+          }
+          static defaultPageReady() {
+            return (R2.loadAllFontFiles && k2.output.font ? k2.output.font.loadDynamicFiles() : Promise.resolve()).then(() => {
+              var e2;
+              return null === (e2 = k2.document.menu) || void 0 === e2 ? void 0 : e2.loadingPromise;
+            }).then(R2.typeset && E.typesetPromise ? () => k2.typesetPromise(R2.elements) : Promise.resolve()).then(() => k2.promiseResolve());
+          }
+          static typesetPromise(e2) {
+            return this.hasTypeset = true, k2.document.whenReady(() => j2(this, void 0, void 0, function* () {
+              k2.document.options.elements = e2, k2.document.reset(), yield k2.document.renderPromise();
+            }));
+          }
+          static getComponents() {
+            k2.visitor = new E._.core.MmlTree.SerializedMmlVisitor.SerializedMmlVisitor(), k2.mathjax = E._.mathjax.mathjax, k2.input = k2.getInputJax(), k2.output = k2.getOutputJax(), k2.adaptor = k2.getAdaptor(), k2.handler && k2.mathjax.handlers.unregister(k2.handler), k2.handler = k2.getHandler(), k2.handler && (k2.mathjax.handlers.register(k2.handler), k2.document = k2.getDocument());
+          }
+          static makeMethods() {
+            k2.input && k2.output && k2.makeTypesetMethods();
+            const e2 = k2.output ? k2.output.name.toLowerCase() : "";
+            for (const t2 of k2.input) {
+              const n2 = t2.name.toLowerCase();
+              k2.makeMmlMethods(n2, t2), k2.makeResetMethod(n2, t2), k2.output && k2.makeOutputMethods(n2, e2, t2);
+            }
+            E.done = () => k2.document.done(), E.whenReady = (e3) => k2.document.whenReady(e3);
+          }
+          static makeTypesetMethods() {
+            E.typeset = (e2 = null) => {
+              this.hasTypeset = true, k2.document.options.elements = e2, k2.document.reset(), k2.document.render();
+            }, E.typesetPromise = (e2 = null) => k2.typesetPromise(e2), E.typesetClear = (e2 = null) => {
+              e2 ? k2.document.clearMathItemsWithin(e2) : k2.document.clear();
+            };
+          }
+          static makeOutputMethods(e2, t2, n2) {
+            const o2 = e2 + "2" + t2;
+            E[o2] = (e3, t3 = {}) => (t3 = Object.assign(Object.assign({}, t3), { format: n2.name }), k2.document.convert(e3, t3)), E[o2 + "Promise"] = (e3, t3 = {}) => (t3 = Object.assign(Object.assign({}, t3), { format: n2.name }), k2.document.convertPromise(e3, t3)), E[t2 + "Stylesheet"] = () => k2.output.styleSheet(k2.document), "getMetricsFor" in k2.output && (E.getMetricsFor = (e3, t3) => k2.output.getMetricsFor(e3, t3));
+          }
+          static makeMmlMethods(e2, t2) {
+            const n2 = E._.core.MathItem.STATE;
+            E[e2 + "2mml"] = (e3, o2 = {}) => (o2 = Object.assign(Object.assign({}, o2), { end: n2.CONVERT, format: t2.name }), k2.toMML(k2.document.convert(e3, o2))), E[e2 + "2mmlPromise"] = (e3, ...o2) => j2(this, [e3, ...o2], void 0, function* (e4, o3 = {}) {
+              o3 = Object.assign(Object.assign({}, o3), { end: n2.CONVERT, format: t2.name });
+              const s2 = yield k2.document.convertPromise(e4, o3);
+              return k2.toMML(s2);
+            });
+          }
+          static makeResetMethod(e2, t2) {
+            E[e2 + "Reset"] = (...e3) => t2.reset(...e3);
+          }
+          static getInputJax() {
+            const e2 = [];
+            for (const t2 of R2.input) {
+              const n2 = k2.constructors[t2];
+              if (!n2) throw Error('Input Jax "' + t2 + '" is not defined (has it been loaded?)');
+              e2[t2] = new n2(E.config[t2]), e2.push(e2[t2]);
+            }
+            return e2;
+          }
+          static getOutputJax() {
+            const e2 = R2.output;
+            if (!e2) return null;
+            const t2 = k2.constructors[e2];
+            if (!t2) throw Error('Output Jax "' + e2 + '" is not defined (has it been loaded?)');
+            return new t2(E.config[e2]);
+          }
+          static getAdaptor() {
+            const e2 = R2.adaptor;
+            if (!e2 || "none" === e2) return null;
+            const t2 = k2.constructors[e2];
+            if (!t2) throw Error('DOMAdaptor "' + e2 + '" is not defined (has it been loaded?)');
+            return t2(E.config[e2]);
+          }
+          static getHandler() {
+            const e2 = R2.handler;
+            if (!e2 || "none" === e2 || !k2.adaptor) return null;
+            const t2 = k2.constructors[e2];
+            if (!t2) throw Error('Handler "' + e2 + '" is not defined (has it been loaded?)');
+            let n2 = new t2(k2.adaptor, 5);
+            for (const e3 of k2.extensions) n2 = e3.item(n2);
+            return n2;
+          }
+          static getDocument(e2 = null) {
+            return k2.mathjax.document(e2 || R2.document, Object.assign(Object.assign({}, E.config.options), { InputJax: k2.input, OutputJax: k2.output }));
+          }
+        }
+        k2.extensions = new g(), k2.constructors = {}, k2.input = [], k2.output = null, k2.handler = null, k2.adaptor = null, k2.elements = null, k2.document = null, k2.promise = new Promise((e2, t2) => {
+          k2.promiseResolve = e2, k2.promiseReject = t2;
+        }), k2.pagePromise = new Promise((e2, t2) => {
+          const n2 = i.document;
+          if (n2 && n2.readyState && "complete" !== n2.readyState && "interactive" !== n2.readyState) {
+            const t3 = () => e2();
+            n2.defaultView.addEventListener("load", t3, true), n2.defaultView.addEventListener("DOMContentLoaded", t3, true);
+          } else e2();
+        }), k2.hasTypeset = false, k2.defaultOptionError = P2.optionError;
+        const E = l;
+        void 0 === E._.startup && (c(E.config, "startup", { input: [], output: "", handler: null, adaptor: null, document: m.document || "", elements: null, typeset: true, ready: k2.defaultReady.bind(k2), pageReady: k2.defaultPageReady.bind(k2), polyfillHasOwn: true }), u({ startup: k2, options: {} }), E.config.startup.invalidOption && (P2.invalidOption = E.config.startup.invalidOption), E.config.startup.optionError && (P2.optionError = E.config.startup.optionError));
+        const R2 = E.config.startup, F = 0 !== R2.input.length;
+        MathJax.loader && MathJax.loader.checkVersion("startup", s, "startup"), u({ _: { components: { loader: n, package: t, startup: o } } });
+        var J;
+        O2.preLoaded("loader", "startup"), c(MathJax.config.loader, "dependencies", { "a11y/semantic-enrich": ["input/mml", "a11y/sre"], "a11y/speech": ["a11y/semantic-enrich"], "a11y/complexity": ["a11y/semantic-enrich"], "a11y/explorer": ["a11y/speech"], "[mml]/mml3": ["input/mml"], "[tex]/action": ["input/tex-base"], "[tex]/ams": ["input/tex-base", "[tex]/newcommand"], "[tex]/amscd": ["input/tex-base"], "[tex]/autoload": ["input/tex-base", "[tex]/require"], "[tex]/bbm": ["input/tex-base"], "[tex]/bboldx": ["input/tex-base", "[tex]/textmacros"], "[tex]/bbox": ["input/tex-base"], "[tex]/begingroup": ["input/tex-base", "[tex]/newcommand"], "[tex]/boldsymbol": ["input/tex-base"], "[tex]/braket": ["input/tex-base"], "[tex]/bussproofs": ["input/tex-base"], "[tex]/cancel": ["input/tex-base", "[tex]/enclose"], "[tex]/cases": ["[tex]/empheq"], "[tex]/centernot": ["input/tex-base"], "[tex]/color": ["input/tex-base"], "[tex]/colortbl": ["input/tex-base", "[tex]/color"], "[tex]/colorv2": ["input/tex-base"], "[tex]/configmacros": ["input/tex-base", "[tex]/newcommand"], "[tex]/dsfont": ["input/tex-base"], "[tex]/empheq": ["input/tex-base", "[tex]/ams"], "[tex]/enclose": ["input/tex-base"], "[tex]/extpfeil": ["input/tex-base", "[tex]/newcommand", "[tex]/ams"], "[tex]/gensymb": ["input/tex-base"], "[tex]/html": ["input/tex-base"], "[tex]/mathtools": ["input/tex-base", "[tex]/newcommand", "[tex]/ams", "[tex]/boldsymbol"], "[tex]/mhchem": ["input/tex-base", "[tex]/ams"], "[tex]/newcommand": ["input/tex-base"], "[tex]/noerrors": ["input/tex-base"], "[tex]/noundefined": ["input/tex-base"], "[tex]/physics": ["input/tex-base"], "[tex]/require": ["input/tex-base"], "[tex]/setoptions": ["input/tex-base"], "[tex]/tagformat": ["input/tex-base"], "[tex]/texhtml": ["input/tex-base"], "[tex]/textcomp": ["input/tex-base", "[tex]/textmacros"], "[tex]/textmacros": ["input/tex-base"], "[tex]/unicode": ["input/tex-base"], "[tex]/units": ["input/tex-base"], "[tex]/upgreek": ["input/tex-base"], "[tex]/verb": ["input/tex-base"], "ui/menu": ["a11y/sre"] }), c(MathJax.config.loader, "paths", { tex: "[mathjax]/input/tex/extensions", mml: "[mathjax]/input/mml/extensions", sre: "[mathjax]/sre", mathmaps: "[sre]/mathmaps" }), c(MathJax.config.loader, "provides", { startup: ["loader"], "input/tex": ["input/tex-base", "[tex]/ams", "[tex]/newcommand", "[tex]/textmacros", "[tex]/noundefined", "[tex]/require", "[tex]/autoload", "[tex]/configmacros"] }), c(MathJax.config.loader, "source", { "[tex]/amsCd": "[tex]/amscd", "[tex]/colorV2": "[tex]/colorv2", "[tex]/configMacros": "[tex]/configmacros", "[tex]/tagFormat": "[tex]/tagformat" }), O2.load(...L2.load).then(() => (J || function() {
+        })()).then(() => L2.ready()).catch((e2) => L2.failed(e2));
+      })();
     }
   });
 
@@ -685,139 +1124,8 @@
     }
   };
 
-  // node_modules/@mathjax/src/components/mjs/source.js
-  var import_source = __toESM(require_source(), 1);
-
-  // node_modules/@mathjax/src/mjs/util/context.js
-  var hasWindow = typeof window !== "undefined";
-  var isCJS = typeof exports !== "undefined";
-  var context = {
-    window: hasWindow ? window : null,
-    document: hasWindow ? window.document : null,
-    os: (() => {
-      if (hasWindow && window.navigator) {
-        const app = window.navigator.appVersion;
-        const osNames = [
-          ["Win", "Windows"],
-          ["Mac", "MacOS"],
-          ["X11", "Unix"],
-          ["Linux", "Unix"]
-        ];
-        for (const [key, os] of osNames) {
-          if (app.includes(key)) {
-            return os;
-          }
-        }
-        if (window.navigator.userAgent.includes("Android")) {
-          return "Unix";
-        }
-      } else if (typeof process !== "undefined") {
-        return {
-          linux: "Unix",
-          android: "Unix",
-          aix: "Unix",
-          freebsd: "Unix",
-          netbsd: "Unix",
-          openbsd: "Unix",
-          sunos: "Unix",
-          darwin: "MacOS",
-          win32: "Windows",
-          cygwin: "Windows"
-        }[process.platform] || process.platform;
-      }
-      return "unknown";
-    })(),
-    path: (file) => file
-  };
-  if (context.os === "Windows") {
-    context.path = (file) => file.match(/^[/\\]?[a-zA-Z]:[/\\]/) ? (isCJS ? "" : "file://") + file.replace(/\\/g, "/").replace(/^\//, "") : file.replace(/^\//, "file:///");
-  }
-
-  // node_modules/@mathjax/src/components/mjs/source.js
-  var src = context.path(import_source.dirname);
-  var source2 = {
-    "core": `${src}/core/core.js`,
-    "adaptors/jsdom": `${src}/adaptors/jsdom/jsdom.js`,
-    "adaptors/linkedom": `${src}/adaptors/linkedom/linkedom.js`,
-    "adaptors/liteDOM": `${src}/adaptors/liteDOM/liteDOM.js`,
-    "input/tex": `${src}/input/tex/tex.js`,
-    "input/tex-base": `${src}/input/tex-base/tex-base.js`,
-    "input/tex-full": `${src}/input/tex-full/tex-full.js`,
-    "[tex]/action": `${src}/input/tex/extensions/action/action.js`,
-    "[tex]/ams": `${src}/input/tex/extensions/ams/ams.js`,
-    "[tex]/amscd": `${src}/input/tex/extensions/amscd/amscd.js`,
-    "[tex]/autoload": `${src}/input/tex/extensions/autoload/autoload.js`,
-    "[tex]/bbm": `${src}/input/tex/extensions/bbm/bbm.js`,
-    "[tex]/bboldx": `${src}/input/tex/extensions/bboldx/bboldx.js`,
-    "[tex]/bbox": `${src}/input/tex/extensions/bbox/bbox.js`,
-    "[tex]/begingroup": `${src}/input/tex/extensions/begingroup/begingroup.js`,
-    "[tex]/boldsymbol": `${src}/input/tex/extensions/boldsymbol/boldsymbol.js`,
-    "[tex]/braket": `${src}/input/tex/extensions/braket/braket.js`,
-    "[tex]/bussproofs": `${src}/input/tex/extensions/bussproofs/bussproofs.js`,
-    "[tex]/cancel": `${src}/input/tex/extensions/cancel/cancel.js`,
-    "[tex]/cases": `${src}/input/tex/extensions/cases/cases.js`,
-    "[tex]/centernot": `${src}/input/tex/extensions/centernot/centernot.js`,
-    "[tex]/color": `${src}/input/tex/extensions/color/color.js`,
-    "[tex]/colortbl": `${src}/input/tex/extensions/colortbl/colortbl.js`,
-    "[tex]/colorv2": `${src}/input/tex/extensions/colorv2/colorv2.js`,
-    "[tex]/configmacros": `${src}/input/tex/extensions/configmacros/configmacros.js`,
-    "[tex]/dsfont": `${src}/input/tex/extensions/dsfont/dsfont.js`,
-    "[tex]/empheq": `${src}/input/tex/extensions/empheq/empheq.js`,
-    "[tex]/enclose": `${src}/input/tex/extensions/enclose/enclose.js`,
-    "[tex]/extpfeil": `${src}/input/tex/extensions/extpfeil/extpfeil.js`,
-    "[tex]/fontsizev3": `${src}/input/tex/extensions/fontsizev3/fontsizev3.js`,
-    "[tex]/gensymb": `${src}/input/tex/extensions/gensymb/gensymb.js`,
-    "[tex]/html": `${src}/input/tex/extensions/html/html.js`,
-    "[tex]/mathtools": `${src}/input/tex/extensions/mathtools/mathtools.js`,
-    "[tex]/mhchem": `${src}/input/tex/extensions/mhchem/mhchem.js`,
-    "[tex]/newcommand": `${src}/input/tex/extensions/newcommand/newcommand.js`,
-    "[tex]/noerrors": `${src}/input/tex/extensions/noerrors/noerrors.js`,
-    "[tex]/noundefined": `${src}/input/tex/extensions/noundefined/noundefined.js`,
-    "[tex]/physics": `${src}/input/tex/extensions/physics/physics.js`,
-    "[tex]/require": `${src}/input/tex/extensions/require/require.js`,
-    "[tex]/setoptions": `${src}/input/tex/extensions/setoptions/setoptions.js`,
-    "[tex]/tagformat": `${src}/input/tex/extensions/tagformat/tagformat.js`,
-    "[tex]/texhtml": `${src}/input/tex/extensions/texhtml/texhtml.js`,
-    "[tex]/textcomp": `${src}/input/tex/extensions/textcomp/textcomp.js`,
-    "[tex]/textmacros": `${src}/input/tex/extensions/textmacros/textmacros.js`,
-    "[tex]/unicode": `${src}/input/tex/extensions/unicode/unicode.js`,
-    "[tex]/units": `${src}/input/tex/extensions/units/units.js`,
-    "[tex]/upgreek": `${src}/input/tex/extensions/upgreek/upgreek.js`,
-    "[tex]/verb": `${src}/input/tex/extensions/verb/verb.js`,
-    "input/mml": `${src}/input/mml/mml.js`,
-    "input/mml/entities": `${src}/input/mml/entities/entities.js`,
-    "[mml]/mml3": `${src}/input/mml/extensions/mml3/mml3.js`,
-    "input/asciimath": `${src}/input/asciimath/asciimath.js`,
-    "output/chtml": `${src}/output/chtml/chtml.js`,
-    "output/svg": `${src}/output/svg/svg.js`,
-    "a11y/assistive-mml": `${src}/a11y/assistive-mml/assistive-mml.js`,
-    "a11y/semantic-enrich": `${src}/a11y/semantic-enrich/semantic-enrich.js`,
-    "a11y/speech": `${src}/a11y/speech/speech.js`,
-    "a11y/complexity": `${src}/a11y/complexity/complexity.js`,
-    "a11y/explorer": `${src}/a11y/explorer/explorer.js`,
-    "a11y/sre": `${src}/a11y/sre/sre.js`,
-    "[mathmaps]": `${src}/../../bundle/sre/mathmaps`,
-    "ui/lazy": `${src}/ui/lazy/lazy.js`,
-    "ui/menu": `${src}/ui/menu/menu.js`,
-    "ui/no-dark-mode": `${src}/ui/nodarkmode/nodarkmode.js`,
-    "ui/safe": `${src}/ui/safe/safe.js`,
-    "mml-chtml": `${src}/mml-chtml/mml-chtml.js`,
-    "mml-chtml-nofont": `${src}/mml-chtml-nofont/mml-chtml-nofont.js`,
-    "mml-svg": `${src}/mml-svg/mml-svg.js`,
-    "mml-svg-nofont": `${src}/mml-svg-nofont/mml-svg-nofont.js`,
-    "tex-chtml": `${src}/tex-chtml/tex-chtml.js`,
-    "tex-chtml-nofont": `${src}/tex-chtml-nofont/tex-chtml-nofont.js`,
-    "tex-svg": `${src}/tex-svg/tex-svg.js`,
-    "tex-svg-nofont": `${src}/tex-svg-nofont/tex-svg-nofont.js`,
-    "tex-mml-chtml": `${src}/tex-mml-chtml/tex-mml-chtml.js`,
-    "tex-mml-chtml-nofont": `${src}/tex-mml-chtml-nofont/tex-mml-chtml-nofont.js`,
-    "tex-mml-svg": `${src}/tex-mml-svg/tex-mml-svg.js`,
-    "tex-mml-svg-nofont": `${src}/tex-mml-svg-nofont/tex-mml-svg-nofont.js`,
-    "loader": `${src}/loader/loader.js`,
-    "startup": `${src}/startup/startup.js`
-  };
-
   // src/formatted-labels.mjs
+  var import_startup = __toESM(require_startup(), 1);
   var htmlToSvgCache = new U({ max: 20 });
   var FULL_CLASS = "ql-full";
   var QUILL_THEME = "snow";
@@ -828,12 +1136,11 @@
   var currentRenderBatch = 0;
   var numAwaitingRender = 0;
   var dQuillEditors = {};
-  global.MathJax = {
+  MathJax = {
     loader: {
       paths: { mathjax: "@mathjax/src/bundle" },
-      load: ["adaptors/liteDOM"],
-      require: ((file) => import(file)),
-      source: source2
+      load: ["input/tex", "output/svg", "adaptors/liteDOM"],
+      require: ((file) => import(file))
     },
     svg: {
       blacker: 1,
@@ -1011,7 +1318,7 @@
     });
   }
   async function loadMathJaxComponents() {
-    return import(source["tex-chtml"]);
+    return Promise.resolve().then(() => __toESM(require_startup(), 1));
   }
   async function waitForMathJax() {
     return Promise.all([loadMathJaxComponents(), MathJax.startup.promise]);
@@ -2827,7 +3134,7 @@ ${baselineDesc}
       }
     }
   }
-  async function generatePlot(context2 = null) {
+  async function generatePlot(context = null) {
     if (window.CookieConsent.acceptedCategory("analytics") && !reportedFirstInteraction) {
       if (setupPhase) {
         setupPhase = false;
@@ -3135,7 +3442,7 @@ ${baselineDesc}
       color: COLOR_TRANSPARENT
     };
     let plot;
-    if (gloriusPlot === null || context2 !== null) {
+    if (gloriusPlot === null || context !== null) {
       let config = {
         type: "radar",
         data: {
@@ -3161,12 +3468,12 @@ ${baselineDesc}
         }
       };
       let usingDefaultContext = true;
-      if (context2 === null) {
-        context2 = CHART_ID;
+      if (context === null) {
+        context = CHART_ID;
       } else {
         usingDefaultContext = false;
       }
-      plot = new Chart(context2, config);
+      plot = new Chart(context, config);
       if (usingDefaultContext) {
         gloriusPlot = plot;
       }
