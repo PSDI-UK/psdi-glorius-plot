@@ -37,6 +37,15 @@ window.MathJax = {
   },
   output: {
     font: 'mathjax-fira'
+  },
+  options: {
+    menuOptions: {
+      settings: {
+        enrich: false,
+        speech: false,
+        braille: false,
+      }
+    }
   }
 }
 require("mathjax/es5/tex-svg.js");
@@ -383,7 +392,6 @@ async function getSvgFromHtml(labelHtml) {
     const adaptor = MathJax.startup.adaptor;
     const mathJaxSVG = await MathJax.tex2svgPromise(HTMLToTex(labelHtml));
     svgHTML = adaptor.tags(mathJaxSVG, 'svg')[0].outerHTML;
-    console.log(svgHTML);
 
     // MathJax SVGs use &lt; and &gt; within their tags. Normally this is fine, but in older versions of Safari the above
     // command will convert them to < and >, which causes problems. We use a Regex to find and correct these instances.
