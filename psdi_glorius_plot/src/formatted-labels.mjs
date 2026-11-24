@@ -303,7 +303,27 @@ export async function loadMathJaxComponents() {
  * available
  */
 export async function waitForMathJax() {
-  return Promise.all([loadMathJaxComponents(), MathJax.startup.promise]);
+  const tex2svgPromise = new Promise(resolve => {
+
+    // Check if it's already available before doing anything else
+    if (MathJax.tex2svg)
+      resolve();
+
+    // Check on an interval until it's ready
+    let interval;
+    let elapsed = 0;
+
+    const checkForMathJax = function () {
+      elapsed += T_WAIT;
+      if (MathJax.tex2svg || elapsed >= MAX_ELAPSED) {
+        clearInterval(interval);
+        resolve();
+      }
+    };
+
+    interval = setInterval(checkForMathJax, T_WAIT);
+  });
+  return Promise.all([loadMathJaxComponents(), tex2svgPromise]);
 }
 
 /**
