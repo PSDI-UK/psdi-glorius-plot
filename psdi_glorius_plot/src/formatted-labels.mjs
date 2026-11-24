@@ -293,10 +293,10 @@ export function enableQuillEvents(alwaysCallback, otherCallbacks) {
  * available
  */
 export async function waitForMathJax() {
-  return new Promise((resolve, reject) => {
+  const tex2svgPromise = new Promise((resolve, reject) => {
 
     // Check if it's already available before doing anything else
-    if (MathJax.tex2svgy) {
+    if (MathJax.tex2svg) {
       resolve();
     }
 
@@ -316,6 +316,7 @@ export async function waitForMathJax() {
 
     interval = setInterval(checkForMathJax, T_WAIT);
   });
+  return Promise.all([tex2svgPromise, MathJax.startup.promise]);
 }
 
 /**
@@ -382,6 +383,7 @@ async function getSvgFromHtml(labelHtml) {
     const adaptor = MathJax.startup.adaptor;
     const mathJaxSVG = await MathJax.tex2svgPromise(HTMLToTex(labelHtml));
     svgHTML = adaptor.tags(mathJaxSVG, 'svg')[0].outerHTML;
+    console.log(svgHTML);
 
     // MathJax SVGs use &lt; and &gt; within their tags. Normally this is fine, but in older versions of Safari the above
     // command will convert them to < and >, which causes problems. We use a Regex to find and correct these instances.
