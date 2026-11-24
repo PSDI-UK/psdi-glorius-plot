@@ -29,4 +29,4 @@ psdi-common-style-*.*.*
 node_modules/
 
 # Build files for variability plot
-psdi_variability_plot/static/js/glorius.js
+psdi_glorius_plot/static/js/glorius.js
