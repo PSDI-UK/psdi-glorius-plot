@@ -4,7 +4,8 @@
  * @author Bryan Gillis
  */
 
-import { LRUCache } from 'lru-cache'
+import { LRUCache } from 'lru-cache';
+import Quill from 'quill';
 
 const htmlToSvgCache = new LRUCache({ max: 20 });
 
@@ -29,12 +30,7 @@ let numAwaitingRender = 0;
 const dQuillEditors = {};
 
 // Load MathJAX
-MathJax = {
-  loader: {
-    paths: { mathjax: '@mathjax/src/bundle' },
-    load: ['input/tex', 'output/svg', 'adaptors/liteDOM'],
-    require: (file => import(file))
-  },
+window.MathJax = {
   svg: {
     blacker: 1,
     fontCache: 'local', // Use a local fontCache to ensure generated SVGs will work as standalone
@@ -43,8 +39,7 @@ MathJax = {
     font: 'mathjax-fira'
   }
 }
-import '@mathjax/src/bundle/startup.js';
-loadMathJaxComponents();
+require("mathjax/es5/tex-svg.js");
 
 /**
  * Initialise a Quill editor
@@ -293,21 +288,17 @@ export function enableQuillEvents(alwaysCallback, otherCallbacks) {
   });
 }
 
-
-export async function loadMathJaxComponents() {
-  return import('@mathjax/src/bundle/startup.js');
-}
-
 /**
  * MathJax is loaded asynchronously, so early calls to generate the plot may not have it. This waits to ensure it's
  * available
  */
 export async function waitForMathJax() {
-  const tex2svgPromise = new Promise(resolve => {
+  return new Promise((resolve, reject) => {
 
     // Check if it's already available before doing anything else
-    if (MathJax.tex2svg)
+    if (MathJax.tex2svgy) {
       resolve();
+    }
 
     // Check on an interval until it's ready
     let interval;
@@ -315,15 +306,16 @@ export async function waitForMathJax() {
 
     const checkForMathJax = function () {
       elapsed += T_WAIT;
-      if (MathJax.tex2svg || elapsed >= MAX_ELAPSED) {
+      if (MathJax.tex2svg) {
         clearInterval(interval);
         resolve();
+      } else if (elapsed >= MAX_ELAPSED) {
+        reject();
       }
     };
 
     interval = setInterval(checkForMathJax, T_WAIT);
   });
-  return Promise.all([loadMathJaxComponents(), tex2svgPromise]);
 }
 
 /**
@@ -383,6 +375,7 @@ export function incrementRenderBatch() {
 }
 
 async function getSvgFromHtml(labelHtml) {
+  await waitForMathJax();
   let svgHTML = htmlToSvgCache.get(labelHtml);
   if (!svgHTML) {
 
