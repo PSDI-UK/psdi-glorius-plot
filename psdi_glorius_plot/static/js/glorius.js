@@ -1132,6 +1132,7 @@
   var MATHJAX_DEFAULT_FONT_SIZE = 16;
   var MATHJAX_BASE_FONT_SCALING = 1.125;
   var T_WAIT = 100;
+  var MAX_ELAPSED = 500;
   var compatibilityMode = "unknown";
   var currentRenderBatch = 0;
   var numAwaitingRender = 0;
@@ -1321,7 +1322,21 @@
     return Promise.resolve().then(() => __toESM(require_startup(), 1));
   }
   async function waitForMathJax() {
-    return Promise.all([loadMathJaxComponents(), MathJax.startup.promise]);
+    const tex2svgPromise = new Promise((resolve) => {
+      if (MathJax.tex2svg)
+        resolve();
+      let interval;
+      let elapsed = 0;
+      const checkForMathJax = function() {
+        elapsed += T_WAIT;
+        if (MathJax.tex2svg || elapsed >= MAX_ELAPSED) {
+          clearInterval(interval);
+          resolve();
+        }
+      };
+      interval = setInterval(checkForMathJax, T_WAIT);
+    });
+    return Promise.all([loadMathJaxComponents(), tex2svgPromise]);
   }
   function cleanTags(s) {
     return s.replaceAll("&nbsp;", " ").replaceAll("<p>", "").replaceAll("</p>", "").replaceAll("<br>", "").replaceAll(/<span\b[^>]*>/gmu, "").replaceAll("</span>", "").replaceAll(/<([a-zA-Z]+)\b[^>]*>/gmu, "<$1>");
