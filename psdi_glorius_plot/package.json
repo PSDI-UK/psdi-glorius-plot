@@ -3,8 +3,8 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "build": "cp node_modules/chart.js/dist/chart.umd.js static/js/packages/; esbuild src/index.mjs --bundle --outfile=static/js/glorius.js",
-    "buildWatch": "cp node_modules/chart.js/dist/chart.umd.js static/js/packages/; esbuild src/index.mjs --bundle --outfile=static/js/glorius.js --watch",
+    "build": "cp node_modules/chart.js/dist/chart.umd.js static/js/packages/; cp node_modules/vanilla-cookieconsent/dist/cookieconsent.umd.js static/js/packages/; esbuild src/index.mjs --bundle --outfile=static/js/glorius.js",
+    "buildWatch": "cp node_modules/chart.js/dist/chart.umd.js static/js/packages/; cp node_modules/vanilla-cookieconsent/dist/cookieconsent.umd.js static/js/packages/; esbuild src/index.mjs --bundle --outfile=static/js/glorius.js --watch",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "license": "",
@@ -13,6 +13,7 @@
     "bootstrap": "^5.3.9",
     "canvas2svg": "^1.0.16",
     "chart.js": "^4.4.1",
+    "cookieconsent": "^3.1.1",
     "esbuild": "^0.25.11",
     "jquery": "^4.1.0",
     "jquery.dirtyforms": "^2.0.0",
@@ -21,6 +22,7 @@
     "mathjax": "^4.1.3",
     "pdfmake": "^0.3.15",
     "quill": "^2.0.3",
-    "quill-paste-smart": "^2.0.1"
+    "quill-paste-smart": "^2.0.1",
+    "vanilla-cookieconsent": "^3.3.0"
   }
 }
