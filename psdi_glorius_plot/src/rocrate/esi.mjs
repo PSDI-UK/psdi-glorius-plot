@@ -1,6 +1,7 @@
 import { cleanTags } from "../formatted-labels.mjs";
 import { loadDataURL } from "../io.mjs";
 import { formatORCIDUrl } from "../utility.mjs";
+const pdfmake = require('pdfmake');
 
 let pdfFontsLoaded = false;
 
