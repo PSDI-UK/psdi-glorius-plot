@@ -4,6 +4,8 @@
  * @author Bryan Gillis
  */
 
+require("./packages/canvas2svg.mjs");
+
 import { initDirtyForms, cleanDirtyForms, checkIsDirty } from "./dirty-forms.mjs";
 import { mixHexes } from "./color-mixing.mjs"
 import { exportImage, loadObject, makeCsv, saveBlob, saveObject, saveText } from "./io.mjs"
