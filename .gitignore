@@ -28,5 +28,6 @@ psdi-common-style-*.*.*
 # Node modules
 node_modules/
 
-# Build files for variability plot
+# Build files for the plot
 psdi_glorius_plot/static/js/glorius.js
+psdi_glorius_plot/static/js/packages/chart.umd.js
