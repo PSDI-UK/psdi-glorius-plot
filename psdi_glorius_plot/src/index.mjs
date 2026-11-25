@@ -5,6 +5,7 @@
  */
 
 require("./packages/canvas2svg.mjs");
+const JSZip = require("jszip");
 
 import { initDirtyForms, cleanDirtyForms, checkIsDirty } from "./dirty-forms.mjs";
 import { mixHexes } from "./color-mixing.mjs"
