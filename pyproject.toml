@@ -81,6 +81,10 @@ exclude = [
 ]
 artifacts = ["psdi_glorius_plot/static/**"]
 
+# Custom build hook to build scripts with Node
+[tool.hatch.build.hooks.custom]
+path = "scripts/build_js.py"
+
 [tool.pytest.ini_options]
 pythonpath = ["."]
 

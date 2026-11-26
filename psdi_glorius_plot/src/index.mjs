@@ -4,20 +4,23 @@
  * @author Bryan Gillis
  */
 
-import { initDirtyForms, cleanDirtyForms, checkIsDirty } from "./dirty-forms.js";
-import { mixHexes } from "./color-mixing.js"
-import { exportImage, loadObject, makeCsv, saveBlob, saveObject, saveText } from "./io.js"
-import { clamp, forenameToInitials, getWebKitMode, surnameToCapitalized } from "./utility.js"
+require("./packages/canvas2svg.mjs");
+const JSZip = require("jszip");
+
+import { initDirtyForms, cleanDirtyForms, checkIsDirty } from "./dirty-forms.mjs";
+import { mixHexes } from "./color-mixing.mjs"
+import { exportImage, loadObject, makeCsv, saveBlob, saveObject, saveText } from "./io.mjs"
+import { clamp, forenameToInitials, getWebKitMode, surnameToCapitalized } from "./utility.mjs"
 import {
   addQuillEditor, getQuillEditor, getQuillEditorHTML, setQuillEditor, removeQuillEditor, updateQuillContents,
   disableQuillToolbar, enableQuillEvents, removeGlobalTags, cleanTags, stripTags, waitForMathJax, drawFormatted,
   incrementRenderBatch, HTMLToMd, renderingComplete
-} from "./formatted-labels.js"
-import { formatReadmeBibInfo, makeReadme } from "./rocrate/readme.js";
-import { formatMetadataBibInfo, makeMetadata } from "./rocrate/metadata.js";
-import { makeBaselineDesc } from "./rocrate/baseline.js";
-import { makeCondDescTable } from "./rocrate/test-conditions.js";
-import { formatESIBibInfo, makeESI } from "./rocrate/esi.js";
+} from "./formatted-labels.mjs"
+import { formatReadmeBibInfo, makeReadme } from "./rocrate/readme.mjs";
+import { formatMetadataBibInfo, makeMetadata } from "./rocrate/metadata.mjs";
+import { makeBaselineDesc } from "./rocrate/baseline.mjs";
+import { makeCondDescTable } from "./rocrate/test-conditions.mjs";
+import { formatESIBibInfo, makeESI } from "./rocrate/esi.mjs";
 
 const CHART_ID = "glorius-plot", CHART_SELECTOR = `#${CHART_ID}`;
 
@@ -3216,7 +3219,7 @@ $(document).ready(function () {
   // WARNING: Anything which relies on Path2D should wait for this to finish before running
   const backupPath2D = Path2D;
   Path2D = null;
-  loadScript("https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js")
+  loadScript("/static/js/packages/chart.umd.js")
     .finally(() => {
       Path2D = backupPath2D;
       enableAutoUpdates();

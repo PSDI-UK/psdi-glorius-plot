@@ -1,4 +1,4 @@
-import { makeCsv } from "../io.js"
+import { makeCsv } from "../io.mjs"
 
 /**
  * Makes the CSV-formatted text of a table providing the descriptions of test conditions, given user input

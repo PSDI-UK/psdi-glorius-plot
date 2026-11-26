@@ -19,6 +19,8 @@ jobs:
   test-gui:
     name: Run full tests of the gui locally
     uses: PSDI-UK/psdi-github-workflows-public/.github/workflows/test-gui.yml@6077506c3723a31fad3b6ff02c84c16f2a8ffc6c
+    with:
+      require_node: true
     secrets:
       token: ${{ secrets.GITHUB_TOKEN }}
 

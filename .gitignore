@@ -24,3 +24,12 @@ scripts/purge-common-style.sh
 # Downloaded assets
 psdi-assets.tar.gz
 psdi-common-style-*.*.*
+
+# Node modules
+node_modules/
+
+# Build files for the web app
+
+psdi_glorius_plot/static/js/glorius.js
+psdi_glorius_plot/static/js/packages/
+psdi_glorius_plot/static/css/packages/
