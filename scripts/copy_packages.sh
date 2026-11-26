@@ -9,6 +9,7 @@ PYPACKAGE_DIR=$SCRIPTS_DIR/../psdi_glorius_plot
 
 MODULES_DIR=$PYPACKAGE_DIR/node_modules
 JSPACKAGE_DIR=$PYPACKAGE_DIR/static/js/packages
+CSSPACKAGE_DIR=$PYPACKAGE_DIR/static/css/packages
 
 mkdir -p $JSPACKAGE_DIR
 for file in \
@@ -23,3 +24,12 @@ done
 
 mkdir -p $JSPACKAGE_DIR/mathjax-fira-font
 cp $MODULES_DIR/@mathjax/mathjax-fira-font/svg.js $JSPACKAGE_DIR/mathjax-fira-font
+
+mkdir -p $CSSPACKAGE_DIR
+for file in \
+    bootstrap/dist/css/bootstrap.min.css \
+    quill/dist/quill.snow.css \
+    vanilla-cookieconsent/dist/cookieconsent.css
+do
+    cp $MODULES_DIR/$file $CSSPACKAGE_DIR
+done

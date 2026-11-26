@@ -3,8 +3,8 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "build": "../scripts/copy_packages.sh; esbuild src/index.mjs --bundle --outfile=static/js/glorius.js",
-    "buildWatch": "../scripts/copy_packages.sh; esbuild src/index.mjs --bundle --outfile=static/js/glorius.js --watch",
+    "build": "../scripts/copy_packages.sh && esbuild src/index.mjs --bundle --outfile=static/js/glorius.js",
+    "buildWatch": "../scripts/copy_packages.sh && esbuild src/index.mjs --bundle --outfile=static/js/glorius.js --watch",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "license": "",
