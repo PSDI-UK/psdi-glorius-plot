@@ -1,5 +1,11 @@
 # Changelog for PSDI Glorius Plot Generator
 
+## v0.6.0
+
+### Breaking changes
+
+- Project restructured to use Node to manage JS dependencies, with source scripts compiled with ESBuild
+
 ## v0.5.5
 
 ### Miscellaneous changes
