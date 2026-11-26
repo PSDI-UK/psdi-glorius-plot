@@ -9,7 +9,8 @@
   },
   "license": "",
   "description": "",
-  "dependencies": {
+  "dependencies": {},
+  "devDependencies": {
     "@popperjs/core": "^2.11.8",
     "bootstrap": "^5.3.9",
     "canvas2svg": "^1.0.16",
