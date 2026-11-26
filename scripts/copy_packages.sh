@@ -9,11 +9,13 @@ PYPACKAGE_DIR=$SCRIPTS_DIR/../psdi_glorius_plot
 MODULES_DIR=$PYPACKAGE_DIR/node_modules
 JSPACKAGE_DIR=$PYPACKAGE_DIR/static/js/packages
 
+mkdir -p JSPACKAGE_DIR
 for file in \
     bootstrap/dist/js/bootstrap.bundle.min.js \
     chart.js/dist/chart.umd.js \
     vanilla-cookieconsent/dist/cookieconsent.umd.js \
-    jquery/dist/jquery.min.js
+    jquery/dist/jquery.min.js \
+    @popperjs/core/dist/umd/popper.min.js
 do
     cp $MODULES_DIR/$file $JSPACKAGE_DIR
 done

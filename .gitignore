@@ -34,3 +34,4 @@ psdi_glorius_plot/static/js/packages/bootstrap.bundle.min.js
 psdi_glorius_plot/static/js/packages/chart.umd.js
 psdi_glorius_plot/static/js/packages/cookieconsent.umd.js
 psdi_glorius_plot/static/js/packages/jquery.min.js
+psdi_glorius_plot/static/js/packages/popper.min.js
