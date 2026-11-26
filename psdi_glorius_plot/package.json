@@ -3,8 +3,8 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "build": "cp node_modules/chart.js/dist/chart.umd.js static/js/packages/; cp node_modules/vanilla-cookieconsent/dist/cookieconsent.umd.js static/js/packages/; esbuild src/index.mjs --bundle --outfile=static/js/glorius.js",
-    "buildWatch": "cp node_modules/chart.js/dist/chart.umd.js static/js/packages/; cp node_modules/vanilla-cookieconsent/dist/cookieconsent.umd.js static/js/packages/; esbuild src/index.mjs --bundle --outfile=static/js/glorius.js --watch",
+    "build": "../scripts/copy_packages.sh; esbuild src/index.mjs --bundle --outfile=static/js/glorius.js",
+    "buildWatch": "../scripts/copy_packages.sh; esbuild src/index.mjs --bundle --outfile=static/js/glorius.js --watch",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "license": "",
