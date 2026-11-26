@@ -23,8 +23,8 @@
   /* Font */
   --ifm-font-size-base     : 1rem;
   --ifm-line-height-base   : 1.5;
-  --ifm-font-family-base   : Lato, Helvetica, Verdana, Arial, Lucida, sans-serif;
-  --ifm-heading-font-family: Oswald, Helvetica, Verdana, Arial, Lucida, sans-serif;
+  --ifm-font-family-base   : Lato, 'Lato Fallback', Helvetica, Verdana, Arial, Lucida, sans-serif;
+  --ifm-heading-font-family: Oswald, 'Oswald Fallback', Helvetica, Verdana, Arial, Lucida, sans-serif;
   --ifm-font-weight-base   : normal;
   --ifm-letter-spacing-base: normal;
 

@@ -4,7 +4,8 @@
  * @author Bryan Gillis
  */
 
-import { LRUCache } from './packages/lru-cache.min.js'
+import { LRUCache } from 'lru-cache';
+import Quill from 'quill';
 
 const htmlToSvgCache = new LRUCache({ max: 20 });
 
@@ -27,6 +28,32 @@ let currentRenderBatch = 0;
 let numAwaitingRender = 0;
 
 const dQuillEditors = {};
+
+// Load MathJAX
+window.MathJax = {
+  svg: {
+    blacker: 1,
+    fontCache: 'local', // Use a local fontCache to ensure generated SVGs will work as standalone
+  },
+  output: {
+    font: 'mathjax-fira'
+  },
+  options: {
+    menuOptions: {
+      settings: {
+        enrich: false,
+        speech: false,
+        braille: false,
+      }
+    }
+  },
+  loader: {
+    paths: {
+      fonts: '/static/js/packages',
+    }
+  }
+}
+require("mathjax/es5/tex-svg.js");
 
 /**
  * Initialise a Quill editor
@@ -280,11 +307,12 @@ export function enableQuillEvents(alwaysCallback, otherCallbacks) {
  * available
  */
 export async function waitForMathJax() {
-  return new Promise(resolve => {
+  const tex2svgPromise = new Promise((resolve, reject) => {
 
     // Check if it's already available before doing anything else
-    if (MathJax.tex2svg)
+    if (MathJax.tex2svg) {
       resolve();
+    }
 
     // Check on an interval until it's ready
     let interval;
@@ -292,14 +320,17 @@ export async function waitForMathJax() {
 
     const checkForMathJax = function () {
       elapsed += T_WAIT;
-      if (MathJax.tex2svg || elapsed >= MAX_ELAPSED) {
+      if (MathJax.tex2svg) {
         clearInterval(interval);
         resolve();
+      } else if (elapsed >= MAX_ELAPSED) {
+        reject();
       }
     };
 
     interval = setInterval(checkForMathJax, T_WAIT);
   });
+  return Promise.all([tex2svgPromise, MathJax.startup.promise]);
 }
 
 /**
@@ -359,6 +390,7 @@ export function incrementRenderBatch() {
 }
 
 async function getSvgFromHtml(labelHtml) {
+  await waitForMathJax();
   let svgHTML = htmlToSvgCache.get(labelHtml);
   if (!svgHTML) {
 

@@ -1,5 +1,5 @@
 [build-system]
-requires = ["hatchling==1.32.4", "hatch-vcs"]
+requires = ["hatchling==1.33.0", "hatch-vcs"]
 build-backend = "hatchling.build"
 
 [project]
@@ -80,6 +80,10 @@ exclude = [
   "Dockerfile",
 ]
 artifacts = ["psdi_glorius_plot/static/**"]
+
+# Custom build hook to build scripts with Node
+[tool.hatch.build.hooks.custom]
+path = "scripts/build_js.py"
 
 [tool.pytest.ini_options]
 pythonpath = ["."]

@@ -1,5 +1,5 @@
-import { cleanDirtyForms } from "./dirty-forms.js";
-import { renderingComplete } from "./formatted-labels.js";
+import { cleanDirtyForms } from "./dirty-forms.mjs";
+import { renderingComplete } from "./formatted-labels.mjs";
 
 /**
  * Export the chart in the desired format
