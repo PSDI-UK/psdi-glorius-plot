@@ -20,6 +20,14 @@ updates:
       all:
         patterns:
           - "*"
+  - package-ecosystem: "npm"
+    directory: "/psdi_glorius_plot/"
+    schedule:
+      interval: "weekly"
+    groups:
+      all:
+        patterns:
+          - "*"
   - package-ecosystem: "docker"
     # We use Dockerfile in the root directory, the default
     directory: "/"
