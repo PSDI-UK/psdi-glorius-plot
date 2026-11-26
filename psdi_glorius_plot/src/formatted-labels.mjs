@@ -46,6 +46,11 @@ window.MathJax = {
         braille: false,
       }
     }
+  },
+  loader: {
+    paths: {
+      fonts: '/static/js/packages',
+    }
   }
 }
 require("mathjax/es5/tex-svg.js");
