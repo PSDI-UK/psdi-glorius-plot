@@ -29,15 +29,20 @@ For internal testing, the main branch of this project is published to https://or
 - `deploy`
   - (Files used as part of the deployment to STFC infrastructure)
 - `psdi_glorius_plot` (Primary source directory)
+  - `src` (Source scripts which are compiled for the web app)
   - `static` (Static code and assets for the web app)
+    - `css`
+      - (CSS stylesheets for the web app)
+    - `fonts`
+      - (Font assets for the web app)
     - `img`
       - (Image assets for the web app)
     - `js`
       - (JavaScript code for the web app)
-    - `css`
-      - (CSS stylesheets for the web app)
   - `templates`
     - (HTML assets rendered by Flask for the web app)
+  - `package.json`
+    - (Node package definition, used to define JS dependencies and a build script to compile JS code for the web app)
   - `__init.py__`
   - (Python packages, modules, and scripts)
 - `scripts`
@@ -55,6 +60,16 @@ For internal testing, the main branch of this project is published to https://or
 - `README.md` (This file)
 
 ## Requirements
+
+This project relies on both Python (`pip`) and Node (`npm`) to manage and install dependencies. The installation and build process works as follows:
+
+- The user invokes installation with `pip install .` (potentially with optional dependencies, see the [Other Dependencies](#other-dependencies) section below)
+- A pre-build hook in the Python builder delegates to `npm` to first manage JS code and dependencies
+  - `npm install` is called from within the package directory, installing all required JS dependencies
+  - `npm run build` is called, which performs the following tasks:
+    - JS files which need to be available at runtime are copied from the `node_modules` folder to the proper locations in the `static/js` folder
+    - The `ESBuild` tool is called to compile the source scripts, with the compiled script created in the `static/js` folder
+- The Python installation resumes, installing Python dependencies and the project
 
 ### Python
 
@@ -104,6 +119,10 @@ conda activate myenv
 
 You can also install a newer version of Python if you wish by substituting "3.11" in the above with e.g. "3.13".
 
+### Node
+
+Node.js is used to manage JavaScript dependencies for the project and compile source scripts to be used with the web app. This project has been tested with Node v26, but earlier versions may work as well. Node may be downloaded and installed by following the instructions at https://nodejs.org/en/download.
+
 ### Other Dependencies
 
 This project depends on other projects available via pip, which will be installed automatically as required:
@@ -122,6 +141,8 @@ Required to run unit tests on the web app (`pip install '.[gui-test]'`):
 - (all test requirements listed above)
 - `selenium`
 - `webdriver_manager`
+
+JavaScript dependencies are managed by Node, and all will be installed automatically as part of the installation process (a build hook in the Python installer will call the installation of JS dependencies, so no separate step is necessary beyond the `pip` install).
 
 In addition to the dependencies listed above, this project uses the assets made public by PSDI's common style project at https://github.com/PSDI-UK/psdi-common-style. The latest versions of these assets are copied to this project periodically (using the scripts in the `scripts` directory). In case a future release of these assets causes a breaking change in this project, the file `fetch-common-style.conf` can be modified to set a previous fixed version to download and use until this project is updated to work with the latest version of the assets.
 
