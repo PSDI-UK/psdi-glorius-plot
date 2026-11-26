@@ -10,8 +10,10 @@ MODULES_DIR=$PYPACKAGE_DIR/node_modules
 JSPACKAGE_DIR=$PYPACKAGE_DIR/static/js/packages
 
 for file in \
+    bootstrap/dist/js/bootstrap.bundle.min.js \
     chart.js/dist/chart.umd.js \
-    vanilla-cookieconsent/dist/cookieconsent.umd.js
+    vanilla-cookieconsent/dist/cookieconsent.umd.js \
+    jquery/dist/jquery.min.js
 do
     cp $MODULES_DIR/$file $JSPACKAGE_DIR
 done
