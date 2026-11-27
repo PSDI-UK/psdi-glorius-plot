@@ -34,6 +34,8 @@ RUN pip install --upgrade pip
 
 WORKDIR /app
 COPY psdi_glorius_plot /app/psdi_glorius_plot
+COPY scripts/build_js.py /app/scripts/build_js.py
+COPY scripts/copy_packages.sh /app/scripts/copy_packages.sh
 COPY CHANGELOG.md CONTRIBUTING.md LICENSE pyproject.toml README.md /app/
 
 ENV SETUPTOOLS_SCM_PRETEND_VERSION="1.0.0"
